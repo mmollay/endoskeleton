@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.2.0 — Template Demo</title>
+  <title>SSI Endoskeleton v4.3.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.2.0';
+      var v = '4.3.0';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -537,7 +537,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.2.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.3.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -764,10 +764,16 @@
           <div class="demo-group">
             <label>Theme</label>
             <div class="demo-btn-row">
-              <button class="demo-btn active" data-theme-switch="light">☀ Hell</button>
-              <button class="demo-btn" data-theme-switch="dark">☾ Dunkel</button>
-              <button class="demo-btn" data-theme-switch="warm">☕ Warm</button>
-              <button class="demo-btn" data-theme-switch="tech">⚡ Tech</button>
+              <button class="demo-btn active" data-theme-switch="light" style="font-size:0.58rem">Hell</button>
+              <button class="demo-btn" data-theme-switch="dark" style="font-size:0.58rem">Dunkel</button>
+              <button class="demo-btn" data-theme-switch="warm" style="font-size:0.58rem">Warm</button>
+              <button class="demo-btn" data-theme-switch="tech" style="font-size:0.58rem">Tech</button>
+              <button class="demo-btn" data-theme-switch="pastel" style="font-size:0.58rem">Pastel</button>
+              <button class="demo-btn" data-theme-switch="earth" style="font-size:0.58rem">Earth</button>
+              <button class="demo-btn" data-theme-switch="ocean" style="font-size:0.58rem">Ocean</button>
+              <button class="demo-btn" data-theme-switch="sunset" style="font-size:0.58rem">Sunset</button>
+              <button class="demo-btn" data-theme-switch="midnight" style="font-size:0.58rem">Midnight</button>
+              <button class="demo-btn" data-theme-switch="forest" style="font-size:0.58rem">Forest</button>
             </div>
           </div>
           <div class="demo-group">
@@ -1201,7 +1207,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.2.0"></script>
+  <script src="shared.js?v=4.3.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1735,7 +1741,7 @@
 
     /* ─── Theme Switcher ──────────────────────── */
     function switchTheme(theme) {
-      if (theme === 'dark' || theme === 'warm' || theme === 'tech') {
+      if (theme && theme !== 'light') {
         document.documentElement.setAttribute('data-theme', theme);
       } else {
         document.documentElement.removeAttribute('data-theme');

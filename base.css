@@ -116,6 +116,98 @@
   --shadow:     rgba(80, 50, 20, 0.08);
 }
 
+/* ─── PASTEL THEME ──────────────────────────────────────────────────────── */
+/* Weich, freundlich — dezenter Lavendel-Hauch, gedaempfte Farben */
+[data-theme="pastel"] {
+  --bg:         #f8f5ff;
+  --bg-alt:     #f0ecf8;
+  --bg-dark:    #2a2440;
+  --text:       #4a4560;
+  --text-muted: #7a7590;
+  --text-light: #6a6580;
+  --heading:    #2e2946;
+  --border:     rgba(120, 100, 180, 0.15);
+  --card-bg:    #fdfbff;
+  --shadow:     rgba(100, 80, 160, 0.06);
+}
+
+/* ─── EARTH THEME ───────────────────────────────────────────────────────── */
+/* Natur, organisch — Sand, Lehm, erdige Toene */
+[data-theme="earth"] {
+  --bg:         #f4f1ec;
+  --bg-alt:     #ece7df;
+  --bg-dark:    #2c2418;
+  --text:       #4a3f30;
+  --text-muted: #7a6e58;
+  --text-light: #6a5e48;
+  --heading:    #332a1e;
+  --border:     rgba(120, 90, 50, 0.15);
+  --card-bg:    #f9f6f1;
+  --shadow:     rgba(60, 40, 15, 0.07);
+}
+
+/* ─── OCEAN THEME ───────────────────────────────────────────────────────── */
+/* Frisch, kuehl — Eisblau, maritime Klarheit */
+[data-theme="ocean"] {
+  --bg:         #f0f7fa;
+  --bg-alt:     #e4f0f6;
+  --bg-dark:    #0d2a3a;
+  --text:       #2a4050;
+  --text-muted: #5a7888;
+  --text-light: #4a6878;
+  --heading:    #1a3040;
+  --border:     rgba(40, 120, 180, 0.12);
+  --card-bg:    #f6fafe;
+  --shadow:     rgba(20, 60, 100, 0.06);
+}
+
+/* ─── SUNSET THEME ──────────────────────────────────────────────────────── */
+/* Warm, lebhaft — Pfirsich-Hauch, goldene Stunde */
+[data-theme="sunset"] {
+  --bg:         #fff8f0;
+  --bg-alt:     #fff0e0;
+  --bg-dark:    #3a2010;
+  --text:       #4a3528;
+  --text-muted: #8a7060;
+  --text-light: #7a6050;
+  --heading:    #3a2518;
+  --border:     rgba(180, 100, 40, 0.14);
+  --card-bg:    #fffaf5;
+  --shadow:     rgba(120, 60, 20, 0.06);
+}
+
+/* ─── MIDNIGHT THEME ────────────────────────────────────────────────────── */
+/* Edel-Dunkel — Tiefblau, silberne Akzente */
+[data-theme="midnight"] {
+  --bg:         #141428;
+  --bg-alt:     #1e1e38;
+  --bg-dark:    #0a0a18;
+  --text:       #c8c8e0;
+  --text-muted: #8888a8;
+  --text-light: #a0a0c0;
+  --heading:    #e8e8f8;
+  --border:     rgba(140, 140, 200, 0.12);
+  --card-bg:    #1e1e38;
+  --shadow:     rgba(0, 0, 20, 0.4);
+  --focus:      #818cf8;
+}
+
+/* ─── FOREST THEME ──────────────────────────────────────────────────────── */
+/* Natur-Dunkel — Tiefgruen, Moos, Waldatmosphaere */
+[data-theme="forest"] {
+  --bg:         #0d1a0d;
+  --bg-alt:     #152215;
+  --bg-dark:    #080f08;
+  --text:       #c8d8c8;
+  --text-muted: #88a888;
+  --text-light: #a0c0a0;
+  --heading:    #e0f0e0;
+  --border:     rgba(80, 140, 80, 0.15);
+  --card-bg:    #152215;
+  --shadow:     rgba(0, 20, 0, 0.4);
+  --focus:      #4ade80;
+}
+
 /* ─── RESET ─────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -573,6 +665,31 @@ small {
 [data-theme="tech"] .site-nav.nav-glass.scrolled:not(.nav-transparent) {
   background: rgba(10, 10, 15, 0.85);
 }
+
+/* ─── Nav-Overrides für neue helle Themes ─── */
+[data-theme="pastel"] .site-nav { background: rgba(248, 245, 255, 0.92); }
+[data-theme="pastel"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(248, 245, 255, 0.98); }
+[data-theme="earth"] .site-nav { background: rgba(244, 241, 236, 0.92); border-bottom: 0.0625rem solid var(--border); }
+[data-theme="earth"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(244, 241, 236, 0.98); }
+[data-theme="ocean"] .site-nav { background: rgba(240, 247, 250, 0.92); }
+[data-theme="ocean"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(240, 247, 250, 0.98); }
+[data-theme="sunset"] .site-nav { background: rgba(255, 248, 240, 0.92); border-bottom: 0.0625rem solid var(--border); }
+[data-theme="sunset"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(255, 248, 240, 0.98); }
+
+/* ─── Nav-Overrides für neue dunkle Themes ─── */
+[data-theme="midnight"] .site-nav { background: rgba(20, 20, 40, 0.92); border-bottom: 0.0625rem solid var(--border); }
+[data-theme="midnight"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(20, 20, 40, 0.98); }
+[data-theme="midnight"] .site-nav .nav-logo { color: #e8e8f8; }
+[data-theme="midnight"] .site-nav .nav-links a { color: #a0a0c0; }
+[data-theme="midnight"] .site-nav .nav-links a:hover { color: #e8e8f8; }
+[data-theme="midnight"] .site-nav .nav-hamburger span { background: #e8e8f8; }
+
+[data-theme="forest"] .site-nav { background: rgba(13, 26, 13, 0.92); border-bottom: 0.0625rem solid var(--border); }
+[data-theme="forest"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(13, 26, 13, 0.98); }
+[data-theme="forest"] .site-nav .nav-logo { color: #e0f0e0; }
+[data-theme="forest"] .site-nav .nav-links a { color: #a0c0a0; }
+[data-theme="forest"] .site-nav .nav-links a:hover { color: #e0f0e0; }
+[data-theme="forest"] .site-nav .nav-hamburger span { background: #e0f0e0; }
 
 /* Transparent mode: alle Stile starten transparent über dem Hero */
 .site-nav.nav-transparent:not(.nav-solid) .nav-dark,
