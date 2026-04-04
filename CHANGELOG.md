@@ -4,6 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.9] — 2026-04-04
+
+### Fixed
+- **navlayouts/centered.css** — Nav-Overlap behoben: `justify-content: center` war auf `.site-nav` gesetzt (kein Flex-Container), muss auf `.nav-inner` (der tatsächliche Flex-Container). Dadurch starteten nav-links links auf gleicher Position wie das absolut positionierte Logo
+- **navlayouts/club.css** — Gleicher Fix: `.site-nav` → `.nav-inner` für justify-content Regeln
+
+---
+
 ## [3.19.8] — 2026-04-04
 
 ### Added

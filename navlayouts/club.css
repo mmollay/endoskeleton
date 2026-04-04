@@ -2,8 +2,11 @@
    Akzentlinie unten, Items zentriert + uppercase, dezente Trenner.
    Fuer Gastronomie, Events, Premium. */
 
-.site-nav {
+.nav-inner {
   justify-content: center;
+}
+
+.site-nav {
   border-bottom: 2px solid var(--primary);
 }
 
@@ -31,7 +34,7 @@
 
 /* Dezente Trenner */
 .site-nav .nav-links li:not(:last-child) a:not(.nav-cta)::after {
-  content: '';
+  content: "";
   display: inline-block;
   width: 1px;
   height: 0.8em;
@@ -53,7 +56,7 @@
 }
 
 @media (max-width: 48rem) {
-  .site-nav {
+  .nav-inner {
     justify-content: space-between;
   }
   .site-nav .nav-logo {

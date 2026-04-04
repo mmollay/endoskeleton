@@ -2,7 +2,7 @@
    Logo links absolut, Nav-Items zentriert, CTA rechts absolut.
    Respektiert Nav-Padding fuer Width-Optionen. */
 
-.site-nav {
+.nav-inner {
   justify-content: center;
 }
 
@@ -33,7 +33,7 @@
 }
 
 @media (max-width: 48rem) {
-  .site-nav {
+  .nav-inner {
     justify-content: space-between;
   }
   .site-nav .nav-logo {
