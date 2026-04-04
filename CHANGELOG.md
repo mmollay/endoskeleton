@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.0] — 2026-04-04
+
+### Changed
+- **demo.html** — Sidebar in 4 Tabs gegliedert: Presets / Struktur / Stil / Details
+- Struktur-Tab: Layout, Hero, Max-Breite, Menü-Layout
+- Stil-Tab: Farbe, Charakter, Schrift, Buttons, Dichte, Animation
+- Details-Tab: Nav-Verhalten, Nav-Stil, Footer, Theme, Sprache, Config-Export
+- **Config Export** — Auto-Copy in Zwischenablage mit Toast-Feedback „✓ Kopiert"
+
+---
+
 ## [3.18.0] — 2026-04-04
 
 ### Added
