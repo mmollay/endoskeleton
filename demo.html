@@ -270,7 +270,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v3.19.1</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v3.19.2</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -879,7 +879,12 @@
       logo: null,
       nav: [
         { label: "Über uns",   href: "#about" },
-        { label: "Leistungen", href: "#leistungen" },
+        { label: "Leistungen", href: "#leistungen", children: [
+          { label: "Webdesign",       href: "#leistungen" },
+          { label: "SEO & Marketing", href: "#leistungen" },
+          { label: "Hosting",         href: "#leistungen" },
+          { label: "Beratung",        href: "#leistungen" }
+        ]},
         { label: "Preise",     href: "#pricing" },
         { label: "Kontakt",    href: "#kontakt" },
         { label: "Jetzt anfragen", href: "#kontakt", cta: true }
@@ -1100,7 +1105,7 @@
       neon:      { layout:'magazine',hero:'fullscreen',color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical', navBehavior:'autohide', navLayout:'club',     navStyle:'dark',   footerStyle:'dark',    width:'wide',    theme:'dark'  }
     };
 
-    function applyPreset(name) {
+    window.applyPreset = function applyPreset(name) {
       var p = PRESETS[name];
       if (!p) return;
 
@@ -1250,7 +1255,7 @@
     }
 
     /* ─── Sidebar Tab Switcher ───────────────────── */
-    function switchSidebarTab(tab) {
+    window.switchSidebarTab = function switchSidebarTab(tab) {
       document.querySelectorAll('.sidebar-tab-panel').forEach(function(p) { p.classList.remove('active'); });
       document.querySelectorAll('.sidebar-tab-btn').forEach(function(b) { b.classList.remove('active'); });
       var panel = document.getElementById('tab-' + tab);
@@ -1261,7 +1266,7 @@
     }
 
     /* ─── Config Export ─────────────────────────── */
-    function exportConfig() {
+    window.exportConfig = function exportConfig() {
       function getActive(sel) {
         var el = document.querySelector(sel + '.active');
         return el ? (el.dataset.layout || el.dataset.hero || el.dataset.navStyle || el.dataset.footerStyle || el.dataset.themeSwitch || el.dataset.lang || el.textContent.trim()) : null;
