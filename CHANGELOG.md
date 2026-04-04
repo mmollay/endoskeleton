@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.7] — 2026-04-04
+
+### Fixed
+- **demo.html** — FOUC (Flash of Unstyled Content) behoben: Blocking-Script im `<head>` parsed Hash und setzt CSS-URLs per `document.write` VOR dem ersten Render. Kein weißer Flash mehr bei URL mit Hash-Parametern.
+
+---
+
 ## [3.19.6] — 2026-04-04
 
 ### Added
