@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.6] — 2026-04-04
+
+### Added
+- **after-fix-v2.png** — Screenshot-Dokumentation nach Logo-Fix
+
+---
+
 ## [3.19.5] — 2026-04-04
 
 ### Fixed
