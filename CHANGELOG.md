@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.5] — 2026-04-04
+
+### Fixed
+- **base.css** — Logo-Overlay in Navigation behoben: `flex-shrink: 0`, `white-space: nowrap` und `gap` auf `.nav-inner` verhindern, dass Logo und Menü-Items sich überlagern
+
+---
+
 ## [3.19.4] — 2026-04-04
 
 ### Fixed

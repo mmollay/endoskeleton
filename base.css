@@ -408,6 +408,7 @@ small {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-lg);
   height: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
@@ -594,6 +595,10 @@ small {
   font-weight: 700;
   font-size: 1.3rem;
   color: var(--heading);
+  flex-shrink: 0;
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
 }
 
 .nav-logo:hover {
@@ -622,6 +627,7 @@ small {
   text-decoration: none;
   transition: color 0.2s;
   padding: var(--space-xs) 0;
+  white-space: nowrap;
 }
 
 .nav-links a:hover,

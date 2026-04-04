@@ -1,0 +1,278 @@
+- generic [ref=e1]:
+  - link "Zum Inhalt springen" [ref=e2] [cursor=pointer]:
+    - /url: "#hero-fullscreen"
+  - generic [ref=e3]:
+    - button "›" [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: ›
+    - generic [ref=e6]:
+      - generic [ref=e7]: SSI Endoskeleton v3.19.4
+      - generic [ref=e8]: 4069,8 Mio. mögliche Designs
+      - generic [ref=e9]:
+        - button "Presets" [ref=e10] [cursor=pointer]
+        - button "Struktur" [ref=e11] [cursor=pointer]
+        - button "Stil" [ref=e12] [cursor=pointer]
+        - button "Details" [ref=e13] [cursor=pointer]
+      - generic [ref=e16]:
+        - generic [ref=e17]: Schnell-Presets
+        - generic [ref=e18]:
+          - button "Corporate Seriös · Blau · Serif" [ref=e19] [cursor=pointer]:
+            - generic [ref=e20]: Corporate
+            - generic [ref=e22]: Seriös · Blau · Serif
+          - button "Kreativ Mutig · Coral · Editorial" [active] [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]: Kreativ
+            - generic [ref=e26]: Mutig · Coral · Editorial
+          - button "Minimal Clean · Grau · System" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28]: Minimal
+            - generic [ref=e30]: Clean · Grau · System
+          - button "Tech Dark · Cyan · Mono" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Tech
+            - generic [ref=e34]: Dark · Cyan · Mono
+          - button "Natur Organisch · Grün · Humanist" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36]: Natur
+            - generic [ref=e38]: Organisch · Grün · Humanist
+          - button "Neon Vibrant · Pink · Rounded" [ref=e39] [cursor=pointer]:
+            - generic [ref=e40]: Neon
+            - generic [ref=e42]: Vibrant · Pink · Rounded
+  - navigation "Hauptnavigation" [ref=e43]:
+    - generic [ref=e44]:
+      - link "SSI Demo Startseite" [ref=e45] [cursor=pointer]:
+        - /url: index.html
+        - text: SSI Demo
+      - list [ref=e46]:
+        - listitem [ref=e47]:
+          - link "Über uns" [ref=e48] [cursor=pointer]:
+            - /url: "#about"
+        - listitem [ref=e49]:
+          - link "Leistungen" [ref=e50] [cursor=pointer]:
+            - /url: "#leistungen"
+        - listitem [ref=e51]:
+          - link "Preise" [ref=e52] [cursor=pointer]:
+            - /url: "#pricing"
+        - listitem [ref=e53]:
+          - link "Kontakt" [ref=e54] [cursor=pointer]:
+            - /url: "#kontakt"
+        - listitem:
+          - link "Jetzt anfragen" [ref=e56] [cursor=pointer]:
+            - /url: "#kontakt"
+  - generic [ref=e299]:
+    - paragraph [ref=e300]: Willkommen
+    - heading "Ihr Auftritt im Web" [level=1] [ref=e301]
+    - paragraph [ref=e302]: Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.
+    - generic [ref=e303]:
+      - link "Jetzt starten" [ref=e304] [cursor=pointer]:
+        - /url: "#kontakt"
+      - link "Mehr erfahren" [ref=e305] [cursor=pointer]:
+        - /url: "#leistungen"
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - paragraph [ref=e72]: Über uns
+      - heading "Wir gestalten digitale Erlebnisse" [level=2] [ref=e73]
+      - paragraph [ref=e75]: Dies ist ein Platzhalter für die Vision oder das Alleinstellungsmerkmal des Unternehmens. Dieser Bereich wird bei der Generierung automatisch mit dem tatsächlichen Inhalt aus den Scan-Daten befüllt.
+      - link "Unsere Leistungen" [ref=e76] [cursor=pointer]:
+        - /url: "#leistungen"
+    - img "Team bei der Arbeit" [ref=e78]
+  - generic [ref=e80]:
+    - paragraph [ref=e81]: Leistungen
+    - heading "Was wir bieten" [level=2] [ref=e82]
+    - paragraph [ref=e83]: Drei Kernbereiche, die bei der Generierung automatisch aus den Scan-Daten befüllt werden.
+    - generic [ref=e84]:
+      - generic [ref=e86]:
+        - img [ref=e88]
+        - heading "Beratung" [level=3] [ref=e90]
+        - paragraph [ref=e91]: Individuelle Konzepte und strategische Planung für Ihren digitalen Auftritt.
+      - generic [ref=e93]:
+        - img [ref=e95]
+        - heading "Umsetzung" [level=3] [ref=e97]
+        - paragraph [ref=e98]: Professionelle Entwicklung mit modernsten Technologien und höchsten Standards.
+      - generic [ref=e100]:
+        - img [ref=e102]
+        - heading "Support" [level=3] [ref=e104]
+        - paragraph [ref=e105]: Verlässlicher Betrieb und kontinuierliche Weiterentwicklung Ihrer Plattform.
+  - generic [ref=e108]:
+    - generic [ref=e109]:
+      - generic [ref=e110]: 15+
+      - generic [ref=e111]: Jahre Erfahrung
+    - generic [ref=e112]:
+      - generic [ref=e113]: 200+
+      - generic [ref=e114]: Projekte
+    - generic [ref=e115]:
+      - generic [ref=e116]: 98%
+      - generic [ref=e117]: Kundenzufriedenheit
+    - generic [ref=e118]:
+      - generic [ref=e119]: 24/7
+      - generic [ref=e120]: Erreichbarkeit
+  - generic [ref=e122]:
+    - generic [ref=e123]:
+      - paragraph [ref=e124]: Stimmen
+      - heading "Was Kunden sagen" [level=2] [ref=e125]
+    - generic [ref=e126]:
+      - generic [ref=e128]:
+        - paragraph [ref=e129]: Die Zusammenarbeit war von Anfang an professionell und unkompliziert. Das Ergebnis übertraf unsere Erwartungen.
+        - generic [ref=e130]: Maximilian Muster, Geschäftsführer
+      - generic [ref=e132]:
+        - paragraph [ref=e133]: Schnell, zuverlässig und kreativ. Genau der Partner, den wir gesucht haben.
+        - generic [ref=e134]: Anna Berger, Marketing
+      - generic [ref=e136]:
+        - paragraph [ref=e137]: Unser neuer Webauftritt hat die Anfragen verdreifacht. Klare Empfehlung!
+        - generic [ref=e138]: Thomas Gruber, Inhaber
+  - generic [ref=e140]:
+    - generic [ref=e141]:
+      - paragraph [ref=e142]: FAQ
+      - heading "Häufige Fragen" [level=2] [ref=e143]
+    - generic [ref=e144]:
+      - group [ref=e145]:
+        - generic "Wie lange dauert ein typisches Projekt?" [ref=e146] [cursor=pointer]
+      - group [ref=e147]:
+        - generic "Was kostet eine Website?" [ref=e148] [cursor=pointer]
+      - group [ref=e149]:
+        - generic "Bieten Sie auch laufende Betreuung an?" [ref=e150] [cursor=pointer]
+  - generic [ref=e152]:
+    - generic [ref=e153]:
+      - paragraph [ref=e154]: Projekte
+      - heading "Ausgewählte Arbeiten" [level=2] [ref=e155]
+    - generic [ref=e156]:
+      - generic [ref=e157]:
+        - img "Projekt 1" [ref=e158]
+        - generic [ref=e159]:
+          - heading "Webshop Redesign" [level=3] [ref=e160]
+          - paragraph [ref=e161]: Moderner E-Commerce-Auftritt mit 40% mehr Conversion.
+      - generic [ref=e162]:
+        - img "Projekt 2" [ref=e163]
+        - generic [ref=e164]:
+          - heading "Unternehmenswebsite" [level=3] [ref=e165]
+          - paragraph [ref=e166]: Klare Struktur und professioneller Auftritt für 500+ Mitarbeiter.
+      - generic [ref=e167]:
+        - img "Projekt 3" [ref=e168]
+        - generic [ref=e169]:
+          - heading "SaaS-Plattform" [level=3] [ref=e170]
+          - paragraph [ref=e171]: Dashboard und Landing Page aus einem Guss.
+  - generic [ref=e173]:
+    - generic [ref=e174]:
+      - paragraph [ref=e175]: Preise
+      - heading "Transparente Pakete" [level=2] [ref=e176]
+      - paragraph [ref=e177]: Einmalige Investition, dauerhafter Auftritt. Keine versteckten Kosten.
+    - generic [ref=e178]:
+      - generic [ref=e180]:
+        - paragraph [ref=e181]: Starter
+        - generic [ref=e182]:
+          - generic [ref=e183]: €
+          - text: "490"
+        - generic [ref=e184]: einmalig, zzgl. MwSt.
+        - list [ref=e185]:
+          - listitem [ref=e186]: ✓ 5 Unterseiten
+          - listitem [ref=e187]: ✓ Kontaktformular
+          - listitem [ref=e188]: ✓ Mobile-optimiert
+          - listitem [ref=e189]: ✓ SSL inklusive
+        - link "Anfragen" [ref=e190] [cursor=pointer]:
+          - /url: "#kontakt"
+      - generic [ref=e192]:
+        - generic [ref=e193]: Empfohlen
+        - paragraph [ref=e194]: Business
+        - generic [ref=e195]:
+          - generic [ref=e196]: €
+          - text: "990"
+        - generic [ref=e197]: einmalig, zzgl. MwSt.
+        - list [ref=e198]:
+          - listitem [ref=e199]: ✓ Bis zu 15 Seiten
+          - listitem [ref=e200]: ✓ Blog-System
+          - listitem [ref=e201]: ✓ SEO-Optimierung
+          - listitem [ref=e202]: ✓ Google Analytics
+          - listitem [ref=e203]: ✓ 1 Jahr Support
+        - link "Anfragen" [ref=e204] [cursor=pointer]:
+          - /url: "#kontakt"
+      - generic [ref=e206]:
+        - paragraph [ref=e207]: Premium
+        - generic [ref=e208]:
+          - generic [ref=e209]: €
+          - text: "1.990"
+        - generic [ref=e210]: einmalig, zzgl. MwSt.
+        - list [ref=e211]:
+          - listitem [ref=e212]: ✓ Unbegrenzte Seiten
+          - listitem [ref=e213]: ✓ Shop-Integration
+          - listitem [ref=e214]: ✓ Mehrsprachig
+          - listitem [ref=e215]: ✓ Custom Animations
+          - listitem [ref=e216]: ✓ 2 Jahre Support
+        - link "Anfragen" [ref=e217] [cursor=pointer]:
+          - /url: "#kontakt"
+  - generic [ref=e220]:
+    - generic [ref=e221]:
+      - paragraph [ref=e222]: Kontakt
+      - heading "Schreiben Sie uns" [level=2] [ref=e223]
+      - paragraph [ref=e224]: Wir freuen uns auf Ihre Nachricht und melden uns innerhalb von 24 Stunden.
+    - generic [ref=e225]:
+      - generic [ref=e226]:
+        - heading "Kontaktdaten" [level=3] [ref=e227]
+        - paragraph [ref=e229]:
+          - strong [ref=e230]: Max Muster
+        - paragraph [ref=e231]:
+          - text: Musterstraße 1
+          - text: 1010 Wien
+        - paragraph [ref=e232]: +43 1 234 5678
+        - paragraph [ref=e233]:
+          - link "office@beispiel.at" [ref=e234] [cursor=pointer]:
+            - /url: mailto:office@beispiel.at
+      - generic [ref=e235]:
+        - generic [ref=e236]:
+          - generic [ref=e237]:
+            - generic [ref=e238]: Vorname
+            - textbox "Vorname" [ref=e239]:
+              - /placeholder: Max
+          - generic [ref=e240]:
+            - generic [ref=e241]: Nachname
+            - textbox "Nachname" [ref=e242]:
+              - /placeholder: Muster
+        - generic [ref=e243]:
+          - generic [ref=e244]: E-Mail
+          - textbox "E-Mail" [ref=e245]:
+            - /placeholder: office@beispiel.at
+        - generic [ref=e246]:
+          - generic [ref=e247]: Nachricht
+          - textbox "Nachricht" [ref=e248]:
+            - /placeholder: Erzählen Sie uns von Ihrem Projekt...
+        - button "Nachricht senden" [ref=e249] [cursor=pointer]
+  - generic [ref=e251]:
+    - heading "Bereit für den nächsten Schritt?" [level=2] [ref=e252]
+    - paragraph [ref=e253]: Kontaktieren Sie uns — wir freuen uns auf Ihr Projekt.
+    - link "Kontakt aufnehmen" [ref=e255] [cursor=pointer]:
+      - /url: mailto:office@beispiel.at
+  - contentinfo [ref=e257]:
+    - generic [ref=e258]:
+      - generic [ref=e259]:
+        - strong [ref=e261]: SSI Demo
+        - paragraph [ref=e262]: Professionell. Zuverlässig. Modern.
+        - generic [ref=e263]:
+          - link "Facebook" [ref=e264] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e265] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e266]:
+        - heading "Navigation" [level=4] [ref=e267]
+        - link "Über uns" [ref=e268] [cursor=pointer]:
+          - /url: "#about"
+        - link "Leistungen" [ref=e269] [cursor=pointer]:
+          - /url: "#leistungen"
+        - link "Preise" [ref=e270] [cursor=pointer]:
+          - /url: "#pricing"
+        - link "Kontakt" [ref=e271] [cursor=pointer]:
+          - /url: "#kontakt"
+      - generic [ref=e272]:
+        - heading "Kontakt" [level=4] [ref=e273]
+        - paragraph [ref=e274]: Max Muster
+        - link "+43 1 234 5678" [ref=e275] [cursor=pointer]:
+          - /url: tel:+4312345678
+        - link "office@beispiel.at" [ref=e276] [cursor=pointer]:
+          - /url: mailto:office@beispiel.at
+        - paragraph [ref=e277]: Musterstraße 1, 1010 Wien
+      - generic [ref=e278]:
+        - heading "Rechtliches" [level=4] [ref=e279]
+        - link "Impressum" [ref=e280] [cursor=pointer]:
+          - /url: impressum.html
+        - link "Datenschutz" [ref=e281] [cursor=pointer]:
+          - /url: datenschutz.html
+    - generic [ref=e282]:
+      - paragraph [ref=e283]: © 2026 SSI Demo. Alle Rechte vorbehalten.
+      - paragraph [ref=e284]:
+        - text: Webdesign von
+        - link "SSI" [ref=e285] [cursor=pointer]:
+          - /url: https://www.ssi.at
+  - button "Farbschema wechseln" [ref=e286] [cursor=pointer]: ☾
