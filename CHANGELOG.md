@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.17.1] — 2026-04-04
+
+### Fixed
+- **VERSION** — Datei zeigte noch 3.16.0 statt 3.17.0 (nicht beim letzten Release mitgekommen)
+
+---
+
 ## [3.17.0] — 2026-04-04
 
 ### Changed
