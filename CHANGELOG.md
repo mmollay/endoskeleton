@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.1] — 2026-04-04
+
+### Changed
+- **VERSION** — Patch-Release nach v3.19.0 (Config-Export, 4-Tab-Sidebar)
+
+---
+
 ## [3.19.0] — 2026-04-04
 
 ### Changed
