@@ -11,15 +11,14 @@
 }
 
 /* Hero-Kontrast: auf dunklen Bildhintergründen weiß */
+/* NICHT für split — split hat helle Textseite! */
 .hero--fullscreen .btn-primary,
-.hero--split .btn-primary,
 .hero--banner .btn-primary,
 .section-dark .btn-primary {
   color: #ffffff !important;
   border-color: #ffffff !important;
 }
 .hero--fullscreen .btn-primary:hover,
-.hero--split .btn-primary:hover,
 .hero--banner .btn-primary:hover,
 .section-dark .btn-primary:hover {
   background: rgba(255, 255, 255, 0.18) !important;
@@ -29,8 +28,6 @@
 
 .hero--fullscreen .btn-ghost,
 .hero--fullscreen .btn-outline,
-.hero--split .btn-ghost,
-.hero--split .btn-outline,
 .hero--banner .btn-ghost,
 .hero--banner .btn-outline,
 .section-dark .btn-ghost,
@@ -40,8 +37,6 @@
 }
 .hero--fullscreen .btn-ghost:hover,
 .hero--fullscreen .btn-outline:hover,
-.hero--split .btn-ghost:hover,
-.hero--split .btn-outline:hover,
 .hero--banner .btn-ghost:hover,
 .hero--banner .btn-outline:hover,
 .section-dark .btn-ghost:hover,

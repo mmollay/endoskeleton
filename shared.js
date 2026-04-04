@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SSI WebGenerator Endoskeleton — shared.js v3.19.7
+   SSI WebGenerator Endoskeleton — shared.js v3.19.8
    Core JavaScript for all generated websites.
    Navigation, footer, cookie consent, theme toggle, scroll reveal,
    module loader, smooth scroll, skip-to-content.

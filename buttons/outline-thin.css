@@ -1,0 +1,74 @@
+/* SSI Endoskeleton — Button Preset: Outline Thin */
+/* Dünne 1px-Linie statt 2px — edler, dezenter Look */
+.btn {
+  background: transparent !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: 6px !important;
+}
+.btn:hover {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+  color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* Primary Button: gefüllter Hintergrund mit dünner Linie */
+.btn-primary {
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+  border: 1px solid var(--primary) !important;
+}
+.btn-primary:hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  color: var(--text-on-primary) !important;
+}
+
+/* Ghost/Outline: dünne Linie, transparent */
+.btn-ghost,
+.btn-outline {
+  background: transparent !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
+.btn-ghost:hover,
+.btn-outline:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background: rgba(var(--primary-rgb), 0.05) !important;
+}
+
+/* Hero-Kontrast: fullscreen/banner (dunkler Hintergrund) */
+.hero--fullscreen .btn-primary,
+.hero--banner .btn-primary,
+.section-dark .btn-primary {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+.hero--fullscreen .btn-primary:hover,
+.hero--banner .btn-primary:hover,
+.section-dark .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: #ffffff !important;
+}
+
+.hero--fullscreen .btn-ghost,
+.hero--fullscreen .btn-outline,
+.hero--banner .btn-ghost,
+.hero--banner .btn-outline,
+.section-dark .btn-ghost,
+.section-dark .btn-outline {
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+.hero--fullscreen .btn-ghost:hover,
+.hero--fullscreen .btn-outline:hover,
+.hero--banner .btn-ghost:hover,
+.hero--banner .btn-outline:hover,
+.section-dark .btn-ghost:hover,
+.section-dark .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}

@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.8] — 2026-04-04
+
+### Added
+- **base.css** — Dropdown-Pfeile (Chevrons) für Submenü-Einträge via CSS `::after` Pseudo-Element
+- **buttons/outline-thin.css** — Neues Button-Preset mit 1px-Linie für edlen, dezenten Look
+
+### Fixed
+- **buttons/outline.css** — Button-Bug behoben: Buttons wurden im Split-Hero unsichtbar (weiße Farbe auf weißem Hintergrund), weil die Hero-Kontrast-Regeln fälschlich auch für `.hero--split` galten
+
+---
+
 ## [3.19.7] — 2026-04-04
 
 ### Fixed

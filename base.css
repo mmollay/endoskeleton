@@ -669,6 +669,21 @@ small {
   position: relative;
 }
 
+/* Dropdown-Pfeil (Chevron) */
+.nav-dropdown > a::after {
+  content: '▾';
+  display: inline-block;
+  margin-left: 0.35em;
+  font-size: 0.75em;
+  opacity: 0.6;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.nav-dropdown:hover > a::after {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
 .nav-sub,
 .nav-dropdown-menu {
   display: none;
