@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v3.19.9 — Template Demo</title>
+  <title>SSI Endoskeleton v4.0.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@400;600&family=Nunito:wght@400;600;700&family=Lato:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '3.19.9';
+      var v = '4.0.0';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -185,13 +185,15 @@
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 5px;
-      padding: 0.45rem 0.5rem;
+      padding: 0;
       cursor: pointer;
       transition: all 0.15s;
       text-align: left;
+      overflow: hidden;
     }
     .preset-card:hover { background: #293548; border-color: #3b82f6; }
     .preset-card.active { border-color: #f59e0b; background: #1c1a10; }
+    .preset-card .preset-text { padding: 0.35rem 0.5rem; }
     .preset-card .preset-name {
       font-size: 0.68rem;
       font-weight: 600;
@@ -210,6 +212,252 @@
       display: inline-block;
       margin-right: 4px;
       vertical-align: middle;
+    }
+
+    /* ─── Mini-Previews ─────────────────────── */
+    .preset-preview {
+      height: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .preset-preview .pv-nav {
+      height: 3px;
+      opacity: 0.9;
+    }
+    .preset-preview .pv-hero {
+      height: 11px;
+      opacity: 0.25;
+    }
+    .preset-preview .pv-body {
+      padding: 3px 5px;
+    }
+    .preset-preview .pv-line {
+      height: 1.5px;
+      margin-bottom: 2px;
+      border-radius: 1px;
+      opacity: 0.18;
+    }
+
+    /* ─── Custom Presets ─────────────────────── */
+    .preset-section-label {
+      font-size: 0.58rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0.6rem 0 0.25rem;
+    }
+    .preset-card.custom-preset { border-style: dashed; position: relative; }
+    .preset-card.custom-preset .preset-delete {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 0.65rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+      padding: 2px 4px;
+      line-height: 1;
+    }
+    .preset-card.custom-preset:hover .preset-delete { opacity: 1; }
+    .preset-card.custom-preset .preset-delete:hover { color: #ef4444; }
+    #save-preset-btn {
+      width: 100%;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px dashed #475569;
+      font-size: 0.65rem;
+      font-family: inherit;
+      padding: 0.4rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      transition: all 0.15s;
+    }
+    #save-preset-btn:hover { background: #293548; color: #e2e8f0; border-color: #3b82f6; }
+    #save-preset-form {
+      display: none;
+      margin-top: 0.4rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      padding: 0.5rem;
+    }
+    #save-preset-form input {
+      width: 100%;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      font-size: 0.68rem;
+      font-family: inherit;
+      padding: 0.3rem 0.4rem;
+      border-radius: 4px;
+      margin-bottom: 0.35rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+    #save-preset-form input:focus { border-color: #3b82f6; }
+    #save-preset-form .form-actions {
+      display: flex;
+      gap: 0.3rem;
+    }
+    #save-preset-form .form-actions button {
+      flex: 1;
+      font-size: 0.62rem;
+      font-family: inherit;
+      padding: 0.25rem;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #334155;
+    }
+    #save-preset-form .btn-save {
+      background: #2563eb;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+    #save-preset-form .btn-cancel {
+      background: #1e293b;
+      color: #94a3b8;
+    }
+
+    /* ─── Visual Pickers (Stil-Tab) ─────────── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+    .color-swatch {
+      width: 100%; aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .color-swatch:hover { transform: scale(1.2); z-index: 1; }
+    .color-swatch.active { border-color: #fff; box-shadow: 0 0 0 2px #2563eb; }
+    .color-swatch::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.45rem;
+      color: #64748b;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+    }
+    .color-swatch:hover::after { opacity: 1; }
+
+    .font-grid { display: flex; flex-direction: column; gap: 3px; }
+    .font-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 0.3rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .font-card:hover { background: #293548; border-color: #3b82f6; }
+    .font-card.active { border-color: #f59e0b; background: #1c1a10; }
+    .font-card .font-preview {
+      font-size: 0.8rem;
+      color: #f1f5f9;
+      line-height: 1.2;
+    }
+    .font-card .font-label {
+      font-size: 0.5rem;
+      color: #64748b;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+    }
+    .button-preview-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 0.35rem 0.2rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .button-preview-card:hover { background: #293548; border-color: #3b82f6; }
+    .button-preview-card.active { border-color: #f59e0b; background: #1c1a10; }
+    .button-preview-card .btn-mini {
+      display: inline-block;
+      font-size: 0.5rem;
+      padding: 0.15rem 0.4rem;
+      color: #fff;
+      line-height: 1.3;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+    }
+    .button-preview-card .btn-label {
+      display: block;
+      font-size: 0.45rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .charakter-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+    }
+    .charakter-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 0.3rem 0.15rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .charakter-card:hover { background: #293548; border-color: #3b82f6; }
+    .charakter-card.active { border-color: #f59e0b; background: #1c1a10; }
+    .charakter-card .ck-shape {
+      width: 22px; height: 16px;
+      margin: 0 auto 3px;
+      background: #3b82f6;
+    }
+    .charakter-card .ck-label {
+      font-size: 0.45rem;
+      color: #94a3b8;
+    }
+
+    .visual-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+    }
+    .visual-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 0.3rem 0.2rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      font-family: inherit;
+      color: #94a3b8;
+      font-size: 0.58rem;
+    }
+    .visual-btn:hover { background: #293548; border-color: #3b82f6; color: #fff; }
+    .visual-btn.active { border-color: #f59e0b; background: #1c1a10; color: #f1f5f9; }
+    .visual-btn .vb-icon {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 1px;
     }
 
     /* ─── Sidebar Tabs ──────────────────────── */
@@ -289,7 +537,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v3.19.9</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.0.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -303,35 +551,20 @@
       </div>
 
       <!-- ══ Tab: Presets ══ -->
-      <div class="sidebar-tab-panel active" id="tab-presets">
+      <div class="sidebar-tab-panel active" id="tab-presets" style="overflow-y:auto;max-height:calc(100vh - 120px);">
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
-            <label>Schnell-Presets</label>
-            <div class="preset-grid">
-              <button class="preset-card" id="preset-corporate" onclick="applyPreset('corporate')">
-                <span class="preset-name"><span class="preset-dot" style="background:#2563eb"></span>Corporate</span>
-                <span class="preset-desc">Seriös · Blau · Serif</span>
-              </button>
-              <button class="preset-card" id="preset-kreativ" onclick="applyPreset('kreativ')">
-                <span class="preset-name"><span class="preset-dot" style="background:#f97316"></span>Kreativ</span>
-                <span class="preset-desc">Mutig · Coral · Editorial</span>
-              </button>
-              <button class="preset-card" id="preset-minimal" onclick="applyPreset('minimal')">
-                <span class="preset-name"><span class="preset-dot" style="background:#64748b"></span>Minimal</span>
-                <span class="preset-desc">Clean · Grau · System</span>
-              </button>
-              <button class="preset-card" id="preset-tech" onclick="applyPreset('tech')">
-                <span class="preset-name"><span class="preset-dot" style="background:#06b6d4"></span>Tech</span>
-                <span class="preset-desc">Dark · Cyan · Mono</span>
-              </button>
-              <button class="preset-card" id="preset-natur" onclick="applyPreset('natur')">
-                <span class="preset-name"><span class="preset-dot" style="background:#4d7c0f"></span>Natur</span>
-                <span class="preset-desc">Organisch · Grün · Humanist</span>
-              </button>
-              <button class="preset-card" id="preset-neon" onclick="applyPreset('neon')">
-                <span class="preset-name"><span class="preset-dot" style="background:#e879f9"></span>Neon</span>
-                <span class="preset-desc">Vibrant · Pink · Rounded</span>
-              </button>
+            <label>Vorlagen</label>
+            <div class="preset-grid" id="builtin-preset-grid"></div>
+            <div class="preset-section-label" id="custom-presets-label" style="display:none;">Eigene Presets</div>
+            <div class="preset-grid" id="custom-preset-grid"></div>
+            <button id="save-preset-btn" onclick="showSaveForm()">+ Aktuelles Design speichern</button>
+            <div id="save-preset-form">
+              <input type="text" id="save-preset-name" placeholder="Name, z.B. Mein Restaurant" maxlength="30">
+              <div class="form-actions">
+                <button class="btn-save" onclick="saveCurrentAsPreset()">Speichern</button>
+                <button class="btn-cancel" onclick="hideSaveForm()">Abbrechen</button>
+              </div>
             </div>
           </div>
         </div>
@@ -382,88 +615,108 @@
       </div>
 
       <!-- ══ Tab: Stil ══ -->
-      <div class="sidebar-tab-panel" id="tab-stil">
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+      <div class="sidebar-tab-panel" id="tab-stil" style="overflow-y:auto;max-height:calc(100vh - 120px);">
+        <!-- Hidden selects for compatibility -->
+        <select id="color-select" style="display:none"></select>
+        <select id="charakter-select" style="display:none"></select>
+        <select id="font-select" style="display:none"></select>
+        <select id="buttons-select" style="display:none"></select>
+        <select id="spacing-select" style="display:none"></select>
+        <select id="animation-select" style="display:none"></select>
+
+        <div class="demo-section">
           <div class="demo-group">
             <label>Farbe</label>
-            <select class="demo-select" id="color-select">
-              <option value="green">Grün</option>
-              <option value="blue">Blau</option>
-              <option value="orange">Orange</option>
-              <option value="teal">Teal</option>
-              <option value="red">Rot</option>
-              <option value="violet">Violett</option>
-              <option value="forest">Dunkelgrün</option>
-              <option value="navy">Navy</option>
-              <option value="brown">Braun</option>
-              <option value="gold">Gold</option>
-              <option value="pink">Pink</option>
-              <option value="coral">Coral</option>
-              <option value="lavender">Lavendel</option>
-              <option value="mint">Mint</option>
-              <option value="olive">Olive</option>
-              <option value="slate">Slate</option>
-              <option value="charcoal">Anthrazit</option>
-              <option value="wine">Weinrot</option>
-              <option value="gray">Grau</option>
-              <option value="lime">⚡ Neon-Grün</option>
-              <option value="cyan">⚡ Cyan</option>
-              <option value="electric">⚡ Electric Blue</option>
-              <option value="neon-pink">⚡ Neon-Pink</option>
-            </select>
+            <div class="color-grid" id="color-grid">
+              <div class="color-swatch active" data-color="green" title="Grün" style="background:#2e6b2e"></div>
+              <div class="color-swatch" data-color="blue" title="Blau" style="background:#2563eb"></div>
+              <div class="color-swatch" data-color="orange" title="Orange" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="teal" title="Teal" style="background:#0d9488"></div>
+              <div class="color-swatch" data-color="red" title="Rot" style="background:#dc2626"></div>
+              <div class="color-swatch" data-color="violet" title="Violett" style="background:#7c3aed"></div>
+              <div class="color-swatch" data-color="forest" title="Forest" style="background:#15803d"></div>
+              <div class="color-swatch" data-color="navy" title="Navy" style="background:#1e3a5f"></div>
+              <div class="color-swatch" data-color="brown" title="Braun" style="background:#78350f"></div>
+              <div class="color-swatch" data-color="gold" title="Gold" style="background:#b45309"></div>
+              <div class="color-swatch" data-color="pink" title="Pink" style="background:#ec4899"></div>
+              <div class="color-swatch" data-color="coral" title="Coral" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="lavender" title="Lavendel" style="background:#7c3aed"></div>
+              <div class="color-swatch" data-color="mint" title="Mint" style="background:#059669"></div>
+              <div class="color-swatch" data-color="olive" title="Olive" style="background:#4d7c0f"></div>
+              <div class="color-swatch" data-color="slate" title="Slate" style="background:#334155"></div>
+              <div class="color-swatch" data-color="charcoal" title="Anthrazit" style="background:#1e1e1e"></div>
+              <div class="color-swatch" data-color="wine" title="Weinrot" style="background:#881337"></div>
+              <div class="color-swatch" data-color="gray" title="Grau" style="background:#64748b"></div>
+              <div class="color-swatch" data-color="lime" title="Neon-Grün" style="background:#22c55e"></div>
+              <div class="color-swatch" data-color="cyan" title="Cyan" style="background:#06b6d4"></div>
+              <div class="color-swatch" data-color="electric" title="Electric" style="background:#6366f1"></div>
+              <div class="color-swatch" data-color="neon-pink" title="Neon-Pink" style="background:#ec4899"></div>
+            </div>
           </div>
+        </div>
+
+        <div class="demo-section">
           <div class="demo-group">
             <label>Charakter</label>
-            <select class="demo-select" id="charakter-select">
-              <option value="elegant">Elegant</option>
-              <option value="sanft">Sanft</option>
-              <option value="neutral" selected>Neutral</option>
-              <option value="markant">Markant</option>
-              <option value="kantig">Kantig</option>
-            </select>
+            <div class="charakter-grid">
+              <button class="charakter-card" data-charakter="elegant"><div class="ck-shape" style="border-radius:12px"></div><span class="ck-label">Elegant</span></button>
+              <button class="charakter-card" data-charakter="sanft"><div class="ck-shape" style="border-radius:8px"></div><span class="ck-label">Sanft</span></button>
+              <button class="charakter-card active" data-charakter="neutral"><div class="ck-shape" style="border-radius:4px"></div><span class="ck-label">Neutral</span></button>
+              <button class="charakter-card" data-charakter="markant"><div class="ck-shape" style="border-radius:2px;border:1px solid #64748b;background:transparent"></div><span class="ck-label">Markant</span></button>
+              <button class="charakter-card" data-charakter="kantig"><div class="ck-shape" style="border-radius:0"></div><span class="ck-label">Kantig</span></button>
+            </div>
           </div>
+        </div>
+
+        <div class="demo-section">
           <div class="demo-group">
             <label>Schrift</label>
-            <select class="demo-select" id="font-select">
-              <option value="modern">Inter</option>
-              <option value="system">System</option>
-              <option value="serif">Serif</option>
-              <option value="humanist">Humanist</option>
-              <option value="editorial">Editorial</option>
-              <option value="elegant">Elegant</option>
-              <option value="mono">Mono</option>
-              <option value="rounded">Rounded</option>
-            </select>
+            <div class="font-grid">
+              <button class="font-card active" data-font="modern"><span class="font-preview" style="font-family:'Inter',sans-serif">Aa Modern</span><span class="font-label">Inter</span></button>
+              <button class="font-card" data-font="system"><span class="font-preview" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">Aa System</span><span class="font-label">System UI</span></button>
+              <button class="font-card" data-font="serif"><span class="font-preview" style="font-family:'Playfair Display',Georgia,serif">Aa Serif</span><span class="font-label">Playfair</span></button>
+              <button class="font-card" data-font="humanist"><span class="font-preview" style="font-family:'Nunito',sans-serif">Aa Humanist</span><span class="font-label">Nunito</span></button>
+              <button class="font-card" data-font="editorial"><span class="font-preview" style="font-family:'Cormorant Garamond',Georgia,serif">Aa Editorial</span><span class="font-label">Cormorant</span></button>
+              <button class="font-card" data-font="elegant"><span class="font-preview" style="font-family:'Playfair Display',Georgia,serif;font-style:italic">Aa Elegant</span><span class="font-label">Playfair+Lato</span></button>
+              <button class="font-card" data-font="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace">Aa Mono</span><span class="font-label">JetBrains</span></button>
+              <button class="font-card" data-font="rounded"><span class="font-preview" style="font-family:'Nunito',sans-serif;font-weight:700">Aa Rounded</span><span class="font-label">Nunito Bold</span></button>
+            </div>
           </div>
+        </div>
+
+        <div class="demo-section">
           <div class="demo-group">
             <label>Buttons</label>
-            <select class="demo-select" id="buttons-select">
-              <option value="rounded">Pill</option>
-              <option value="soft">Soft</option>
-              <option value="sharp">Sharp</option>
-              <option value="outline">Outline</option>
-              <option value="outline-thin">Outline Thin</option>
-              <option value="bold">Bold</option>
-              <option value="ghost">Ghost</option>
-              <option value="tech">Tech</option>
-              <option value="tactical">Tactical</option>
-            </select>
+            <div class="button-grid">
+              <button class="button-preview-card active" data-buttons="rounded"><span class="btn-mini" style="background:#3b82f6;border-radius:50px">Button</span><span class="btn-label">Pill</span></button>
+              <button class="button-preview-card" data-buttons="soft"><span class="btn-mini" style="background:#3b82f6;border-radius:8px">Button</span><span class="btn-label">Soft</span></button>
+              <button class="button-preview-card" data-buttons="sharp"><span class="btn-mini" style="background:#3b82f6;border-radius:0">Button</span><span class="btn-label">Sharp</span></button>
+              <button class="button-preview-card" data-buttons="outline"><span class="btn-mini" style="background:transparent;border:1.5px solid #3b82f6;border-radius:4px;color:#3b82f6">Button</span><span class="btn-label">Outline</span></button>
+              <button class="button-preview-card" data-buttons="outline-thin"><span class="btn-mini" style="background:transparent;border:1px solid #3b82f6;border-radius:4px;color:#3b82f6">Button</span><span class="btn-label">Thin</span></button>
+              <button class="button-preview-card" data-buttons="bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:800;font-size:0.55rem">BUTTON</span><span class="btn-label">Bold</span></button>
+              <button class="button-preview-card" data-buttons="ghost"><span class="btn-mini" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:4px;color:#3b82f6">Button</span><span class="btn-label">Ghost</span></button>
+              <button class="button-preview-card" data-buttons="tech"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)">Button</span><span class="btn-label">Tech</span></button>
+              <button class="button-preview-card" data-buttons="tactical"><span class="btn-mini" style="background:#3b82f6;transform:skewX(-6deg);border-radius:0">Button</span><span class="btn-label">Tactical</span></button>
+            </div>
           </div>
+        </div>
+
+        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
             <label>Dichte</label>
-            <select class="demo-select" id="spacing-select">
-              <option value="normal">Normal</option>
-              <option value="compact">Compact</option>
-              <option value="spacious">Spacious</option>
-            </select>
+            <div class="visual-btn-row">
+              <button class="visual-btn" data-spacing="compact"><span class="vb-icon" style="letter-spacing:-1px">|||</span>Compact</button>
+              <button class="visual-btn active" data-spacing="normal"><span class="vb-icon">| | |</span>Normal</button>
+              <button class="visual-btn" data-spacing="spacious"><span class="vb-icon" style="letter-spacing:3px">| | |</span>Spacious</button>
+            </div>
           </div>
           <div class="demo-group">
             <label>Animation</label>
-            <select class="demo-select" id="animation-select">
-              <option value="subtle">Subtle</option>
-              <option value="none">Keine</option>
-              <option value="dynamic">Dynamic</option>
-            </select>
+            <div class="visual-btn-row">
+              <button class="visual-btn" data-animation="none"><span class="vb-icon">—</span>Keine</button>
+              <button class="visual-btn active" data-animation="subtle"><span class="vb-icon">~</span>Subtle</button>
+              <button class="visual-btn" data-animation="dynamic"><span class="vb-icon">⚡</span>Dynamic</button>
+            </div>
           </div>
         </div>
       </div>
@@ -926,7 +1179,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=3.19.9"></script>
+  <script src="shared.js?v=4.0.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1117,63 +1370,201 @@
 
     /* ─── Quick-Presets ──────────────────────────── */
     var PRESETS = {
-      corporate: { layout:'modern', hero:'split',      color:'blue',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',  navBehavior:'sticky',   navLayout:'standard', navStyle:'light',  footerStyle:'dark',    width:'default', theme:'light' },
-      kreativ:   { layout:'magazine',hero:'banner',    color:'coral',     charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',     navBehavior:'autohide', navLayout:'centered', navStyle:'colored',footerStyle:'colored', width:'wide',    theme:'light' },
-      minimal:   { layout:'modern', hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'system',    buttons:'ghost',    navBehavior:'sticky',   navLayout:'minimal',  navStyle:'light',  footerStyle:'minimal', width:'default', theme:'light' },
-      tech:      { layout:'modern', hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',     navBehavior:'transparent',navLayout:'standard',navStyle:'dark',   footerStyle:'dark',    width:'full',    theme:'dark'  },
-      natur:     { layout:'classic',hero:'veil',       color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',     navBehavior:'shrink',   navLayout:'standard', navStyle:'light',  footerStyle:'light',   width:'default', theme:'light' },
-      neon:      { layout:'magazine',hero:'fullscreen',color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical', navBehavior:'autohide', navLayout:'club',     navStyle:'dark',   footerStyle:'dark',    width:'wide',    theme:'dark'  }
+      corporate:  { layout:'modern',  hero:'split',      color:'blue',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+      kreativ:    { layout:'magazine', hero:'banner',     color:'coral',     charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',         navBehavior:'autohide',    navLayout:'centered', navStyle:'colored',  footerStyle:'colored', width:'wide',    theme:'light' },
+      minimal:    { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'system',    buttons:'ghost',        navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+      tech:       { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',         navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+      natur:      { layout:'classic', hero:'veil',       color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
+      neon:       { layout:'magazine', hero:'fullscreen', color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+      restaurant: { layout:'classic', hero:'veil',       color:'red',       charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'serif',     buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+      arzt:       { layout:'modern',  hero:'minimal',    color:'teal',      charakter:'elegant', spacing:'normal',  animation:'none',    font:'modern',    buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+      fotograf:   { layout:'magazine', hero:'fullscreen', color:'charcoal', charakter:'markant', spacing:'spacious',animation:'dynamic', font:'mono',      buttons:'ghost',        navBehavior:'transparent', navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+      immobilien: { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+      startup:    { layout:'modern',  hero:'banner',     color:'violet',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'rounded',      navBehavior:'autohide',    navLayout:'centered', navStyle:'colored',  footerStyle:'colored', width:'wide',    theme:'light' },
+      agentur:    { layout:'magazine', hero:'fullscreen', color:'orange',   charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',         navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+      blog:       { layout:'classic', hero:'minimal',    color:'lime',      charakter:'sanft',   spacing:'spacious',animation:'none',    font:'humanist',  buttons:'soft',         navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
+      portfolio:  { layout:'magazine', hero:'banner',    color:'slate',     charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'system',    buttons:'ghost',        navBehavior:'autohide',    navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'wide',    theme:'light' },
+      event:      { layout:'magazine', hero:'fullscreen', color:'electric', charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+      wellness:   { layout:'classic', hero:'veil',       color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'elegant',   buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' }
     };
+
+    var PRESET_META = {
+      corporate:  { dot:'#2563eb', desc:'Seriös · Blau · Serif' },
+      kreativ:    { dot:'#f97316', desc:'Mutig · Coral · Editorial' },
+      minimal:    { dot:'#64748b', desc:'Clean · Grau · System' },
+      tech:       { dot:'#06b6d4', desc:'Dark · Cyan · Mono' },
+      natur:      { dot:'#4d7c0f', desc:'Organisch · Grün · Humanist' },
+      neon:       { dot:'#e879f9', desc:'Vibrant · Pink · Rounded' },
+      restaurant: { dot:'#dc2626', desc:'Warm · Rot · Serif' },
+      arzt:       { dot:'#0891b2', desc:'Vertrauen · Teal · Modern' },
+      fotograf:   { dot:'#1e1e1e', desc:'Visuell · Dunkel · Mono' },
+      immobilien: { dot:'#b45309', desc:'Edel · Gold · Serif' },
+      startup:    { dot:'#7c3aed', desc:'Fresh · Violet · Rounded' },
+      agentur:    { dot:'#f97316', desc:'Bold · Orange · Editorial' },
+      blog:       { dot:'#65a30d', desc:'Lesbar · Lime · Humanist' },
+      portfolio:  { dot:'#334155', desc:'Galerie · Slate · System' },
+      event:      { dot:'#6366f1', desc:'Energie · Electric · Bold' },
+      wellness:   { dot:'#059669', desc:'Ruhig · Mint · Elegant' }
+    };
+
+    var COLOR_HEX = {
+      green:'#2e6b2e', blue:'#2563eb', orange:'#f97316', teal:'#0d9488', red:'#dc2626', violet:'#7c3aed',
+      brown:'#78350f', forest:'#15803d', gold:'#b45309', pink:'#ec4899', gray:'#64748b', coral:'#f97316',
+      navy:'#1e3a5f', wine:'#881337', olive:'#4d7c0f', mint:'#059669', slate:'#334155', lavender:'#7c3aed',
+      charcoal:'#1e1e1e', cyan:'#06b6d4', electric:'#6366f1', 'neon-pink':'#ec4899', lime:'#65a30d'
+    };
+
+    function buildPreviewHTML(config) {
+      var isDark = config.theme === 'dark';
+      var bg = isDark ? '#0f172a' : '#f8f9fa';
+      var primary = COLOR_HEX[config.color] || '#2e6b2e';
+      var lineColor = isDark ? '#e2e8f0' : '#1e293b';
+      return '<div class="preset-preview" style="background:' + bg + '">'
+        + '<div class="pv-nav" style="background:' + primary + '"></div>'
+        + '<div class="pv-hero" style="background:' + primary + '"></div>'
+        + '<div class="pv-body">'
+        + '<div class="pv-line" style="background:' + lineColor + ';width:70%"></div>'
+        + '<div class="pv-line" style="background:' + lineColor + ';width:50%"></div>'
+        + '</div></div>';
+    }
+
+    function renderBuiltinPresets() {
+      var grid = document.getElementById('builtin-preset-grid');
+      if (!grid) return;
+      var html = '';
+      Object.keys(PRESETS).forEach(function(key) {
+        var meta = PRESET_META[key];
+        if (!meta) return;
+        var config = PRESETS[key];
+        html += '<button class="preset-card" id="preset-' + key + '" onclick="applyPreset(\'' + key + '\')">'
+          + buildPreviewHTML(config)
+          + '<div class="preset-text">'
+          + '<span class="preset-name"><span class="preset-dot" style="background:' + meta.dot + '"></span>' + key.charAt(0).toUpperCase() + key.slice(1) + '</span>'
+          + '<span class="preset-desc">' + meta.desc + '</span>'
+          + '</div></button>';
+      });
+      grid.innerHTML = html;
+    }
+
+    var CUSTOM_PRESETS = {};
+
+    function loadCustomPresets() {
+      try { CUSTOM_PRESETS = JSON.parse(localStorage.getItem('endo-custom-presets') || '{}'); }
+      catch(e) { CUSTOM_PRESETS = {}; }
+      return CUSTOM_PRESETS;
+    }
+
+    function saveCustomPresetsToStorage() {
+      localStorage.setItem('endo-custom-presets', JSON.stringify(CUSTOM_PRESETS));
+    }
+
+    function renderCustomPresets() {
+      var grid = document.getElementById('custom-preset-grid');
+      var label = document.getElementById('custom-presets-label');
+      if (!grid) return;
+      loadCustomPresets();
+      var keys = Object.keys(CUSTOM_PRESETS);
+      if (label) label.style.display = keys.length ? '' : 'none';
+      if (!keys.length) { grid.innerHTML = ''; return; }
+      var html = '';
+      keys.forEach(function(key) {
+        var cp = CUSTOM_PRESETS[key];
+        var dotColor = COLOR_HEX[cp.config.color] || '#64748b';
+        var safeKey = key.replace(/'/g, "\\'");
+        html += '<button class="preset-card custom-preset" id="preset-custom-' + key + '" onclick="applyCustomPreset(\'' + safeKey + '\')">'
+          + buildPreviewHTML(cp.config)
+          + '<div class="preset-text">'
+          + '<span class="preset-name"><span class="preset-dot" style="background:' + dotColor + '"></span>' + cp.name + '</span>'
+          + '<span class="preset-desc">' + (cp.desc || '') + '</span>'
+          + '</div>'
+          + '<button class="preset-delete" onclick="event.stopPropagation();deleteCustomPreset(\'' + safeKey + '\')" title="Löschen">&times;</button>'
+          + '</button>';
+      });
+      grid.innerHTML = html;
+    }
+
+    function generatePresetDesc(config) {
+      var cn = {green:'Grün',blue:'Blau',orange:'Orange',teal:'Teal',red:'Rot',violet:'Violet',brown:'Braun',forest:'Forest',gold:'Gold',pink:'Pink',gray:'Grau',coral:'Coral',navy:'Navy',wine:'Wine',olive:'Olive',mint:'Mint',slate:'Slate',lavender:'Lavendel',charcoal:'Charcoal',cyan:'Cyan',electric:'Electric','neon-pink':'Neon-Pink',lime:'Lime'};
+      var fn = {modern:'Modern',system:'System',serif:'Serif',humanist:'Humanist',editorial:'Editorial',elegant:'Elegant',mono:'Mono',rounded:'Rounded'};
+      return (cn[config.color]||config.color) + ' · ' + (fn[config.font]||config.font) + ' · ' + (config.theme==='dark'?'Dunkel':'Hell');
+    }
+
+    function stateToPresetConfig(state) {
+      return { layout:state.layout, hero:state.hero, color:state.color, charakter:state.charakter,
+        spacing:state.spacing, animation:state.animation, font:state.font, buttons:state.buttons,
+        navBehavior:state.nav||state.navBehavior, navLayout:state.navLayout, navStyle:state.navStyle,
+        footerStyle:state.footer||state.footerStyle, width:state.width, theme:state.theme };
+    }
+
+    window.showSaveForm = function() {
+      document.getElementById('save-preset-form').style.display = 'block';
+      document.getElementById('save-preset-btn').style.display = 'none';
+      document.getElementById('save-preset-name').value = '';
+      document.getElementById('save-preset-name').focus();
+    };
+    window.hideSaveForm = function() {
+      document.getElementById('save-preset-form').style.display = 'none';
+      document.getElementById('save-preset-btn').style.display = '';
+    };
+    window.saveCurrentAsPreset = function() {
+      var nameInput = document.getElementById('save-preset-name');
+      var name = (nameInput.value || '').trim();
+      if (!name) { nameInput.style.borderColor = '#ef4444'; return; }
+      var config = stateToPresetConfig(getState());
+      var key = name.toLowerCase().replace(/[^a-z0-9äöü]/g, '-').replace(/-+/g, '-');
+      loadCustomPresets();
+      CUSTOM_PRESETS[key] = { name: name, desc: generatePresetDesc(config), config: config };
+      saveCustomPresetsToStorage();
+      renderCustomPresets();
+      hideSaveForm();
+    };
+    window.deleteCustomPreset = function(key) {
+      loadCustomPresets();
+      delete CUSTOM_PRESETS[key];
+      saveCustomPresetsToStorage();
+      renderCustomPresets();
+    };
+    window.applyCustomPreset = function(key) {
+      loadCustomPresets();
+      var cp = CUSTOM_PRESETS[key];
+      if (!cp) return;
+      applyPreset_config(cp.config);
+      document.querySelectorAll('.preset-card').forEach(function(c) { c.classList.remove('active'); });
+      var card = document.getElementById('preset-custom-' + key);
+      if (card) card.classList.add('active');
+    };
+
+    function applyPreset_config(p) {
+      switchLayout(p.layout); switchHero(p.hero); switchColor(p.color); switchCharakter(p.charakter);
+      switchSpacing(p.spacing); switchAnimation(p.animation); switchFont(p.font); switchButtons(p.buttons);
+      switchNavBehavior(p.navBehavior); switchNavLayout(p.navLayout); switchNavStyle(p.navStyle);
+      switchFooterStyle(p.footerStyle); switchWidth(p.width); switchTheme(p.theme);
+      syncUIControls(p);
+      updateUrlState();
+    }
+
+    function syncUIControls(p) {
+      function setActiveByData(a, v) { document.querySelectorAll('['+a+']').forEach(function(b){ b.classList.toggle('active', b.getAttribute(a)===v); }); }
+      setActiveByData('data-layout', p.layout); setActiveByData('data-hero', p.hero);
+      setActiveByData('data-nav-style', p.navStyle); setActiveByData('data-nav-layout', p.navLayout);
+      setActiveByData('data-width', p.width); setActiveByData('data-footer-style', p.footerStyle);
+      setActiveByData('data-theme-switch', p.theme);
+      /* Visual pickers */
+      setActiveByData('data-color', p.color);
+      setActiveByData('data-charakter', p.charakter);
+      setActiveByData('data-font', p.font);
+      setActiveByData('data-buttons', p.buttons);
+      setActiveByData('data-spacing', p.spacing);
+      setActiveByData('data-animation', p.animation);
+      /* Nav-Select bleibt ein <select> */
+      var navSel = document.getElementById('nav-select');
+      if (navSel) navSel.value = p.navBehavior;
+    }
 
     window.applyPreset = function applyPreset(name) {
       var p = PRESETS[name];
       if (!p) return;
-
-      /* CSS-Dateien tauschen */
-      switchLayout(p.layout);
-      switchHero(p.hero);
-      switchColor(p.color);
-      switchCharakter(p.charakter);
-      switchSpacing(p.spacing);
-      switchAnimation(p.animation);
-      switchFont(p.font);
-      switchButtons(p.buttons);
-      switchNavBehavior(p.navBehavior);
-      switchNavLayout(p.navLayout);
-      switchNavStyle(p.navStyle);
-      switchFooterStyle(p.footerStyle);
-      switchWidth(p.width);
-      switchTheme(p.theme);
-
-      /* UI-Controls synchronisieren */
-      /* Buttons mit data-* */
-      function setActiveByData(attr, val) {
-        document.querySelectorAll('[' + attr + ']').forEach(function(b) {
-          b.classList.toggle('active', b.getAttribute(attr) === val);
-        });
-      }
-      setActiveByData('data-layout', p.layout);
-      setActiveByData('data-hero', p.hero);
-      setActiveByData('data-nav-style', p.navStyle);
-      setActiveByData('data-nav-layout', p.navLayout);
-      setActiveByData('data-width', p.width);
-      setActiveByData('data-footer-style', p.footerStyle);
-      setActiveByData('data-theme-switch', p.theme);
-
-      /* Selects */
-      function setSelect(id, val) {
-        var el = document.getElementById(id);
-        if (el) el.value = val;
-      }
-      setSelect('color-select', p.color);
-      setSelect('charakter-select', p.charakter);
-      setSelect('spacing-select', p.spacing);
-      setSelect('animation-select', p.animation);
-      setSelect('font-select', p.font);
-      setSelect('buttons-select', p.buttons);
-      setSelect('nav-select', p.navBehavior);
-
-      /* Preset-Karten hervorheben */
+      applyPreset_config(p);
       document.querySelectorAll('.preset-card').forEach(function(c) {
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
@@ -1287,29 +1678,22 @@
 
     /* ─── Config Export ─────────────────────────── */
     window.exportConfig = function exportConfig() {
-      function getActive(sel) {
-        var el = document.querySelector(sel + '.active');
-        return el ? (el.dataset.layout || el.dataset.hero || el.dataset.navStyle || el.dataset.footerStyle || el.dataset.themeSwitch || el.dataset.lang || el.textContent.trim()) : null;
-      }
-      function getSelect(id) {
-        var el = document.getElementById(id);
-        return el ? el.value : null;
-      }
+      var s = getState();
       var config = {
-        layout: getActive('[data-layout]') || 'modern',
-        hero: getActive('[data-hero]') || 'fullscreen',
-        color: getSelect('color-select'),
-        charakter: getSelect('charakter-select'),
-        spacing: getSelect('spacing-select'),
-        animation: getSelect('animation-select'),
-        font: getSelect('font-select'),
-        buttons: getSelect('buttons-select'),
-        navBehavior: getSelect('nav-select'),
-        navLayout: (document.querySelector('[data-nav-layout].active') || {}).dataset.navLayout || 'standard',
-        width: (document.querySelector('[data-width].active') || {}).dataset.width || 'default',
-        navStyle: getActive('[data-nav-style]') || 'light',
-        footerStyle: getActive('[data-footer-style]') || 'dark',
-        theme: getActive('[data-theme-switch]') || 'light'
+        layout: s.layout,
+        hero: s.hero,
+        color: s.color,
+        charakter: s.charakter,
+        spacing: s.spacing,
+        animation: s.animation,
+        font: s.font,
+        buttons: s.buttons,
+        navBehavior: s.nav,
+        navLayout: s.navLayout,
+        width: s.width,
+        navStyle: s.navStyle,
+        footerStyle: s.footer,
+        theme: s.theme
       };
       var json = JSON.stringify(config, null, 2);
       var pre = document.getElementById('config-export');
@@ -1351,30 +1735,55 @@
     document.querySelectorAll('[data-lang]').forEach(function(btn) {
       btn.addEventListener('click', function() { setActive(this); applyLang(this.dataset.lang); });
     });
-    var colorSelect = document.getElementById('color-select');
-    if (colorSelect) {
-      colorSelect.addEventListener('change', function() { switchColor(this.value); });
-    }
-    var buttonsSelect = document.getElementById('buttons-select');
-    if (buttonsSelect) {
-      buttonsSelect.addEventListener('change', function() { switchButtons(this.value); });
-    }
-    var charakterSelect = document.getElementById('charakter-select');
-    if (charakterSelect) {
-      charakterSelect.addEventListener('change', function() { switchCharakter(this.value); });
-    }
-    var fontSelect = document.getElementById('font-select');
-    if (fontSelect) {
-      fontSelect.addEventListener('change', function() { switchFont(this.value); });
-    }
-    var animationSelect = document.getElementById('animation-select');
-    if (animationSelect) {
-      animationSelect.addEventListener('change', function() { switchAnimation(this.value); });
-    }
-    var spacingSelect = document.getElementById('spacing-select');
-    if (spacingSelect) {
-      spacingSelect.addEventListener('change', function() { switchSpacing(this.value); });
-    }
+    /* Visual picker event listeners */
+    document.querySelectorAll('.color-swatch[data-color]').forEach(function(sw) {
+      sw.addEventListener('click', function() {
+        document.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
+        sw.classList.add('active');
+        switchColor(sw.dataset.color);
+        updateUrlState();
+      });
+    });
+    document.querySelectorAll('.font-card[data-font]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.font-card').forEach(function(c) { c.classList.remove('active'); });
+        card.classList.add('active');
+        switchFont(card.dataset.font);
+        updateUrlState();
+      });
+    });
+    document.querySelectorAll('.button-preview-card[data-buttons]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.button-preview-card').forEach(function(c) { c.classList.remove('active'); });
+        card.classList.add('active');
+        switchButtons(card.dataset.buttons);
+        updateUrlState();
+      });
+    });
+    document.querySelectorAll('.charakter-card[data-charakter]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.charakter-card').forEach(function(c) { c.classList.remove('active'); });
+        card.classList.add('active');
+        switchCharakter(card.dataset.charakter);
+        updateUrlState();
+      });
+    });
+    document.querySelectorAll('[data-spacing]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-spacing]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        switchSpacing(btn.dataset.spacing);
+        updateUrlState();
+      });
+    });
+    document.querySelectorAll('[data-animation]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-animation]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        switchAnimation(btn.dataset.animation);
+        updateUrlState();
+      });
+    });
     var navSelect = document.getElementById('nav-select');
     if (navSelect) {
       navSelect.addEventListener('change', function() { switchNavBehavior(this.value); });
@@ -1394,22 +1803,26 @@
     });
 
     /* ─── URL State (shareable config) ──────────── */
+    function getActiveData(sel, attr) {
+      var el = document.querySelector(sel + '.active');
+      return el ? el.dataset[attr] : null;
+    }
     function getState() {
       return {
-        layout: (document.querySelector('[data-layout].active') || {}).dataset.layout || 'modern',
-        hero:   (document.querySelector('[data-hero].active') || {}).dataset.hero   || 'fullscreen',
-        color:  (document.getElementById('color-select') || {}).value              || 'green',
-        charakter: (document.getElementById('charakter-select') || {}).value        || 'neutral',
-        spacing:  (document.getElementById('spacing-select') || {}).value          || 'normal',
-        animation:(document.getElementById('animation-select') || {}).value        || 'subtle',
-        font:     (document.getElementById('font-select') || {}).value             || 'modern',
-        buttons:  (document.getElementById('buttons-select') || {}).value          || 'rounded',
-        nav:      (document.getElementById('nav-select') || {}).value              || 'sticky',
-        navStyle: (document.querySelector('[data-nav-style].active') || {}).dataset.navStyle  || 'light',
-        navLayout:(document.querySelector('[data-nav-layout].active') || {}).dataset.navLayout || 'standard',
-        width:    (document.querySelector('[data-width].active') || {}).dataset.width || 'default',
-        footer:   (document.querySelector('[data-footer-style].active') || {}).dataset.footerStyle || 'dark',
-        theme:    document.documentElement.getAttribute('data-theme') || 'light'
+        layout:    getActiveData('[data-layout]', 'layout') || 'modern',
+        hero:      getActiveData('[data-hero]', 'hero') || 'fullscreen',
+        color:     getActiveData('.color-swatch[data-color]', 'color') || 'green',
+        charakter: getActiveData('.charakter-card[data-charakter]', 'charakter') || 'neutral',
+        spacing:   getActiveData('[data-spacing]', 'spacing') || 'normal',
+        animation: getActiveData('[data-animation]', 'animation') || 'subtle',
+        font:      getActiveData('.font-card[data-font]', 'font') || 'modern',
+        buttons:   getActiveData('.button-preview-card[data-buttons]', 'buttons') || 'rounded',
+        nav:       (document.getElementById('nav-select') || {}).value || 'sticky',
+        navStyle:  getActiveData('[data-nav-style]', 'navStyle') || 'light',
+        navLayout: getActiveData('[data-nav-layout]', 'navLayout') || 'standard',
+        width:     getActiveData('[data-width]', 'width') || 'default',
+        footer:    getActiveData('[data-footer-style]', 'footerStyle') || 'dark',
+        theme:     document.documentElement.getAttribute('data-theme') || 'light'
       };
     }
 
@@ -1436,28 +1849,34 @@
         if (btn) { setActive(btn); switchHero(params.hero); }
       }
       if (params.color) {
-        var sel = document.getElementById('color-select');
-        if (sel) { sel.value = params.color; switchColor(params.color); }
+        var sw = document.querySelector('.color-swatch[data-color="' + params.color + '"]');
+        if (sw) { document.querySelectorAll('.color-swatch').forEach(function(s){s.classList.remove('active')}); sw.classList.add('active'); }
+        switchColor(params.color);
       }
       if (params.charakter) {
-        var sel = document.getElementById('charakter-select');
-        if (sel) { sel.value = params.charakter; switchCharakter(params.charakter); }
+        var ck = document.querySelector('.charakter-card[data-charakter="' + params.charakter + '"]');
+        if (ck) { document.querySelectorAll('.charakter-card').forEach(function(c){c.classList.remove('active')}); ck.classList.add('active'); }
+        switchCharakter(params.charakter);
       }
       if (params.spacing) {
-        var sel = document.getElementById('spacing-select');
-        if (sel) { sel.value = params.spacing; switchSpacing(params.spacing); }
+        var sp = document.querySelector('[data-spacing="' + params.spacing + '"]');
+        if (sp) { document.querySelectorAll('[data-spacing]').forEach(function(b){b.classList.remove('active')}); sp.classList.add('active'); }
+        switchSpacing(params.spacing);
       }
       if (params.animation) {
-        var sel = document.getElementById('animation-select');
-        if (sel) { sel.value = params.animation; switchAnimation(params.animation); }
+        var an = document.querySelector('[data-animation="' + params.animation + '"]');
+        if (an) { document.querySelectorAll('[data-animation]').forEach(function(b){b.classList.remove('active')}); an.classList.add('active'); }
+        switchAnimation(params.animation);
       }
       if (params.font) {
-        var sel = document.getElementById('font-select');
-        if (sel) { sel.value = params.font; switchFont(params.font); }
+        var fc = document.querySelector('.font-card[data-font="' + params.font + '"]');
+        if (fc) { document.querySelectorAll('.font-card').forEach(function(c){c.classList.remove('active')}); fc.classList.add('active'); }
+        switchFont(params.font);
       }
       if (params.buttons) {
-        var sel = document.getElementById('buttons-select');
-        if (sel) { sel.value = params.buttons; switchButtons(params.buttons); }
+        var bc = document.querySelector('.button-preview-card[data-buttons="' + params.buttons + '"]');
+        if (bc) { document.querySelectorAll('.button-preview-card').forEach(function(c){c.classList.remove('active')}); bc.classList.add('active'); }
+        switchButtons(params.buttons);
       }
       if (params.nav) {
         var sel = document.getElementById('nav-select');
@@ -1486,12 +1905,9 @@
       }
     }
 
-    /* Attach URL state updates to all switchers */
-    ['color-select', 'charakter-select', 'spacing-select', 'animation-select',
-     'font-select', 'buttons-select', 'nav-select'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('change', updateUrlState);
-    });
+    /* Attach URL state update to nav-select (the only remaining <select>) */
+    var navSelect = document.getElementById('nav-select');
+    if (navSelect) navSelect.addEventListener('change', updateUrlState);
     document.querySelectorAll('[data-layout],[data-hero],[data-theme-switch],[data-lang]').forEach(function(btn) {
       btn.addEventListener('click', updateUrlState);
     });
@@ -1502,6 +1918,8 @@
       btn.addEventListener('click', updateUrlState);
     });
 
+    renderBuiltinPresets();
+    renderCustomPresets();
     restoreUrlState();
 
     /* ─── Kombinations-Counter ────────────────────────── */
@@ -1509,12 +1927,12 @@
       var counts = {
         layout:   document.querySelectorAll('[data-layout]').length,
         hero:     document.querySelectorAll('[data-hero]').length,
-        color:    document.querySelectorAll('#color-select option').length,
-        charakter: document.querySelectorAll('#charakter-select option').length,
-        spacing:  document.querySelectorAll('#spacing-select option').length,
-        animation:document.querySelectorAll('#animation-select option').length,
-        font:     document.querySelectorAll('#font-select option').length,
-        buttons:  document.querySelectorAll('#buttons-select option').length,
+        color:    document.querySelectorAll('.color-swatch[data-color]').length,
+        charakter: document.querySelectorAll('.charakter-card[data-charakter]').length,
+        spacing:  document.querySelectorAll('[data-spacing]').length,
+        animation:document.querySelectorAll('[data-animation]').length,
+        font:     document.querySelectorAll('.font-card[data-font]').length,
+        buttons:  document.querySelectorAll('.button-preview-card[data-buttons]').length,
         nav:      document.querySelectorAll('#nav-select option').length,
         navStyle: document.querySelectorAll('[data-nav-style]').length,
         navLayout:document.querySelectorAll('[data-nav-layout]').length,

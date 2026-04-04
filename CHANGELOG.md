@@ -4,6 +4,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.0.0] — 2026-04-04
+
+### Changed
+- **demo.html** — Komplett überarbeitetes Stil-Tab mit visuellen Pickern:
+  - **Farb-Swatches**: 23 Farben als klickbare Kreise statt Dropdown
+  - **Font-Previews**: Jede Schrift in ihrer eigenen Typeface gerendert (Aa Modern, Aa Serif, etc.)
+  - **Button-Previews**: Jeder Button-Stil als Mini-Button mit echtem Styling (Pill, Ghost, Tech, etc.)
+  - **Charakter-Visualisierung**: 5 Formen zeigen Rundung (Elegant→Kantig)
+  - **Dichte + Animation**: Visuelle Buttons mit Icons statt Dropdown
+- **Preset-System** — Erweitert auf 16 Built-in-Presets mit CSS-Mini-Previews:
+  - Neu: Restaurant, Arzt, Fotograf, Immobilien, Startup, Agentur, Blog, Portfolio, Event, Wellness
+  - Jedes Preset zeigt eine Mini-Vorschau (Nav-Balken, Hero, Content-Linien) mit echten Farben
+- **Custom Presets** — Eigene Designs speichern/laden/löschen via localStorage:
+  - "Aktuelles Design speichern" Button unter der Preset-Grid
+  - Eigene Presets mit gestricheltem Rahmen, Lösch-Button auf Hover
+  - Auto-generierte Beschreibung (Farbe · Font · Theme)
+- Alle Google Fonts für Sidebar-Previews vorgeladen
+
+---
+
 ## [3.19.9] — 2026-04-04
 
 ### Fixed
