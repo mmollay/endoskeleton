@@ -3,25 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v3.16 — Template Demo</title>
-  <meta name="description" content="SSI Endoskeleton v3.16 — Basis-Template für alle generierten Websites">
+  <title>SSI Endoskeleton v3.17 — Template Demo</title>
+  <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="base.css?v=3.16.0">
-  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.16.0">
-  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.16.0">
-  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.16.0">
-  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.16.0">
-  <link id="charakter-css" rel="stylesheet" href="softness/neutral.css?v=3.16.0">
-  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.16.0">
-  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.16.0">
-  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.16.0">
-  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.16.0">
-  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.16.0">
+  <link rel="stylesheet" href="base.css?v=3.17.0">
+  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.17.0">
+  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.17.0">
+  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.17.0">
+  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.17.0">
+  <link id="charakter-css" rel="stylesheet" href="softness/neutral.css?v=3.17.0">
+  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.17.0">
+  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.17.0">
+  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.17.0">
+  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.17.0">
+  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.17.0">
   <style>
     /* ═══ Demo Sidebar ═══ */
+    /* ─── Push-Layout: Content wird verschoben, nicht überlagert ─── */
+    body {
+      margin-right: 288px; /* 260px Panel + 28px Tab */
+      transition: margin-right 0.25s ease;
+    }
+    body.sidebar-collapsed {
+      margin-right: 28px; /* nur Tab */
+    }
+    /* Fixe Nav mitverschieben */
+    .site-nav {
+      right: 288px !important;
+      transition: right 0.25s ease, background 0.3s, box-shadow 0.3s, transform 0.35s ease, color 0.3s !important;
+    }
+    body.sidebar-collapsed .site-nav {
+      right: 28px !important;
+    }
+
     .demo-sidebar-wrapper {
       position: fixed;
       top: 0;
@@ -40,22 +57,26 @@
       color: #fff;
       border: none;
       cursor: pointer;
-      font-size: 0.62rem;
+      font-size: 1rem;
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
       display: flex;
       align-items: center;
       justify-content: center;
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
       flex-shrink: 0;
       border-radius: 6px 0 0 6px;
       box-shadow: -3px 0 10px rgba(0,0,0,0.35);
       transition: background 0.15s;
+      user-select: none;
     }
     .demo-sidebar-tab:hover { background: #1d4ed8; }
+    .demo-sidebar-tab .tab-arrow {
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+    .demo-sidebar-wrapper.collapsed .tab-arrow {
+      transform: rotate(180deg);
+    }
 
     .demo-sidebar-panel {
       width: 260px;
@@ -166,10 +187,10 @@
   <!-- ═══ Demo Sidebar ═══ -->
   <div class="demo-sidebar-wrapper" id="demo-sidebar-wrapper">
     <button class="demo-sidebar-tab" id="demo-sidebar-tab"
-      onclick="document.getElementById('demo-sidebar-wrapper').classList.toggle('collapsed');"
-      title="Demo-Einstellungen ein-/ausblenden">Demo</button>
+      onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
+      title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v3.16.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v3.17.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -755,7 +776,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=3.16.0"></script>
+  <script src="shared.js?v=3.17.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>

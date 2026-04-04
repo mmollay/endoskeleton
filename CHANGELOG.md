@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.17.0] — 2026-04-04
+
+### Changed
+- **demo.html** — Sidebar wechselt von Overlay auf Push-Modus: Content und fixe Nav werden
+  seitlich verschoben statt überlagert (`margin-right` auf `body`, `right` auf `.site-nav`)
+- **demo.html** — Tab-Button zeigt jetzt Pfeil-Symbol `›` mit Rotation-Animation statt statischem "Demo"-Text
+
+---
+
 ## [3.16.0] — 2026-04-04
 
 ### Fixed
