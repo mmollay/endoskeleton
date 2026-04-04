@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.3] — 2026-04-04
+
+### Fixed
+- **demo.html** — Release-Bump nach IIFE-Scope-Fix und Tab/Quick-Preset-Korrekturen
+
+---
+
 ## [3.19.2] — 2026-04-04
 
 ### Fixed
