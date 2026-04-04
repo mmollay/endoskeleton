@@ -1,0 +1,8 @@
+/* SSI Endoskeleton — Font Preset: Playful (Fredoka + Nunito)
+   Inspiriert von borki.at. Rund, freundlich, kindgerecht. */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-heading: 'Fredoka', 'Comic Sans MS', cursive;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}

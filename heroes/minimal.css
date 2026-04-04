@@ -1,17 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SSI Endoskeleton — Hero: Minimal
-   Kein Hintergrundbild. Typografiezentriert mit Primärfarb-Gradient.
-   Load via: <link rel="stylesheet" href="heroes/minimal.css">
+   SSI Endoskeleton — Hero: Minimal v4.0
+   Typografiezentriert mit lebendigen Gradienten und dezenten Deko-Elementen.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .hero--minimal {
-  min-height: 70vh;
+  min-height: 75vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(ellipse 80% 60% at 0% 0%, rgba(var(--primary-rgb), 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(var(--primary-rgb), 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 10% 20%, rgba(var(--primary-rgb), 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 90% 80%, rgba(var(--primary-rgb), 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(var(--primary-rgb), 0.06) 0%, transparent 60%),
     var(--bg);
   margin-top: calc(var(--nav-height) * -1);
   padding: calc(var(--nav-height) + var(--space-3xl)) var(--space-lg) var(--space-3xl);
@@ -19,7 +19,54 @@
   overflow: hidden;
 }
 
-/* ─── Gradient-Variante: stärkerer Akzent ─── */
+/* ─── Dekorative schwebende Shapes ─── */
+.hero--minimal::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: 8%;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.12) 0%, transparent 70%);
+  animation: heroFloat 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero--minimal::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6rem;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+/* Zweites Deko-Element via Box-Shadow-Trick auf dem Content */
+.hero--minimal .hero-content::before {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: -15%;
+  width: 120px;
+  height: 120px;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  background: rgba(var(--primary-rgb), 0.07);
+  animation: heroFloat 10s ease-in-out infinite reverse;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ─── Gradient-Variante: staerkerer Akzent ─── */
 .hero--minimal-gradient {
   background:
     radial-gradient(ellipse 80% 60% at 0% 0%, rgba(var(--primary-rgb), 0.22) 0%, transparent 60%),
@@ -27,7 +74,7 @@
     linear-gradient(160deg, var(--bg-alt) 0%, var(--bg) 100%);
 }
 
-/* ─── Tinted-Variante: primärfarb-getönter Hintergrund ─── */
+/* ─── Tinted-Variante ─── */
 .hero--minimal-tinted {
   background: linear-gradient(180deg,
     rgba(var(--primary-rgb), 0.1) 0%,
@@ -40,7 +87,7 @@
   text-align: center;
   max-width: 44rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero--minimal .hero-eyebrow {
@@ -73,18 +120,6 @@
   flex-wrap: wrap;
 }
 
-/* ─── Dezenter Trenn-Gradient nach unten ─── */
-.hero--minimal::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4rem;
-  background: linear-gradient(to bottom, transparent, var(--bg));
-  pointer-events: none;
-}
-
 /* ─── Veil-Variante: Bild nur als Hauch sichtbar ─── */
 .hero--minimal-veil {
   background: transparent;
@@ -111,40 +146,30 @@
   z-index: 1;
 }
 
-/* ─── Tech/Dark: Radiales Glow hinter dem Titel (pawbot.ssi.at-Stil) ─── */
+/* ─── Tech/Dark: Radiales Glow ─── */
 [data-theme="tech"] .hero--minimal::before,
 [data-theme="dark"] .hero--minimal::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40rem;
-  height: 30rem;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(var(--primary-rgb), 0.18) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 0;
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.20) 0%, transparent 60%);
+  width: 250px;
+  height: 250px;
 }
 
-/* hero-decoration — nicht mehr verwendet, nur Fallback ─── */
-.hero--minimal .hero-decoration {
-  display: none;
+[data-theme="tech"] .hero--minimal .hero-content::before,
+[data-theme="dark"] .hero--minimal .hero-content::before {
+  background: rgba(var(--primary-rgb), 0.10);
 }
+
+/* ─── Deko ausblenden auf Mobile ─── */
+.hero--minimal .hero-decoration { display: none; }
 
 @media (max-width: 48rem) {
-  .hero--minimal {
-    min-height: 60vh;
-  }
-
+  .hero--minimal { min-height: 60vh; }
+  .hero--minimal::before { display: none; }
+  .hero--minimal .hero-content::before { display: none; }
   .hero--minimal .hero-ctas {
     flex-direction: column;
     align-items: center;
   }
-
   .hero--minimal .hero-ctas .btn {
     width: 100%;
     max-width: 20rem;

@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.0.0 — Template Demo</title>
+  <title>SSI Endoskeleton v4.1.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@400;600&family=Nunito:wght@400;600;700&family=Lato:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@400;600&family=Nunito:wght@400;500;600;700&family=Lato:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@400;600&family=Oswald:wght@400;500;600;700&family=Source+Serif+4:wght@300;400;600&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.0.0';
+      var v = '4.1.0';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -537,7 +537,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.0.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.1.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -628,29 +628,33 @@
           <div class="demo-group">
             <label>Farbe</label>
             <div class="color-grid" id="color-grid">
-              <div class="color-swatch active" data-color="green" title="Grün" style="background:#2e6b2e"></div>
-              <div class="color-swatch" data-color="blue" title="Blau" style="background:#2563eb"></div>
-              <div class="color-swatch" data-color="orange" title="Orange" style="background:#f97316"></div>
-              <div class="color-swatch" data-color="teal" title="Teal" style="background:#0d9488"></div>
+              <!-- Rot/Warm -->
               <div class="color-swatch" data-color="red" title="Rot" style="background:#dc2626"></div>
-              <div class="color-swatch" data-color="violet" title="Violett" style="background:#7c3aed"></div>
-              <div class="color-swatch" data-color="forest" title="Forest" style="background:#15803d"></div>
-              <div class="color-swatch" data-color="navy" title="Navy" style="background:#1e3a5f"></div>
-              <div class="color-swatch" data-color="brown" title="Braun" style="background:#78350f"></div>
-              <div class="color-swatch" data-color="gold" title="Gold" style="background:#b45309"></div>
-              <div class="color-swatch" data-color="pink" title="Pink" style="background:#ec4899"></div>
-              <div class="color-swatch" data-color="coral" title="Coral" style="background:#f97316"></div>
-              <div class="color-swatch" data-color="lavender" title="Lavendel" style="background:#7c3aed"></div>
-              <div class="color-swatch" data-color="mint" title="Mint" style="background:#059669"></div>
-              <div class="color-swatch" data-color="olive" title="Olive" style="background:#4d7c0f"></div>
-              <div class="color-swatch" data-color="slate" title="Slate" style="background:#334155"></div>
-              <div class="color-swatch" data-color="charcoal" title="Anthrazit" style="background:#1e1e1e"></div>
               <div class="color-swatch" data-color="wine" title="Weinrot" style="background:#881337"></div>
+              <div class="color-swatch" data-color="coral" title="Coral" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="orange" title="Orange" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="gold" title="Gold" style="background:#b45309"></div>
+              <div class="color-swatch" data-color="brown" title="Braun" style="background:#78350f"></div>
+              <!-- Grün -->
+              <div class="color-swatch active" data-color="green" title="Grün" style="background:#2e6b2e"></div>
+              <div class="color-swatch" data-color="forest" title="Forest" style="background:#15803d"></div>
+              <div class="color-swatch" data-color="olive" title="Olive" style="background:#4d7c0f"></div>
+              <div class="color-swatch" data-color="mint" title="Mint" style="background:#059669"></div>
+              <div class="color-swatch" data-color="teal" title="Teal" style="background:#0d9488"></div>
+              <div class="color-swatch" data-color="pink" title="Pink" style="background:#ec4899"></div>
+              <!-- Blau/Violett -->
+              <div class="color-swatch" data-color="blue" title="Blau" style="background:#2563eb"></div>
+              <div class="color-swatch" data-color="navy" title="Navy" style="background:#1e3a5f"></div>
+              <div class="color-swatch" data-color="violet" title="Violett" style="background:#7c3aed"></div>
+              <div class="color-swatch" data-color="lavender" title="Lavendel" style="background:#a78bfa"></div>
+              <div class="color-swatch" data-color="slate" title="Slate" style="background:#334155"></div>
               <div class="color-swatch" data-color="gray" title="Grau" style="background:#64748b"></div>
-              <div class="color-swatch" data-color="lime" title="Neon-Grün" style="background:#22c55e"></div>
-              <div class="color-swatch" data-color="cyan" title="Cyan" style="background:#06b6d4"></div>
-              <div class="color-swatch" data-color="electric" title="Electric" style="background:#6366f1"></div>
-              <div class="color-swatch" data-color="neon-pink" title="Neon-Pink" style="background:#ec4899"></div>
+              <!-- Neutral + Neon -->
+              <div class="color-swatch" data-color="charcoal" title="Anthrazit" style="background:#1e1e1e"></div>
+              <div class="color-swatch" data-color="lime" title="Neon-Grün" style="background:#22c55e;box-shadow:0 0 6px #22c55e"></div>
+              <div class="color-swatch" data-color="cyan" title="Cyan" style="background:#06b6d4;box-shadow:0 0 6px #06b6d4"></div>
+              <div class="color-swatch" data-color="electric" title="Electric" style="background:#6366f1;box-shadow:0 0 6px #6366f1"></div>
+              <div class="color-swatch" data-color="neon-pink" title="Neon-Pink" style="background:#ec4899;box-shadow:0 0 6px #ec4899"></div>
             </div>
           </div>
         </div>
@@ -680,6 +684,8 @@
               <button class="font-card" data-font="elegant"><span class="font-preview" style="font-family:'Playfair Display',Georgia,serif;font-style:italic">Aa Elegant</span><span class="font-label">Playfair+Lato</span></button>
               <button class="font-card" data-font="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace">Aa Mono</span><span class="font-label">JetBrains</span></button>
               <button class="font-card" data-font="rounded"><span class="font-preview" style="font-family:'Nunito',sans-serif;font-weight:700">Aa Rounded</span><span class="font-label">Nunito Bold</span></button>
+              <button class="font-card" data-font="survival"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase">Aa Survival</span><span class="font-label">Oswald</span></button>
+              <button class="font-card" data-font="playful"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:600">Aa Playful</span><span class="font-label">Fredoka</span></button>
             </div>
           </div>
         </div>
@@ -697,6 +703,7 @@
               <button class="button-preview-card" data-buttons="ghost"><span class="btn-mini" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:4px;color:#3b82f6">Button</span><span class="btn-label">Ghost</span></button>
               <button class="button-preview-card" data-buttons="tech"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)">Button</span><span class="btn-label">Tech</span></button>
               <button class="button-preview-card" data-buttons="tactical"><span class="btn-mini" style="background:#3b82f6;transform:skewX(-6deg);border-radius:0">Button</span><span class="btn-label">Tactical</span></button>
+              <button class="button-preview-card" data-buttons="outline-elegant"><span class="btn-mini" style="background:transparent;border:1px solid rgba(59,130,246,0.3);border-radius:4px;color:#3b82f6;font-weight:400">Button</span><span class="btn-label">Elegant</span></button>
             </div>
           </div>
         </div>
@@ -1179,7 +1186,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.0.0"></script>
+  <script src="shared.js?v=4.1.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1377,12 +1384,14 @@
       natur:      { layout:'classic', hero:'veil',       color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
       neon:       { layout:'magazine', hero:'fullscreen', color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
       restaurant: { layout:'classic', hero:'veil',       color:'red',       charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'serif',     buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      arzt:       { layout:'modern',  hero:'minimal',    color:'teal',      charakter:'elegant', spacing:'normal',  animation:'none',    font:'modern',    buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+      arzt:       { layout:'modern',  hero:'minimal',    color:'teal',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'modern',    buttons:'outline-elegant', navBehavior:'sticky',  navLayout:'standard', navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
       fotograf:   { layout:'magazine', hero:'fullscreen', color:'charcoal', charakter:'markant', spacing:'spacious',animation:'dynamic', font:'mono',      buttons:'ghost',        navBehavior:'transparent', navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
       immobilien: { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
       startup:    { layout:'modern',  hero:'banner',     color:'violet',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'rounded',      navBehavior:'autohide',    navLayout:'centered', navStyle:'colored',  footerStyle:'colored', width:'wide',    theme:'light' },
       agentur:    { layout:'magazine', hero:'fullscreen', color:'orange',   charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',         navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
-      blog:       { layout:'classic', hero:'minimal',    color:'lime',      charakter:'sanft',   spacing:'spacious',animation:'none',    font:'humanist',  buttons:'soft',         navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
+      blog:       { layout:'classic', hero:'banner',     color:'olive',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',         navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
+      outdoor:    { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'survival',  buttons:'outline-elegant', navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'light' },
+      kinder:     { layout:'modern',  hero:'minimal',    color:'orange',    charakter:'sanft',   spacing:'spacious',animation:'dynamic', font:'playful',   buttons:'rounded',      navBehavior:'sticky',      navLayout:'standard', navStyle:'colored',  footerStyle:'colored', width:'default', theme:'light' },
       portfolio:  { layout:'magazine', hero:'banner',    color:'slate',     charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'system',    buttons:'ghost',        navBehavior:'autohide',    navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'wide',    theme:'light' },
       event:      { layout:'magazine', hero:'fullscreen', color:'electric', charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
       wellness:   { layout:'classic', hero:'veil',       color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'elegant',   buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' }
@@ -1396,12 +1405,14 @@
       natur:      { dot:'#4d7c0f', desc:'Organisch · Grün · Humanist' },
       neon:       { dot:'#e879f9', desc:'Vibrant · Pink · Rounded' },
       restaurant: { dot:'#dc2626', desc:'Warm · Rot · Serif' },
-      arzt:       { dot:'#0891b2', desc:'Vertrauen · Teal · Modern' },
+      arzt:       { dot:'#0891b2', desc:'Vertrauen · Teal · Elegant' },
       fotograf:   { dot:'#1e1e1e', desc:'Visuell · Dunkel · Mono' },
       immobilien: { dot:'#b45309', desc:'Edel · Gold · Serif' },
       startup:    { dot:'#7c3aed', desc:'Fresh · Violet · Rounded' },
       agentur:    { dot:'#f97316', desc:'Bold · Orange · Editorial' },
-      blog:       { dot:'#65a30d', desc:'Lesbar · Lime · Humanist' },
+      blog:       { dot:'#4d7c0f', desc:'Lesbar · Olive · Humanist' },
+      outdoor:    { dot:'#78350f', desc:'Kraft · Braun · Oswald' },
+      kinder:     { dot:'#f97316', desc:'Spielerisch · Fredoka · Bunt' },
       portfolio:  { dot:'#334155', desc:'Galerie · Slate · System' },
       event:      { dot:'#6366f1', desc:'Energie · Electric · Bold' },
       wellness:   { dot:'#059669', desc:'Ruhig · Mint · Elegant' }

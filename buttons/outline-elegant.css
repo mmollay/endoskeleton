@@ -1,0 +1,48 @@
+/* SSI Endoskeleton — Button Preset: Outline Elegant
+   Inspiriert von survivaltraining.at. Zarter Rahmen, transparent, dezent. */
+
+.btn,
+button[type="submit"] {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.btn:hover,
+button[type="submit"]:hover {
+  background: rgba(var(--primary-rgb), 0.06);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.12);
+}
+
+.btn-primary,
+.hero .btn:first-child {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.hero .btn:first-child:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--text-on-primary);
+}
+
+/* Hero contrast */
+.hero--fullscreen .btn:not(:first-child),
+.hero--banner .btn:not(:first-child) {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.hero--fullscreen .btn:not(:first-child):hover,
+.hero--banner .btn:not(:first-child):hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.7);
+}
