@@ -1,0 +1,72 @@
+/* SSI Endoskeleton — Charakter: Markant (wenig Rundung, klare Kanten) */
+/* Passend fuer: Architektur, Industrie, Recht, Finanzen, Corporate */
+
+/* ─── Cards: wenig Rundung, klare Border ─── */
+.card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 3px !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.25s ease !important;
+}
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+  border-color: var(--primary) !important;
+}
+
+/* ─── Buttons: minimal gerundet, kein Hover-Lift ─── */
+.btn {
+  border-radius: 3px !important;
+}
+.btn-primary {
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+.btn-ghost {
+  border-width: 2px !important;
+}
+
+/* ─── Hero: staerkerer Overlay ─── */
+.hero:not(.hero--veil) .hero-bg::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    rgba(0, 0, 0, 0.75) 100%
+  ) !important;
+}
+
+/* ─── Blockquote: scharf, markante Border ─── */
+.blockquote {
+  border-radius: 2px !important;
+  border-left-width: 5px !important;
+  box-shadow: none !important;
+}
+
+/* ─── Banner: fast keine Rundung ─── */
+.banner-grid {
+  border-radius: 3px !important;
+  overflow: hidden !important;
+}
+
+/* ─── Divider: solid, volle Breite ─── */
+.divider {
+  background: var(--primary) !important;
+  height: 3px !important;
+}
+
+/* ─── Pricing Cards: kantig ─── */
+.pricing-card {
+  border-radius: 3px !important;
+}
+
+/* ─── Inputs: leicht kantig ─── */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  border-radius: 3px !important;
+}

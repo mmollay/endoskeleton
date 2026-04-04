@@ -1,0 +1,12 @@
+/* SSI Endoskeleton — Spacing Preset: Compact */
+/* Reduzierte Abstände für kompakte, informationsdichte Layouts */
+:root {
+  --space-xs:      0.175rem;
+  --space-sm:      0.375rem;
+  --space-md:      0.625rem;
+  --space-lg:      1rem;
+  --space-xl:      1.5rem;
+  --space-2xl:     2rem;
+  --space-3xl:     2.75rem;
+  --space-section: 3.5rem;
+}

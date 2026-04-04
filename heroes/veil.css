@@ -1,0 +1,120 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Hero: Veil
+   Vollbild mit hellem Schleier — Bild dezent sichtbar, dunkler Text.
+   Inspiriert von survivaltraining.at.
+   Load via: <link rel="stylesheet" href="heroes/veil.css">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hero--veil {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: calc(var(--nav-height) * -1);
+  padding-top: var(--nav-height);
+  background: var(--bg);
+}
+
+.hero--veil .hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Heller Schleier-Overlay — Bild bleibt dezent sichtbar */
+/* Nutzt CSS color-mix() damit das Theme (hell/dunkel) respektiert wird */
+.hero--veil .hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 60%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 75%, transparent) 40%,
+    color-mix(in srgb, var(--bg) 92%, transparent) 85%,
+    var(--bg) 100%
+  );
+}
+
+/* Dunkler Text (nicht weiß!) */
+.hero--veil .hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 56.25rem;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.hero--veil .hero-eyebrow {
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.hero--veil .hero-title {
+  color: var(--heading);
+}
+
+.hero--veil .hero-subtitle {
+  color: var(--text-muted);
+  max-width: 40rem;
+  margin: 0 auto var(--space-xl);
+}
+
+.hero--veil .hero-ctas {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Scroll indicator — dunkle Variante */
+.hero--veil .hero-scroll {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.hero--veil .hero-scroll:hover {
+  color: var(--primary);
+}
+
+.hero--veil .hero-scroll::after {
+  content: '';
+  width: 0.0625rem;
+  height: 2.5rem;
+  background: var(--border);
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@media (max-width: 48rem) {
+  .hero--veil {
+    min-height: 85vh;
+  }
+
+  .hero--veil .hero-ctas {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero--veil .hero-ctas .btn {
+    width: 100%;
+    max-width: 20rem;
+  }
+}

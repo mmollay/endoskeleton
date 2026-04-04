@@ -1,0 +1,9 @@
+/* SSI Endoskeleton — Font Preset: Serif (elegant, klassisch) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+:root {
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+}
+
+h1, h2, h3 { font-style: normal; }

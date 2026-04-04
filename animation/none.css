@@ -1,0 +1,6 @@
+/* SSI Endoskeleton — Animation Preset: None */
+/* Keine Scroll-Animationen — alles sofort sichtbar */
+.reveal {
+  transform: none !important;
+  transition: none !important;
+}

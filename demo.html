@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSI Endoskeleton v3.15 — Template Demo</title>
+  <meta name="description" content="SSI Endoskeleton v3.15 — Basis-Template für alle generierten Websites">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css?v=3.15.0">
+  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.15.0">
+  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.15.0">
+  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.15.0">
+  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.15.0">
+  <link id="softness-css" rel="stylesheet" href="softness/neutral.css?v=3.15.0">
+  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.15.0">
+  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.15.0">
+  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.15.0">
+  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.15.0">
+  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.15.0">
+  <style>
+    /* ═══ Demo Sidebar ═══ */
+    .demo-sidebar-wrapper {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      z-index: 10000;
+      display: flex;
+      align-items: stretch;
+      transition: transform 0.25s ease;
+    }
+    .demo-sidebar-wrapper.collapsed { transform: translateX(260px); }
+
+    .demo-sidebar-tab {
+      width: 28px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 0.62rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      flex-shrink: 0;
+      border-radius: 6px 0 0 6px;
+      box-shadow: -3px 0 10px rgba(0,0,0,0.35);
+      transition: background 0.15s;
+    }
+    .demo-sidebar-tab:hover { background: #1d4ed8; }
+
+    .demo-sidebar-panel {
+      width: 260px;
+      height: 100%;
+      overflow-y: auto;
+      background: #0f172a;
+      border-left: 2px solid #2563eb;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 #0f172a;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+    }
+
+    .demo-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #fff;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .demo-title span { color: #60a5fa; font-weight: 400; }
+
+    .demo-section {
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .demo-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .demo-group { margin-bottom: 0.65rem; }
+    .demo-group:last-child { margin-bottom: 0; }
+
+    .demo-group label {
+      color: #94a3b8;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .demo-btn-row { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+    .demo-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      font-size: 0.65rem;
+      font-family: inherit;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .demo-btn:hover { background: #334155; color: #fff; }
+    .demo-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; }
+
+    .demo-select {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      font-size: 0.68rem;
+      font-family: inherit;
+      padding: 0.22rem 0.4rem;
+      border-radius: 4px;
+      cursor: pointer;
+      outline: none;
+      width: 100%;
+    }
+    .demo-select:focus { border-color: #3b82f6; }
+
+    /* Cookie-Banner verstecken */
+    #cookie-banner { display: none !important; }
+
+    /* Ghost-Button auf dunklen Bild-Hintergründen */
+    .hero--fullscreen .btn-ghost,
+    .hero--split .btn-ghost,
+    .hero--banner .btn-ghost {
+      color: #ffffff !important;
+      border: 2px solid rgba(255, 255, 255, 0.85) !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      backdrop-filter: blur(4px) !important;
+    }
+    .hero--fullscreen .btn-ghost:hover,
+    .hero--split .btn-ghost:hover,
+    .hero--banner .btn-ghost:hover {
+      border-color: #ffffff !important;
+      background: rgba(255, 255, 255, 0.22) !important;
+    }
+    /* Veil-Hero: heller Hintergrund → Outline-Button statt Ghost */
+    .hero--veil .btn-outline {
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+      background: rgba(255, 255, 255, 0.7) !important;
+      backdrop-filter: blur(4px) !important;
+    }
+  </style>
+</head>
+<body class="layout-modern">
+
+  <!-- ═══ Demo Sidebar ═══ -->
+  <div class="demo-sidebar-wrapper" id="demo-sidebar-wrapper">
+    <button class="demo-sidebar-tab" id="demo-sidebar-tab"
+      onclick="document.getElementById('demo-sidebar-wrapper').classList.toggle('collapsed');"
+      title="Demo-Einstellungen ein-/ausblenden">Demo</button>
+    <div class="demo-sidebar-panel">
+      <div class="demo-title">SSI Endoskeleton <span>v3.15.0</span></div>
+      <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
+        <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
+      </div>
+
+      <!-- Struktur -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Layout</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-layout="modern">Modern</button>
+            <button class="demo-btn" data-layout="classic">Classic</button>
+            <button class="demo-btn" data-layout="magazine">Magazine</button>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Hero</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-hero="fullscreen">Fullscreen</button>
+            <button class="demo-btn" data-hero="split">Split</button>
+            <button class="demo-btn" data-hero="minimal">Minimal</button>
+            <button class="demo-btn" data-hero="banner">Banner</button>
+            <button class="demo-btn" data-hero="veil">Veil</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stil -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Farbe</label>
+          <select class="demo-select" id="color-select">
+            <option value="green">Grün</option>
+            <option value="blue">Blau</option>
+            <option value="orange">Orange</option>
+            <option value="teal">Teal</option>
+            <option value="red">Rot</option>
+            <option value="violet">Violett</option>
+            <option value="forest">Dunkelgrün</option>
+            <option value="navy">Navy</option>
+            <option value="brown">Braun</option>
+            <option value="gold">Gold</option>
+            <option value="pink">Pink</option>
+            <option value="coral">Coral</option>
+            <option value="lavender">Lavendel</option>
+            <option value="mint">Mint</option>
+            <option value="olive">Olive</option>
+            <option value="slate">Slate</option>
+            <option value="charcoal">Anthrazit</option>
+            <option value="wine">Weinrot</option>
+            <option value="gray">Grau</option>
+            <option value="lime">⚡ Neon-Grün</option>
+            <option value="cyan">⚡ Cyan</option>
+            <option value="electric">⚡ Electric Blue</option>
+            <option value="neon-pink">⚡ Neon-Pink</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Dichte</label>
+          <select class="demo-select" id="spacing-select">
+            <option value="normal">Normal</option>
+            <option value="compact">Compact</option>
+            <option value="spacious">Spacious</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Charakter</label>
+          <select class="demo-select" id="softness-select">
+            <option value="elegant">Elegant</option>
+            <option value="sanft">Sanft</option>
+            <option value="neutral" selected>Neutral</option>
+            <option value="markant">Markant</option>
+            <option value="kantig">Kantig</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Animation</label>
+          <select class="demo-select" id="animation-select">
+            <option value="subtle">Subtle</option>
+            <option value="none">Keine</option>
+            <option value="dynamic">Dynamic</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Schrift</label>
+          <select class="demo-select" id="font-select">
+            <option value="modern">Inter</option>
+            <option value="system">System</option>
+            <option value="serif">Serif</option>
+            <option value="humanist">Humanist</option>
+            <option value="editorial">Editorial</option>
+            <option value="elegant">Elegant</option>
+            <option value="mono">Mono</option>
+            <option value="rounded">Rounded</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Buttons</label>
+          <select class="demo-select" id="buttons-select">
+            <option value="rounded">Pill</option>
+            <option value="soft">Soft</option>
+            <option value="sharp">Sharp</option>
+            <option value="outline">Outline</option>
+            <option value="bold">Bold</option>
+            <option value="ghost">Ghost</option>
+            <option value="tech">Tech</option>
+            <option value="tactical">Tactical</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Nav-Verhalten</label>
+          <select class="demo-select" id="nav-select">
+            <option value="sticky">Sticky — immer sichtbar</option>
+            <option value="autohide">Autohide — versteckt sich</option>
+            <option value="transparent">Transparent — über Hero</option>
+            <option value="shrink">Shrink — wird kleiner</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Nav-Stil</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-nav-style="light">Light</button>
+            <button class="demo-btn" data-nav-style="dark">Dark</button>
+            <button class="demo-btn" data-nav-style="colored">Color</button>
+            <button class="demo-btn" data-nav-style="glass">Glass</button>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Menü-Layout</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-nav-layout="standard">Standard</button>
+            <button class="demo-btn" data-nav-layout="centered">Centered</button>
+            <button class="demo-btn" data-nav-layout="minimal">Minimal</button>
+            <button class="demo-btn" data-nav-layout="club">Club</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breite -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Max-Breite</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn" data-width="compact">1000px</button>
+            <button class="demo-btn active" data-width="default">1200px</button>
+            <button class="demo-btn" data-width="wide">1400px</button>
+            <button class="demo-btn" data-width="full">Voll</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Footer-Stil</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-footer-style="dark">Dark</button>
+            <button class="demo-btn" data-footer-style="light">Light</button>
+            <button class="demo-btn" data-footer-style="minimal">Minimal</button>
+            <button class="demo-btn" data-footer-style="colored">Color</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="demo-section">
+        <button class="demo-btn" style="width:100%;padding:0.4rem;font-size:0.7rem;background:#1e40af;border-color:#2563eb;" onclick="exportConfig()">Config exportieren</button>
+        <pre id="config-export" style="display:none;margin-top:0.5rem;padding:0.5rem;background:#1e293b;border-radius:4px;font-size:0.6rem;color:#94a3b8;max-height:12rem;overflow:auto;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent)" title="Klick zum Kopieren"></pre>
+      </div>
+
+      <!-- Theme & Sprache -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Theme</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-theme-switch="light">☀ Hell</button>
+            <button class="demo-btn" data-theme-switch="dark">☾ Dunkel</button>
+            <button class="demo-btn" data-theme-switch="warm">☕ Warm</button>
+            <button class="demo-btn" data-theme-switch="tech">⚡ Tech</button>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Sprache</label>
+          <div class="demo-btn-row">
+            <button class="demo-btn active" data-lang="de">DE</button>
+            <button class="demo-btn" data-lang="en">EN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header (von shared.js generiert) -->
+  <div id="site-header"></div>
+
+  <!-- ═══ Hero: Fullscreen (Standard) ═══ -->
+  <div id="hero-container">
+    <!-- Fullscreen Hero -->
+    <section class="hero hero--fullscreen" id="hero-fullscreen">
+      <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
+          <a href="#leistungen" class="btn btn-ghost btn-lg" data-i18n="hero.cta2">Mehr erfahren</a>
+        </div>
+      </div>
+      <a href="#about" class="hero-scroll" aria-label="Nach unten scrollen">Scroll</a>
+    </section>
+
+    <!-- Split Hero (versteckt) -->
+    <section class="hero hero--split" id="hero-split" style="display:none;">
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" alt="Office" loading="lazy">
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
+          <a href="#leistungen" class="btn btn-ghost btn-lg" data-i18n="hero.cta2">Mehr erfahren</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Minimal Hero (versteckt) -->
+    <section class="hero hero--minimal hero--minimal-gradient" id="hero-minimal" style="display:none;">
+      <div class="hero-decoration"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
+          <a href="#leistungen" class="btn btn-ghost btn-lg" data-i18n="hero.cta2">Mehr erfahren</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banner Hero (versteckt) -->
+    <section class="hero hero--banner" id="hero-banner" style="display:none;">
+      <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
+          <a href="#leistungen" class="btn btn-ghost btn-lg" data-i18n="hero.cta2">Mehr erfahren</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Veil Hero (versteckt) — heller Schleier, survival-style -->
+    <section class="hero hero--veil" id="hero-veil" style="display:none;">
+      <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80');"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
+          <a href="#leistungen" class="btn btn-outline btn-lg" data-i18n="hero.cta2">Mehr erfahren</a>
+        </div>
+      </div>
+      <a href="#about" class="hero-scroll" aria-label="Nach unten scrollen">Scroll</a>
+    </section>
+  </div>
+
+  <!-- ═══ About Section ═══ -->
+  <section class="reveal" id="about">
+    <div class="container">
+      <div class="grid-2 align-center">
+        <div>
+          <p class="section-tag" data-i18n="about.tag">Über uns</p>
+          <h2 class="section-title" data-i18n="about.title">Wir gestalten digitale Erlebnisse</h2>
+          <div class="divider"></div>
+          <p class="section-lead" data-i18n="about.text">Dies ist ein Platzhalter für die Vision oder das Alleinstellungsmerkmal des Unternehmens. Dieser Bereich wird bei der Generierung automatisch mit dem tatsächlichen Inhalt aus den Scan-Daten befüllt.</p>
+          <a href="#leistungen" class="btn btn-outline mt-lg" data-i18n="about.cta">Unsere Leistungen</a>
+        </div>
+        <div class="rounded overflow-hidden shadow-lg">
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80" alt="Team bei der Arbeit" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Services Section ═══ -->
+  <section class="reveal" id="leistungen">
+    <div class="container text-center">
+      <p class="section-tag" data-i18n="services.tag">Leistungen</p>
+      <h2 class="section-title" data-i18n="services.title">Was wir bieten</h2>
+      <p class="section-lead mx-auto" data-i18n="services.lead">Drei Kernbereiche, die bei der Generierung automatisch aus den Scan-Daten befüllt werden.</p>
+      <div class="grid-3 mt-xl">
+        <div class="card reveal">
+          <div class="card-body">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h3 data-i18n="services.s1.title">Beratung</h3>
+            <p data-i18n="services.s1.text">Individuelle Konzepte und strategische Planung für Ihren digitalen Auftritt.</p>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-body">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <h3 data-i18n="services.s2.title">Umsetzung</h3>
+            <p data-i18n="services.s2.text">Professionelle Entwicklung mit modernsten Technologien und höchsten Standards.</p>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-body">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3 data-i18n="services.s3.title">Support</h3>
+            <p data-i18n="services.s3.text">Verlässlicher Betrieb und kontinuierliche Weiterentwicklung Ihrer Plattform.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Stats Banner ═══ -->
+  <div class="banner-strip reveal">
+    <div class="container">
+      <div class="banner-grid">
+        <div class="banner-item">
+          <div class="banner-val">15+</div>
+          <div class="banner-label" data-i18n="stats.s1">Jahre Erfahrung</div>
+        </div>
+        <div class="banner-item">
+          <div class="banner-val">200+</div>
+          <div class="banner-label" data-i18n="stats.s2">Projekte</div>
+        </div>
+        <div class="banner-item">
+          <div class="banner-val">98%</div>
+          <div class="banner-label" data-i18n="stats.s3">Kundenzufriedenheit</div>
+        </div>
+        <div class="banner-item">
+          <div class="banner-val">24/7</div>
+          <div class="banner-label" data-i18n="stats.s4">Erreichbarkeit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Testimonials Section ═══ -->
+  <section class="reveal">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-tag" data-i18n="testimonial.tag">Stimmen</p>
+        <h2 class="section-title" data-i18n="testimonial.title">Was Kunden sagen</h2>
+      </div>
+      <div class="grid-3 mt-xl">
+        <div class="card reveal">
+          <div class="card-body">
+            <p data-i18n="testimonial.q1">Die Zusammenarbeit war von Anfang an professionell und unkompliziert. Das Ergebnis übertraf unsere Erwartungen.</p>
+            <cite data-i18n="testimonial.a1">Maximilian Muster, Geschäftsführer</cite>
+          </div>
+        </div>
+        <div class="card reveal reveal-delay-1">
+          <div class="card-body">
+            <p data-i18n="testimonial.q2">Schnell, zuverlässig und kreativ. Genau der Partner, den wir gesucht haben.</p>
+            <cite data-i18n="testimonial.a2">Anna Berger, Marketing</cite>
+          </div>
+        </div>
+        <div class="card reveal reveal-delay-2">
+          <div class="card-body">
+            <p data-i18n="testimonial.q3">Unser neuer Webauftritt hat die Anfragen verdreifacht. Klare Empfehlung!</p>
+            <cite data-i18n="testimonial.a3">Thomas Gruber, Inhaber</cite>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FAQ Section ═══ -->
+  <section class="reveal" id="faq">
+    <div class="container-narrow">
+      <div class="text-center">
+        <p class="section-tag" data-i18n="faq.tag">FAQ</p>
+        <h2 class="section-title" data-i18n="faq.title">Häufige Fragen</h2>
+      </div>
+      <div class="mt-xl">
+        <details class="card mb-md">
+          <summary class="card-body" style="cursor:pointer;font-weight:600;" data-i18n="faq.q1">Wie lange dauert ein typisches Projekt?</summary>
+          <div class="card-body" style="border-top:1px solid var(--border);padding-top:var(--space-md);" data-i18n="faq.a1">
+            Je nach Umfang zwischen 2 und 8 Wochen. Ein einfacher Webauftritt ist oft in 2-3 Wochen online.
+          </div>
+        </details>
+        <details class="card mb-md">
+          <summary class="card-body" style="cursor:pointer;font-weight:600;" data-i18n="faq.q2">Was kostet eine Website?</summary>
+          <div class="card-body" style="border-top:1px solid var(--border);padding-top:var(--space-md);" data-i18n="faq.a2">
+            Das hängt vom Funktionsumfang ab. Wir erstellen gerne ein individuelles Angebot nach einem kurzen Erstgespräch.
+          </div>
+        </details>
+        <details class="card mb-md">
+          <summary class="card-body" style="cursor:pointer;font-weight:600;" data-i18n="faq.q3">Bieten Sie auch laufende Betreuung an?</summary>
+          <div class="card-body" style="border-top:1px solid var(--border);padding-top:var(--space-md);" data-i18n="faq.a3">
+            Ja, wir bieten Wartungsverträge mit regelmäßigen Updates, Sicherheitschecks und Support.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Gallery Section ═══ -->
+  <section class="reveal">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-tag" data-i18n="gallery.tag">Projekte</p>
+        <h2 class="section-title" data-i18n="gallery.title">Ausgewählte Arbeiten</h2>
+      </div>
+      <div class="grid-3 mt-xl">
+        <div class="card reveal">
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Projekt 1" loading="lazy" class="card-img">
+          <div class="card-body"><h3 data-i18n="gallery.p1.title">Webshop Redesign</h3><p data-i18n="gallery.p1.text">Moderner E-Commerce-Auftritt mit 40% mehr Conversion.</p></div>
+        </div>
+        <div class="card reveal reveal-delay-1">
+          <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&q=80" alt="Projekt 2" loading="lazy" class="card-img">
+          <div class="card-body"><h3 data-i18n="gallery.p2.title">Unternehmenswebsite</h3><p data-i18n="gallery.p2.text">Klare Struktur und professioneller Auftritt für 500+ Mitarbeiter.</p></div>
+        </div>
+        <div class="card reveal reveal-delay-2">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80" alt="Projekt 3" loading="lazy" class="card-img">
+          <div class="card-body"><h3 data-i18n="gallery.p3.title">SaaS-Plattform</h3><p data-i18n="gallery.p3.text">Dashboard und Landing Page aus einem Guss.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Pricing Section ═══ -->
+  <section class="section-alt reveal" id="preise">
+    <div class="container">
+      <div class="text-center">
+        <p class="section-tag" data-i18n="pricing.tag">Preise</p>
+        <h2 class="section-title" data-i18n="pricing.title">Transparente Pakete</h2>
+        <p class="section-lead mx-auto" data-i18n="pricing.lead">Einmalige Investition, dauerhafter Auftritt. Keine versteckten Kosten.</p>
+      </div>
+      <div class="grid-3 mt-xl">
+        <div class="card pricing-card reveal">
+          <div class="card-body">
+            <p class="section-tag" data-i18n="pricing.s.name">Starter</p>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span><span class="pricing-amount">490</span>
+            </div>
+            <span class="pricing-period" data-i18n="pricing.period">einmalig, zzgl. MwSt.</span>
+            <ul class="pricing-features">
+              <li data-i18n="pricing.s.f1">5 Unterseiten</li>
+              <li data-i18n="pricing.s.f2">Kontaktformular</li>
+              <li data-i18n="pricing.s.f3">Mobile-optimiert</li>
+              <li data-i18n="pricing.s.f4">SSL inklusive</li>
+            </ul>
+            <a href="#kontakt" class="btn btn-outline btn-lg" data-i18n="pricing.cta">Anfragen</a>
+          </div>
+        </div>
+        <div class="card pricing-card pricing-featured reveal reveal-delay-1">
+          <div class="card-body">
+            <span class="pricing-badge" data-i18n="pricing.badge">Empfohlen</span>
+            <p class="section-tag" data-i18n="pricing.b.name">Business</p>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span><span class="pricing-amount">990</span>
+            </div>
+            <span class="pricing-period" data-i18n="pricing.period">einmalig, zzgl. MwSt.</span>
+            <ul class="pricing-features">
+              <li data-i18n="pricing.b.f1">Bis zu 15 Seiten</li>
+              <li data-i18n="pricing.b.f2">Blog-System</li>
+              <li data-i18n="pricing.b.f3">SEO-Optimierung</li>
+              <li data-i18n="pricing.b.f4">Google Analytics</li>
+              <li data-i18n="pricing.b.f5">1 Jahr Support</li>
+            </ul>
+            <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="pricing.cta">Anfragen</a>
+          </div>
+        </div>
+        <div class="card pricing-card reveal reveal-delay-2">
+          <div class="card-body">
+            <p class="section-tag" data-i18n="pricing.p.name">Premium</p>
+            <div class="pricing-price">
+              <span class="pricing-currency">€</span><span class="pricing-amount">1.990</span>
+            </div>
+            <span class="pricing-period" data-i18n="pricing.period">einmalig, zzgl. MwSt.</span>
+            <ul class="pricing-features">
+              <li data-i18n="pricing.p.f1">Unbegrenzte Seiten</li>
+              <li data-i18n="pricing.p.f2">Shop-Integration</li>
+              <li data-i18n="pricing.p.f3">Mehrsprachig</li>
+              <li data-i18n="pricing.p.f4">Custom Animations</li>
+              <li data-i18n="pricing.p.f5">2 Jahre Support</li>
+            </ul>
+            <a href="#kontakt" class="btn btn-outline btn-lg" data-i18n="pricing.cta">Anfragen</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Kontakt Section ═══ -->
+  <section class="section-veil reveal" id="kontakt">
+    <div class="section-veil-bg" style="background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1400&q=60');"></div>
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="section-tag" data-i18n="contact.tag">Kontakt</p>
+        <h2 class="section-title" data-i18n="contact.title">Schreiben Sie uns</h2>
+        <p class="section-lead mx-auto" data-i18n="contact.lead">Wir freuen uns auf Ihre Nachricht und melden uns innerhalb von 24 Stunden.</p>
+      </div>
+      <div class="grid-2 mt-xl">
+        <div class="contact-info">
+          <h3 data-i18n="contact.info">Kontaktdaten</h3>
+          <div class="divider"></div>
+          <p><strong>Max Muster</strong></p>
+          <p>Musterstraße 1<br>1010 Wien</p>
+          <p>+43 1 234 5678</p>
+          <p><a href="mailto:office@beispiel.at">office@beispiel.at</a></p>
+        </div>
+        <form action="contact.php" method="post" data-ajax>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="demo-vorname" data-i18n="contact.firstname">Vorname</label>
+              <input type="text" id="demo-vorname" name="vorname" placeholder="Max" required>
+            </div>
+            <div class="form-group">
+              <label for="demo-nachname" data-i18n="contact.lastname">Nachname</label>
+              <input type="text" id="demo-nachname" name="nachname" placeholder="Muster" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="demo-email" data-i18n="contact.email">E-Mail</label>
+            <input type="email" id="demo-email" name="email" placeholder="office@beispiel.at" required>
+          </div>
+          <div class="form-group">
+            <label for="demo-nachricht" data-i18n="contact.message">Nachricht</label>
+            <textarea id="demo-nachricht" name="nachricht" rows="5" placeholder="Erzählen Sie uns von Ihrem Projekt..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%" data-i18n="contact.submit">Nachricht senden</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA Section ═══ -->
+  <section class="section-dark reveal" id="cta">
+    <div class="container text-center">
+      <h2 class="section-title" data-i18n="cta.title">Bereit für den nächsten Schritt?</h2>
+      <p class="section-lead mx-auto" data-i18n="cta.text">Kontaktieren Sie uns — wir freuen uns auf Ihr Projekt.</p>
+      <div class="hero-ctas mt-xl">
+        <a href="mailto:office@beispiel.at" class="btn btn-primary btn-lg" data-i18n="cta.button">Kontakt aufnehmen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (von shared.js generiert) -->
+  <div id="site-footer"></div>
+
+  <!-- ═══ Config ═══ -->
+  <script>
+    window.SITE_CONFIG = {
+      name: "SSI Demo",
+      logo: null,
+      nav: [
+        { label: "Über uns",   href: "#about" },
+        { label: "Leistungen", href: "#leistungen" },
+        { label: "Preise",     href: "#pricing" },
+        { label: "Kontakt",    href: "#kontakt" },
+        { label: "Jetzt anfragen", href: "#kontakt", cta: true }
+      ],
+      contact: {
+        name: "Max Muster",
+        email: "office@beispiel.at",
+        phone: "+43 1 234 5678",
+        address: "Musterstraße 1, 1010 Wien"
+      },
+      social: {
+        facebook: "#",
+        instagram: "#"
+      },
+      footer: {
+        tagline: "Professionell. Zuverlässig. Modern.",
+        credit: true
+      },
+      modules: []
+    };
+  </script>
+  <script src="shared.js?v=3.15.0"></script>
+
+  <!-- ═══ Demo Controller ═══ -->
+  <script>
+  (function() {
+    'use strict';
+
+    /* ─── i18n Strings ────────────────────────── */
+    var i18n = {
+      de: {
+        'hero.eyebrow': 'Willkommen',
+        'hero.title': 'Ihr Auftritt im Web',
+        'hero.subtitle': 'Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.',
+        'hero.cta1': 'Jetzt starten',
+        'hero.cta2': 'Mehr erfahren',
+        'about.tag': 'Über uns',
+        'about.title': 'Wir gestalten digitale Erlebnisse',
+        'about.text': 'Dies ist ein Platzhalter für die Vision oder das Alleinstellungsmerkmal des Unternehmens. Dieser Bereich wird bei der Generierung automatisch mit dem tatsächlichen Inhalt aus den Scan-Daten befüllt.',
+        'about.cta': 'Unsere Leistungen',
+        'services.tag': 'Leistungen',
+        'services.title': 'Was wir bieten',
+        'services.lead': 'Drei Kernbereiche, die bei der Generierung automatisch aus den Scan-Daten befüllt werden.',
+        'services.s1.title': 'Beratung',
+        'services.s1.text': 'Individuelle Konzepte und strategische Planung für Ihren digitalen Auftritt.',
+        'services.s2.title': 'Umsetzung',
+        'services.s2.text': 'Professionelle Entwicklung mit modernsten Technologien und höchsten Standards.',
+        'services.s3.title': 'Support',
+        'services.s3.text': 'Verlässlicher Betrieb und kontinuierliche Weiterentwicklung Ihrer Plattform.',
+        'stats.s1': 'Jahre Erfahrung',
+        'stats.s2': 'Projekte',
+        'stats.s3': 'Kundenzufriedenheit',
+        'stats.s4': 'Erreichbarkeit',
+        'testimonial.tag': 'Stimmen',
+        'testimonial.title': 'Was Kunden sagen',
+        'testimonial.q1': 'Die Zusammenarbeit war von Anfang an professionell und unkompliziert. Das Ergebnis übertraf unsere Erwartungen.',
+        'testimonial.a1': 'Maximilian Muster, Geschäftsführer',
+        'testimonial.q2': 'Schnell, zuverlässig und kreativ. Genau der Partner, den wir gesucht haben.',
+        'testimonial.a2': 'Anna Berger, Marketing',
+        'testimonial.q3': 'Unser neuer Webauftritt hat die Anfragen verdreifacht. Klare Empfehlung!',
+        'testimonial.a3': 'Thomas Gruber, Inhaber',
+        'faq.tag': 'FAQ',
+        'faq.title': 'Häufige Fragen',
+        'faq.q1': 'Wie lange dauert ein typisches Projekt?',
+        'faq.a1': 'Je nach Umfang zwischen 2 und 8 Wochen. Ein einfacher Webauftritt ist oft in 2-3 Wochen online.',
+        'faq.q2': 'Was kostet eine Website?',
+        'faq.a2': 'Das hängt vom Funktionsumfang ab. Wir erstellen gerne ein individuelles Angebot nach einem kurzen Erstgespräch.',
+        'faq.q3': 'Bieten Sie auch laufende Betreuung an?',
+        'faq.a3': 'Ja, wir bieten Wartungsverträge mit regelmäßigen Updates, Sicherheitschecks und Support.',
+        'gallery.tag': 'Projekte',
+        'gallery.title': 'Ausgewählte Arbeiten',
+        'gallery.p1.title': 'Webshop Redesign',
+        'gallery.p1.text': 'Moderner E-Commerce-Auftritt mit 40% mehr Conversion.',
+        'gallery.p2.title': 'Unternehmenswebsite',
+        'gallery.p2.text': 'Klare Struktur und professioneller Auftritt für 500+ Mitarbeiter.',
+        'gallery.p3.title': 'SaaS-Plattform',
+        'gallery.p3.text': 'Dashboard und Landing Page aus einem Guss.',
+        'pricing.tag': 'Preise',
+        'pricing.title': 'Transparente Pakete',
+        'pricing.lead': 'Einmalige Investition, dauerhafter Auftritt. Keine versteckten Kosten.',
+        'pricing.period': 'einmalig, zzgl. MwSt.',
+        'pricing.cta': 'Anfragen',
+        'pricing.badge': 'Empfohlen',
+        'pricing.s.name': 'Starter',
+        'pricing.s.f1': '5 Unterseiten',
+        'pricing.s.f2': 'Kontaktformular',
+        'pricing.s.f3': 'Mobile-optimiert',
+        'pricing.s.f4': 'SSL inklusive',
+        'pricing.b.name': 'Business',
+        'pricing.b.f1': 'Bis zu 15 Seiten',
+        'pricing.b.f2': 'Blog-System',
+        'pricing.b.f3': 'SEO-Optimierung',
+        'pricing.b.f4': 'Google Analytics',
+        'pricing.b.f5': '1 Jahr Support',
+        'pricing.p.name': 'Premium',
+        'pricing.p.f1': 'Unbegrenzte Seiten',
+        'pricing.p.f2': 'Shop-Integration',
+        'pricing.p.f3': 'Mehrsprachig',
+        'pricing.p.f4': 'Custom Animations',
+        'pricing.p.f5': '2 Jahre Support',
+        'contact.tag': 'Kontakt',
+        'contact.title': 'Schreiben Sie uns',
+        'contact.lead': 'Wir freuen uns auf Ihre Nachricht und melden uns innerhalb von 24 Stunden.',
+        'contact.firstname': 'Vorname',
+        'contact.lastname': 'Nachname',
+        'contact.email': 'E-Mail',
+        'contact.message': 'Nachricht',
+        'contact.submit': 'Nachricht senden',
+        'contact.info': 'Kontaktdaten',
+        'cta.title': 'Bereit für den nächsten Schritt?',
+        'cta.text': 'Kontaktieren Sie uns — wir freuen uns auf Ihr Projekt.',
+        'cta.button': 'Kontakt aufnehmen'
+      },
+      en: {
+        'hero.eyebrow': 'Welcome',
+        'hero.title': 'Your Web Presence',
+        'hero.subtitle': 'Professional. Fast. Scalable. Powered by SSI WebEngine.',
+        'hero.cta1': 'Get Started',
+        'hero.cta2': 'Learn More',
+        'about.tag': 'About',
+        'about.title': 'We create digital experiences',
+        'about.text': 'This is a placeholder for the company\'s vision or unique value proposition. This section is automatically populated with actual content from scan data during generation.',
+        'about.cta': 'Our Services',
+        'services.tag': 'Services',
+        'services.title': 'What we offer',
+        'services.lead': 'Three core areas that are automatically populated from scan data during generation.',
+        'services.s1.title': 'Consulting',
+        'services.s1.text': 'Individual concepts and strategic planning for your digital presence.',
+        'services.s2.title': 'Development',
+        'services.s2.text': 'Professional development with the latest technologies and highest standards.',
+        'services.s3.title': 'Support',
+        'services.s3.text': 'Reliable operations and continuous improvement of your platform.',
+        'stats.s1': 'Years Experience',
+        'stats.s2': 'Projects',
+        'stats.s3': 'Client Satisfaction',
+        'stats.s4': 'Availability',
+        'testimonial.tag': 'Testimonials',
+        'testimonial.title': 'What clients say',
+        'testimonial.q1': 'The collaboration was professional and straightforward from the start. The result exceeded our expectations.',
+        'testimonial.a1': 'Maximilian Muster, CEO',
+        'testimonial.q2': 'Fast, reliable and creative. Exactly the partner we were looking for.',
+        'testimonial.a2': 'Anna Berger, Marketing',
+        'testimonial.q3': 'Our new website tripled our inquiries. Highly recommended!',
+        'testimonial.a3': 'Thomas Gruber, Owner',
+        'faq.tag': 'FAQ',
+        'faq.title': 'Frequently Asked Questions',
+        'faq.q1': 'How long does a typical project take?',
+        'faq.a1': 'Depending on scope, between 2 and 8 weeks. A simple website is often online in 2-3 weeks.',
+        'faq.q2': 'How much does a website cost?',
+        'faq.a2': 'That depends on the scope of features. We are happy to create an individual offer after a brief initial consultation.',
+        'faq.q3': 'Do you offer ongoing maintenance?',
+        'faq.a3': 'Yes, we offer maintenance contracts with regular updates, security checks and support.',
+        'gallery.tag': 'Projects',
+        'gallery.title': 'Selected Work',
+        'gallery.p1.title': 'Webshop Redesign',
+        'gallery.p1.text': 'Modern e-commerce presence with 40% more conversion.',
+        'gallery.p2.title': 'Corporate Website',
+        'gallery.p2.text': 'Clear structure and professional presence for 500+ employees.',
+        'gallery.p3.title': 'SaaS Platform',
+        'gallery.p3.text': 'Dashboard and landing page in perfect harmony.',
+        'pricing.tag': 'Pricing',
+        'pricing.title': 'Transparent Packages',
+        'pricing.lead': 'One-time investment, lasting presence. No hidden costs.',
+        'pricing.period': 'one-time, excl. VAT',
+        'pricing.cta': 'Inquire',
+        'pricing.badge': 'Recommended',
+        'pricing.s.name': 'Starter',
+        'pricing.s.f1': '5 Subpages',
+        'pricing.s.f2': 'Contact Form',
+        'pricing.s.f3': 'Mobile-optimized',
+        'pricing.s.f4': 'SSL included',
+        'pricing.b.name': 'Business',
+        'pricing.b.f1': 'Up to 15 Pages',
+        'pricing.b.f2': 'Blog System',
+        'pricing.b.f3': 'SEO Optimization',
+        'pricing.b.f4': 'Google Analytics',
+        'pricing.b.f5': '1 Year Support',
+        'pricing.p.name': 'Premium',
+        'pricing.p.f1': 'Unlimited Pages',
+        'pricing.p.f2': 'Shop Integration',
+        'pricing.p.f3': 'Multilingual',
+        'pricing.p.f4': 'Custom Animations',
+        'pricing.p.f5': '2 Years Support',
+        'contact.tag': 'Contact',
+        'contact.title': 'Get in Touch',
+        'contact.lead': 'We look forward to your message and will respond within 24 hours.',
+        'contact.firstname': 'First Name',
+        'contact.lastname': 'Last Name',
+        'contact.email': 'Email',
+        'contact.message': 'Message',
+        'contact.submit': 'Send Message',
+        'contact.info': 'Contact Details',
+        'cta.title': 'Ready for the next step?',
+        'cta.text': 'Contact us — we look forward to your project.',
+        'cta.button': 'Get in Touch'
+      }
+    };
+
+    var currentLang = 'de';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      var strings = i18n[lang] || i18n.de;
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (strings[key]) el.textContent = strings[key];
+      });
+    }
+
+    /* ─── Layout Switcher ─────────────────────── */
+    var cssVer = Date.now();
+    function switchLayout(layout) {
+      document.getElementById('layout-css').href = 'layouts/' + layout + '.css?v=' + cssVer;
+      document.body.className = document.body.className.replace(/layout-\w+/, 'layout-' + layout);
+    }
+
+    /* ─── Color Switcher ─────────────────────── */
+    function switchColor(color) {
+      document.getElementById('color-css').href = 'colors/' + color + '.css?v=' + cssVer;
+    }
+
+    /* ─── Button Switcher ────────────────────── */
+    function switchButtons(preset) {
+      document.getElementById('button-css').href = 'buttons/' + preset + '.css?v=' + cssVer;
+    }
+
+    /* ─── Hero Switcher ───────────────────────── */
+    function switchHero(hero) {
+      document.getElementById('hero-css').href = 'heroes/' + hero + '.css?v=' + cssVer;
+      ['fullscreen', 'split', 'minimal', 'banner', 'veil'].forEach(function(h) {
+        var el = document.getElementById('hero-' + h);
+        if (el) el.style.display = (h === hero) ? '' : 'none';
+      });
+      /* Re-apply language to new hero elements */
+      applyLang(currentLang);
+    }
+
+    /* ─── Softness Switcher ──────────────────── */
+    function switchSoftness(preset) {
+      document.getElementById('softness-css').href = 'softness/' + preset + '.css?v=' + cssVer;
+    }
+
+    /* ─── Font Switcher ──────────────────────── */
+    function switchFont(preset) {
+      document.getElementById('font-css').href = 'fonts/' + preset + '.css?v=' + cssVer;
+    }
+
+    /* ─── Spacing Switcher ────────────────────── */
+    function switchSpacing(preset) {
+      document.getElementById('spacing-css').href = 'spacing/' + preset + '.css?v=' + cssVer;
+    }
+
+    /* ─── Animation Switcher ──────────────────── */
+    function switchAnimation(preset) {
+      document.getElementById('animation-css').href = 'animation/' + preset + '.css?v=' + cssVer;
+    }
+
+    /* ─── Nav Behavior Switcher ───────────────── */
+    /* SITE_CONFIG sicherstellen — ist im Demo nicht vorab gesetzt */
+    window.SITE_CONFIG = window.SITE_CONFIG || {};
+
+    function switchNavBehavior(behavior) {
+      window.SITE_CONFIG.navBehavior = behavior;  /* Immer setzen — auch wenn Nav noch nicht im DOM */
+      var nav = document.querySelector('.site-nav');
+      if (!nav) return;
+      nav.classList.remove('nav-transparent', 'nav-solid', 'nav-hidden', 'nav-shrink', 'scrolled');
+      if (window._applyNavState) window._applyNavState();
+    }
+
+    /* ─── Nav Style Switcher ──────────────────── */
+    var navStyles = ['light', 'dark', 'colored', 'glass'];
+    function switchNavStyle(style) {
+      window.SITE_CONFIG.navStyle = style;  /* Immer setzen — shared.js liest davon beim Nav-Erstellen */
+      var nav = document.querySelector('.site-nav');
+      if (!nav) return;
+      navStyles.forEach(function(s) { nav.classList.remove('nav-' + s); });
+      if (style !== 'light') nav.classList.add('nav-' + style);
+    }
+
+    /* ─── Nav Layout Switcher ────────────────── */
+    function switchNavLayout(layout) {
+      document.getElementById('navlayout-css').href = 'navlayouts/' + layout + '.css?v=' + cssVer;
+    }
+
+    /* ─── Width Switcher ─────────────────────── */
+    function switchWidth(width) {
+      document.getElementById('width-css').href = 'widths/' + width + '.css?v=' + cssVer;
+    }
+
+    /* ─── Footer Style Switcher ───────────────── */
+    var footerStyles = ['dark', 'light', 'minimal', 'colored'];
+    function switchFooterStyle(style) {
+      window.SITE_CONFIG.footerStyle = style;  /* Immer setzen — shared.js liest davon beim Footer-Erstellen */
+      var footer = document.querySelector('.site-footer');
+      if (!footer) return;
+      footer.classList.remove('site-footer--light');
+      footerStyles.forEach(function(s) { footer.classList.remove('footer-' + s); });
+      if (style === 'light') {
+        footer.classList.add('site-footer--light');
+      } else if (style !== 'dark') {
+        footer.classList.add('footer-' + style);
+      }
+    }
+
+    /* ─── Config Export ─────────────────────────── */
+    function exportConfig() {
+      function getActive(sel) {
+        var el = document.querySelector(sel + '.active');
+        return el ? (el.dataset.layout || el.dataset.hero || el.dataset.navStyle || el.dataset.footerStyle || el.dataset.themeSwitch || el.dataset.lang || el.textContent.trim()) : null;
+      }
+      function getSelect(id) {
+        var el = document.getElementById(id);
+        return el ? el.value : null;
+      }
+      var config = {
+        layout: getActive('[data-layout]') || 'modern',
+        hero: getActive('[data-hero]') || 'fullscreen',
+        color: getSelect('color-select'),
+        softness: getSelect('softness-select'),
+        spacing: getSelect('spacing-select'),
+        animation: getSelect('animation-select'),
+        font: getSelect('font-select'),
+        buttons: getSelect('buttons-select'),
+        navBehavior: getSelect('nav-select'),
+        navLayout: (document.querySelector('[data-nav-layout].active') || {}).dataset.navLayout || 'standard',
+        width: (document.querySelector('[data-width].active') || {}).dataset.width || 'default',
+        navStyle: getActive('[data-nav-style]') || 'light',
+        footerStyle: getActive('[data-footer-style]') || 'dark',
+        theme: getActive('[data-theme-switch]') || 'light'
+      };
+      var pre = document.getElementById('config-export');
+      pre.style.display = 'block';
+      pre.textContent = JSON.stringify(config, null, 2);
+    }
+
+    /* ─── Theme Switcher ──────────────────────── */
+    function switchTheme(theme) {
+      if (theme === 'dark' || theme === 'warm' || theme === 'tech') {
+        document.documentElement.setAttribute('data-theme', theme);
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+
+    /* ─── Button Handling ─────────────────────── */
+    function setActive(btn) {
+      var row = btn.closest('.demo-btn-row');
+      row.querySelectorAll('.demo-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+
+    document.querySelectorAll('[data-layout]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchLayout(this.dataset.layout); });
+    });
+    document.querySelectorAll('[data-hero]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchHero(this.dataset.hero); });
+    });
+    document.querySelectorAll('[data-theme-switch]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchTheme(this.dataset.themeSwitch); });
+    });
+    document.querySelectorAll('[data-lang]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); applyLang(this.dataset.lang); });
+    });
+    var colorSelect = document.getElementById('color-select');
+    if (colorSelect) {
+      colorSelect.addEventListener('change', function() { switchColor(this.value); });
+    }
+    var buttonsSelect = document.getElementById('buttons-select');
+    if (buttonsSelect) {
+      buttonsSelect.addEventListener('change', function() { switchButtons(this.value); });
+    }
+    var softnessSelect = document.getElementById('softness-select');
+    if (softnessSelect) {
+      softnessSelect.addEventListener('change', function() { switchSoftness(this.value); });
+    }
+    var fontSelect = document.getElementById('font-select');
+    if (fontSelect) {
+      fontSelect.addEventListener('change', function() { switchFont(this.value); });
+    }
+    var animationSelect = document.getElementById('animation-select');
+    if (animationSelect) {
+      animationSelect.addEventListener('change', function() { switchAnimation(this.value); });
+    }
+    var spacingSelect = document.getElementById('spacing-select');
+    if (spacingSelect) {
+      spacingSelect.addEventListener('change', function() { switchSpacing(this.value); });
+    }
+    var navSelect = document.getElementById('nav-select');
+    if (navSelect) {
+      navSelect.addEventListener('change', function() { switchNavBehavior(this.value); });
+    }
+
+    document.querySelectorAll('[data-nav-style]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchNavStyle(this.dataset.navStyle); updateUrlState(); });
+    });
+    document.querySelectorAll('[data-footer-style]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchFooterStyle(this.dataset.footerStyle); updateUrlState(); });
+    });
+    document.querySelectorAll('[data-nav-layout]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchNavLayout(this.dataset.navLayout); updateUrlState(); });
+    });
+    document.querySelectorAll('[data-width]').forEach(function(btn) {
+      btn.addEventListener('click', function() { setActive(this); switchWidth(this.dataset.width); updateUrlState(); });
+    });
+
+    /* ─── URL State (shareable config) ──────────── */
+    function getState() {
+      return {
+        layout: (document.querySelector('[data-layout].active') || {}).dataset.layout || 'modern',
+        hero:   (document.querySelector('[data-hero].active') || {}).dataset.hero   || 'fullscreen',
+        color:  (document.getElementById('color-select') || {}).value              || 'green',
+        softness: (document.getElementById('softness-select') || {}).value         || 'balanced',
+        spacing:  (document.getElementById('spacing-select') || {}).value          || 'normal',
+        animation:(document.getElementById('animation-select') || {}).value        || 'subtle',
+        font:     (document.getElementById('font-select') || {}).value             || 'modern',
+        buttons:  (document.getElementById('buttons-select') || {}).value          || 'rounded',
+        nav:      (document.getElementById('nav-select') || {}).value              || 'sticky',
+        navStyle: (document.querySelector('[data-nav-style].active') || {}).dataset.navStyle  || 'light',
+        navLayout:(document.querySelector('[data-nav-layout].active') || {}).dataset.navLayout || 'standard',
+        width:    (document.querySelector('[data-width].active') || {}).dataset.width || 'default',
+        footer:   (document.querySelector('[data-footer-style].active') || {}).dataset.footerStyle || 'dark',
+        theme:    document.documentElement.getAttribute('data-theme') || 'light'
+      };
+    }
+
+    function updateUrlState() {
+      var s = getState();
+      var hash = Object.keys(s).map(function(k) { return k + '=' + encodeURIComponent(s[k]); }).join('&');
+      history.replaceState(null, '', '#' + hash);
+    }
+
+    function restoreUrlState() {
+      var hash = location.hash.replace(/^#/, '');
+      if (!hash) return;
+      var params = {};
+      hash.split('&').forEach(function(p) {
+        var kv = p.split('=');
+        if (kv.length === 2) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
+      });
+      if (params.layout) {
+        var btn = document.querySelector('[data-layout="' + params.layout + '"]');
+        if (btn) { setActive(btn); switchLayout(params.layout); }
+      }
+      if (params.hero) {
+        var btn = document.querySelector('[data-hero="' + params.hero + '"]');
+        if (btn) { setActive(btn); switchHero(params.hero); }
+      }
+      if (params.color) {
+        var sel = document.getElementById('color-select');
+        if (sel) { sel.value = params.color; switchColor(params.color); }
+      }
+      if (params.softness) {
+        var sel = document.getElementById('softness-select');
+        if (sel) { sel.value = params.softness; switchSoftness(params.softness); }
+      }
+      if (params.spacing) {
+        var sel = document.getElementById('spacing-select');
+        if (sel) { sel.value = params.spacing; switchSpacing(params.spacing); }
+      }
+      if (params.animation) {
+        var sel = document.getElementById('animation-select');
+        if (sel) { sel.value = params.animation; switchAnimation(params.animation); }
+      }
+      if (params.font) {
+        var sel = document.getElementById('font-select');
+        if (sel) { sel.value = params.font; switchFont(params.font); }
+      }
+      if (params.buttons) {
+        var sel = document.getElementById('buttons-select');
+        if (sel) { sel.value = params.buttons; switchButtons(params.buttons); }
+      }
+      if (params.nav) {
+        var sel = document.getElementById('nav-select');
+        if (sel) { sel.value = params.nav; switchNavBehavior(params.nav); }
+      }
+      if (params.navStyle) {
+        var btn = document.querySelector('[data-nav-style="' + params.navStyle + '"]');
+        if (btn) { setActive(btn); switchNavStyle(params.navStyle); }
+      }
+      if (params.navLayout) {
+        var btn = document.querySelector('[data-nav-layout="' + params.navLayout + '"]');
+        if (btn) { setActive(btn); switchNavLayout(params.navLayout); }
+      }
+      if (params.width) {
+        var btn = document.querySelector('[data-width="' + params.width + '"]');
+        if (btn) { setActive(btn); switchWidth(params.width); }
+      }
+      if (params.footer) {
+        var btn = document.querySelector('[data-footer-style="' + params.footer + '"]');
+        if (btn) { setActive(btn); switchFooterStyle(params.footer); }
+      }
+      if (params.theme) {
+        var themeBtn = document.querySelector('[data-theme-switch="' + params.theme + '"]');
+        if (themeBtn) setActive(themeBtn);
+        switchTheme(params.theme);
+      }
+    }
+
+    /* Attach URL state updates to all switchers */
+    ['color-select', 'softness-select', 'spacing-select', 'animation-select',
+     'font-select', 'buttons-select', 'nav-select'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('change', updateUrlState);
+    });
+    document.querySelectorAll('[data-layout],[data-hero],[data-theme-switch],[data-lang]').forEach(function(btn) {
+      btn.addEventListener('click', updateUrlState);
+    });
+    document.querySelectorAll('[data-nav-style]').forEach(function(btn) {
+      btn.addEventListener('click', updateUrlState);
+    });
+    document.querySelectorAll('[data-nav-layout]').forEach(function(btn) {
+      btn.addEventListener('click', updateUrlState);
+    });
+
+    restoreUrlState();
+
+    /* ─── Kombinations-Counter ────────────────────────── */
+    (function() {
+      var counts = {
+        layout:   document.querySelectorAll('[data-layout]').length,
+        hero:     document.querySelectorAll('[data-hero]').length,
+        color:    document.querySelectorAll('#color-select option').length,
+        softness: document.querySelectorAll('#softness-select option').length,
+        spacing:  document.querySelectorAll('#spacing-select option').length,
+        animation:document.querySelectorAll('#animation-select option').length,
+        font:     document.querySelectorAll('#font-select option').length,
+        buttons:  document.querySelectorAll('#buttons-select option').length,
+        nav:      document.querySelectorAll('#nav-select option').length,
+        navStyle: document.querySelectorAll('[data-nav-style]').length,
+        navLayout:document.querySelectorAll('[data-nav-layout]').length,
+        width:    document.querySelectorAll('[data-width]').length,
+        footer:   document.querySelectorAll('[data-footer-style]').length,
+        theme:    document.querySelectorAll('[data-theme-switch]').length
+      };
+      var total = Object.values(counts).reduce(function(a, b) { return a * b; }, 1);
+      var formatted = total >= 1000000
+        ? (total / 1000000).toFixed(1).replace('.', ',') + ' Mio.'
+        : total.toLocaleString('de-AT');
+      var el = document.getElementById('variation-count');
+      if (el) el.textContent = formatted;
+    })();
+
+  })();
+  </script>
+</body>
+</html>

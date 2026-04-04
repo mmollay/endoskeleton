@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Olive (Olivgrün/Erdton) */
+:root {
+  --primary:       #6b7f3b;
+  --primary-dark:  #4a5928;
+  --primary-light: #8ba34e;
+  --primary-rgb:   107, 127, 59;
+}

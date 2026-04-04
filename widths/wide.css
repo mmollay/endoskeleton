@@ -1,0 +1,8 @@
+/* SSI Endoskeleton — Width: Wide (87.5rem / 1400px)
+   Fuer Portfolio, Galerie, Dashboard-artige Layouts. */
+
+:root {
+  --max-width: 87.5rem;
+  --max-narrow: 62.5rem;
+  --max-wide: 100rem;
+}

@@ -1,0 +1,34 @@
+# SSI Endoskeleton — .gitignore
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-workspace
+
+# Logs
+*.log
+error_log
+
+# Uploads (site-specific)
+uploads/
+
+# Node (if using build tools)
+node_modules/
+package-lock.json
+
+# Compiled
+*.min.css
+*.min.js
+*.map

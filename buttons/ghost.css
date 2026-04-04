@@ -1,0 +1,58 @@
+/* SSI Endoskeleton — Button Preset: Ghost */
+.btn {
+  background: transparent !important;
+  color: var(--primary) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.3) !important;
+  border-radius: 6px !important;
+  font-weight: 400 !important;
+  opacity: 0.85;
+}
+.btn:hover {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+  border-color: var(--primary) !important;
+  opacity: 1;
+}
+
+/* Hero-Kontrast: auf dunklen Bildhintergründen weiß */
+.hero--fullscreen .btn-primary,
+.hero--split .btn-primary,
+.hero--banner .btn-primary,
+.section-dark .btn-primary {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px) !important;
+  opacity: 1;
+}
+.hero--fullscreen .btn-primary:hover,
+.hero--split .btn-primary:hover,
+.hero--banner .btn-primary:hover,
+.section-dark .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: #ffffff !important;
+}
+
+.hero--fullscreen .btn-ghost,
+.hero--fullscreen .btn-outline,
+.hero--split .btn-ghost,
+.hero--split .btn-outline,
+.hero--banner .btn-ghost,
+.hero--banner .btn-outline,
+.section-dark .btn-ghost,
+.section-dark .btn-outline {
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  opacity: 1;
+}
+.hero--fullscreen .btn-ghost:hover,
+.hero--fullscreen .btn-outline:hover,
+.hero--split .btn-ghost:hover,
+.hero--split .btn-outline:hover,
+.hero--banner .btn-ghost:hover,
+.hero--banner .btn-outline:hover,
+.section-dark .btn-ghost:hover,
+.section-dark .btn-outline:hover {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}

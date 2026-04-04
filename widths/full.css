@@ -1,0 +1,8 @@
+/* SSI Endoskeleton — Width: Full (keine Begrenzung)
+   Content nutzt volle Viewport-Breite. */
+
+:root {
+  --max-width: 100%;
+  --max-narrow: 75rem;
+  --max-wide: 100%;
+}

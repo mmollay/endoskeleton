@@ -1,0 +1,5 @@
+/* SSI Endoskeleton — Font Preset: System (schnell, nativ) */
+:root {
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

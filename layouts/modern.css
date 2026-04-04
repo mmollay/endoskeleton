@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Layout: Modern
+   Full-width sections, bold headers, strong visual separation.
+   Load via: <link rel="stylesheet" href="layouts/modern.css">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Full-width sections with generous height — Hero ausgenommen */
+.layout-modern section:not(.hero) {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  padding: var(--space-section) 0;
+}
+
+.layout-modern section > .container,
+.layout-modern section > .container-wide {
+  width: 100%;
+}
+
+/* Bold heading style */
+.layout-modern .section-title {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Strong visual separation between sections */
+.layout-modern section:not(.hero):not(.section-dark):nth-of-type(even) {
+  background: var(--bg-alt);
+  border-top: 0.0625rem solid var(--border);
+  border-bottom: 0.0625rem solid var(--border);
+}
+
+/* Full-bleed images */
+.layout-modern .full-bleed {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  border-radius: 0;
+}
+
+.layout-modern .full-bleed img {
+  width: 100%;
+  height: 25rem;
+  object-fit: cover;
+}
+
+/* Grid items get larger gaps */
+.layout-modern .grid-2,
+.layout-modern .grid-3 {
+  gap: var(--space-2xl);
+}
+
+/* Cards are borderless and rely on shadow */
+.layout-modern .card {
+  border: none;
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+}
+
+.layout-modern .card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-0.375rem);
+}
+
+/* Section tags get bolder treatment */
+.layout-modern .section-tag {
+  font-size: var(--fs-sm);
+  letter-spacing: 0.2em;
+  padding: 0.25rem 0.75rem;
+  background: rgba(var(--primary-rgb), 0.08);
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+/* Buttons are larger */
+.layout-modern .btn {
+  padding: 1rem 2.5rem;
+  font-size: var(--fs-base);
+  border-radius: var(--radius-md);
+}
+
+.layout-modern .btn-lg {
+  padding: 1.125rem 3rem;
+  font-size: var(--fs-md);
+}
+
+/* Lead text is larger */
+.layout-modern .section-lead {
+  font-size: var(--fs-lg);
+  max-width: 45rem;
+}
+
+/* Dark sections get more dramatic treatment */
+/* Use section.section-dark to beat nth-of-type specificity */
+.layout-modern section.section-dark,
+.layout-modern .section-dark {
+  background: linear-gradient(135deg, var(--bg-dark) 0%, #0a0a1a 100%);
+}
+
+/* Stats banner */
+.layout-modern .banner-item {
+  padding: var(--space-lg) var(--space-lg);
+}
+
+.layout-modern .banner-val {
+  font-size: var(--fs-hero);
+}
+
+@media (max-width: 48rem) {
+  .layout-modern section:not(.hero) {
+    min-height: auto;
+  }
+
+  .layout-modern .full-bleed img {
+    height: 15rem;
+  }
+}

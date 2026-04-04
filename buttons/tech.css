@@ -1,0 +1,22 @@
+/* SSI Endoskeleton — Button Preset: Tech (SSI-Style, abgeschrägte Ecken) */
+.btn {
+  border-radius: 0 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)) !important;
+}
+.btn:hover {
+  box-shadow: 0 4px 24px rgba(var(--primary-rgb), 0.3) !important;
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  clip-path: none !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  border: 2px solid var(--primary) !important;
+  color: var(--primary) !important;
+}
+.btn-ghost:hover {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+}

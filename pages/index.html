@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PAGE_TITLE}} — {{SITE_NAME}}</title>
+  <meta name="description" content="{{PAGE_DESCRIPTION}}">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="{{PAGE_TITLE}} — {{SITE_NAME}}">
+  <meta property="og:description" content="{{PAGE_DESCRIPTION}}">
+  <meta property="og:image" content="{{SITE_URL}}/img/og-image.jpg">
+  <meta property="og:url" content="{{SITE_URL}}/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_AT">
+  <link rel="icon" href="img/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family={{FONT}}&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="layouts/{{LAYOUT}}.css">
+  <link rel="stylesheet" href="heroes/{{HERO}}.css">
+  <link rel="stylesheet" href="buttons/{{BUTTONS}}.css">
+  <link rel="stylesheet" href="softness/{{CHARAKTER}}.css">
+  <link rel="stylesheet" href="spacing/{{SPACING}}.css">
+  <link rel="stylesheet" href="animation/{{ANIMATION}}.css">
+  <link rel="stylesheet" href="widths/{{WIDTH}}.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body class="layout-{{LAYOUT}}" data-modules="{{MODULES}}">
+
+  <!-- Header -->
+  <div id="site-header"></div>
+
+  <!-- Hero Section -->
+  <section class="hero hero--{{HERO_TYPE}}" id="main-content">
+    <div class="hero-bg" style="background-image: url('{{HERO_IMAGE}}');"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">{{HERO_EYEBROW}}</p>
+      <h1 class="hero-title">{{HERO_TITLE}}</h1>
+      <p class="hero-subtitle">{{HERO_SUBTITLE}}</p>
+      <div class="hero-ctas">
+        <a href="{{CTA_PRIMARY_HREF}}" class="btn btn-primary btn-lg">{{CTA_PRIMARY_TEXT}}</a>
+        <a href="{{CTA_SECONDARY_HREF}}" class="btn btn-ghost btn-lg">{{CTA_SECONDARY_TEXT}}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Vision Section -->
+  <section class="reveal">
+    <div class="container">
+      <div class="grid-2 align-center">
+        <div>
+          <p class="section-tag">{{ABOUT_TAG}}</p>
+          <h2 class="section-title">{{ABOUT_TITLE}}</h2>
+          <div class="divider"></div>
+          <p class="section-lead">{{ABOUT_TEXT}}</p>
+          <a href="{{ABOUT_LINK}}" class="btn btn-outline mt-lg">{{ABOUT_CTA}}</a>
+        </div>
+        <div class="rounded overflow-hidden shadow-lg">
+          <img src="{{ABOUT_IMAGE}}" alt="{{ABOUT_IMAGE_ALT}}" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services / Features Section -->
+  <section class="reveal">
+    <div class="container text-center">
+      <p class="section-tag">{{SERVICES_TAG}}</p>
+      <h2 class="section-title">{{SERVICES_TITLE}}</h2>
+      <p class="section-lead mx-auto">{{SERVICES_LEAD}}</p>
+      <div class="grid-3 mt-xl">
+        {{#SERVICES}}
+        <div class="card reveal">
+          <div class="card-body">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24"><path d="{{SERVICE_ICON_PATH}}"/></svg>
+            </div>
+            <h3>{{SERVICE_TITLE}}</h3>
+            <p>{{SERVICE_TEXT}}</p>
+          </div>
+        </div>
+        {{/SERVICES}}
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats / Banner Strip -->
+  <div class="banner-strip reveal">
+    <div class="container">
+      <div class="banner-grid">
+        {{#STATS}}
+        <div class="banner-item">
+          <div class="banner-val">{{STAT_VALUE}}</div>
+          <div class="banner-label">{{STAT_LABEL}}</div>
+        </div>
+        {{/STATS}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonial / Quote Section -->
+  <section class="reveal">
+    <div class="container-narrow text-center">
+      <p class="section-tag">{{TESTIMONIAL_TAG}}</p>
+      <h2 class="section-title">{{TESTIMONIAL_TITLE}}</h2>
+      <div class="blockquote mt-xl">
+        <p>{{TESTIMONIAL_QUOTE}}</p>
+        <cite>{{TESTIMONIAL_AUTHOR}}</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section-dark reveal">
+    <div class="container text-center">
+      <h2 class="section-title">{{CTA_SECTION_TITLE}}</h2>
+      <p class="section-lead mx-auto">{{CTA_SECTION_TEXT}}</p>
+      <div class="hero-ctas mt-xl">
+        <a href="{{CTA_SECTION_HREF}}" class="btn btn-primary btn-lg">{{CTA_SECTION_BUTTON}}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Config & Scripts -->
+  <script>
+    window.SITE_CONFIG = {
+      name: "{{SITE_NAME}}",
+      logo: "img/logo.png",
+      nav: [
+        {{NAV_ITEMS}}
+      ],
+      contact: {
+        name: "{{CONTACT_NAME}}",
+        email: "{{CONTACT_EMAIL}}",
+        phone: "{{CONTACT_PHONE}}",
+        address: "{{CONTACT_ADDRESS}}"
+      },
+      social: {
+        {{SOCIAL_LINKS}}
+      },
+      footer: {
+        tagline: "{{FOOTER_TAGLINE}}",
+        credit: true
+      },
+      modules: [{{MODULES_LIST}}]
+    };
+  </script>
+  <script src="shared.js"></script>
+</body>
+</html>

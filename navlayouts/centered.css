@@ -1,0 +1,47 @@
+/* SSI Endoskeleton — Nav Layout: Centered
+   Logo links absolut, Nav-Items zentriert, CTA rechts absolut.
+   Respektiert Nav-Padding fuer Width-Optionen. */
+
+.site-nav {
+  justify-content: center;
+}
+
+/* Logo absolut links — respektiert Padding */
+.site-nav .nav-logo {
+  position: absolute;
+  left: var(--space-xl);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* CTA absolut rechts — respektiert Padding */
+.site-nav .nav-cta {
+  position: absolute;
+  right: var(--space-xl);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Padding-aware: Logo/CTA folgen dem Nav-Padding */
+.site-nav[style*="padding"] .nav-logo,
+.site-nav .nav-logo {
+  left: max(var(--space-xl), calc((100vw - var(--max-width, 75rem)) / 2));
+}
+.site-nav[style*="padding"] .nav-cta,
+.site-nav .nav-cta {
+  right: max(var(--space-xl), calc((100vw - var(--max-width, 75rem)) / 2));
+}
+
+@media (max-width: 48rem) {
+  .site-nav {
+    justify-content: space-between;
+  }
+  .site-nav .nav-logo {
+    position: static;
+    transform: none;
+  }
+  .site-nav .nav-cta {
+    position: static;
+    transform: none;
+  }
+}

@@ -1,0 +1,94 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Hero: Banner
+   Kompakter Header-Banner (~52vh). Für Vereine, Gemeinden, Organisationen.
+   Kein Scroll-Indikator. Nav überlagert den Banner nicht.
+   Load via: <link rel="stylesheet" href="heroes/banner.css">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hero--banner {
+  min-height: 52vh;
+  max-height: 60vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Banner beginnt UNTER der Nav — kein negativer margin */
+}
+
+.hero--banner .hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.hero--banner .hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.35) 60%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+.hero--banner .hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 52rem;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.hero--banner .hero-eyebrow {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.hero--banner .hero-title {
+  color: #ffffff;
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  text-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.35);
+  margin-bottom: var(--space-md);
+}
+
+.hero--banner .hero-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  max-width: 36rem;
+  margin: 0 auto var(--space-lg);
+}
+
+.hero--banner .hero-ctas {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Kein Scroll-Indikator bei Banner */
+.hero--banner .hero-scroll {
+  display: none;
+}
+
+@media (max-width: 48rem) {
+  .hero--banner {
+    min-height: 45vh;
+    max-height: none;
+  }
+  .hero--banner .hero-ctas {
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero--banner .hero-ctas .btn {
+    width: 100%;
+    max-width: 20rem;
+  }
+}

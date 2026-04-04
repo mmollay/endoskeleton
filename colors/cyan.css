@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Cyan (Electric) */
+:root {
+  --primary:       #06b6d4;
+  --primary-dark:  #0891b2;
+  --primary-light: #22d3ee;
+  --primary-rgb:   6, 182, 212;
+}

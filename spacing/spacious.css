@@ -1,0 +1,12 @@
+/* SSI Endoskeleton — Spacing Preset: Spacious */
+/* Großzügige Abstände für luftige, premium-wirkende Layouts */
+:root {
+  --space-xs:      0.375rem;
+  --space-sm:      0.75rem;
+  --space-md:      1.25rem;
+  --space-lg:      2rem;
+  --space-xl:      3rem;
+  --space-2xl:     4.5rem;
+  --space-3xl:     6rem;
+  --space-section: 7rem;
+}

@@ -1,0 +1,153 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SSI Endoskeleton — .htaccess v3.0.0
+# Security headers, GZIP, caching, HTTPS redirect.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ─── FORCE HTTPS ────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Remove www (uncomment ONE of these options)
+  # Option A: Remove www
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # Option B: Force www (uncomment if preferred, comment out Option A)
+  # RewriteCond %{HTTP_HOST} !^www\. [NC]
+  # RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ─── SECURITY HEADERS ──────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # Prevent MIME type sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Clickjacking protection
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # XSS Protection
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Referrer Policy
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Permissions Policy
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=()"
+
+  # Content Security Policy (adjust domains as needed)
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://www.google.com https://maps.google.com; connect-src 'self' https://www.google-analytics.com"
+
+  # Strict Transport Security (enable after confirming HTTPS works)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Remove server info
+  Header always unset X-Powered-By
+  Header always unset Server
+</IfModule>
+
+# ─── BLOCK SENSITIVE FILES ─────────────────────────────────────────────
+<FilesMatch "^\.env|\.git|\.htpasswd|composer\.(json|lock)|package(-lock)?\.json|VERSION">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Block access to backup/config files
+<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+
+# ─── GZIP COMPRESSION ─────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2
+</IfModule>
+
+# ─── BROWSER CACHING ──────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Default
+  ExpiresDefault "access plus 1 month"
+
+  # HTML — no cache (always fresh)
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # CSS & JavaScript — 1 year (use cache busting via query string)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+
+  # Images — 1 month
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/gif "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/avif "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # Fonts — 1 year
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# ─── CACHE CONTROL HEADERS ────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # HTML — no cache
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+
+  # CSS, JS — immutable with long cache
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # Fonts
+  <FilesMatch "\.(woff|woff2|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# ─── MIME TYPES ───────────────────────────────────────────────────────
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType image/avif .avif
+  AddType font/woff .woff
+  AddType font/woff2 .woff2
+  AddType application/json .json
+</IfModule>
+
+# ─── ERROR DOCUMENTS ─────────────────────────────────────────────────
+ErrorDocument 404 /index.html
+
+# ─── DIRECTORY OPTIONS ───────────────────────────────────────────────
+Options -Indexes -MultiViews

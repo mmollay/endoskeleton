@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Layout: Classic
+   Centered content, max-width container, traditional feel.
+   Load via: <link rel="stylesheet" href="layouts/classic.css">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* All content centered in narrow container */
+.layout-classic section {
+  padding: var(--space-section) var(--space-lg);
+}
+
+.layout-classic section > .container {
+  max-width: 56.25rem;
+}
+
+/* More traditional heading style — Serif for classic feel */
+.layout-classic .section-title {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: 0;
+  position: relative;
+  padding-bottom: var(--space-md);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.layout-classic .section-tag {
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+.layout-classic .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 3rem;
+  height: 0.125rem;
+  background: var(--primary);
+}
+
+.layout-classic .text-center .section-title::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Subtle borders between sections instead of background changes */
+.layout-classic section:not(.hero):not(.section-dark):nth-of-type(even) {
+  background: transparent;
+  border-top: 0.0625rem solid var(--border);
+  border-bottom: 0.0625rem solid var(--border);
+}
+
+/* Dark sections müssen dunkel bleiben */
+.layout-classic section.section-dark {
+  background: var(--bg-dark) !important;
+  border: none !important;
+}
+
+/* Text-focused: larger body text, smaller headings */
+.layout-classic p {
+  font-size: var(--fs-base);
+  line-height: 1.9;
+}
+
+.layout-classic .section-lead {
+  font-size: var(--fs-base);
+  line-height: 1.9;
+  max-width: 40rem;
+}
+
+/* Cards with subtle border, no shadow */
+.layout-classic .card {
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.layout-classic .card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-0.125rem);
+}
+
+/* Buttons are more understated */
+.layout-classic .btn {
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.75rem;
+  font-size: var(--fs-sm);
+}
+
+/* Blockquotes get serif treatment */
+.layout-classic .blockquote {
+  border-left-width: 0.125rem;
+  padding: var(--space-xl) var(--space-2xl);
+  background: transparent;
+}
+
+.layout-classic .blockquote p {
+  font-size: var(--fs-lg);
+  line-height: 1.9;
+}
+
+/* Grids: 3 Spalten beibehalten, Container bleibt schmal */
+.layout-classic .grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.layout-classic .grid-4 {
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+/* FAQ items get more spacing */
+.layout-classic .faq-list {
+  max-width: 40rem;
+}
+
+.layout-classic .faq-item {
+  padding: var(--space-xl) 0;
+}
+
+/* Footer stays full-width but with narrower grid */
+.layout-classic .footer-grid {
+  max-width: 56.25rem;
+  grid-template-columns: 1.5fr 1fr 1fr;
+}
+
+@media (max-width: 48rem) {
+  .layout-classic .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-classic .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-classic .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}

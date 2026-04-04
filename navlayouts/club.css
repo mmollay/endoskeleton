@@ -1,0 +1,73 @@
+/* SSI Endoskeleton — Nav Layout: Club
+   Akzentlinie unten, Items zentriert + uppercase, dezente Trenner.
+   Fuer Gastronomie, Events, Premium. */
+
+.site-nav {
+  justify-content: center;
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Logo absolut links */
+.site-nav .nav-logo {
+  position: absolute;
+  left: max(var(--space-xl), calc((100vw - var(--max-width, 75rem)) / 2));
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Kein Gap — Trenner uebernehmen den Abstand */
+.site-nav .nav-links {
+  gap: 0;
+}
+
+/* Uppercase + Spacing */
+.site-nav .nav-links a:not(.nav-cta) {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-md);
+}
+
+/* Dezente Trenner */
+.site-nav .nav-links li:not(:last-child) a:not(.nav-cta)::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.8em;
+  background: var(--border);
+  margin-left: var(--space-md);
+  vertical-align: middle;
+  opacity: 0.5;
+}
+
+/* CTA absolut rechts */
+.site-nav .nav-cta {
+  position: absolute;
+  right: max(var(--space-xl), calc((100vw - var(--max-width, 75rem)) / 2));
+  top: 50%;
+  transform: translateY(-50%);
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 48rem) {
+  .site-nav {
+    justify-content: space-between;
+  }
+  .site-nav .nav-logo {
+    position: static;
+    transform: none;
+  }
+  .site-nav .nav-links {
+    gap: var(--space-xl);
+  }
+  .site-nav .nav-links a:not(.nav-cta)::after {
+    display: none;
+  }
+  .site-nav .nav-cta {
+    position: static;
+    transform: none;
+  }
+}

@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Forest (Dunkelgrün/Natur) */
+:root {
+  --primary:       #2d6a4f;
+  --primary-dark:  #1b4332;
+  --primary-light: #40916c;
+  --primary-rgb:   45, 106, 79;
+}

@@ -1,0 +1,43 @@
+{
+  "layout": "modern",
+  "hero": "fullscreen",
+  "color": "blue",
+  "buttons": "rounded",
+  "charakter": "neutral",
+  "spacing": "normal",
+  "animation": "subtle",
+  "width": "default",
+  "font": "modern",
+
+  "_options": {
+    "layout":   ["modern", "classic", "magazine"],
+    "hero":     ["fullscreen", "split", "minimal", "banner"],
+    "color":    ["green", "blue", "orange", "teal", "red", "violet", "forest", "gold", "brown", "gray", "cyan", "lime", "pink", "electric", "neon-pink", "navy", "wine", "coral", "olive", "mint", "slate", "lavender", "charcoal"],
+    "buttons":   ["rounded", "soft", "sharp", "outline", "bold", "ghost", "tech", "tactical"],
+    "charakter": ["elegant", "sanft", "neutral", "markant", "kantig"],
+    "spacing":   ["compact", "normal", "spacious"],
+    "animation": ["none", "subtle", "dynamic"],
+    "width":     ["compact", "default", "wide", "full"],
+    "font":      ["modern", "system", "serif", "humanist", "editorial", "elegant", "rounded", "mono"],
+
+    "_charakter_hints": {
+      "elegant":  "Spa, Luxus, Mode, Hochzeit, Premium",
+      "sanft":    "Gesundheit, Beratung, Spiritualität, Vereine, Natur",
+      "neutral":  "Standard, Gewerbe, Dienstleistung, Gastronomie",
+      "markant":  "Architektur, Industrie, Recht, Finanzen, Corporate",
+      "kantig":   "Outdoor, Sport, Technik, Handwerk, Militär"
+    },
+    "_font_hints": {
+      "modern":    "Tech, Startup, Agentur, SaaS",
+      "system":    "Schnell, unauffällig, Performance",
+      "serif":     "Kanzlei, Luxus, Tradition, Kultur",
+      "humanist":  "Gesundheit, Bildung, Soziales, Verein",
+      "editorial": "Magazin, Blog, Redaktion, Medien",
+      "elegant":   "Mode, Beauty, Hochzeit, Premium",
+      "rounded":   "Kinder, Freizeit, kreative Branchen",
+      "mono":      "Tech, Developer, Digital"
+    },
+
+    "_note": "Farbpresets sind Vorlagen. Der Generator kann in theme.css eigene --primary Werte setzen basierend auf Logo/Branding."
+  }
+}

@@ -1,0 +1,52 @@
+/* SSI Endoskeleton — Softness Preset: Raw (hart, keine Schatten) */
+/* Passend für: Outdoor, Sport, Technik, Handwerk */
+
+/* ─── Cards: kantig, flach ─── */
+.card {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: 2px solid var(--border) !important;
+}
+.card:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  border-color: var(--primary) !important;
+}
+
+/* ─── Buttons: keine Schatten, kein Hover-Lift ─── */
+.btn,
+.btn-primary,
+.btn-ghost {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.btn:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ─── Hero: härterer Overlay (Veil hat eigenen hellen Overlay) ─── */
+.hero:not(.hero--veil) .hero-bg::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  ) !important;
+}
+
+/* ─── Blockquote: flach ─── */
+.blockquote {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ─── Banner: harte Kante ─── */
+.banner-item {
+  border-color: var(--border) !important;
+}
+
+/* ─── Divider: solid ─── */
+.divider {
+  background: var(--primary) !important;
+}

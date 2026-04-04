@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Violet */
+:root {
+  --primary:       #6b2ea0;
+  --primary-dark:  #4a1e72;
+  --primary-light: #8f50c4;
+  --primary-rgb:   107, 46, 160;
+}

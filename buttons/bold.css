@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Button Preset: Bold */
+.btn {
+  border-radius: 4px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 900 !important;
+  font-size: 0.85em !important;
+  box-shadow: 4px 4px 0 var(--primary-dark) !important;
+  border: none !important;
+}
+.btn:hover {
+  box-shadow: 2px 2px 0 var(--primary-dark) !important;
+  transform: translate(2px, 2px);
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impressum — {{SITE_NAME}}</title>
+  <meta name="description" content="Impressum und rechtliche Informationen von {{SITE_NAME}}.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="img/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family={{FONT}}&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="layouts/{{LAYOUT}}.css">
+  <link rel="stylesheet" href="buttons/{{BUTTONS}}.css">
+  <link rel="stylesheet" href="softness/{{CHARAKTER}}.css">
+  <link rel="stylesheet" href="spacing/{{SPACING}}.css">
+  <link rel="stylesheet" href="animation/{{ANIMATION}}.css">
+  <link rel="stylesheet" href="widths/{{WIDTH}}.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body class="layout-{{LAYOUT}}">
+
+  <div id="site-header"></div>
+
+  <div class="page-hero" id="main-content">
+    <div class="container">
+      <h1 class="section-title">Impressum</h1>
+    </div>
+  </div>
+
+  <section>
+    <div class="container-narrow">
+      <h2>Angaben gemäß § 5 ECG</h2>
+      <p>
+        <strong>{{COMPANY_NAME}}</strong><br>
+        {{COMPANY_ADDRESS_STREET}}<br>
+        {{COMPANY_ADDRESS_CITY}}
+      </p>
+
+      <h3 class="mt-xl">Kontakt</h3>
+      <p>
+        Telefon: <a href="tel:{{CONTACT_PHONE_RAW}}">{{CONTACT_PHONE}}</a><br>
+        E-Mail: <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a><br>
+        Website: <a href="{{SITE_URL}}">{{SITE_URL}}</a>
+      </p>
+
+      <h3 class="mt-xl">Unternehmensgegenstand</h3>
+      <p>{{COMPANY_BUSINESS}}</p>
+
+      <h3 class="mt-xl">UID-Nummer</h3>
+      <p>{{COMPANY_UID}}</p>
+
+      <h3 class="mt-xl">Gewerbeordnung</h3>
+      <p>{{COMPANY_TRADE_REGULATION}}</p>
+
+      <h3 class="mt-xl">Aufsichtsbehörde</h3>
+      <p>{{COMPANY_AUTHORITY}}</p>
+
+      <h3 class="mt-xl">Mitgliedschaft</h3>
+      <p>{{COMPANY_MEMBERSHIP}}</p>
+
+      <h3 class="mt-xl">Haftungsausschluss</h3>
+      <h4>Haftung für Inhalte</h4>
+      <p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 ECG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 ECG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.</p>
+
+      <h4 class="mt-lg">Haftung für Links</h4>
+      <p>Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.</p>
+
+      <h4 class="mt-lg">Urheberrecht</h4>
+      <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem österreichischen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.</p>
+
+      <h3 class="mt-xl">Webdesign</h3>
+      <p>Website erstellt von <a href="https://www.ssi.at" target="_blank" rel="noopener noreferrer">SSI — Smart Solutions & Infrastructure</a></p>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script>
+    window.SITE_CONFIG = {
+      name: "{{SITE_NAME}}",
+      logo: "img/logo.png",
+      nav: [{{NAV_ITEMS}}],
+      contact: {
+        name: "{{CONTACT_NAME}}",
+        email: "{{CONTACT_EMAIL}}",
+        phone: "{{CONTACT_PHONE}}",
+        address: "{{CONTACT_ADDRESS}}"
+      },
+      social: { {{SOCIAL_LINKS}} },
+      footer: { tagline: "{{FOOTER_TAGLINE}}", credit: true },
+      modules: []
+    };
+  </script>
+  <script src="shared.js"></script>
+</body>
+</html>

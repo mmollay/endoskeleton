@@ -1,0 +1,87 @@
+/* SSI Endoskeleton — Charakter: Elegant (maximale Weichheit, Glow, Luxus) */
+/* Passend fuer: Spa, Luxus, Mode, Hochzeit, Premium-Dienstleistung */
+
+/* ─── Cards: große Rundung, Glow-Schatten ─── */
+.card {
+  box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.1), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.08) !important;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.card:hover {
+  box-shadow: 0 16px 56px rgba(var(--primary-rgb), 0.16), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+  transform: translateY(-8px) !important;
+}
+
+/* ─── Buttons: Pill-Form, weicher Glow ─── */
+.btn {
+  border-radius: 50px !important;
+  letter-spacing: 0.03em !important;
+}
+.btn-primary {
+  box-shadow: 0 6px 24px rgba(var(--primary-rgb), 0.35) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.45) !important;
+  transform: translateY(-4px) !important;
+}
+.btn-ghost {
+  border-radius: 50px !important;
+  transition: all 0.4s ease !important;
+}
+
+/* ─── Hero: sanfter, eleganter Overlay ─── */
+.hero:not(.hero--veil) .hero-bg::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.25) 40%,
+    rgba(0, 0, 0, 0.5) 100%
+  ) !important;
+}
+.hero .hero-title {
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ─── Sektionen: subtile Farbtoenung ─── */
+section:nth-of-type(even) {
+  background-color: rgba(var(--primary-rgb), 0.02) !important;
+}
+
+/* ─── Banner-Leiste: stark gerundet ─── */
+.banner-grid {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+.banner-item {
+  border-color: rgba(var(--primary-rgb), 0.08) !important;
+}
+
+/* ─── Blockquote: weich mit Glow ─── */
+.blockquote {
+  border-radius: 16px !important;
+  border-left-width: 4px !important;
+  box-shadow: 0 4px 24px rgba(var(--primary-rgb), 0.08) !important;
+}
+
+/* ─── Divider: Gradient mit Fade ─── */
+.divider {
+  background: linear-gradient(90deg, transparent, var(--primary), transparent) !important;
+  height: 2px !important;
+}
+
+/* ─── Pricing Cards: extra Glow ─── */
+.pricing-card {
+  border-radius: 20px !important;
+}
+.pricing-card.featured {
+  box-shadow: 0 8px 40px rgba(var(--primary-rgb), 0.2) !important;
+}
+
+/* ─── Inputs: gerundeter ─── */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  border-radius: 12px !important;
+}

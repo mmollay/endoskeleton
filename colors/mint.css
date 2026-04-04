@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Mint (Mintgrün/Frisch) */
+:root {
+  --primary:       #3eb489;
+  --primary-dark:  #2a8a69;
+  --primary-light: #5ccda3;
+  --primary-rgb:   62, 180, 137;
+}

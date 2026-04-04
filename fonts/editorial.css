@@ -1,0 +1,10 @@
+/* SSI Endoskeleton — Font Preset: Editorial (magazin, redaktionell) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Lato', system-ui, sans-serif;
+}
+
+h1 { font-weight: 600; }
+h2, h3 { font-weight: 500; }

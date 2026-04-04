@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Brown (Erdton) */
+:root {
+  --primary:       #7a5230;
+  --primary-dark:  #563a22;
+  --primary-light: #a0734a;
+  --primary-rgb:   122, 82, 48;
+}

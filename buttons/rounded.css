@@ -1,0 +1,6 @@
+/* SSI Endoskeleton — Button Preset: Rounded (Pill) */
+.btn {
+  border-radius: 9999px !important;
+  padding-left: 1.75em !important;
+  padding-right: 1.75em !important;
+}

@@ -1,0 +1,11 @@
+/* SSI Endoskeleton — Width: Compact (62.5rem / 1000px)
+   Fuer Content-lastige Seiten, Blogs, Landing Pages.
+   Nav-Inhalt wird ueber Padding begrenzt, kein transform. */
+
+:root {
+  --max-width: 62.5rem;
+  --max-narrow: 42rem;
+  --max-wide: 75rem;
+}
+
+/* nav-inner erbt max-width aus --max-width, kein Sonder-Padding noetig */

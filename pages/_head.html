@@ -1,0 +1,39 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SSI Endoskeleton — _head.html (Reference Template)
+     This file documents what every page's <head> must contain.
+     The WebGenerator uses this as reference when building pages.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{PAGE_TITLE}} — {{SITE_NAME}}</title>
+<meta name="description" content="{{PAGE_DESCRIPTION}}">
+<meta name="robots" content="index, follow">
+<meta name="author" content="{{SITE_NAME}}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{{PAGE_TITLE}} — {{SITE_NAME}}">
+<meta property="og:description" content="{{PAGE_DESCRIPTION}}">
+<meta property="og:image" content="{{SITE_URL}}/img/og-image.jpg">
+<meta property="og:url" content="{{SITE_URL}}/{{PAGE_FILE}}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_AT">
+
+<!-- Favicon -->
+<link rel="icon" href="img/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="img/logo.png">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={{FONT}}&display=swap" rel="stylesheet">
+
+<!-- Styles -->
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="layouts/{{LAYOUT}}.css">
+<link rel="stylesheet" href="heroes/{{HERO}}.css">
+<link rel="stylesheet" href="buttons/{{BUTTONS}}.css">
+<link rel="stylesheet" href="softness/{{CHARAKTER}}.css">
+<link rel="stylesheet" href="spacing/{{SPACING}}.css">
+<link rel="stylesheet" href="animation/{{ANIMATION}}.css">
+<link rel="stylesheet" href="widths/{{WIDTH}}.css">
+<link rel="stylesheet" href="theme.css">

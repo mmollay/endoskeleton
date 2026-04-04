@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Neon Pink */
+:root {
+  --primary:       #ec4899;
+  --primary-dark:  #db2777;
+  --primary-light: #f472b6;
+  --primary-rgb:   236, 72, 153;
+}

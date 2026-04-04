@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PAGE_TITLE}} — {{SITE_NAME}}</title>
+  <meta name="description" content="{{PAGE_DESCRIPTION}}">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="{{PAGE_TITLE}} — {{SITE_NAME}}">
+  <meta property="og:description" content="{{PAGE_DESCRIPTION}}">
+  <meta property="og:url" content="{{SITE_URL}}/{{PAGE_FILE}}">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="img/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family={{FONT}}&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="layouts/{{LAYOUT}}.css">
+  <link rel="stylesheet" href="buttons/{{BUTTONS}}.css">
+  <link rel="stylesheet" href="softness/{{CHARAKTER}}.css">
+  <link rel="stylesheet" href="spacing/{{SPACING}}.css">
+  <link rel="stylesheet" href="animation/{{ANIMATION}}.css">
+  <link rel="stylesheet" href="widths/{{WIDTH}}.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body class="layout-{{LAYOUT}}" data-modules="{{MODULES}}">
+
+  <div id="site-header"></div>
+
+  <!-- Page Hero -->
+  <div class="page-hero" id="main-content">
+    <div class="container">
+      <p class="section-tag">{{PAGE_TAG}}</p>
+      <h1 class="section-title">{{PAGE_TITLE}}</h1>
+      <p class="section-lead mx-auto">{{PAGE_LEAD}}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="reveal">
+    <div class="container">
+      {{PAGE_CONTENT}}
+    </div>
+  </section>
+
+  <!-- Optional: Features / Cards Section -->
+  <section class="reveal">
+    <div class="container text-center">
+      <p class="section-tag">{{FEATURES_TAG}}</p>
+      <h2 class="section-title">{{FEATURES_TITLE}}</h2>
+      <div class="grid-3 mt-xl">
+        {{#FEATURES}}
+        <div class="card reveal">
+          <div class="card-body">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24"><path d="{{FEATURE_ICON_PATH}}"/></svg>
+            </div>
+            <h3>{{FEATURE_TITLE}}</h3>
+            <p>{{FEATURE_TEXT}}</p>
+          </div>
+        </div>
+        {{/FEATURES}}
+      </div>
+    </div>
+  </section>
+
+  <!-- Optional: CTA Section -->
+  <section class="section-dark reveal">
+    <div class="container text-center">
+      <h2 class="section-title">{{CTA_TITLE}}</h2>
+      <p class="section-lead mx-auto">{{CTA_TEXT}}</p>
+      <div class="hero-ctas mt-xl">
+        <a href="{{CTA_HREF}}" class="btn btn-primary btn-lg">{{CTA_BUTTON}}</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script>
+    window.SITE_CONFIG = {
+      name: "{{SITE_NAME}}",
+      logo: "img/logo.png",
+      nav: [{{NAV_ITEMS}}],
+      contact: {
+        name: "{{CONTACT_NAME}}",
+        email: "{{CONTACT_EMAIL}}",
+        phone: "{{CONTACT_PHONE}}",
+        address: "{{CONTACT_ADDRESS}}"
+      },
+      social: { {{SOCIAL_LINKS}} },
+      footer: { tagline: "{{FOOTER_TAGLINE}}", credit: true },
+      modules: [{{MODULES_LIST}}]
+    };
+  </script>
+  <script src="shared.js"></script>
+</body>
+</html>

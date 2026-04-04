@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Layout: Magazine
+   Editorial, typografiebetont. Klare Struktur mit Luft und Leichtigkeit.
+   Load via: <link rel="stylesheet" href="layouts/magazine.css">
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Sections: großzügig, nicht eng ── */
+.layout-magazine section:not(.hero) {
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+/* ── Titles: editorial, kein Unterstrich ── */
+.layout-magazine .section-title {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: none;
+  padding-bottom: 0;
+  display: block;
+}
+
+/* ── Divider: zentriert, schmal, dezent ── */
+.layout-magazine .divider {
+  height: 2px;
+  background: var(--primary);
+  width: 2.5rem;
+  opacity: 0.6;
+}
+
+/* ── Section tags: elegante Kategorie-Labels ── */
+.layout-magazine .section-tag {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+  font-size: var(--fs-xs);
+}
+
+/* ── Lead text: lesbar, nicht zu eng ── */
+.layout-magazine .section-lead {
+  font-size: var(--fs-sm);
+  max-width: 38rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+/* ── Cards: luftig, kein Rahmen, subtiler Schatten ── */
+.layout-magazine .card {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04) !important;
+  border: none !important;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.layout-magazine .card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.layout-magazine .card-body {
+  padding: var(--space-lg) var(--space-lg);
+  text-align: left !important;
+}
+
+.layout-magazine .card-body h3 {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  margin-bottom: var(--space-sm);
+}
+
+.layout-magazine .card-body p {
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+/* ── Card icon: clean, links ── */
+.layout-magazine .card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 0 var(--space-md) 0;
+  padding: 0.4rem;
+  border: none;
+  background: rgba(var(--primary-rgb), 0.06);
+}
+
+/* ── Grid: mehr Abstand zwischen Karten ── */
+.layout-magazine .grid-3 {
+  gap: var(--space-lg);
+}
+
+.layout-magazine .grid-2 {
+  gap: var(--space-xl);
+}
+
+/* ── Section-Wechsel: sanft, ohne harte Linien ── */
+.layout-magazine section:not(.hero):not(.section-dark):nth-of-type(odd) {
+  background: var(--bg);
+}
+
+.layout-magazine section:not(.hero):not(.section-dark):nth-of-type(even) {
+  background: var(--bg-alt);
+}
+
+/* ── Stats: offen, keine Trennlinien, viel Luft ── */
+.layout-magazine .banner-strip {
+  border-top: none;
+  border-bottom: none;
+}
+
+.layout-magazine .banner-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  border: none;
+  border-radius: 0;
+}
+
+.layout-magazine .banner-item {
+  padding: var(--space-lg) var(--space-md);
+  border-right: none;
+  border-top: none;
+}
+
+.layout-magazine .banner-val {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.layout-magazine .banner-label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: var(--space-xs);
+}
+
+/* ── Buttons: editorial, aber nicht eckig ── */
+.layout-magazine .btn {
+  padding: 0.625rem 1.5rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* ── Blockquote: editorial, dezent ── */
+.layout-magazine .blockquote {
+  border-left: 2px solid rgba(var(--primary-rgb), 0.4);
+  background: transparent;
+  padding: var(--space-md) var(--space-xl);
+  font-style: italic;
+}
+
+/* ── CTA / Dark sections ── */
+.layout-magazine .section-dark,
+.layout-magazine section.section-dark {
+  background: var(--bg-dark) !important;
+  color: rgba(255, 255, 255, 0.85);
+  border: none !important;
+}
+
+.layout-magazine .section-dark .section-title {
+  color: #ffffff;
+}
+
+.layout-magazine .section-dark .section-lead {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Footer: passender Abstand ── */
+.layout-magazine footer {
+  padding: var(--space-xl) 0;
+}
+
+@media (max-width: 48rem) {
+  .layout-magazine .banner-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

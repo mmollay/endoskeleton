@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Lime (Neon-Grün) */
+:root {
+  --primary:       #22c55e;
+  --primary-dark:  #16a34a;
+  --primary-light: #4ade80;
+  --primary-rgb:   34, 197, 94;
+}

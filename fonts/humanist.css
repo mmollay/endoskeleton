@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Font Preset: Humanist (warm, freundlich) */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Nunito+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --font-heading: 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito Sans', system-ui, sans-serif;
+}

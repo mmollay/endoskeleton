@@ -1,0 +1,10 @@
+/* SSI Endoskeleton — Nav Layout: Minimal */
+/* Nur Logo + Hamburger, auch am Desktop. Clean/reduziert. */
+
+.site-nav .nav-links {
+  display: none !important;
+}
+
+.site-nav .nav-hamburger {
+  display: flex !important;
+}

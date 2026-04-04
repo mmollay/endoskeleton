@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Button Preset: Sharp */
+.btn {
+  border-radius: 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 700 !important;
+}

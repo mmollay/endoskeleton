@@ -1,0 +1,7 @@
+/* SSI Endoskeleton — Color Preset: Green (Standard) */
+:root {
+  --primary:       #2e6b2e;
+  --primary-dark:  #1e4d1e;
+  --primary-light: #4a9e4a;
+  --primary-rgb:   46, 107, 46;
+}
