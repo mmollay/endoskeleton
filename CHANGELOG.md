@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.4] — 2026-04-04
+
+### Fixed
+- **demo.html / shared.js** — Release-Bump v3.19.4
+
+---
+
 ## [3.19.3] — 2026-04-04
 
 ### Fixed
