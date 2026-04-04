@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.18.0] — 2026-04-04
+
+### Added
+- **demo.html** — 6 Quick-Presets in der Sidebar: Corporate, Kreativ, Minimal, Tech, Natur, Neon
+- Jeder Preset setzt alle Parameter gleichzeitig (Layout, Hero, Farbe, Charakter, Font, Buttons,
+  Nav-Stil/Verhalten/Layout, Footer, Spacing, Animation, Breite, Theme)
+- UI-Controls (Selects + Buttons) werden bei Preset-Wahl synchron aktualisiert
+- Aktiver Preset wird visuell hervorgehoben (goldener Rahmen)
+
+---
+
 ## [3.17.1] — 2026-04-04
 
 ### Fixed

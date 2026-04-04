@@ -9,17 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="base.css?v=3.17.1">
-  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.17.1">
-  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.17.1">
-  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.17.1">
-  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.17.1">
-  <link id="charakter-css" rel="stylesheet" href="softness/neutral.css?v=3.17.1">
-  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.17.1">
-  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.17.1">
-  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.17.1">
-  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.17.1">
-  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.17.1">
+  <link rel="stylesheet" href="base.css?v=3.18.0">
+  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.18.0">
+  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.18.0">
+  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.18.0">
+  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.18.0">
+  <link id="charakter-css" rel="stylesheet" href="softness/neutral.css?v=3.18.0">
+  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.18.0">
+  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.18.0">
+  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.18.0">
+  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.18.0">
+  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.18.0">
   <style>
     /* ═══ Demo Sidebar ═══ */
     /* ─── Push-Layout: Content wird verschoben, nicht überlagert ─── */
@@ -155,6 +155,44 @@
     }
     .demo-select:focus { border-color: #3b82f6; }
 
+    /* ─── Quick-Presets ──────────────────────── */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem;
+      margin-top: 0.1rem;
+    }
+    .preset-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      padding: 0.45rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .preset-card:hover { background: #293548; border-color: #3b82f6; }
+    .preset-card.active { border-color: #f59e0b; background: #1c1a10; }
+    .preset-card .preset-name {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      display: block;
+    }
+    .preset-card .preset-desc {
+      font-size: 0.55rem;
+      color: #64748b;
+      display: block;
+      margin-top: 0.1rem;
+    }
+    .preset-card .preset-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
     /* Cookie-Banner verstecken */
     #cookie-banner { display: none !important; }
 
@@ -190,9 +228,42 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v3.17.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v3.18.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
+      </div>
+
+      <!-- Quick-Presets -->
+      <div class="demo-section">
+        <div class="demo-group">
+          <label>Schnell-Presets</label>
+          <div class="preset-grid">
+            <button class="preset-card" id="preset-corporate" onclick="applyPreset('corporate')">
+              <span class="preset-name"><span class="preset-dot" style="background:#2563eb"></span>Corporate</span>
+              <span class="preset-desc">Seriös · Blau · Serif</span>
+            </button>
+            <button class="preset-card" id="preset-kreativ" onclick="applyPreset('kreativ')">
+              <span class="preset-name"><span class="preset-dot" style="background:#f97316"></span>Kreativ</span>
+              <span class="preset-desc">Mutig · Coral · Editorial</span>
+            </button>
+            <button class="preset-card" id="preset-minimal" onclick="applyPreset('minimal')">
+              <span class="preset-name"><span class="preset-dot" style="background:#64748b"></span>Minimal</span>
+              <span class="preset-desc">Clean · Grau · System</span>
+            </button>
+            <button class="preset-card" id="preset-tech" onclick="applyPreset('tech')">
+              <span class="preset-name"><span class="preset-dot" style="background:#06b6d4"></span>Tech</span>
+              <span class="preset-desc">Dark · Cyan · Mono</span>
+            </button>
+            <button class="preset-card" id="preset-natur" onclick="applyPreset('natur')">
+              <span class="preset-name"><span class="preset-dot" style="background:#4d7c0f"></span>Natur</span>
+              <span class="preset-desc">Organisch · Grün · Humanist</span>
+            </button>
+            <button class="preset-card" id="preset-neon" onclick="applyPreset('neon')">
+              <span class="preset-name"><span class="preset-dot" style="background:#e879f9"></span>Neon</span>
+              <span class="preset-desc">Vibrant · Pink · Rounded</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Struktur -->
@@ -776,7 +847,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=3.17.1"></script>
+  <script src="shared.js?v=3.18.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -962,6 +1033,70 @@
       document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
         if (strings[key]) el.textContent = strings[key];
+      });
+    }
+
+    /* ─── Quick-Presets ──────────────────────────── */
+    var PRESETS = {
+      corporate: { layout:'modern', hero:'split',      color:'blue',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',  navBehavior:'sticky',   navLayout:'standard', navStyle:'light',  footerStyle:'dark',    width:'default', theme:'light' },
+      kreativ:   { layout:'magazine',hero:'banner',    color:'coral',     charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',     navBehavior:'autohide', navLayout:'centered', navStyle:'colored',footerStyle:'colored', width:'wide',    theme:'light' },
+      minimal:   { layout:'modern', hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'system',    buttons:'ghost',    navBehavior:'sticky',   navLayout:'minimal',  navStyle:'light',  footerStyle:'minimal', width:'default', theme:'light' },
+      tech:      { layout:'modern', hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',     navBehavior:'transparent',navLayout:'standard',navStyle:'dark',   footerStyle:'dark',    width:'full',    theme:'dark'  },
+      natur:     { layout:'classic',hero:'veil',       color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',     navBehavior:'shrink',   navLayout:'standard', navStyle:'light',  footerStyle:'light',   width:'default', theme:'light' },
+      neon:      { layout:'magazine',hero:'fullscreen',color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical', navBehavior:'autohide', navLayout:'club',     navStyle:'dark',   footerStyle:'dark',    width:'wide',    theme:'dark'  }
+    };
+
+    function applyPreset(name) {
+      var p = PRESETS[name];
+      if (!p) return;
+
+      /* CSS-Dateien tauschen */
+      switchLayout(p.layout);
+      switchHero(p.hero);
+      switchColor(p.color);
+      switchCharakter(p.charakter);
+      switchSpacing(p.spacing);
+      switchAnimation(p.animation);
+      switchFont(p.font);
+      switchButtons(p.buttons);
+      switchNavBehavior(p.navBehavior);
+      switchNavLayout(p.navLayout);
+      switchNavStyle(p.navStyle);
+      switchFooterStyle(p.footerStyle);
+      switchWidth(p.width);
+      switchTheme(p.theme);
+
+      /* UI-Controls synchronisieren */
+      /* Buttons mit data-* */
+      function setActiveByData(attr, val) {
+        document.querySelectorAll('[' + attr + ']').forEach(function(b) {
+          b.classList.toggle('active', b.getAttribute(attr) === val);
+        });
+      }
+      setActiveByData('data-layout', p.layout);
+      setActiveByData('data-hero', p.hero);
+      setActiveByData('data-nav-style', p.navStyle);
+      setActiveByData('data-nav-layout', p.navLayout);
+      setActiveByData('data-width', p.width);
+      setActiveByData('data-footer-style', p.footerStyle);
+      setActiveByData('data-theme-switch', p.theme);
+
+      /* Selects */
+      function setSelect(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.value = val;
+      }
+      setSelect('color-select', p.color);
+      setSelect('charakter-select', p.charakter);
+      setSelect('spacing-select', p.spacing);
+      setSelect('animation-select', p.animation);
+      setSelect('font-select', p.font);
+      setSelect('buttons-select', p.buttons);
+      setSelect('nav-select', p.navBehavior);
+
+      /* Preset-Karten hervorheben */
+      document.querySelectorAll('.preset-card').forEach(function(c) {
+        c.classList.toggle('active', c.id === 'preset-' + name);
       });
     }
 
