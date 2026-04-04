@@ -4,6 +4,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.16.0] — 2026-04-04
+
+### Fixed
+- **demo.html** — alle internen IDs und Funktionen von `softness-*` auf `charakter-*` umbenannt
+  (Link-ID, Select-ID, JS-Funktion, Event-Listener, URL-State-Key, Kombinations-Counter)
+- **Config-Export** — Schlüssel war `softness`, jetzt korrekt `charakter` (konsistent mit config.json)
+- **URL-State** — Fallback-Wert war `'balanced'` (legacy, existiert nicht mehr), jetzt `'neutral'`
+- **Versionsangaben** — demo.html Title, Sidebar-Label, alle CSS-Cache-Buster auf v3.16.0
+- **shared.js** — Version-Kommentar auf v3.16.0
+
+### Removed
+- **softness/balanced.css** — Legacy-Datei, ersetzt durch `neutral.css`
+- **softness/raw.css** — Legacy-Datei, ersetzt durch `kantig.css`
+- **softness/soft.css** — Legacy-Datei, ersetzt durch `sanft.css`
+
+---
+
 ## [3.15.0] — 2026-04-04
 
 ### Changed

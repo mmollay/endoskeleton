@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v3.15 — Template Demo</title>
-  <meta name="description" content="SSI Endoskeleton v3.15 — Basis-Template für alle generierten Websites">
+  <title>SSI Endoskeleton v3.16 — Template Demo</title>
+  <meta name="description" content="SSI Endoskeleton v3.16 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="base.css?v=3.15.0">
-  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.15.0">
-  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.15.0">
-  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.15.0">
-  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.15.0">
-  <link id="softness-css" rel="stylesheet" href="softness/neutral.css?v=3.15.0">
-  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.15.0">
-  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.15.0">
-  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.15.0">
-  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.15.0">
-  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.15.0">
+  <link rel="stylesheet" href="base.css?v=3.16.0">
+  <link id="color-css" rel="stylesheet" href="colors/green.css?v=3.16.0">
+  <link id="layout-css" rel="stylesheet" href="layouts/modern.css?v=3.16.0">
+  <link id="hero-css" rel="stylesheet" href="heroes/fullscreen.css?v=3.16.0">
+  <link id="button-css" rel="stylesheet" href="buttons/rounded.css?v=3.16.0">
+  <link id="charakter-css" rel="stylesheet" href="softness/neutral.css?v=3.16.0">
+  <link id="font-css" rel="stylesheet" href="fonts/modern.css?v=3.16.0">
+  <link id="spacing-css" rel="stylesheet" href="spacing/normal.css?v=3.16.0">
+  <link id="animation-css" rel="stylesheet" href="animation/subtle.css?v=3.16.0">
+  <link id="navlayout-css" rel="stylesheet" href="navlayouts/standard.css?v=3.16.0">
+  <link id="width-css" rel="stylesheet" href="widths/default.css?v=3.16.0">
   <style>
     /* ═══ Demo Sidebar ═══ */
     .demo-sidebar-wrapper {
@@ -169,7 +169,7 @@
       onclick="document.getElementById('demo-sidebar-wrapper').classList.toggle('collapsed');"
       title="Demo-Einstellungen ein-/ausblenden">Demo</button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v3.15.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v3.16.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -236,7 +236,7 @@
         </div>
         <div class="demo-group">
           <label>Charakter</label>
-          <select class="demo-select" id="softness-select">
+          <select class="demo-select" id="charakter-select">
             <option value="elegant">Elegant</option>
             <option value="sanft">Sanft</option>
             <option value="neutral" selected>Neutral</option>
@@ -755,7 +755,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=3.15.0"></script>
+  <script src="shared.js?v=3.16.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -972,9 +972,9 @@
       applyLang(currentLang);
     }
 
-    /* ─── Softness Switcher ──────────────────── */
-    function switchSoftness(preset) {
-      document.getElementById('softness-css').href = 'softness/' + preset + '.css?v=' + cssVer;
+    /* ─── Charakter Switcher ──────────────────── */
+    function switchCharakter(preset) {
+      document.getElementById('charakter-css').href = 'softness/' + preset + '.css?v=' + cssVer;
     }
 
     /* ─── Font Switcher ──────────────────────── */
@@ -1053,7 +1053,7 @@
         layout: getActive('[data-layout]') || 'modern',
         hero: getActive('[data-hero]') || 'fullscreen',
         color: getSelect('color-select'),
-        softness: getSelect('softness-select'),
+        charakter: getSelect('charakter-select'),
         spacing: getSelect('spacing-select'),
         animation: getSelect('animation-select'),
         font: getSelect('font-select'),
@@ -1106,9 +1106,9 @@
     if (buttonsSelect) {
       buttonsSelect.addEventListener('change', function() { switchButtons(this.value); });
     }
-    var softnessSelect = document.getElementById('softness-select');
-    if (softnessSelect) {
-      softnessSelect.addEventListener('change', function() { switchSoftness(this.value); });
+    var charakterSelect = document.getElementById('charakter-select');
+    if (charakterSelect) {
+      charakterSelect.addEventListener('change', function() { switchCharakter(this.value); });
     }
     var fontSelect = document.getElementById('font-select');
     if (fontSelect) {
@@ -1146,7 +1146,7 @@
         layout: (document.querySelector('[data-layout].active') || {}).dataset.layout || 'modern',
         hero:   (document.querySelector('[data-hero].active') || {}).dataset.hero   || 'fullscreen',
         color:  (document.getElementById('color-select') || {}).value              || 'green',
-        softness: (document.getElementById('softness-select') || {}).value         || 'balanced',
+        charakter: (document.getElementById('charakter-select') || {}).value        || 'neutral',
         spacing:  (document.getElementById('spacing-select') || {}).value          || 'normal',
         animation:(document.getElementById('animation-select') || {}).value        || 'subtle',
         font:     (document.getElementById('font-select') || {}).value             || 'modern',
@@ -1186,9 +1186,9 @@
         var sel = document.getElementById('color-select');
         if (sel) { sel.value = params.color; switchColor(params.color); }
       }
-      if (params.softness) {
-        var sel = document.getElementById('softness-select');
-        if (sel) { sel.value = params.softness; switchSoftness(params.softness); }
+      if (params.charakter) {
+        var sel = document.getElementById('charakter-select');
+        if (sel) { sel.value = params.charakter; switchCharakter(params.charakter); }
       }
       if (params.spacing) {
         var sel = document.getElementById('spacing-select');
@@ -1234,7 +1234,7 @@
     }
 
     /* Attach URL state updates to all switchers */
-    ['color-select', 'softness-select', 'spacing-select', 'animation-select',
+    ['color-select', 'charakter-select', 'spacing-select', 'animation-select',
      'font-select', 'buttons-select', 'nav-select'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('change', updateUrlState);
@@ -1257,7 +1257,7 @@
         layout:   document.querySelectorAll('[data-layout]').length,
         hero:     document.querySelectorAll('[data-hero]').length,
         color:    document.querySelectorAll('#color-select option').length,
-        softness: document.querySelectorAll('#softness-select option').length,
+        charakter: document.querySelectorAll('#charakter-select option').length,
         spacing:  document.querySelectorAll('#spacing-select option').length,
         animation:document.querySelectorAll('#animation-select option').length,
         font:     document.querySelectorAll('#font-select option').length,
