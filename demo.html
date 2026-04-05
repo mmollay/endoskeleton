@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.7';
+      var v = '5.0.8';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
@@ -88,27 +88,28 @@
       align-items: stretch;
       transition: transform 0.25s ease;
     }
-    .demo-sidebar-wrapper.collapsed { transform: translateX(300px); }
+    .demo-sidebar-wrapper.collapsed { transform: translateX(340px); }
 
     .demo-sidebar-tab {
-      width: 24px;
-      background: #334155;
-      color: #fff;
+      width: 14px;
+      background: #fafafa;
+      color: #64748b;
       border: none;
+      border-left: 1px solid #e2e8f0;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.75rem;
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      border-radius: 4px 0 0 4px;
-      box-shadow: -2px 0 8px rgba(0,0,0,0.15);
-      transition: background 0.15s;
+      border-radius: 3px 0 0 3px;
+      box-shadow: -1px 0 4px rgba(0,0,0,0.04);
+      transition: background 0.15s, color 0.15s;
       user-select: none;
     }
-    .demo-sidebar-tab:hover { background: #475569; }
+    .demo-sidebar-tab:hover { background: #fff; color: #3b82f6; }
     .demo-sidebar-tab .tab-arrow {
       display: inline-block;
       transition: transform 0.25s ease;
@@ -118,12 +119,12 @@
     }
 
     .demo-sidebar-panel {
-      width: 300px;
+      width: 340px;
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
       background: #fafafa;
-      padding: 0.75rem;
+      padding: 0.875rem 1rem;
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -368,8 +369,8 @@
     /* ─── Visual Pickers (Stil-Tab) ─────────── */
     .color-grid {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
     }
     .color-swatch {
       width: 100%; aspect-ratio: 1;
