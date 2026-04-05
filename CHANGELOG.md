@@ -4,6 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.6] — 2026-04-05
+
+### Added
+- **9. Preset: `survival`** — Direkte survivaltraining.at-Nachbildung. Cream-BG (theme=warm `#f5f2eb`), Oswald+Source-Serif Typography (font=survival), Survival-Grün `#2d7a2d` (neuer `colors/survival.css`), sharp angular border-radius:0 Buttons, fullscreen Hero mit Dark-Overlay, transparent Nav. Löst Martins Beschwerde #4 "nicht wie survivaltraining.at" — jetzt 1:1 Design-Referenz als Preset nutzbar.
+- **colors/survival.css** — Ember-Green Palette: primary `#2d7a2d`, dark `#1e5c1e`, light `#4a8c3f`. RGB-Tokens für rgba-Transparenzen.
+- **base.css Harmonielehre** — `body[data-color="survival"]` farbgetönter Text `#253525` / Heading `#0f2010` (forest-ähnlich, dunkel mit Grünstich).
+- **demo.html** — Sidebar Color-Swatch für Survival Green + PRESET_META-Eintrag "Outdoor · Grün · Oswald + Source Serif".
+
+---
+
 ## [4.6.5] — 2026-04-05
 
 ### Added

@@ -2595,6 +2595,7 @@ body[data-color="orange"] { --text: #3a2820; --heading: #26140c; }
 body[data-color="cyan"]   { --text: #263a42; --heading: #0f2630; }
 body[data-color="teal"]   { --text: #263a38; --heading: #0f2620; }
 body[data-color="mint"]   { --text: #2a3a32; --heading: #0f2a1e; }
+body[data-color="survival"]{ --text: #253525; --heading: #0f2010; }
 body[data-color="forest"] { --text: #253525; --heading: #0f2010; }
 body[data-color="olive"]  { --text: #30382a; --heading: #182010; }
 body[data-color="violet"] { --text: #322840; --heading: #1a0f2e; }
