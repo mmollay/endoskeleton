@@ -26,13 +26,14 @@
 }
 
 /* ─── Hero: härterer Overlay (Veil hat eigenen hellen Overlay) ─── */
+/* Overridable via --hero-overlay-gradient — keine !important */
 .hero:not(.hero--veil) .hero-bg::after {
-  background: linear-gradient(
+  background: var(--hero-overlay-gradient, linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.4) 0%,
     rgba(0, 0, 0, 0.6) 50%,
     rgba(0, 0, 0, 0.8) 100%
-  ) !important;
+  ));
 }
 
 /* ─── Blockquote: flach ─── */

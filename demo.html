@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.6.10 — Template Demo</title>
+  <title>SSI Endoskeleton v4.7.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.6.10';
+      var v = '4.7.0-b2';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -36,6 +36,13 @@
         var id=ids[i], d=defaults[id];
         var val = p[d[0]] || d[2];
         document.write('<link id="'+id+'" rel="stylesheet" href="'+d[1]+val+'.css?v='+v+'">');
+      }
+      /* Preset-Komplettpaket als LETZTES (höchste Specificity) */
+      if (p.preset) {
+        var safePreset = p.preset.replace(/[^a-z0-9_-]/gi, '');
+        if (safePreset) {
+          document.write('<link id="preset-css" rel="stylesheet" href="presets/'+safePreset+'.css?v='+v+'">');
+        }
       }
     })();
   </script>
@@ -566,7 +573,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.6.10</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.6.11</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.625rem 0.75rem;background:linear-gradient(135deg,#eff6ff,#f0fdfa);border:1px solid #dbeafe;border-radius:8px;margin-bottom:1rem;font-size:0.75rem;color:#64748b;letter-spacing:0.02em;">
         <span id="variation-count" style="font-size:1rem;font-weight:700;color:#3b82f6;">—</span> mögliche Designs
       </div>
@@ -587,6 +594,7 @@
             <div class="preset-grid" id="builtin-preset-grid"></div>
             <div class="preset-section-label" id="custom-presets-label" style="display:none;">Eigene Presets</div>
             <div class="preset-grid" id="custom-preset-grid"></div>
+            <button id="reset-demo-btn" onclick="if(confirm('Alle Einstellungen zurücksetzen?')){location.hash='';location.reload();}" style="width:100%;padding:10px 12px;margin-top:8px;margin-bottom:8px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;color:#64748b;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.background='#fff';this.style.borderColor='#e2e8f0';this.style.color='#64748b';">↺ Zurücksetzen / Reset</button>
             <button id="save-preset-btn" onclick="showSaveForm()">+ Aktuelles Design speichern</button>
             <div id="save-preset-form">
               <input type="text" id="save-preset-name" placeholder="Name, z.B. Mein Restaurant" maxlength="30">
@@ -1220,7 +1228,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.6.10"></script>
+  <script src="shared.js?v=4.6.11"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1464,7 +1472,8 @@
       creative:  ['photo-1513364776144-60967b0f800f','photo-1452860606245-08befc0ff44b','photo-1541701494587-cb58502866ab','photo-1558655146-9f40138edfeb','photo-1460661419201-fd4cecdf8a8b'],
       outdoor:   ['photo-1506905925346-21bda4d32df4','photo-1441974231531-c6227db76b6e','photo-1464822759023-fed622ff2c3b','photo-1501554728187-ce583db33af7','photo-1426604966848-d7adac402bff'],
       playful:   ['photo-1503023345310-bd7c1de61c7d','photo-1513151233558-d860c5398176','photo-1491438590914-bc09fcaaf77a','photo-1472162072942-cd5147eb3902','photo-1530103862676-de8c9debad1d'],
-      elegant:   ['photo-1517604931442-7e0c8ed2963c','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1']
+      elegant:   ['photo-1517604931442-7e0c8ed2963c','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1'],
+      survival:  ['photo-1511497584788-876760111969','photo-1448375240586-882707db888b','photo-1542601906990-b4d3fb778b09','photo-1441974231531-c6227db76b6e','photo-1506905925346-21bda4d32df4']
     };
 
     function getRandomPresetImage(presetKey) {
@@ -1906,6 +1915,12 @@
         var kv = p.split('=');
         if (kv.length === 2) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
       });
+      /* Hero-Bild bei URL-Load — nur bei explizitem preset=X (konservativ, QA-safe) */
+      if (params.preset) {
+        var heroType = params.hero || 'fullscreen';
+        var imgId = getRandomPresetImage(params.preset);
+        if (imgId) applyHeroImage(imgId, heroType);
+      }
       if (params.layout) {
         var btn = document.querySelector('[data-layout="' + params.layout + '"]');
         if (btn) { setActive(btn); switchLayout(params.layout); }

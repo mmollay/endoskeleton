@@ -1,0 +1,135 @@
+/* SSI Endoskeleton — Preset: Survival (v4.7.0)
+ * Komplettpaket angelehnt an survivaltraining.at
+ * Beige/Warm + Grün + Oswald Big-Type + Wald-Hero
+ * Wird als LETZTES CSS geladen → höchste Specificity ohne !important.
+ */
+
+:root {
+  /* ─── Farben: warm beige + survival green ─── */
+  --bg:              #f5f2eb;
+  --bg-alt:          #ede8dc;
+  --bg-dark:         #2a2a2a;
+  --text:            #2a2a2a;
+  --text-muted:      #5a5550;
+  --text-light:      #7a756e;
+  --heading:         #1a1a1a;
+  --border:          #d9d3c5;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(26, 26, 26, 0.08);
+
+  --primary:         #2d7a2d;
+  --primary-dark:    #1e5c1e;
+  --primary-light:   #4a8c3f;
+  --primary-rgb:     45, 122, 45;
+
+  /* ─── Typography: Oswald Big-Type ─── */
+  --font-heading:    'Oswald', 'Inter', system-ui, sans-serif;
+  --font-body:       'Source Serif 4', 'Source Sans 3', Georgia, serif;
+  --fs-display:      clamp(4rem, 3rem + 8vw, 10rem);
+  --fs-hero:         clamp(3.5rem, 2.5rem + 6vw, 8rem);
+
+  /* ─── Hero-Overlay: heller beiger Veil (statt dunkler Gradient) ─── */
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(245, 242, 235, 0.35) 0%,
+    rgba(245, 242, 235, 0.55) 60%,
+    rgba(245, 242, 235, 0.75) 100%
+  );
+  --hero-title-color: #1a1a1a;
+
+  /* ─── Wald-Hero-Hintergrundbild (Fallback via CSS) ─── */
+  --hero-bg-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1920&q=80');
+}
+
+/* ─── Hero-Title: dunkel, Oswald, uppercase, stark ─── */
+/* Spezifität muss hero-variant-Selektoren schlagen */
+.hero-title,
+.hero--image .hero-title,
+.hero--fullscreen .hero-title,
+.hero--split .hero-title,
+.hero--banner .hero-title,
+.hero--veil .hero-title,
+.hero--minimal .hero-title {
+  font-family: var(--font-heading);
+  color: var(--hero-title-color);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  line-height: 0.95;
+  text-shadow: 0 2px 20px rgba(245, 242, 235, 0.6);
+}
+
+/* Grüne Akzent-Wörter (strong/em in Headline) */
+.hero-title strong,
+.hero-title em,
+.hero--image .hero-title strong,
+.hero--image .hero-title em {
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* Subtitle: Serif, warmer grey */
+.hero-subtitle,
+.hero--image .hero-subtitle,
+.hero--fullscreen .hero-subtitle,
+.hero--split .hero-subtitle,
+.hero--banner .hero-subtitle,
+.hero--veil .hero-subtitle,
+.hero--minimal .hero-subtitle {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-weight: 400;
+  text-shadow: 0 1px 10px rgba(245, 242, 235, 0.5);
+}
+
+.hero-eyebrow,
+.hero--image .hero-eyebrow,
+.hero--fullscreen .hero-eyebrow,
+.hero--split .hero-eyebrow,
+.hero--banner .hero-eyebrow,
+.hero--veil .hero-eyebrow,
+.hero--minimal .hero-eyebrow {
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+/* ─── Hero-Background: Wald-Bild via CSS-Variable ─── */
+.hero .hero-bg,
+.hero--image .hero-bg,
+.hero--fullscreen .hero-bg {
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+}
+
+/* ─── Hero-Overlay: heller Veil statt schwarz ─── */
+.hero .hero-bg::after,
+.hero:not(.hero--veil) .hero-bg::after,
+.hero--fullscreen .hero-bg::after {
+  background: var(--hero-overlay-gradient);
+}
+
+/* ─── Headings generell: Oswald ─── */
+h1, h2, h3, h4, h5, h6,
+.section-title {
+  font-family: var(--font-heading);
+  color: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+/* ─── Body-Text: Serif ─── */
+body, p {
+  font-family: var(--font-body);
+}
+
+/* ─── Section Backgrounds konsistent beige ─── */
+section {
+  background-color: var(--bg);
+}
+section:nth-child(even) {
+  background-color: var(--bg-alt);
+}

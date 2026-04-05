@@ -115,3 +115,51 @@
     max-width: 20rem;
   }
 }
+
+
+/* ─── Cream Overlay für warme/helle Themes (survivaltraining.at-Stil) ─── */
+/* Bei warm/sunset/earth/pastel Themes soll das Hero-Bild DURCH einen
+   cremig-hellen Overlay scheinen statt unter dark gradient zu verschwinden.
+   Text wird dunkel gesetzt für Kontrast auf hellem Overlay. */
+[data-theme=warm] .hero--fullscreen .hero-bg::after,
+[data-theme=sunset] .hero--fullscreen .hero-bg::after,
+[data-theme=earth] .hero--fullscreen .hero-bg::after,
+[data-theme=pastel] .hero--fullscreen .hero-bg::after {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 82%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 88%, transparent) 40%,
+    color-mix(in srgb, var(--bg) 95%, transparent) 85%,
+    var(--bg) 100%
+  ) !important;
+}
+
+/* Dark text on cream overlay (invertiert vom weißen Text auf dark overlay) */
+[data-theme=warm] .hero--fullscreen .hero-title,
+[data-theme=sunset] .hero--fullscreen .hero-title,
+[data-theme=earth] .hero--fullscreen .hero-title,
+[data-theme=pastel] .hero--fullscreen .hero-title {
+  color: var(--heading) !important;
+  text-shadow: none !important;
+}
+[data-theme=warm] .hero--fullscreen .hero-eyebrow,
+[data-theme=warm] .hero--fullscreen .hero-subtitle,
+[data-theme=warm] .hero--fullscreen .hero-scroll,
+[data-theme=sunset] .hero--fullscreen .hero-eyebrow,
+[data-theme=sunset] .hero--fullscreen .hero-subtitle,
+[data-theme=sunset] .hero--fullscreen .hero-scroll,
+[data-theme=earth] .hero--fullscreen .hero-eyebrow,
+[data-theme=earth] .hero--fullscreen .hero-subtitle,
+[data-theme=earth] .hero--fullscreen .hero-scroll,
+[data-theme=pastel] .hero--fullscreen .hero-eyebrow,
+[data-theme=pastel] .hero--fullscreen .hero-subtitle,
+[data-theme=pastel] .hero--fullscreen .hero-scroll {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* Eyebrow in der Primary-Farbe (grün für survival, wie survivaltraining.at) */
+[data-theme="warm"] .hero--fullscreen .hero-eyebrow,
+[data-theme="sunset"] .hero--fullscreen .hero-eyebrow {
+  color: var(--primary) !important;
+}

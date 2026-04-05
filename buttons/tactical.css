@@ -2,23 +2,29 @@
 :root { --cta-radius: 0; }
 .btn {
   border-radius: 0 !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   letter-spacing: 0.18em !important;
   text-transform: uppercase !important;
-  padding-left: 2.2rem !important;
-  padding-right: 2.2rem !important;
+  padding: 0.9rem 2.5rem !important;
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%) !important;
+  box-shadow: none !important;
+  transition: background 0.2s ease, transform 0.2s ease !important;
 }
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
-.btn-ghost {
+.btn-ghost,
+.btn-secondary,
+.btn-outline {
   clip-path: none !important;
   background: transparent !important;
   border: 1px solid rgba(var(--primary-rgb), 0.4) !important;
-  color: inherit !important;
+  color: var(--text) !important;
 }
-.btn-ghost:hover {
+.btn-ghost:hover,
+.btn-secondary:hover,
+.btn-outline:hover {
   border-color: var(--primary) !important;
   color: var(--primary) !important;
+  transform: translateY(-1px);
 }
