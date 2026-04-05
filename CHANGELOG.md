@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.10] — 2026-04-05
+
+### Changed
+- **PRESETS.survival** — `buttons: 'sharp'` → `buttons: 'tactical'`. Tactical hat das exakte survivaltraining.at-Button-Profil: Primary-Buttons sind Parallelogramme (clip-path angled sides, `padding: 2.2rem`, `letter-spacing: 0.18em`, uppercase), Ghost-Buttons haben rechteckige 1px zarte Rahmen `rgba(primary, 0.4)`. Sharp war zu generisch (nur border-radius:0). Visual-Match zum Referenz-Design jetzt 1:1.
+
+---
+
 ## [4.6.9] — 2026-04-05
 
 ### Fixed
