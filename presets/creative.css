@@ -115,3 +115,38 @@ article h2, article h3 {
 .card p, [class*=card] p, article p {
   color: var(--text) !important;
 }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #fef9ff;
+  --bg-alt:          #faeefc;
+  --bg-dark:         #1a0a22;
+  --text:            #2a1038;
+  --text-muted:      #5a3070;
+  --text-light:      #8a6095;
+  --heading:         #1a0a22;
+  --border:          #e8d5f0;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(124, 58, 237, 0.12);
+
+  --primary:         #7c3aed;
+  --primary-dark:    #5b21b6;
+  --primary-light:   #a78bfa;
+  --primary-rgb:     124, 58, 237;
+  --accent-pink:     #ec4899;
+  --accent-yellow:   #fbbf24;
+
+  --font-heading:    'Fraunces', 'Playfair Display', Georgia, serif;
+  --font-body:       'Space Grotesk', -apple-system, sans-serif;
+  --fs-display:      clamp(3.5rem, 2.5rem + 8vw, 10rem);
+  --fs-hero:         clamp(3rem, 2rem + 6vw, 8rem);
+
+  --hero-overlay-gradient: linear-gradient(
+    135deg,
+    rgba(124,58,237,0.25) 0%,
+    rgba(236,72,153,0.35) 50%,
+    rgba(251,191,36,0.30) 100%
+  );
+  --hero-title-color: #ffffff;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1920&q=80');
+}

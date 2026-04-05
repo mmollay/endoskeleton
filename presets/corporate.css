@@ -93,3 +93,34 @@ body, p {
 
 section { background-color: var(--bg); }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #ffffff;
+  --bg-alt:          #f5f7fa;
+  --bg-dark:         #0f1e38;
+  --text:            #334155;
+  --text-muted:      #64748b;
+  --text-light:      #94a3b8;
+  --heading:         #0f1e38;
+  --border:          #e2e8f0;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(15, 30, 56, 0.08);
+
+  --primary:         #1e3a5f;
+  --primary-dark:    #14284a;
+  --primary-light:   #2c527d;
+  --primary-rgb:     30, 58, 95;
+
+  --font-heading:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.88) 0%,
+    rgba(255,255,255,0.94) 60%,
+    rgba(255,255,255,0.98) 100%
+  );
+  --hero-title-color: #0f1e38;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80');
+}

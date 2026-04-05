@@ -96,3 +96,36 @@ body, p { font-family: var(--font-body); font-weight: 400; }
 
 section { background-color: var(--bg); padding-top: 5rem; padding-bottom: 5rem; }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #fafaf7;
+  --bg-alt:          #f3f1ea;
+  --bg-dark:         #14130e;
+  --text:            #2a2620;
+  --text-muted:      #5a544a;
+  --text-light:      #8a8276;
+  --heading:         #14130e;
+  --border:          #e2ddd0;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(176, 141, 87, 0.10);
+
+  --primary:         #8a6a3a;
+  --primary-dark:    #5c4520;
+  --primary-light:   #b08d57;
+  --primary-rgb:     138, 106, 58;
+  --accent-gold:     #b08d57;
+
+  --font-heading:    'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body:       'Montserrat', -apple-system, sans-serif;
+  --fs-display:      clamp(3.5rem, 2.5rem + 7vw, 9rem);
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(250,250,247,0.78) 0%,
+    rgba(250,250,247,0.90) 60%,
+    rgba(250,250,247,0.98) 100%
+  );
+  --hero-title-color: #14130e;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80');
+}

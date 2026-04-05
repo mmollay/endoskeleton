@@ -94,3 +94,35 @@ body, p { font-family: var(--font-body); font-weight: 500; }
 
 section { background-color: var(--bg); }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #fff9f4;
+  --bg-alt:          #ffefe3;
+  --bg-dark:         #3a1810;
+  --text:            #3a1810;
+  --text-muted:      #6a3828;
+  --text-light:      #8a5848;
+  --heading:         #26140c;
+  --border:          #f3d9c7;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(249, 115, 22, 0.10);
+
+  --primary:         #ea580c;
+  --primary-dark:    #c2410c;
+  --primary-light:   #fb923c;
+  --primary-rgb:     234, 88, 12;
+  --accent-pink:     #fb7185;
+
+  --font-heading:    'Fredoka', 'Nunito', -apple-system, sans-serif;
+  --font-body:       'Nunito', -apple-system, sans-serif;
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(255,249,244,0.70) 0%,
+    rgba(255,249,244,0.85) 50%,
+    rgba(255,249,244,0.96) 100%
+  );
+  --hero-title-color: #26140c;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=1920&q=80');
+}

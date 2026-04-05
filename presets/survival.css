@@ -133,3 +133,41 @@ section {
 section:nth-child(even) {
   background-color: var(--bg-alt);
 }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  /* ─── Farben: warm beige + survival green ─── */
+  --bg:              #f5f2eb;
+  --bg-alt:          #ede8dc;
+  --bg-dark:         #2a2a2a;
+  --text:            #2a2a2a;
+  --text-muted:      #5a5550;
+  --text-light:      #7a756e;
+  --heading:         #1a1a1a;
+  --border:          #d9d3c5;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(26, 26, 26, 0.08);
+
+  --primary:         #2d7a2d;
+  --primary-dark:    #1e5c1e;
+  --primary-light:   #4a8c3f;
+  --primary-rgb:     45, 122, 45;
+
+  /* ─── Typography: Oswald Big-Type ─── */
+  --font-heading:    'Oswald', 'Inter', system-ui, sans-serif;
+  --font-body:       'Source Serif 4', 'Source Sans 3', Georgia, serif;
+  --fs-display:      clamp(4rem, 3rem + 8vw, 10rem);
+  --fs-hero:         clamp(3.5rem, 2.5rem + 6vw, 8rem);
+
+  /* ─── Hero-Overlay: heller beiger Veil (statt dunkler Gradient) ─── */
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(245, 242, 235, 0.35) 0%,
+    rgba(245, 242, 235, 0.55) 60%,
+    rgba(245, 242, 235, 0.75) 100%
+  );
+  --hero-title-color: #1a1a1a;
+
+  /* ─── Wald-Hero-Hintergrundbild (Fallback via CSS) ─── */
+  --hero-bg-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1920&q=80');
+}

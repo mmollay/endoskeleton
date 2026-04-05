@@ -98,3 +98,36 @@ blockquote, .blockquote { font-family: var(--font-heading); font-style: italic; 
 
 section { background-color: var(--bg); }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #faf7f2;
+  --bg-alt:          #f2ede3;
+  --bg-dark:         #1a1a1a;
+  --text:            #2a1015;
+  --text-muted:      #5a4448;
+  --text-light:      #7a6469;
+  --heading:         #1a0a0d;
+  --border:          #e0d8ca;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(26, 10, 13, 0.08);
+
+  --primary:         #c0392b;
+  --primary-dark:    #962d22;
+  --primary-light:   #d5493a;
+  --primary-rgb:     192, 57, 43;
+
+  --font-heading:    'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body:       'Inter', -apple-system, sans-serif;
+  --fs-display:      clamp(3.5rem, 2.5rem + 7vw, 9rem);
+  --fs-hero:         clamp(3rem, 2rem + 5vw, 7rem);
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(250,247,242,0.82) 0%,
+    rgba(250,247,242,0.90) 50%,
+    rgba(250,247,242,0.97) 100%
+  );
+  --hero-title-color: #1a0a0d;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=1920&q=80');
+}

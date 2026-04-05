@@ -91,3 +91,34 @@ body, p { font-family: var(--font-body); font-weight: 400; }
 
 section { background-color: var(--bg); padding-top: 6rem; padding-bottom: 6rem; }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #ffffff;
+  --bg-alt:          #fafafa;
+  --bg-dark:         #0a0a0a;
+  --text:            #1a1a1a;
+  --text-muted:      #525252;
+  --text-light:      #a3a3a3;
+  --heading:         #0a0a0a;
+  --border:          #e5e5e5;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(0,0,0,0.04);
+
+  --primary:         #1a1a1a;
+  --primary-dark:    #000000;
+  --primary-light:   #404040;
+  --primary-rgb:     26, 26, 26;
+
+  --font-heading:    'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.85) 0%,
+    rgba(255,255,255,0.95) 80%,
+    #ffffff 100%
+  );
+  --hero-title-color: #0a0a0a;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80');
+}

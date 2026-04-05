@@ -99,3 +99,35 @@ body { background-color: var(--bg); color: var(--text); }
 section { background-color: var(--bg); }
 section:nth-child(even) { background-color: var(--bg-alt); }
 .card, [class*='card'] { background-color: var(--card-bg); border-color: var(--border); }
+
+/* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
+body[data-color], html[data-theme] body[data-color], html body[data-color] {
+  --bg:              #0a0a0a;
+  --bg-alt:          #12121a;
+  --bg-dark:         #000000;
+  --text:            #e0e0e8;
+  --text-muted:      #9090a0;
+  --text-light:      #6a6a7a;
+  --heading:         #ffffff;
+  --border:          #25252e;
+  --card-bg:         #12121a;
+  --shadow:          rgba(0, 217, 255, 0.15);
+
+  --primary:         #00d9ff;
+  --primary-dark:    #00a8cc;
+  --primary-light:   #33e1ff;
+  --primary-rgb:     0, 217, 255;
+
+  --font-heading:    'Inter', 'JetBrains Mono', system-ui, sans-serif;
+  --font-body:       'Inter', -apple-system, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(10,10,10,0.55) 0%,
+    rgba(10,10,10,0.75) 50%,
+    rgba(10,10,10,0.92) 100%
+  );
+  --hero-title-color: #ffffff;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80');
+}
