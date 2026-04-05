@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.3.1 — Template Demo</title>
+  <title>SSI Endoskeleton v4.4.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.3.1';
+      var v = '4.4.0';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -537,7 +537,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.3.1</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.4.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -662,31 +662,14 @@
 
         <div class="demo-section">
           <div class="demo-group">
-            <label>Charakter</label>
-            <div class="charakter-grid">
-              <button class="charakter-card" data-charakter="elegant"><div class="ck-shape" style="border-radius:12px"></div><span class="ck-label">Elegant</span></button>
-              <button class="charakter-card" data-charakter="sanft"><div class="ck-shape" style="border-radius:8px"></div><span class="ck-label">Sanft</span></button>
-              <button class="charakter-card active" data-charakter="neutral"><div class="ck-shape" style="border-radius:4px"></div><span class="ck-label">Neutral</span></button>
-              <button class="charakter-card" data-charakter="markant"><div class="ck-shape" style="border-radius:2px;border:1px solid #64748b;background:transparent"></div><span class="ck-label">Markant</span></button>
-              <button class="charakter-card" data-charakter="kantig"><div class="ck-shape" style="border-radius:0"></div><span class="ck-label">Kantig</span></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="demo-section">
-          <div class="demo-group">
             <label>Schrift</label>
             <div class="font-grid">
               <button class="font-card active" data-font="modern"><span class="font-preview" style="font-family:'Inter',sans-serif">Aa Modern</span><span class="font-label">Inter</span></button>
-              <button class="font-card" data-font="system"><span class="font-preview" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">Aa System</span><span class="font-label">System UI</span></button>
-              <button class="font-card" data-font="serif"><span class="font-preview" style="font-family:'Playfair Display',Georgia,serif">Aa Serif</span><span class="font-label">Playfair</span></button>
-              <button class="font-card" data-font="humanist"><span class="font-preview" style="font-family:'Nunito',sans-serif">Aa Humanist</span><span class="font-label">Nunito</span></button>
-              <button class="font-card" data-font="editorial"><span class="font-preview" style="font-family:'Cormorant Garamond',Georgia,serif">Aa Editorial</span><span class="font-label">Cormorant</span></button>
-              <button class="font-card" data-font="elegant"><span class="font-preview" style="font-family:'Playfair Display',Georgia,serif;font-style:italic">Aa Elegant</span><span class="font-label">Playfair+Lato</span></button>
-              <button class="font-card" data-font="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace">Aa Mono</span><span class="font-label">JetBrains</span></button>
-              <button class="font-card" data-font="rounded"><span class="font-preview" style="font-family:'Nunito',sans-serif;font-weight:700">Aa Rounded</span><span class="font-label">Nunito Bold</span></button>
-              <button class="font-card" data-font="survival"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase">Aa Survival</span><span class="font-label">Oswald</span></button>
-              <button class="font-card" data-font="playful"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:600">Aa Playful</span><span class="font-label">Fredoka</span></button>
+              <button class="font-card" data-font="contrast"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:600">Aa Contrast</span><span class="font-label">Playfair + Inter</span></button>
+              <button class="font-card" data-font="editorial"><span class="font-preview" style="font-family:'Cormorant Garamond',serif;font-weight:600">Aa Editorial</span><span class="font-label">Cormorant + Lato</span></button>
+              <button class="font-card" data-font="survival"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase">Aa Survival</span><span class="font-label">Oswald + Source Serif</span></button>
+              <button class="font-card" data-font="playful"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:600">Aa Playful</span><span class="font-label">Fredoka + Nunito</span></button>
+              <button class="font-card" data-font="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace">Aa Technical</span><span class="font-label">JetBrains + Inter</span></button>
             </div>
           </div>
         </div>
@@ -1207,7 +1190,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.3.1"></script>
+  <script src="shared.js?v=4.4.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1398,45 +1381,25 @@
 
     /* ─── Quick-Presets ──────────────────────────── */
     var PRESETS = {
-      corporate:  { layout:'modern',  hero:'split',      color:'blue',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      kreativ:    { layout:'magazine', hero:'banner',     color:'coral',     charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',         navBehavior:'autohide',    navLayout:'centered', navStyle:'colored',  footerStyle:'colored', width:'wide',    theme:'light' },
-      minimal:    { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'system',    buttons:'ghost',        navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
-      tech:       { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',         navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
-      natur:      { layout:'classic', hero:'veil',       color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
-      neon:       { layout:'magazine', hero:'fullscreen', color:'neon-pink', charakter:'markant', spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
-      restaurant: { layout:'classic', hero:'veil',       color:'red',       charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'serif',     buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      arzt:       { layout:'modern',  hero:'minimal',    color:'teal',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'modern',    buttons:'outline-elegant', navBehavior:'sticky',  navLayout:'standard', navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
-      fotograf:   { layout:'magazine', hero:'fullscreen', color:'charcoal', charakter:'markant', spacing:'spacious',animation:'dynamic', font:'mono',      buttons:'ghost',        navBehavior:'transparent', navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
-      immobilien: { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'normal',  animation:'subtle',  font:'serif',     buttons:'outline',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      startup:    { layout:'modern',  hero:'banner',     color:'violet',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded',   buttons:'rounded',      navBehavior:'autohide',    navLayout:'centered', navStyle:'colored',  footerStyle:'colored', width:'wide',    theme:'light' },
-      agentur:    { layout:'magazine', hero:'fullscreen', color:'orange',   charakter:'markant', spacing:'spacious',animation:'dynamic', font:'editorial', buttons:'bold',         navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
-      blog:       { layout:'classic', hero:'banner',     color:'olive',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',  buttons:'soft',         navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' },
-      outdoor:    { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'survival',  buttons:'outline-elegant', navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'light' },
-      kinder:     { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'playful',   buttons:'rounded',      navBehavior:'sticky',      navLayout:'standard', navStyle:'colored',  footerStyle:'colored', width:'default', theme:'light' },
-      portfolio:  { layout:'magazine', hero:'banner',    color:'slate',     charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'system',    buttons:'ghost',        navBehavior:'autohide',    navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'wide',    theme:'light' },
-      event:      { layout:'magazine', hero:'fullscreen', color:'electric', charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'rounded',   buttons:'tactical',     navBehavior:'autohide',    navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
-      wellness:   { layout:'classic', hero:'veil',       color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'elegant',   buttons:'soft',         navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'light',   width:'default', theme:'light' }
+      corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'contrast',  buttons:'outline-elegant', navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+      editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial', buttons:'outline',         navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+      minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'modern',    buttons:'ghost',           navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+      tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',            navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
+      creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'contrast',  buttons:'bold',            navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+      outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'survival',  buttons:'outline-elegant', navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'warm'  },
+      playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'playful',   buttons:'rounded',         navBehavior:'sticky',      navLayout:'standard', navStyle:'colored', footerStyle:'colored', width:'default', theme:'sunset' },
+      elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'editorial', buttons:'outline-elegant', navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  }
     };
 
     var PRESET_META = {
-      corporate:  { dot:'#2563eb', desc:'Seriös · Blau · Serif' },
-      kreativ:    { dot:'#f97316', desc:'Mutig · Coral · Editorial' },
-      minimal:    { dot:'#64748b', desc:'Clean · Grau · System' },
-      tech:       { dot:'#06b6d4', desc:'Dark · Cyan · Mono' },
-      natur:      { dot:'#4d7c0f', desc:'Organisch · Grün · Humanist' },
-      neon:       { dot:'#e879f9', desc:'Vibrant · Pink · Rounded' },
-      restaurant: { dot:'#dc2626', desc:'Warm · Rot · Serif' },
-      arzt:       { dot:'#0891b2', desc:'Vertrauen · Teal · Elegant' },
-      fotograf:   { dot:'#1e1e1e', desc:'Visuell · Dunkel · Mono' },
-      immobilien: { dot:'#b45309', desc:'Edel · Gold · Serif' },
-      startup:    { dot:'#7c3aed', desc:'Fresh · Violet · Rounded' },
-      agentur:    { dot:'#f97316', desc:'Bold · Orange · Editorial' },
-      blog:       { dot:'#4d7c0f', desc:'Lesbar · Olive · Humanist' },
-      outdoor:    { dot:'#78350f', desc:'Kraft · Braun · Oswald' },
-      kinder:     { dot:'#f97316', desc:'Spielerisch · Fredoka · Bunt' },
-      portfolio:  { dot:'#334155', desc:'Galerie · Slate · System' },
-      event:      { dot:'#6366f1', desc:'Energie · Electric · Bold' },
-      wellness:   { dot:'#059669', desc:'Ruhig · Mint · Elegant' }
+      corporate: { dot:'#2563eb', desc:'Business · Blau · Playfair + Inter' },
+      editorial: { dot:'#881337', desc:'Magazin · Wine · Cormorant + Lato' },
+      minimal:   { dot:'#64748b', desc:'Clean · Grau · Inter' },
+      tech:      { dot:'#06b6d4', desc:'Cyber · Cyan · JetBrains Mono' },
+      creative:  { dot:'#f97316', desc:'Bold · Orange · Playfair Contrast' },
+      outdoor:   { dot:'#78350f', desc:'Kraft · Braun · Oswald + Serif' },
+      playful:   { dot:'#f97316', desc:'Verspielt · Fredoka · SVG-Landschaft' },
+      elegant:   { dot:'#b45309', desc:'Luxus · Gold · Cormorant Garamond' }
     };
 
     var COLOR_HEX = {
@@ -1960,7 +1923,7 @@
         layout:   document.querySelectorAll('[data-layout]').length,
         hero:     document.querySelectorAll('[data-hero]').length,
         color:    document.querySelectorAll('.color-swatch[data-color]').length,
-        charakter: document.querySelectorAll('.charakter-card[data-charakter]').length,
+        charakter: 5,
         spacing:  document.querySelectorAll('[data-spacing]').length,
         animation:document.querySelectorAll('[data-animation]').length,
         font:     document.querySelectorAll('.font-card[data-font]').length,
