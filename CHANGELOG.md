@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.2] — 2026-04-05
+
+### Fixed
+- **shared.js** — Theme-Switcher Race Condition: `initThemeToggle()` überschrieb URL-Hash-`theme`-Parameter mit System-`prefers-color-scheme` bzw. `localStorage.theme`. Dadurch ignorierten 6 von 8 Presets ihr deklariertes Theme und renderten dark-on-dark mit WCAG-Kontrast 1.0–1.2:1 (FAIL). Fix: URL-Hash hat jetzt höchste Priorität (Hash > localStorage > System), unterstützt alle 10 Themes (light/dark/warm/tech/pastel/earth/ocean/sunset/midnight/forest). `prefers-color-scheme`-change-Listener wird bei aktivem Hash-Theme deaktiviert, damit Preset-Links deterministisch rendern.
+
+---
+
 ## [4.3.1] — 2026-04-05
 
 ### Changed

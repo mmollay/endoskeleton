@@ -461,14 +461,31 @@
   }
 
   /* ─── 5. THEME TOGGLE ───────────────────────────────────────────────── */
+  /* Priority: URL-hash (?theme=X) > localStorage > system preference.
+     Hash wins so demo/preset links render deterministically regardless of
+     the visitor's OS theme. Supports all 10 themes, not just light/dark. */
+  function getHashTheme() {
+    var h = (location.hash || "").replace(/^#/, "");
+    if (!h) return null;
+    var m = h.match(/(?:^|&)theme=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
   function initThemeToggle() {
-    /* Respect system preference */
+    var hashTheme = getHashTheme();
     var saved = localStorage.getItem("theme");
     var prefersDark =
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    if (saved === "dark" || (!saved && prefersDark)) {
+    if (hashTheme) {
+      /* URL hash wins — applies to light/dark/warm/tech/pastel/earth/ocean/sunset/midnight/forest */
+      if (hashTheme === "light") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", hashTheme);
+      }
+    } else if (saved === "dark" || (!saved && prefersDark)) {
       document.documentElement.setAttribute("data-theme", "dark");
     }
 
@@ -500,12 +517,14 @@
       updateIcon();
     });
 
-    /* Listen for system preference changes */
-    if (window.matchMedia) {
+    /* Listen for system preference changes — but only when neither hash
+       nor localStorage has claimed control. Hash-driven preset pages must
+       stay deterministic even if the user toggles OS theme mid-session. */
+    if (window.matchMedia && !hashTheme) {
       window
         .matchMedia("(prefers-color-scheme: dark)")
         .addEventListener("change", function (e) {
-          if (!localStorage.getItem("theme")) {
+          if (!localStorage.getItem("theme") && !getHashTheme()) {
             if (e.matches) {
               document.documentElement.setAttribute("data-theme", "dark");
             } else {
