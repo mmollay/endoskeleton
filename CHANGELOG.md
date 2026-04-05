@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.7] — 2026-04-05
+
+### Added
+- **tests/preset-qa.mjs** — Playwright-basiertes WCAG-AA-Build-Gate. Testet alle 9 Presets auf Kontrast-Konformität. Nutzt **Pixel-Sampling** (statt naivem DOM-walkup): versteckt Text-Color kurz, screenshotet die Element-BBox, mittelt RGB der sichtbaren Hintergrund-Pixel. Funktioniert robust bei Hero-over-Image, Gradient-Overlays, ::after-Pseudo-Elementen und transparenten Cards. Fällt zurück auf alpha-aware DOM-walk wenn Pixel-Sample fehlschlägt. Exit-Code 1 bei FAIL, 0 bei PASS. Output: `tests/qa-report.md` mit Tabellen je Preset.
+- **tests/README.md** — Usage-Doku: `npm run qa` oder `node tests/preset-qa.mjs`.
+- **package.json** — Scripts + devDependencies (`playwright`, `pngjs`).
+- **.gitignore** — `tests/screenshots/` + `tests/qa-report.md` (Artifacts, werden bei jedem Run neu erzeugt).
+
+### Verified
+Alle 9 Presets PASS: corporate 12-16:1 / editorial 12-17:1 / minimal 11-17:1 / tech 4-17:1 / creative 4-16:1 / outdoor 12-15:1 / playful 10-16:1 / elegant 10-14:1 / **survival 3.64-16.10:1** — alle ≥ WCAG AA (4.5:1 body, 3:1 large).
+
+---
+
 ## [4.6.6] — 2026-04-05
 
 ### Added

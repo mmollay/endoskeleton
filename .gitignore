@@ -32,3 +32,7 @@ package-lock.json
 *.min.css
 *.min.js
 *.map
+
+# QA artifacts
+tests/screenshots/
+tests/qa-report.md
