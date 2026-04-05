@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.8.0-3';
+      var v = '4.8.0-4';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -825,7 +825,7 @@
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -842,7 +842,7 @@
       </div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -856,7 +856,7 @@
       <div class="hero-decoration"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -870,7 +870,7 @@
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -884,7 +884,7 @@
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -899,7 +899,7 @@
       <div class="hero-bg"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
-        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im Web</h1>
+        <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.</p>
         <div class="hero-ctas">
           <a href="#kontakt" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Jetzt starten</a>
@@ -1239,7 +1239,7 @@
     var i18n = {
       de: {
         'hero.eyebrow': 'Willkommen',
-        'hero.title': 'Ihr Auftritt im Web',
+        'hero.title': 'Ihr Auftritt im <strong>Web</strong>',
         'hero.subtitle': 'Professionell. Schnell. Skalierbar. Powered by SSI WebEngine.',
         'hero.cta1': 'Jetzt starten',
         'hero.cta2': 'Mehr erfahren',
@@ -1322,7 +1322,7 @@
       },
       en: {
         'hero.eyebrow': 'Welcome',
-        'hero.title': 'Your Web Presence',
+        'hero.title': 'Your <strong>Web</strong> Presence',
         'hero.subtitle': 'Professional. Fast. Scalable. Powered by SSI WebEngine.',
         'hero.cta1': 'Get Started',
         'hero.cta2': 'Learn More',
@@ -1413,7 +1413,7 @@
       var strings = i18n[lang] || i18n.de;
       document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
-        if (strings[key]) el.textContent = strings[key];
+        if (strings[key]) { if (key === "hero.title") { el.innerHTML = strings[key]; } else { el.textContent = strings[key]; } }
       });
     }
 
