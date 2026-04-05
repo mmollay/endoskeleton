@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.6';
+      var v = '5.0.7';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
@@ -873,7 +873,7 @@
   <!-- ═══ Hero: Fullscreen (Standard) ═══ -->
   <div id="hero-container">
     <!-- Fullscreen Hero -->
-    <section class="hero hero--fullscreen" id="hero-fullscreen">
+    <section class="hero hero--fullscreen hero--image" id="hero-fullscreen">
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
@@ -918,7 +918,7 @@
     </section>
 
     <!-- Banner Hero (versteckt) -->
-    <section class="hero hero--banner" id="hero-banner" style="display:none;">
+    <section class="hero hero--banner hero--image" id="hero-banner" style="display:none;">
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
@@ -932,7 +932,7 @@
     </section>
 
     <!-- Veil Hero (versteckt) — heller Schleier, survival-style -->
-    <section class="hero hero--veil" id="hero-veil" style="display:none;">
+    <section class="hero hero--veil hero--image" id="hero-veil" style="display:none;">
       <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
