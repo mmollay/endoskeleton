@@ -556,18 +556,18 @@
     /* Cookie-Banner verstecken */
     #cookie-banner { display: none !important; }
 
-    /* Ghost-Button auf dunklen Bild-Hintergründen */
-    .hero--fullscreen .btn-ghost,
-    .hero--split .btn-ghost,
-    .hero--banner .btn-ghost {
+    /* Ghost-Button nur auf Hero mit echtem Bild-Hintergrund (sonst würde weiß auf hell unlesbar) */
+    .hero--image.hero--fullscreen .btn-ghost,
+    .hero--image.hero--split .btn-ghost,
+    .hero--image.hero--banner .btn-ghost {
       color: #ffffff !important;
       border: 2px solid rgba(255, 255, 255, 0.85) !important;
       background: rgba(255, 255, 255, 0.12) !important;
       backdrop-filter: blur(4px) !important;
     }
-    .hero--fullscreen .btn-ghost:hover,
-    .hero--split .btn-ghost:hover,
-    .hero--banner .btn-ghost:hover {
+    .hero--image.hero--fullscreen .btn-ghost:hover,
+    .hero--image.hero--split .btn-ghost:hover,
+    .hero--image.hero--banner .btn-ghost:hover {
       border-color: #ffffff !important;
       background: rgba(255, 255, 255, 0.22) !important;
     }
@@ -1444,7 +1444,10 @@
       outdoor:   { dot:'#78350f', desc:'Kraft · Braun · Oswald + Serif' },
       playful:   { dot:'#f97316', desc:'Verspielt · Fredoka · SVG-Landschaft' },
       elegant:   { dot:'#b45309', desc:'Luxus · Gold · Cormorant Garamond' },
-      survival:  { dot:'#2d7a2d', desc:'Outdoor · Grün · Oswald + Source Serif' }
+      survival:  { dot:'#2d7a2d', desc:'Outdoor · Grün · Oswald + Source Serif' },
+      cinematic: { dot:'#1e1e1e', desc:'Kino · Dark · Cinematic Display' },
+      softcraft: { dot:'#4d7c0f', desc:'Handwerk · Olive · Softcraft Serif' },
+      startup:   { dot:'#6366f1', desc:'Startup · Electric · Geometric Black' }
     };
 
     var COLOR_HEX = {

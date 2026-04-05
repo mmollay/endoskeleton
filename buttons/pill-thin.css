@@ -15,10 +15,15 @@
 .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
 .btn-outline, .btn-ghost, .btn-secondary {
   background: transparent;
-  color: var(--heading);
-  border: 1.5px solid rgba(var(--primary-rgb),0.45);
+  color: #1a1a1a;
+  border: 1.5px solid rgba(0,0,0,0.35);
 }
 .btn-outline:hover, .btn-ghost:hover, .btn-secondary:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+[data-theme="dark"] .btn-outline, [data-theme="dark"] .btn-ghost, [data-theme="dark"] .btn-secondary,
+[data-theme="tech"] .btn-outline, [data-theme="tech"] .btn-ghost, [data-theme="tech"] .btn-secondary {
+  color: #f0f0f0;
+  border-color: rgba(255,255,255,0.35);
 }

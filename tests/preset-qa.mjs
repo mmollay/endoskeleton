@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Preset QA - WCAG AA Contrast Gate
- * Tests all 8 endoskeleton presets. Fails (exit 1) if any preset breaks WCAG AA.
+ * Tests all 12 endoskeleton presets. Fails (exit 1) if any preset breaks WCAG AA.
  * Usage: node tests/preset-qa.mjs
  * Env: BASE_URL (default: https://skeleton.ssi.at)
  */
@@ -19,24 +19,9 @@ const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-');
 
 mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-const BASE_PRESETS = {
-  corporate:  'layout=modern&hero=split&color=blue&charakter=neutral&spacing=normal&animation=subtle&font=contrast&buttons=outline-elegant&nav=sticky&navStyle=light&navLayout=standard&width=default&footer=dark&theme=light',
-  editorial:  'layout=magazine&hero=banner&color=wine&charakter=neutral&spacing=normal&animation=subtle&font=editorial&buttons=outline&nav=sticky&navStyle=light&navLayout=centered&width=wide&footer=dark&theme=light',
-  minimal:    'layout=modern&hero=minimal&color=gray&charakter=elegant&spacing=compact&animation=none&font=modern&buttons=ghost&nav=sticky&navStyle=light&navLayout=minimal&width=default&footer=minimal&theme=light',
-  tech:       'layout=modern&hero=fullscreen&color=cyan&charakter=kantig&spacing=compact&animation=dynamic&font=mono&buttons=tech&nav=transparent&navStyle=dark&navLayout=standard&width=full&footer=dark&theme=tech',
-  creative:   'layout=magazine&hero=fullscreen&color=orange&charakter=markant&spacing=spacious&animation=dynamic&font=contrast&buttons=bold&nav=transparent&navStyle=dark&navLayout=club&width=wide&footer=dark&theme=dark',
-  outdoor:    'layout=modern&hero=fullscreen&color=brown&charakter=markant&spacing=normal&animation=dynamic&font=survival&buttons=outline-elegant&nav=shrink&navStyle=light&navLayout=standard&width=wide&footer=dark&theme=warm',
-  playful:    'layout=modern&hero=playful&color=orange&charakter=sanft&spacing=normal&animation=dynamic&font=playful&buttons=rounded&nav=sticky&navStyle=light&navLayout=standard&width=default&footer=colored&theme=sunset',
-  elegant:    'layout=modern&hero=split&color=gold&charakter=elegant&spacing=spacious&animation=subtle&font=editorial&buttons=outline-elegant&nav=sticky&navStyle=light&navLayout=standard&width=default&footer=dark&theme=warm',
-  survival:   'layout=modern&hero=fullscreen&color=survival&charakter=kantig&spacing=spacious&animation=dynamic&font=survival&buttons=sharp&nav=transparent&navStyle=light&navLayout=standard&width=default&footer=dark&theme=warm',
-};
-
-/* Full preset-packages (via preset=X) — Komplettpakete, override alle params */
-const PACKAGE_NAMES = ['corporate','editorial','minimal','tech','creative','playful','elegant','survival'];
-const PRESETS = { ...BASE_PRESETS };
-for (const name of PACKAGE_NAMES) {
-  PRESETS['pkg-' + name] = BASE_PRESETS[name] + '&preset=' + name;
-}
+/* v5.0: 12 presets, each loaded via #preset=X (JS-config expands all params) */
+const PRESET_NAMES = ['survival','corporate','editorial','minimal','tech','creative','playful','elegant','outdoor','cinematic','softcraft','startup'];
+const PRESETS = Object.fromEntries(PRESET_NAMES.map(n => [n, 'preset=' + n]));
 
 function parseColor(str) {
   const m = str && str.match(/rgba?\(\s*(\d+(?:\.\d+)?)\s*,?\s*(\d+(?:\.\d+)?)\s*,?\s*(\d+(?:\.\d+)?)(?:\s*[,\/]\s*(\d+(?:\.\d+)?%?))?\s*\)/);
