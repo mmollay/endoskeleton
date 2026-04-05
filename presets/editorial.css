@@ -3,7 +3,7 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@400;500;600&display=swap');
 
-:root {
+:root, :root[data-theme], html[data-theme=dark], html[data-theme=light], html[data-theme=warm], html[data-theme=sunset], html[data-theme=tech], html[data-theme=midnight], html[data-theme=pastel], html[data-theme=earth] {
   --bg:              #faf7f2;
   --bg-alt:          #f2ede3;
   --bg-dark:         #1a1a1a;

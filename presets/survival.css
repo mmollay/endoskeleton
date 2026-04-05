@@ -4,7 +4,7 @@
  * Wird als LETZTES CSS geladen → höchste Specificity ohne !important.
  */
 
-:root {
+:root, :root[data-theme], html[data-theme=dark], html[data-theme=light], html[data-theme=warm], html[data-theme=sunset], html[data-theme=tech], html[data-theme=midnight], html[data-theme=pastel], html[data-theme=earth] {
   /* ─── Farben: warm beige + survival green ─── */
   --bg:              #f5f2eb;
   --bg-alt:          #ede8dc;

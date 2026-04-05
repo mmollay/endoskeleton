@@ -3,7 +3,14 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,700&display=swap');
 
-:root {
+:root,
+[data-theme],
+html[data-theme=dark],
+html[data-theme=light],
+html[data-theme=warm],
+html[data-theme=sunset],
+html[data-theme=tech],
+html[data-theme=midnight] {
   --bg:              #fef9ff;
   --bg-alt:          #faeefc;
   --bg-dark:         #1a0a22;

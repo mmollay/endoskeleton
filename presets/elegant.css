@@ -3,7 +3,7 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap');
 
-:root {
+:root, :root[data-theme], html[data-theme=dark], html[data-theme=light], html[data-theme=warm], html[data-theme=sunset], html[data-theme=tech], html[data-theme=midnight], html[data-theme=pastel], html[data-theme=earth] {
   --bg:              #fafaf7;
   --bg-alt:          #f3f1ea;
   --bg-dark:         #14130e;

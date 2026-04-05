@@ -3,7 +3,7 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
 
-:root {
+:root, :root[data-theme], html[data-theme=dark], html[data-theme=light], html[data-theme=warm], html[data-theme=sunset], html[data-theme=tech], html[data-theme=midnight], html[data-theme=pastel], html[data-theme=earth] {
   --bg:              #fff9f4;
   --bg-alt:          #ffefe3;
   --bg-dark:         #3a1810;

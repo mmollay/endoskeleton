@@ -3,7 +3,7 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
+:root, :root[data-theme], html[data-theme=dark], html[data-theme=light], html[data-theme=warm], html[data-theme=sunset], html[data-theme=tech], html[data-theme=midnight], html[data-theme=pastel], html[data-theme=earth] {
   --bg:              #0a0a0a;
   --bg-alt:          #12121a;
   --bg-dark:         #000000;
