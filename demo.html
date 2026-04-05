@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.3';
+      var v = '5.0.4';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
@@ -564,7 +564,13 @@
     /* Cookie-Banner verstecken */
     #cookie-banner { display: none !important; }
 
-    /* Ghost-Button nur auf Hero mit echtem Bild-Hintergrund (sonst würde weiß auf hell unlesbar) */
+    /* Hero mit echtem Bild-Hintergrund: Accent-Wort + Ghost-Button weiß/hell für Lesbarkeit */
+    .hero--image .hero-title strong,
+    .hero--image .hero-title em,
+    .hero--image .hero-title .accent {
+      color: #ffffff !important;
+      opacity: 0.92;
+    }
     .hero--image.hero--fullscreen .btn-ghost,
     .hero--image.hero--split .btn-ghost,
     .hero--image.hero--banner .btn-ghost {
@@ -1513,6 +1519,8 @@
       if (!section) return;
       var bg = section.querySelector('.hero-bg');
       if (bg) bg.style.backgroundImage = 'url(' + url + ')';
+      /* Signal that this hero now renders over an image — CSS uses .hero--image to flip text/buttons to white */
+      section.classList.add('hero--image');
     }
 
     function renderBuiltinPresets() {
