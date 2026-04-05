@@ -49,9 +49,8 @@
       if (p.preset && PRESETS[p.preset]) {
         var pc = PRESETS[p.preset];
         for (var k in pc) { if (!(k in p)) p[k] = pc[k]; }
-        /* Preset-Theme in body data-attr for runtime sync */
-        window.__SSI_PRESET__ = p.preset;
       }
+      window.PRESETS = PRESETS;
       document.write('<link rel="stylesheet" href="base.css?v='+v+'">');
       var ids = Object.keys(defaults);
       for (var i=0; i<ids.length; i++) {
@@ -1433,21 +1432,8 @@
       });
     }
 
-    /* ─── Quick-Presets ──────────────────────────── */
-    var PRESETS = {
-      survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
-      corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
-      minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
-      tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
-      creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
-      playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded-friendly', buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'sunset' },
-      elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'luxury-thin',      buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
-      outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
-      cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
-      softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
-      startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech'  }
-    };
+    /* ─── Quick-Presets (single source: IIFE head) ──────────────────────────── */
+    var PRESETS = window.PRESETS;
 
     var PRESET_META = {
       corporate: { dot:'#2563eb', desc:'Business · Blau · Playfair + Inter' },
@@ -1935,26 +1921,12 @@
         var kv = p.split('=');
         if (kv.length === 2) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
       });
-      /* Preset-Resolution: expandiere preset=X zu vollem Config (user-params win) */
-      if (params.preset && PRESETS[params.preset]) {
+      if (params.preset && PRESETS && PRESETS[params.preset]) {
         var pc = PRESETS[params.preset];
         for (var k in pc) { if (!(k in params)) params[k] = pc[k]; }
-        /* map inner preset keys to URL param keys */
-        if (!('hero' in params) && pc.hero) params.hero = pc.hero;
-        if (!('font' in params) && pc.font) params.font = pc.font;
-        if (!('buttons' in params) && pc.buttons) params.buttons = pc.buttons;
-        if (!('charakter' in params) && pc.charakter) params.charakter = pc.charakter;
-        if (!('spacing' in params) && pc.spacing) params.spacing = pc.spacing;
-        if (!('animation' in params) && pc.animation) params.animation = pc.animation;
-        if (!('color' in params) && pc.color) params.color = pc.color;
-        if (!('layout' in params) && pc.layout) params.layout = pc.layout;
-        if (!('width' in params) && pc.width) params.width = pc.width;
-        if (!('theme' in params) && pc.theme) params.theme = pc.theme;
+        /* navBehavior and footerStyle use shorter URL param names */
         if (!('nav' in params) && pc.navBehavior) params.nav = pc.navBehavior;
-        if (!('navStyle' in params) && pc.navStyle) params.navStyle = pc.navStyle;
-        if (!('navLayout' in params) && pc.navLayout) params.navLayout = pc.navLayout;
         if (!('footer' in params) && pc.footerStyle) params.footer = pc.footerStyle;
-        /* Hero-Bild aus Pool */
         var imgId = getRandomPresetImage(params.preset);
         if (imgId) applyHeroImage(imgId, params.hero || 'fullscreen');
       }
