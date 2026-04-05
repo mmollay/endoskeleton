@@ -19,7 +19,7 @@ const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-');
 
 mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-const PRESETS = {
+const BASE_PRESETS = {
   corporate:  'layout=modern&hero=split&color=blue&charakter=neutral&spacing=normal&animation=subtle&font=contrast&buttons=outline-elegant&nav=sticky&navStyle=light&navLayout=standard&width=default&footer=dark&theme=light',
   editorial:  'layout=magazine&hero=banner&color=wine&charakter=neutral&spacing=normal&animation=subtle&font=editorial&buttons=outline&nav=sticky&navStyle=light&navLayout=centered&width=wide&footer=dark&theme=light',
   minimal:    'layout=modern&hero=minimal&color=gray&charakter=elegant&spacing=compact&animation=none&font=modern&buttons=ghost&nav=sticky&navStyle=light&navLayout=minimal&width=default&footer=minimal&theme=light',
@@ -30,6 +30,13 @@ const PRESETS = {
   elegant:    'layout=modern&hero=split&color=gold&charakter=elegant&spacing=spacious&animation=subtle&font=editorial&buttons=outline-elegant&nav=sticky&navStyle=light&navLayout=standard&width=default&footer=dark&theme=warm',
   survival:   'layout=modern&hero=fullscreen&color=survival&charakter=kantig&spacing=spacious&animation=dynamic&font=survival&buttons=sharp&nav=transparent&navStyle=light&navLayout=standard&width=default&footer=dark&theme=warm',
 };
+
+/* Full preset-packages (via preset=X) — Komplettpakete, override alle params */
+const PACKAGE_NAMES = ['corporate','editorial','minimal','tech','creative','playful','elegant','survival'];
+const PRESETS = { ...BASE_PRESETS };
+for (const name of PACKAGE_NAMES) {
+  PRESETS['pkg-' + name] = BASE_PRESETS[name] + '&preset=' + name;
+}
 
 function parseColor(str) {
   const m = str && str.match(/rgba?\(\s*(\d+(?:\.\d+)?)\s*,?\s*(\d+(?:\.\d+)?)\s*,?\s*(\d+(?:\.\d+)?)(?:\s*[,\/]\s*(\d+(?:\.\d+)?%?))?\s*\)/);

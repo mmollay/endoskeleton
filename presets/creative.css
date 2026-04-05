@@ -1,0 +1,101 @@
+/* SSI Endoskeleton — Preset: Creative (v4.8.0)
+ * Bold, farbig. Lila + Pink + Gelb. Space Grotesk + Display-Serif.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,700&display=swap');
+
+:root {
+  --bg:              #fef9ff;
+  --bg-alt:          #faeefc;
+  --bg-dark:         #1a0a22;
+  --text:            #2a1038;
+  --text-muted:      #5a3070;
+  --text-light:      #8a6095;
+  --heading:         #1a0a22;
+  --border:          #e8d5f0;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(124, 58, 237, 0.12);
+
+  --primary:         #7c3aed;
+  --primary-dark:    #5b21b6;
+  --primary-light:   #a78bfa;
+  --primary-rgb:     124, 58, 237;
+  --accent-pink:     #ec4899;
+  --accent-yellow:   #fbbf24;
+
+  --font-heading:    'Fraunces', 'Playfair Display', Georgia, serif;
+  --font-body:       'Space Grotesk', -apple-system, sans-serif;
+  --fs-display:      clamp(3.5rem, 2.5rem + 8vw, 10rem);
+  --fs-hero:         clamp(3rem, 2rem + 6vw, 8rem);
+
+  --hero-overlay-gradient: linear-gradient(
+    135deg,
+    rgba(124,58,237,0.25) 0%,
+    rgba(236,72,153,0.35) 50%,
+    rgba(251,191,36,0.30) 100%
+  );
+  --hero-title-color: #ffffff;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1920&q=80');
+}
+
+.hero-title,
+.hero--fullscreen .hero-title,
+.hero--split .hero-title,
+.hero--banner .hero-title,
+.hero--veil .hero-title,
+.hero--minimal .hero-title {
+  font-family: var(--font-heading);
+  color: var(--hero-title-color);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-shadow: 0 4px 20px rgba(26,10,34,0.5);
+}
+
+.hero-title strong, .hero-title em {
+  color: var(--accent-yellow);
+  font-style: italic;
+  font-weight: 900;
+  -webkit-text-stroke: 1px rgba(26,10,34,0.2);
+}
+
+.hero-subtitle,
+.hero--fullscreen .hero-subtitle {
+  font-family: var(--font-body);
+  color: rgba(255,255,255,0.95);
+  font-weight: 500;
+  text-shadow: 0 2px 10px rgba(26,10,34,0.6);
+}
+
+.hero-eyebrow,
+.hero--fullscreen .hero-eyebrow {
+  color: var(--accent-yellow) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(26,10,34,0.7);
+}
+
+.hero.hero--fullscreen .hero-bg,
+.hero--image .hero-bg,
+.hero .hero-bg {
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+}
+.hero.hero--fullscreen .hero-bg::after {
+  background: linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(236,72,153,0.65) 50%, rgba(251,191,36,0.55) 100%), linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%) !important;
+}
+
+h1,h2,h3,h4,h5,h6,.section-title {
+  font-family: var(--font-heading);
+  color: var(--heading);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+body, p { font-family: var(--font-body); }
+
+section { background-color: var(--bg); }
+section:nth-child(even) { background-color: var(--bg-alt); }

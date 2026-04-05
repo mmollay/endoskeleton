@@ -1,0 +1,95 @@
+/* SSI Endoskeleton — Preset: Corporate (v4.8.0)
+ * Seriös, Vertrauen, clean. Navy + Weiß + Inter.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg:              #ffffff;
+  --bg-alt:          #f5f7fa;
+  --bg-dark:         #0f1e38;
+  --text:            #334155;
+  --text-muted:      #64748b;
+  --text-light:      #94a3b8;
+  --heading:         #0f1e38;
+  --border:          #e2e8f0;
+  --card-bg:         #ffffff;
+  --shadow:          rgba(15, 30, 56, 0.08);
+
+  --primary:         #1e3a5f;
+  --primary-dark:    #14284a;
+  --primary-light:   #2c527d;
+  --primary-rgb:     30, 58, 95;
+
+  --font-heading:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+  --hero-overlay-gradient: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.88) 0%,
+    rgba(255,255,255,0.94) 60%,
+    rgba(255,255,255,0.98) 100%
+  );
+  --hero-title-color: #0f1e38;
+  --hero-bg-image:   url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80');
+}
+
+.hero-title,
+.hero--image .hero-title,
+.hero--fullscreen .hero-title,
+.hero--split .hero-title,
+.hero--banner .hero-title,
+.hero--veil .hero-title,
+.hero--minimal .hero-title {
+  font-family: var(--font-heading);
+  color: var(--hero-title-color);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-shadow: none;
+}
+
+.hero-title strong, .hero-title em {
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.hero-subtitle,
+.hero--fullscreen .hero-subtitle {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-weight: 400;
+}
+
+.hero-eyebrow,
+.hero--fullscreen .hero-eyebrow {
+  color: var(--primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.hero.hero--fullscreen .hero-bg,
+.hero--image .hero-bg,
+.hero .hero-bg {
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+}
+.hero.hero--fullscreen .hero-bg::after {
+  background: var(--hero-overlay-gradient) !important;
+}
+
+h1,h2,h3,h4,h5,h6,.section-title {
+  font-family: var(--font-heading);
+  color: var(--heading);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+body, p {
+  font-family: var(--font-body);
+}
+
+section { background-color: var(--bg); }
+section:nth-child(even) { background-color: var(--bg-alt); }
