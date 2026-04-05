@@ -4,6 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.9] — 2026-04-05
+
+### Fixed
+- **heroes/playful.css — Wolken/Blob-Deko entfernt:** 4 decorative pseudo-elements (2 White-Cloud radial-gradients auf `::before`/`.hero-bg`, 2 Peach organic Blobs auf `.hero-content::before/::after` mit `blobMorph` Animation) rendern auf light themes (sunset/warm/pastel) wie broken Placeholder-Rechtecke: graue Kästen top-left, peach Kreise die zufällig wirken. Entfernt. Nur die 3 SVG-Hügel-Layer bleiben — ergeben saubere "Landschafts"-Welle am Hero-Boden.
+- **Dark-Overlay-Regression:** Als Seiten-Effekt der Wolken-Entfernung zeigte `.hero-bg::after` (aus base.css:998: `rgba(0,0,0,0.45)` overlay für Hero-Image-Sections) einen 45% schwarzen Vollflächen-Overlay über dem playful Hero an, obwohl kein Image da war. Fix: `.hero--playful .hero-bg { display: none !important }`. Hero-BG DIV bleibt im DOM aber rendert nicht mehr.
+
+---
+
 ## [4.6.8] — 2026-04-05
 
 ### Fixed
