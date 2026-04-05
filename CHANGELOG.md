@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.3] — 2026-04-05
+
+### Fixed
+- **base.css** — Harmonielehre-Regression auf dunklen Themes: `body[data-color=X]` (v4.5.2) setzt farbgetönte dunkle `--text`/`--heading`-Werte, die auf dunklen Themes (dark/tech/midnight/forest) dark-on-dark-Kontrast erzeugen (tech-preset: 1.66:1, creative-preset: 1.36:1 — beide WCAG FAIL). Fix: Reset-Regeln `[data-theme="dark|tech|midnight|forest"] body[data-color]` stellen für dunkle Themes helle, theme-konforme Textfarben wieder her. Specificity 0,2,1 schlägt `body[data-color]` (0,1,1). Verifiziert: tech-preset 1.66:1 → 16.21:1 AAA, creative-preset 1.36:1 → 14.42:1 AAA.
+
+---
+
 ## [4.6.2] — 2026-04-05
 
 ### Fixed

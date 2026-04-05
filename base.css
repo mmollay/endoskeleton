@@ -2529,6 +2529,18 @@ body[data-color="slate"]  { --text: #2d3748; --heading: #0f172a; }
 body[data-color="gray"]   { --text: #2d3748; --heading: #0f172a; }
 body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
 
+/* ─── HARMONIE-RESET: Dunkle Themes brauchen helle Textfarben ─── */
+/* Die body[data-color] Regeln oben setzen dunkle, farbgetönte Textwerte
+   für helle Themes. Bei dunklen Themes (dark/tech/midnight/forest)
+   entsteht dadurch dark-on-dark (WCAG FAIL 1.0-1.7:1). Diese Regeln
+   stellen für dunkle Themes wieder helle Textwerte her, passend zum
+   jeweiligen Theme-BG. Specificity 0,2,1 schlägt body[data-color] (0,1,1). */
+[data-theme="dark"] body[data-color]     { --text: #e0e0e0; --text-muted: #a0a0a0; --text-light: #b0b0b0; --heading: #f0f0f0; }
+[data-theme="tech"] body[data-color]     { --text: #e8e8f0; --text-muted: #9090a8; --text-light: #b0b0c8; --heading: #f0f0f8; }
+[data-theme="midnight"] body[data-color] { --text: #c8c8e0; --text-muted: #8888a8; --text-light: #a0a0c0; --heading: #e8e8f8; }
+[data-theme="forest"] body[data-color]   { --text: #d0e0d0; --text-muted: #8ca88c; --text-light: #a8c0a8; --heading: #e8f0e8; }
+
+
 /* ─── KONTRAST-SCHUTZ: Section-Tag Sichtbarkeit auf dunklen Themes ─── */
 [data-theme="dark"] .section-tag,
 [data-theme="tech"] .section-tag,
