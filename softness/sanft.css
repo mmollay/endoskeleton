@@ -1,69 +1,20 @@
-/* SSI Endoskeleton — Charakter: Sanft (primärfarb-getönte Schatten, große Rundung) */
-/* Passend fuer: Gesundheit, Beratung, Spiritualität, Naturthemen, Vereine */
+/* SSI Endoskeleton — Charakter: Sanft (v5.0)
+   Primärfarb-getönte Schatten, größere Rundung.
+   Regelt: Cards, Shadows, Blockquotes, Banner, Inputs.
+   Regelt NICHT: Buttons, Hero-Overlay (eigene Module). */
 
-/* ─── Cards: primärfarb-getönte Schatten, größere Rundung ─── */
+:root { --card-radius: 14px; --card-shadow: 0 4px 24px rgba(var(--primary-rgb),0.08); }
+
 .card {
-  box-shadow: 0 4px 24px rgba(var(--primary-rgb), 0.08) !important;
-  border-radius: 14px !important;
-  border: 1px solid rgba(var(--primary-rgb), 0.12) !important;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: var(--card-shadow);
+  border-radius: 14px;
+  border: 1px solid rgba(var(--primary-rgb),0.12);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
 }
-.card:hover {
-  box-shadow: 0 12px 48px rgba(var(--primary-rgb), 0.14) !important;
-  transform: translateY(-6px) !important;
-}
-
-/* ─── Buttons: weiche Schatten + Gradient-Option ─── */
-.btn-primary {
-  box-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.3) !important;
-  transition: all 0.35s ease !important;
-}
-.btn-primary:hover {
-  box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.4) !important;
-  transform: translateY(-3px) !important;
-}
-.btn-ghost {
-  transition: all 0.35s ease !important;
-}
-.btn {
-  border-radius: 50px !important;
-}
-
-/* ─── Hero: weicherer Overlay-Gradient (Veil hat eigenen hellen Overlay) ─── */
-.hero:not(.hero--veil) .hero-bg::after {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.2) 0%,
-    rgba(0, 0, 0, 0.35) 40%,
-    rgba(0, 0, 0, 0.55) 100%
-  ) !important;
-}
-.hero .hero-title {
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* ─── Sektionen: subtile Farbtönung ─── */
-section:nth-of-type(even) {
-  background-color: rgba(var(--primary-rgb), 0.025) !important;
-}
-
-/* ─── Banner-Leiste: weicher ─── */
-.banner-grid {
-  border-radius: 12px !important;
-  overflow: hidden !important;
-}
-.banner-item {
-  border-color: rgba(var(--primary-rgb), 0.1) !important;
-}
-
-/* ─── Blockquote: sanfter Rahmen ─── */
-.blockquote {
-  border-radius: 12px !important;
-  border-left-width: 4px !important;
-  box-shadow: 0 2px 16px rgba(var(--primary-rgb), 0.06) !important;
-}
-
-/* ─── Divider: Gradient statt solid ─── */
-.divider {
-  background: linear-gradient(90deg, var(--primary), transparent) !important;
-}
+.card:hover { box-shadow: 0 12px 48px rgba(var(--primary-rgb),0.14); transform: translateY(-6px); }
+.blockquote { border-radius: 12px; border-left-width: 4px; box-shadow: 0 2px 16px rgba(var(--primary-rgb),0.06); }
+.banner-grid { border-radius: 12px; overflow: hidden; }
+.pricing-card { border-radius: 14px; }
+.form-group input, .form-group textarea, .form-group select { border-radius: 10px; }
+section:nth-of-type(even) { background-color: rgba(var(--primary-rgb),0.025); }
+.divider { background: linear-gradient(90deg, var(--primary), transparent); }

@@ -1,0 +1,15 @@
+/* SSI Endoskeleton — Font Module: Cinematic (v5.0)
+   Bebas Neue Display + Manrope body. Kino/Poster/Event. */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+:root {
+  --font-heading: 'Bebas Neue', Impact, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --display-weight: 400;
+  --heading-weight: 400;
+  --body-weight: 400;
+  --fs-hero: clamp(4rem, 3rem + 8vw, 12rem);
+  --fs-display: clamp(5rem, 3.5rem + 12vw, 14rem);
+}
+.hero-title { letter-spacing: 0.005em; line-height: 0.88; text-transform: uppercase; }
+.hero-subtitle { font-weight: 300; letter-spacing: 0.01em; }
+.hero-eyebrow { letter-spacing: 0.3em; text-transform: uppercase; font-weight: 700; font-size: 0.75rem; font-family: var(--font-body); }

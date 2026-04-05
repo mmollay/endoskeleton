@@ -73,18 +73,6 @@
   display: inline-block;
 }
 
-/* Buttons are larger */
-.layout-modern .btn {
-  padding: 1rem 2.5rem;
-  font-size: var(--fs-base);
-  border-radius: var(--radius-md);
-}
-
-.layout-modern .btn-lg {
-  padding: 1.125rem 3rem;
-  font-size: var(--fs-md);
-}
-
 /* Lead text is larger */
 .layout-modern .section-lead {
   font-size: var(--fs-lg);

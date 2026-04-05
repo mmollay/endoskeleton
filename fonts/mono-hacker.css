@@ -1,0 +1,16 @@
+/* SSI Endoskeleton — Font Module: Mono-Hacker (v5.0)
+   JetBrains Mono Display + Inter body. Tech, Developer, Hacker. */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+:root {
+  --font-heading: 'JetBrains Mono', 'Courier New', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --display-weight: 700;
+  --heading-weight: 600;
+  --body-weight: 400;
+  --fs-hero: clamp(2.25rem, 1.5rem + 3.5vw, 5rem);
+  --fs-display: clamp(3rem, 2rem + 5vw, 6.5rem);
+}
+.hero-title { letter-spacing: -0.04em; line-height: 1.1; }
+.hero-title::before { content: '> '; opacity: 0.5; }
+.hero-eyebrow { letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; font-size: 0.75rem; font-family: var(--font-heading); }
+.hero-eyebrow::before { content: '// '; opacity: 0.6; }

@@ -1,0 +1,31 @@
+/* SSI Endoskeleton — Button Module: Rect-Solid (v5.0)
+   Scharfes Rechteck solid fill. Uppercase letter-spaced. Survival-primary. */
+.btn {
+  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.95rem 2.5rem;
+  font-size: 0.8rem;
+  box-shadow: none;
+  border: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); box-shadow: none; }
+.btn-outline, .btn-secondary, .btn-ghost {
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(var(--primary-rgb), 0.45);
+}
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+.hero--image .btn-outline, .hero--image .btn-ghost, .hero--veil .btn-outline, .hero--veil .btn-ghost {
+  border-color: rgba(0,0,0,0.25);
+  color: var(--text);
+}

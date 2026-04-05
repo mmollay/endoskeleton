@@ -1,53 +1,19 @@
-/* SSI Endoskeleton — Charakter: Kantig (hart, keine Schatten, null Rundung) */
-/* Passend fuer: Outdoor, Sport, Technik, Handwerk, Militär */
+/* SSI Endoskeleton — Charakter: Kantig (v5.0)
+   Hart, keine Schatten, null Rundung.
+   Regelt: Cards, Shadows, Blockquotes, Banner, Inputs.
+   Regelt NICHT: Buttons, Hero-Overlay (eigene Module). */
 
-/* ─── Cards: kantig, flach ─── */
+:root { --card-radius: 0; --card-shadow: none; }
+
 .card {
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  border: 2px solid var(--border) !important;
+  box-shadow: none;
+  border-radius: 0;
+  border: 2px solid var(--border);
+  transition: border-color 0.2s ease;
 }
-.card:hover {
-  box-shadow: none !important;
-  transform: none !important;
-  border-color: var(--primary) !important;
-}
-
-/* ─── Buttons: keine Schatten, kein Hover-Lift ─── */
-.btn,
-.btn-primary,
-.btn-ghost {
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-.btn:hover {
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* ─── Hero: härterer Overlay (Veil hat eigenen hellen Overlay) ─── */
-/* Overridable via --hero-overlay-gradient — keine !important */
-.hero:not(.hero--veil) .hero-bg::after {
-  background: var(--hero-overlay-gradient, linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.6) 50%,
-    rgba(0, 0, 0, 0.8) 100%
-  ));
-}
-
-/* ─── Blockquote: flach ─── */
-.blockquote {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-/* ─── Banner: harte Kante ─── */
-.banner-item {
-  border-color: var(--border) !important;
-}
-
-/* ─── Divider: solid ─── */
-.divider {
-  background: var(--primary) !important;
-}
+.card:hover { box-shadow: none; transform: none; border-color: var(--primary); }
+.blockquote { border-radius: 0; box-shadow: none; border-left-width: 4px; }
+.banner-grid { border-radius: 0; overflow: hidden; }
+.pricing-card { border-radius: 0; }
+.form-group input, .form-group textarea, .form-group select { border-radius: 0; border-width: 2px; }
+.divider { background: var(--primary); height: 2px; }

@@ -556,6 +556,8 @@
       } else {
         document.documentElement.setAttribute("data-theme", hashTheme);
       }
+    } else if (document.documentElement.hasAttribute("data-theme")) {
+      /* already set by demo.html restoreUrlState - do not override */
     } else if (saved === "dark" || (!saved && prefersDark)) {
       document.documentElement.setAttribute("data-theme", "dark");
     }

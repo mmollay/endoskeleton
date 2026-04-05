@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.8.0 — Template Demo</title>
+  <title>SSI Endoskeleton v5.0.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,22 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.8.1';
+      var v = '5.0.1';
+      /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
+      var PRESETS = {
+        survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+        editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+        minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+        tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
+        creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+        playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded-friendly', buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'sunset' },
+        elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'luxury-thin',      buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
+        cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+        softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
+        startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech'  }
+      };
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -30,6 +45,13 @@
       if (h) {
         h.split('&').forEach(function(s){ var kv=s.split('='); if(kv.length===2) p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]); });
       }
+      /* Preset-Resolution: wenn preset=X, expandiere zu vollem Config (User-Params überschreiben) */
+      if (p.preset && PRESETS[p.preset]) {
+        var pc = PRESETS[p.preset];
+        for (var k in pc) { if (!(k in p)) p[k] = pc[k]; }
+        /* Preset-Theme in body data-attr for runtime sync */
+        window.__SSI_PRESET__ = p.preset;
+      }
       document.write('<link rel="stylesheet" href="base.css?v='+v+'">');
       var ids = Object.keys(defaults);
       for (var i=0; i<ids.length; i++) {
@@ -37,13 +59,7 @@
         var val = p[d[0]] || d[2];
         document.write('<link id="'+id+'" rel="stylesheet" href="'+d[1]+val+'.css?v='+v+'">');
       }
-      /* Preset-Komplettpaket als LETZTES (höchste Specificity) */
-      if (p.preset) {
-        var safePreset = p.preset.replace(/[^a-z0-9_-]/gi, '');
-        if (safePreset) {
-          document.write('<link id="preset-css" rel="stylesheet" href="presets/'+safePreset+'.css?v='+v+'">');
-        }
-      }
+      
     })();
   </script>
   <style>
@@ -573,7 +589,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.6.11</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v5.0.0</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.625rem 0.75rem;background:linear-gradient(135deg,#eff6ff,#f0fdfa);border:1px solid #dbeafe;border-radius:8px;margin-bottom:1rem;font-size:0.75rem;color:#64748b;letter-spacing:0.02em;">
         <span id="variation-count" style="font-size:1rem;font-weight:700;color:#3b82f6;">—</span> mögliche Designs
       </div>
@@ -1228,7 +1244,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.6.11"></script>
+  <script src="shared.js?v=5.0.0"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1419,15 +1435,18 @@
 
     /* ─── Quick-Presets ──────────────────────────── */
     var PRESETS = {
-      corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'contrast',  buttons:'outline-elegant', navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-      editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial', buttons:'outline',         navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
-      minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'modern',    buttons:'ghost',           navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
-      tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono',      buttons:'tech',            navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
-      creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'contrast',  buttons:'bold',            navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
-      outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'survival',  buttons:'outline-elegant', navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
-      playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'playful',   buttons:'rounded',         navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'sunset' },
-      elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'editorial', buttons:'outline-elegant', navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
-      survival:  { layout:'modern',  hero:'fullscreen', color:'survival',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'survival',  buttons:'tactical',           navBehavior:'transparent', navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  }
+      survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+      corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+      editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+      minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
+      tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
+      creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+      playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded-friendly', buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'sunset' },
+      elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'luxury-thin',      buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+      outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
+      cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+      softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
+      startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech'  }
     };
 
     var PRESET_META = {
@@ -1916,19 +1935,37 @@
         var kv = p.split('=');
         if (kv.length === 2) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
       });
-      /* Hero-Bild bei URL-Load — nur bei explizitem preset=X (konservativ, QA-safe) */
-      if (params.preset) {
-        var heroType = params.hero || 'fullscreen';
+      /* Preset-Resolution: expandiere preset=X zu vollem Config (user-params win) */
+      if (params.preset && PRESETS[params.preset]) {
+        var pc = PRESETS[params.preset];
+        for (var k in pc) { if (!(k in params)) params[k] = pc[k]; }
+        /* map inner preset keys to URL param keys */
+        if (!('hero' in params) && pc.hero) params.hero = pc.hero;
+        if (!('font' in params) && pc.font) params.font = pc.font;
+        if (!('buttons' in params) && pc.buttons) params.buttons = pc.buttons;
+        if (!('charakter' in params) && pc.charakter) params.charakter = pc.charakter;
+        if (!('spacing' in params) && pc.spacing) params.spacing = pc.spacing;
+        if (!('animation' in params) && pc.animation) params.animation = pc.animation;
+        if (!('color' in params) && pc.color) params.color = pc.color;
+        if (!('layout' in params) && pc.layout) params.layout = pc.layout;
+        if (!('width' in params) && pc.width) params.width = pc.width;
+        if (!('theme' in params) && pc.theme) params.theme = pc.theme;
+        if (!('nav' in params) && pc.navBehavior) params.nav = pc.navBehavior;
+        if (!('navStyle' in params) && pc.navStyle) params.navStyle = pc.navStyle;
+        if (!('navLayout' in params) && pc.navLayout) params.navLayout = pc.navLayout;
+        if (!('footer' in params) && pc.footerStyle) params.footer = pc.footerStyle;
+        /* Hero-Bild aus Pool */
         var imgId = getRandomPresetImage(params.preset);
-        if (imgId) applyHeroImage(imgId, heroType);
+        if (imgId) applyHeroImage(imgId, params.hero || 'fullscreen');
       }
       if (params.layout) {
         var btn = document.querySelector('[data-layout="' + params.layout + '"]');
         if (btn) { setActive(btn); switchLayout(params.layout); }
       }
       if (params.hero) {
+        switchHero(params.hero);
         var btn = document.querySelector('[data-hero="' + params.hero + '"]');
-        if (btn) { setActive(btn); switchHero(params.hero); }
+        if (btn) setActive(btn);
       }
       if (params.color) {
         var sw = document.querySelector('.color-swatch[data-color="' + params.color + '"]');

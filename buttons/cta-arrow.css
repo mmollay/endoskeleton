@@ -1,0 +1,26 @@
+/* SSI Endoskeleton — Button Module: CTA-Arrow (v5.0)
+   Text + animierter Pfeil. Modern editorial. */
+.btn {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.65rem 0;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  box-shadow: none;
+  color: var(--text);
+  gap: 0.6rem;
+  min-height: auto;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.btn::after {
+  content: '→';
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+.btn:hover { transform: none; gap: 0.9rem; color: var(--primary); }
+.btn:hover::after { transform: translateX(0.25rem); }
+.btn-primary { color: var(--primary); }
+.btn-outline, .btn-secondary, .btn-ghost { color: var(--text); }

@@ -4,6 +4,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.0.0] — 2026-04-05
+
+### BREAKING
+- **Preset-System komplett umgebaut** — Presets sind jetzt pure JS-Config-Objekte (PRESETS in demo.html) statt CSS-Dateien. Jedes Preset definiert 15 Parameter (layout/hero/color/charakter/spacing/animation/font/buttons/navBehavior/navLayout/navStyle/footerStyle/width/theme). Legacy `presets/*.css` Dateien entfernt.
+- **CSS-Ownership neu geordnet:** Buttons owned ALL button styles. Softness owned cards/shadows/chrome (keine .btn rules mehr). Layouts owned structural layout only (keine .btn rules mehr). Fonts owned typography inkl. hero-title signature (text-transform, letter-spacing).
+
+### Added
+- **12 Font-Module** (fonts/): brand-bold, cinematic, classic-serif, editorial-grand, geometric-black, luxury-thin, magazine, mono-hacker, rounded-friendly, softcraft, swiss-precision, tech-display. Jedes Modul self-contained mit @import + CSS vars + hero-title signature.
+- **6 Button-Module** (buttons/): brutalist, cta-arrow, minimal-link, pill-thin, rect-outline, rect-solid. Eigene Ownership, keine Konflikte mit softness/layouts.
+- **3 neue Presets:** cinematic, softcraft, startup (zusammen 12 Presets total).
+- **URL-Hash-Preset-System:** `#preset=X` expandiert zu allen 15 Parametern via restoreUrlState(). Hash-Params überschreiben einzeln (`#font=X&buttons=Y`).
+
+### Fixed
+- **Survival-Preset matches survivaltraining.at 1:1:** Cream-Veil-Overlay auf Wald-Hero, Opaque Nav (solid beige), Oswald uppercase H1, grünes WEB Accent, sharp rect-solid Buttons, keine parallelogram tactical Buttons mehr.
+- **shared.js theme-init race condition:** initThemeToggle überschrieb data-theme aus restoreUrlState mit localStorage/prefersDark. Fix: `hasAttribute('data-theme')` Check erhält preset-theme.
+- **softness/*.css:** Alle .btn Rules + .hero-overlay Overrides entfernt (5 Dateien).
+- **layouts/*.css:** Alle .layout-X .btn {...} Rules per Python-Regex entfernt (3 Dateien).
+- **buttons/pill-thin.css:** Outline-Contrast auf warmen Themes (1.5px border rgba primary 0.45 + color: var(--heading)).
+
+### Removed
+- 8 Legacy Preset-CSS-Dateien: `presets/{corporate,creative,editorial,elegant,minimal,playful,survival,tech}.css`
+
+---
+
 ## [4.6.10] — 2026-04-05
 
 ### Changed

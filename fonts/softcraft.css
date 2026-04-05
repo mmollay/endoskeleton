@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Softcraft (v5.0)
+   Fraunces variable + Outfit. Warm, handgefertigt, Craft. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+:root {
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+  --display-weight: 700;
+  --heading-weight: 600;
+  --body-weight: 400;
+  --fs-hero: clamp(2.75rem, 2rem + 5vw, 7rem);
+  --fs-display: clamp(3.75rem, 2.5rem + 8vw, 9.5rem);
+}
+.hero-title { letter-spacing: -0.02em; line-height: 1.04; font-optical-sizing: auto; }
+.hero-eyebrow { letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; font-size: 0.8rem; font-family: var(--font-body); }

@@ -138,16 +138,6 @@
   margin-top: var(--space-xs);
 }
 
-/* ── Buttons: editorial, aber nicht eckig ── */
-.layout-magazine .btn {
-  padding: 0.625rem 1.5rem;
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-}
-
 /* ── Blockquote: editorial, dezent ── */
 .layout-magazine .blockquote {
   border-left: 2px solid rgba(var(--primary-rgb), 0.4);

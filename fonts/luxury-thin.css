@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Luxury-Thin (v5.0)
+   Cormorant Garamond 300 thin + Lato body. Boutique, Spa, Luxus. */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap');
+:root {
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Lato', system-ui, sans-serif;
+  --display-weight: 300;
+  --heading-weight: 400;
+  --body-weight: 400;
+  --fs-hero: clamp(3.5rem, 2.5rem + 7vw, 9rem);
+  --fs-display: clamp(4.5rem, 3rem + 9vw, 10.5rem);
+}
+.hero-title { letter-spacing: -0.005em; line-height: 1.05; font-style: italic; }
+.hero-eyebrow { letter-spacing: 0.35em; text-transform: uppercase; font-weight: 300; font-size: 0.75rem; font-family: var(--font-body); }

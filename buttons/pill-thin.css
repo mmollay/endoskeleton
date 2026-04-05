@@ -1,0 +1,24 @@
+/* SSI Endoskeleton — Button Module: Pill-Thin (v5.0)
+   Pill-Form, 1px dünner Border, kompakt. */
+.btn {
+  border-radius: 999px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.7rem 1.6rem;
+  font-size: 0.85rem;
+  box-shadow: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn-outline, .btn-ghost, .btn-secondary {
+  background: transparent;
+  color: var(--heading);
+  border: 1.5px solid rgba(var(--primary-rgb),0.45);
+}
+.btn-outline:hover, .btn-ghost:hover, .btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

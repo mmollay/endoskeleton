@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Magazine (v5.0)
+   Fraunces 900 Display + Space Grotesk body. Kreativ-Magazin. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root {
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --display-weight: 900;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --fs-hero: clamp(3rem, 2rem + 6vw, 8.5rem);
+  --fs-display: clamp(4.5rem, 3rem + 9vw, 11rem);
+}
+.hero-title { letter-spacing: -0.015em; line-height: 0.94; font-optical-sizing: auto; }
+.hero-eyebrow { letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem; font-family: var(--font-body); }

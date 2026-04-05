@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Classic-Serif (v5.0)
+   Lora + Inter. Klassisch, Blog, Lesbar. */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap');
+:root {
+  --font-heading: 'Lora', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --display-weight: 700;
+  --heading-weight: 600;
+  --body-weight: 400;
+  --fs-hero: clamp(2.75rem, 2rem + 4.5vw, 6.5rem);
+  --fs-display: clamp(3.5rem, 2.5rem + 7vw, 9rem);
+}
+.hero-title { letter-spacing: -0.015em; line-height: 1.1; }
+.hero-eyebrow { letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem; font-family: var(--font-body); }

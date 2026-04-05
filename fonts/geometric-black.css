@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Geometric-Black (v5.0)
+   Archivo Black Display + Archivo body. Geometrisch, Startup, bold. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap');
+:root {
+  --font-heading: 'Archivo Black', Impact, sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --display-weight: 400;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --fs-hero: clamp(3rem, 2rem + 6vw, 8rem);
+  --fs-display: clamp(4rem, 2.5rem + 9vw, 10rem);
+}
+.hero-title { letter-spacing: -0.02em; line-height: 0.98; }
+.hero-eyebrow { letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; font-size: 0.8rem; font-family: var(--font-body); }
