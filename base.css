@@ -2506,3 +2506,25 @@ section.section-dark {
     page-break-inside: avoid;
   }
 }
+
+/* ─── FARB-HARMONIE: Text & Heading farbgetönt je nach Primärfarbe ─── */
+/* Jede Farbe bringt einen Hauch ihres Akzents ins Fließtext-Heading-System */
+body[data-color="blue"]   { --text: #2a3548; --heading: #0f1e38; }
+body[data-color="navy"]   { --text: #252e48; --heading: #0a1530; }
+body[data-color="wine"]   { --text: #3d2a2e; --heading: #2a1015; }
+body[data-color="red"]    { --text: #3d2a2a; --heading: #2a0f0f; }
+body[data-color="gold"]   { --text: #3d3326; --heading: #26200f; }
+body[data-color="brown"]  { --text: #3a2e24; --heading: #241810; }
+body[data-color="coral"]  { --text: #3a2820; --heading: #26140c; }
+body[data-color="orange"] { --text: #3a2820; --heading: #26140c; }
+body[data-color="cyan"]   { --text: #263a42; --heading: #0f2630; }
+body[data-color="teal"]   { --text: #263a38; --heading: #0f2620; }
+body[data-color="mint"]   { --text: #2a3a32; --heading: #0f2a1e; }
+body[data-color="forest"] { --text: #253525; --heading: #0f2010; }
+body[data-color="olive"]  { --text: #30382a; --heading: #182010; }
+body[data-color="violet"] { --text: #322840; --heading: #1a0f2e; }
+body[data-color="lavender"]{ --text: #322840; --heading: #1a0f2e; }
+body[data-color="pink"]   { --text: #3a2838; --heading: #261024; }
+body[data-color="slate"]  { --text: #2d3748; --heading: #0f172a; }
+body[data-color="gray"]   { --text: #2d3748; --heading: #0f172a; }
+body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
