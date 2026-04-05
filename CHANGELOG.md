@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.3.1] — 2026-04-05
+
+### Changed
+- **heroes/playful.css** — Playful Hero v2: SVG-Hügellandschaft mit 3 Tiefen-Layern ersetzt Wellen-Divider, schwebende CSS-Wolken (`::before`), Theme-Support für alle 10 Themes (dark, tech, warm, midnight, forest, ocean, sunset, pastel, earth). Animationen überarbeitet (`cloudFloat`, `blobMorph`). Responsive verbessert.
+
+---
+
 ## [4.0.0] — 2026-04-04
 
 ### Changed

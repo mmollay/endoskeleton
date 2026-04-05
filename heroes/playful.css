@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SSI Endoskeleton — Hero: Playful
-   SVG-Wellen, organische Formen, schwebende Deko-Elemente.
+   SSI Endoskeleton — Hero: Playful v2
+   SVG-Landschaft mit Huegeln, Wolken, organischen Formen.
    Funktioniert fuer Kinder UND als liebevolles Upgrade fuer jede Seite.
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -10,109 +10,122 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(
-    175deg,
-    rgba(var(--primary-rgb), 0.06) 0%,
-    rgba(var(--primary-rgb), 0.12) 40%,
-    rgba(var(--primary-rgb), 0.04) 100%
+    180deg,
+    rgba(var(--primary-rgb), 0.04) 0%,
+    rgba(var(--primary-rgb), 0.10) 50%,
+    rgba(var(--primary-rgb), 0.06) 100%
   );
   margin-top: calc(var(--nav-height) * -1);
-  padding: calc(var(--nav-height) + var(--space-3xl)) var(--space-lg) 8rem;
+  padding: calc(var(--nav-height) + var(--space-3xl)) var(--space-lg) 10rem;
   position: relative;
   overflow: hidden;
 }
 
-/* ─── SVG Wellen-Divider unten ─── */
-.hero--playful::after {
+/* ─── Wolken (schwebend) ─── */
+.hero--playful::before {
+  content: '';
+  position: absolute;
+  top: 18%;
+  right: 8%;
+  width: 180px;
+  height: 80px;
+  background:
+    radial-gradient(ellipse 50% 80% at 30% 50%, rgba(255,255,255,0.7) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 90% at 60% 60%, rgba(255,255,255,0.6) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 70% at 80% 40%, rgba(255,255,255,0.5) 0%, transparent 60%);
+  border-radius: 50%;
+  animation: cloudFloat 14s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── SVG Landschaft: 3 Huegel-Layer fuer Tiefe ─── */
+
+/* Layer 1 — hinterster Huegel (dezent) */
+.hero--playful .hero-decoration {
+  display: block !important;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  pointer-events: none;
+  z-index: 2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200' preserveAspectRatio='none'%3E%3Cpath d='M0,140 C200,80 400,160 600,110 C800,60 1000,130 1200,90 C1350,70 1440,100 1440,100 L1440,200 L0,200 Z' fill='%23e8e8e8' fill-opacity='0.5'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: bottom;
+}
+
+/* Layer 2 — mittlerer Huegel */
+.hero--playful .hero-decoration::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 160' preserveAspectRatio='none'%3E%3Cpath d='M0,100 C180,140 360,60 540,100 C720,140 900,70 1080,110 C1260,150 1380,90 1440,80 L1440,160 L0,160 Z' fill='%23d4d4d4' fill-opacity='0.4'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: bottom;
+}
+
+/* Layer 3 — vorderster Huegel (Uebergang zum Content) */
+.hero--playful .hero-decoration::after {
   content: '';
   position: absolute;
   bottom: -1px;
   left: 0;
   right: 0;
   height: 120px;
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 120 preserveAspectRatio=none%3E%3Cpath d=M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z fill=white/%3E%3C/svg%3E);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='white'/%3E%3C/svg%3E");
   background-size: cover;
   background-position: bottom;
-  pointer-events: none;
-  z-index: 3;
+  z-index: 1;
 }
 
-/* Dark-Theme: Welle in dunkler Farbe */
-[data-theme="dark"] .hero--playful::after {
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 120 preserveAspectRatio=none%3E%3Cpath d=M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z fill=%230f0f1a/%3E%3C/svg%3E);
-}
-[data-theme="tech"] .hero--playful::after {
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 120 preserveAspectRatio=none%3E%3Cpath d=M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z fill=%230a0a0f/%3E%3C/svg%3E);
-}
-[data-theme="warm"] .hero--playful::after {
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 120 preserveAspectRatio=none%3E%3Cpath d=M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z fill=%23f5f2eb/%3E%3C/svg%3E);
-}
-
-/* ─── Schwebende Deko-Kreise ─── */
-.hero--playful::before {
-  content: '';
-  position: absolute;
-  top: 12%;
-  right: 10%;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: rgba(var(--primary-rgb), 0.10);
-  animation: playfulFloat 7s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ─── SVG-Deko via hero-decoration ─── */
-.hero--playful .hero-decoration {
-  display: block !important;
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-/* Blob links unten */
-.hero--playful .hero-decoration::before {
-  content: '';
-  position: absolute;
-  bottom: 10%;
-  left: -5%;
-  width: 280px;
-  height: 280px;
-  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-  background: rgba(var(--primary-rgb), 0.08);
-  animation: playfulMorph 12s ease-in-out infinite;
-}
-
-/* Blob rechts oben */
-.hero--playful .hero-decoration::after {
-  content: '';
-  position: absolute;
-  top: 20%;
-  right: 5%;
-  width: 160px;
-  height: 160px;
-  border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
-  background: rgba(var(--primary-rgb), 0.06);
-  animation: playfulMorph 9s ease-in-out infinite reverse;
-}
-
-/* ─── Zweite Welle (Huegel) weiter oben fuer Tiefe ─── */
+/* ─── Zweite Wolke (kleiner, links) ─── */
 .hero--playful .hero-bg {
   position: absolute;
-  bottom: 40px;
-  left: 0;
-  right: 0;
-  height: 100px;
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 100 preserveAspectRatio=none%3E%3Cpath d=M0,80 C360,30 720,100 1080,50 C1260,30 1380,60 1440,45 L1440,100 L0,100 Z fill=white fill-opacity=0.4/%3E%3C/svg%3E);
-  background-size: cover;
+  top: 25%;
+  left: 5%;
+  width: 120px;
+  height: 55px;
+  background:
+    radial-gradient(ellipse 55% 85% at 35% 50%, rgba(255,255,255,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 75% at 65% 55%, rgba(255,255,255,0.4) 0%, transparent 65%);
+  border-radius: 50%;
+  animation: cloudFloat 18s ease-in-out infinite 4s;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
 }
 
-[data-theme="dark"] .hero--playful .hero-bg {
-  background-image: url(data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 1440 100 preserveAspectRatio=none%3E%3Cpath d=M0,80 C360,30 720,100 1080,50 C1260,30 1380,60 1440,45 L1440,100 L0,100 Z fill=%230f0f1a fill-opacity=0.4/%3E%3C/svg%3E);
+/* ─── Schwebende Deko-Blobs ─── */
+.hero--playful .hero-content::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -80px;
+  width: 140px;
+  height: 140px;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: rgba(var(--primary-rgb), 0.08);
+  animation: blobMorph 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero--playful .hero-content::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -60px;
+  width: 100px;
+  height: 100px;
+  border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
+  background: rgba(var(--primary-rgb), 0.06);
+  animation: blobMorph 12s ease-in-out infinite reverse;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* ─── Content ─── */
@@ -120,7 +133,7 @@
   text-align: center;
   max-width: 48rem;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .hero--playful .hero-eyebrow {
@@ -153,40 +166,78 @@
   flex-wrap: wrap;
 }
 
+/* ─── Dark Themes: Huegel + Wolken anpassen ─── */
+[data-theme="dark"] .hero--playful .hero-decoration {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200' preserveAspectRatio='none'%3E%3Cpath d='M0,140 C200,80 400,160 600,110 C800,60 1000,130 1200,90 C1350,70 1440,100 1440,100 L1440,200 L0,200 Z' fill='%231a1a2e' fill-opacity='0.5'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .hero--playful .hero-decoration::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 160' preserveAspectRatio='none'%3E%3Cpath d='M0,100 C180,140 360,60 540,100 C720,140 900,70 1080,110 C1260,150 1380,90 1440,80 L1440,160 L0,160 Z' fill='%23151528' fill-opacity='0.5'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%230f0f1a'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .hero--playful::before,
+[data-theme="dark"] .hero--playful .hero-bg {
+  opacity: 0.15;
+}
+
+[data-theme="tech"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%230a0a0f'/%3E%3C/svg%3E");
+}
+
+[data-theme="warm"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23f5f2eb'/%3E%3C/svg%3E");
+}
+
+[data-theme="midnight"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23141428'/%3E%3C/svg%3E");
+}
+
+[data-theme="forest"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%230d1a0d'/%3E%3C/svg%3E");
+}
+
+[data-theme="ocean"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23f0f7fa'/%3E%3C/svg%3E");
+}
+
+[data-theme="sunset"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23fff8f0'/%3E%3C/svg%3E");
+}
+
+[data-theme="pastel"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23f8f5ff'/%3E%3C/svg%3E");
+}
+
+[data-theme="earth"] .hero--playful .hero-decoration::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 C240,110 480,30 720,70 C960,110 1200,40 1440,70 L1440,120 L0,120 Z' fill='%23f4f1ec'/%3E%3C/svg%3E");
+}
+
 /* ─── Animationen ─── */
-@keyframes playfulFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-15px) rotate(2deg); }
-  66% { transform: translateY(8px) rotate(-1deg); }
+@keyframes cloudFloat {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(15px) translateY(-5px); }
+  50% { transform: translateX(30px) translateY(0); }
+  75% { transform: translateX(15px) translateY(5px); }
 }
 
-@keyframes playfulMorph {
-  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-  25% { border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%; }
-  50% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 60%; }
-  75% { border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%; }
+@keyframes blobMorph {
+  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+  25% { border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%; transform: scale(1.05); }
+  50% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 60%; transform: scale(0.98); }
+  75% { border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%; transform: scale(1.03); }
 }
 
-/* ─── Deko auf Mobile kleiner ─── */
+/* ─── Responsive ─── */
 @media (max-width: 48rem) {
   .hero--playful {
     min-height: 70vh;
-    padding-bottom: 6rem;
+    padding-bottom: 7rem;
   }
-  .hero--playful::before {
-    width: 100px;
-    height: 100px;
-    top: 8%;
-    right: 5%;
-  }
-  .hero--playful .hero-decoration::before {
-    width: 150px;
-    height: 150px;
-  }
-  .hero--playful .hero-decoration::after {
-    width: 80px;
-    height: 80px;
-  }
+  .hero--playful::before { width: 100px; height: 45px; top: 10%; right: 5%; }
+  .hero--playful .hero-bg { width: 70px; height: 35px; }
+  .hero--playful .hero-content::before,
+  .hero--playful .hero-content::after { display: none; }
   .hero--playful .hero-ctas {
     flex-direction: column;
     align-items: center;
