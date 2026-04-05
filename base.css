@@ -781,6 +781,50 @@ small {
   box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
 }
 
+/* ─── LANGUAGE SWITCH ─────────────────────────────────────────────────── */
+/* Kompakter DE/EN-Toggle in der Nav — neutral, themefähig, tastaturbedienbar */
+.nav-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px);
+  overflow: hidden;
+  margin: 0 0.5rem;
+  line-height: 1;
+}
+.nav-lang-btn {
+  appearance: none;
+  background: transparent;
+  color: var(--text-muted);
+  border: 0;
+  padding: 0.4rem 0.65rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  min-width: 2.25rem;
+}
+.nav-lang-btn:hover {
+  color: var(--text);
+  background: rgba(var(--primary-rgb), 0.06);
+}
+.nav-lang-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+}
+.nav-lang-btn:focus-visible {
+  outline: 2px solid var(--focus, var(--primary));
+  outline-offset: -2px;
+}
+/* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
+@media (max-width: 48rem) {
+  .nav-lang { margin: 0 0.35rem; }
+  .nav-lang-btn { padding: 0.35rem 0.5rem; font-size: 0.68rem; min-width: 2rem; }
+}
+
 /* Dropdown */
 .nav-dropdown {
   position: relative;

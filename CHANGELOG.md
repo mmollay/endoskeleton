@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.5] — 2026-04-05
+
+### Added
+- **shared.js Lang-Switch** — Universeller DE/EN-Toggle in der Site-Nav (konfigurierbar via `SITE_CONFIG.languages = ['de','en']`). Vorher war der Toggle nur in der Demo-Sidebar versteckt — für User auf der generierten Seite unsichtbar. Jetzt permanent in der Nav, themefähig (nutzt `--primary`/`--text-muted`/`--border`), Tastaturbedienbar (`aria-pressed`, `focus-visible`), responsive (verkleinert auf Mobile, wird NICHT ausgeblendet).
+- **shared.js `sssi:langchange`** — Custom Event das bei Sprachwechsel feuert (Detail: `{lang}`). Host-Pages können Listener registrieren. Zusätzlich wird `window.applyLang(lang)` aufgerufen falls definiert.
+- **shared.js Lang-Priorität** — URL-Hash (`?lang=en`) > localStorage.siteLang > `<html lang>` > `'de'`. Wählt bei Page-Load automatisch die richtige Sprache.
+- **base.css `.nav-lang` + `.nav-lang-btn`** — Kompakte Segment-Control-Optik, active-Button in Primary-Farbe, Hover-State, Mobile-angepasst.
+- **demo.html** — `applyLang` als `window.applyLang` global exponiert, damit shared.js den Demo-Translator ansteuern kann.
+
+---
+
 ## [4.6.4] — 2026-04-05
 
 ### Changed

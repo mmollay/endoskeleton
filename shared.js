@@ -25,6 +25,7 @@
       tagline: "",
       credit: true,
     },
+    languages: ["de", "en"],
   };
 
   /* Merge user config with defaults */
@@ -82,6 +83,66 @@
     link.href = "#" + targetId;
     link.textContent = "Zum Inhalt springen";
     document.body.insertBefore(link, document.body.firstChild);
+  }
+
+  /* ─── 1b. LANGUAGE SWITCH ────────────────────────────────────────────
+     Universal DE/EN toggle (configurable via CONFIG.languages).
+     Priority: URL hash (lang=xx) > localStorage > <html lang>.
+     Fires 'sssi:langchange' event + calls window.applyLang(lang) if defined
+     so host pages can wire their own translation loader. */
+  function getHashLang() {
+    var h = (location.hash || "").replace(/^#/, "");
+    var m = h.match(/(?:^|&)lang=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function getCurrentLang() {
+    return (
+      getHashLang() ||
+      localStorage.getItem("siteLang") ||
+      document.documentElement.getAttribute("lang") ||
+      "de"
+    );
+  }
+  function setLang(lang) {
+    document.documentElement.setAttribute("lang", lang);
+    try { localStorage.setItem("siteLang", lang); } catch(e){}
+    /* Sync all lang-switch buttons across the page */
+    document
+      .querySelectorAll("[data-nav-lang]")
+      .forEach(function (b) {
+        b.classList.toggle("active", b.getAttribute("data-nav-lang") === lang);
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-nav-lang") === lang));
+      });
+    /* Custom event for host integration */
+    try {
+      window.dispatchEvent(new CustomEvent("sssi:langchange", { detail: { lang: lang } }));
+    } catch(e){}
+    /* Hook for host page translation loader */
+    if (typeof window.applyLang === "function") window.applyLang(lang);
+  }
+  function buildLangSwitch() {
+    var langs = CONFIG.languages || [];
+    if (!Array.isArray(langs) || langs.length < 2) return "";
+    var current = getCurrentLang();
+    var buttons = langs
+      .map(function (l) {
+        var active = l === current;
+        return (
+          '<button type="button" class="nav-lang-btn' +
+          (active ? " active" : "") +
+          '" data-nav-lang="' + escapeHtml(l) + '"' +
+          ' aria-pressed="' + (active ? "true" : "false") + '"' +
+          ' aria-label="' + escapeHtml(l.toUpperCase()) + '">' +
+          escapeHtml(l.toUpperCase()) +
+          "</button>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="nav-lang" role="group" aria-label="Sprache">' +
+      buttons +
+      "</div>"
+    );
   }
 
   /* ─── 2. NAVIGATION ─────────────────────────────────────────────────── */
@@ -182,12 +243,22 @@
       '<ul class="nav-links" role="list">' +
       linksHtml +
       "</ul>" +
+      buildLangSwitch() +
       '<button class="nav-hamburger" aria-label="Navigation öffnen" aria-expanded="false">' +
       "<span></span><span></span><span></span></button>" +
       "</div></nav>" +
       '<div class="nav-mobile" role="navigation" aria-label="Mobile Navigation">' +
       mobileHtml +
       "</div>";
+
+    /* Language switch handlers */
+    el.querySelectorAll("[data-nav-lang]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setLang(btn.getAttribute("data-nav-lang"));
+      });
+    });
+    /* Apply initial lang to <html> so host pages render correctly on load */
+    setLang(getCurrentLang());
 
     /* Hamburger toggle */
     var burger = el.querySelector(".nav-hamburger");
