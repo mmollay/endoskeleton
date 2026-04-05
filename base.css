@@ -977,7 +977,7 @@ small {
 
 .hero-title {
   font-size: var(--fs-hero);
-  font-weight: 800;
+  font-weight: var(--display-weight, 700);
   line-height: 1.05;
   margin-bottom: var(--space-lg);
   color: var(--heading);
@@ -1346,7 +1346,7 @@ section.section-dark {
 .banner-val {
   font-family: var(--font-heading);
   font-size: var(--fs-xl);
-  font-weight: 800;
+  font-weight: var(--display-weight, 700);
   color: var(--banner-val-color, var(--primary));
   line-height: 1.1;
   margin-bottom: var(--space-xs);
