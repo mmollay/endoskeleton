@@ -1,0 +1,20 @@
+/* SSI Endoskeleton — Button Module: Tech-Angle (v5.0)
+   Angled clip-path, monospace feel, cyber/tech. */
+.btn {
+  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
+  font-size: 0.8rem;
+  border: none;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  box-shadow: none;
+  transition: all 0.18s ease;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.btn:hover { transform: translateX(2px); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline, .btn-secondary, .btn-ghost { background: rgba(var(--primary-rgb),0.15); color: var(--primary); }
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover { background: rgba(var(--primary-rgb),0.25); }

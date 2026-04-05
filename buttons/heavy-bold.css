@@ -1,0 +1,18 @@
+/* SSI Endoskeleton — Button Module: Heavy-Bold (v5.0)
+   Extra-bold, uppercase, dick, großer Impact. */
+.btn {
+  border-radius: 4px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1.1rem 2.4rem;
+  font-size: 0.85rem;
+  border: none;
+  box-shadow: none;
+  transition: all 0.15s ease;
+}
+.btn:hover { transform: scale(1.02); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline, .btn-secondary, .btn-ghost { background: transparent; color: var(--primary); border: 3px solid var(--primary); }
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover { background: var(--primary); color: #fff; }

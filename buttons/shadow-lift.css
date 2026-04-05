@@ -1,0 +1,18 @@
+/* SSI Endoskeleton — Button Module: Shadow-Lift (v5.0)
+   Prominenter Schatten, raised-look, marketing. */
+.btn {
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.9rem 1.8rem;
+  font-size: 0.9rem;
+  border: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.18); }
+.btn:active { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline, .btn-secondary, .btn-ghost { background: #fff; color: var(--primary); border: 1px solid rgba(0,0,0,0.08); }
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover { color: var(--primary-dark); }

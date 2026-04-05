@@ -1,0 +1,17 @@
+/* SSI Endoskeleton — Button Module: Pill-Solid (v5.0)
+   Voll gefüllte Pille. Klassischer CTA. */
+.btn {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.85rem 2rem;
+  font-size: 0.9rem;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline, .btn-secondary, .btn-ghost { background: transparent; color: var(--primary); border: 2px solid var(--primary); box-shadow: none; }
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover { background: var(--primary); color: #fff; }

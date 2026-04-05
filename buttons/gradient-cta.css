@@ -1,0 +1,20 @@
+/* SSI Endoskeleton — Button Module: Gradient-CTA (v5.0)
+   Gradient-Fill, moderne Startup-CTA. */
+.btn {
+  border-radius: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.85rem 1.8rem;
+  font-size: 0.9rem;
+  border: none;
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb),0.35);
+  transition: all 0.2s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(var(--primary-rgb),0.45); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+}
+.btn-primary:hover { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); }
+.btn-outline, .btn-secondary, .btn-ghost { background: transparent; color: var(--primary); border: 2px solid var(--primary); box-shadow: none; }
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover { background: rgba(var(--primary-rgb),0.08); }
