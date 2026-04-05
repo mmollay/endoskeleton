@@ -2295,27 +2295,58 @@ section.section-dark {
 }
 
 /* ─── REVEAL ANIMATION ──────────────────────────────────────────────────── */
-/* Nur transform-Animation — opacity bleibt immer 1.
-   Dunkle Hintergründe, Farben und Text sind sofort sichtbar. */
+/* Opacity + translateY Fade. Safety-Net: Falls IntersectionObserver fehlt
+   oder JS nicht lädt, garantiert ein CSS-Fallback-@keyframes nach 3s die
+   Sichtbarkeit (kein Unsichtbarer-Text-Bug wie v4.6.0 ihn vermeiden wollte). */
 .reveal {
+  opacity: 0;
   transform: translateY(1.25rem);
-  transition: transform 0.5s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  animation: reveal-safety-net 0.6s ease 6s forwards;
 }
 
 .reveal.visible {
+  opacity: 1;
   transform: translateY(0);
+  animation: none;
 }
 
-.reveal-delay-1 {
-  transition-delay: 0.1s;
+@keyframes reveal-safety-net {
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.reveal-delay-2 {
-  transition-delay: 0.2s;
-}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
 
-.reveal-delay-3 {
-  transition-delay: 0.3s;
+/* Hero on-load Stagger — 4-stufig wie survivaltraining.at Referenz.
+   Nutzt fadeUp-keyframe (unten definiert). animation-fill-mode: both
+   sorgt dafür dass Endzustand nach Animation bleibt. */
+.hero .hero-eyebrow,
+.hero-eyebrow { animation: fadeUp 0.8s ease 0.2s both; }
+.hero .hero-title,
+.hero-title   { animation: fadeUp 0.9s ease 0.4s both; }
+.hero .hero-subtitle,
+.hero-subtitle { animation: fadeUp 0.9s ease 0.6s both; }
+.hero .hero-ctas,
+.hero-ctas    { animation: fadeUp 0.9s ease 0.8s both; }
+
+/* Respect user motion preference — instant visibility, no motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  .hero .hero-eyebrow, .hero-eyebrow,
+  .hero .hero-title, .hero-title,
+  .hero .hero-subtitle, .hero-subtitle,
+  .hero .hero-ctas, .hero-ctas {
+    animation: none;
+  }
 }
 
 @keyframes fadeUp {

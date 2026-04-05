@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.4] — 2026-04-05
+
+### Changed
+- **base.css .reveal** — Animation-System wiederbelebt: opacity-Fade (0→1) zurück im Standard-`.reveal`, kombiniert mit translateY(1.25rem) und 0.6s ease. v4.6.0 hatte opacity entfernt ("Contrast-Schutz") was die Seiten statisch wirken ließ. Neu: CSS-Safety-Net `@keyframes reveal-safety-net` garantiert Sichtbarkeit nach 6s falls IntersectionObserver nicht feuert — kein Risiko unsichtbaren Texts.
+- **base.css Hero-Stagger** — 4-stufiges on-load fadeUp auf `.hero-eyebrow` (0.2s), `.hero-title` (0.4s), `.hero-subtitle` (0.6s), `.hero-ctas` (0.8s) delays. Entspricht dem survivaltraining.at-Referenzmuster. `animation-fill-mode: both` stellt Endzustand sicher.
+- **base.css reduced-motion** — `@media (prefers-reduced-motion: reduce)` deaktiviert alle Animationen und Transitions für Accessibility.
+- **animation/dynamic.css** — Verstärkt: cubic-bezier(0.22,1,0.36,1) easing, translateY(2.5rem)+scale(0.98) transform, 0.8s duration, Hero-Animationen 1.0-1.1s mit sanftem Bounce-Ease. 4 stagger-delays (-1 bis -4).
+- **animation/subtle.css** — Kommentar aktualisiert (nutzt neue base.css-Defaults mit opacity).
+
+---
+
 ## [4.6.3] — 2026-04-05
 
 ### Fixed

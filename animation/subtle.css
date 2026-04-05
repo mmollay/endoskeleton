@@ -1,2 +1,4 @@
 /* SSI Endoskeleton — Animation Preset: Subtle (Standard) */
-/* Keine Overrides — base.css-Defaults gelten (0.5s, 1.25rem translateY) */
+/* Nutzt base.css-Defaults: opacity 0→1 + 1.25rem translateY, 0.6s ease.
+   Hero-on-load Stagger: 0.2s/0.4s/0.6s/0.8s delays.
+   Das ist der ausgewogene Standard für die meisten Sites. */
