@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [4.6.8] — 2026-04-05
+
+### Fixed
+- **KRITISCHER BUG: Sections unsichtbar für 6s** (Regression aus v4.6.4): Das CSS-Safety-Net war auf `6s forwards` gesetzt — bei `hero=fullscreen` + `spacing=spacious` sind alle Body-Sections below-fold. IntersectionObserver feuert zwar, aber für einen kurzen Moment nach Page-Load sind sie opacity:0. Bei Martins Test erschien der Hero + direkt Footer, dazwischen leere Cream-Fläche. Fix: Safety-Net-Delay von 6s auf 0.3s gesenkt + Duration 0.5s. Content wird garantiert innerhalb von 0.8s sichtbar, auch ohne Scroll.
+- **.nav-cta ignorierte Button-Preset Border-Radius:** `.nav-cta` hatte `border-radius: var(--radius-full) !important` hardcoded — alle Button-Presets mit angular shape (sharp/tactical/tech/bold) wurden vom nav-cta NICHT übernommen, CTA-Button blieb pill-shaped. Fix: `.nav-cta` liest jetzt `var(--cta-radius, var(--radius-full))` — Fallback ist rund, aber Button-Presets setzen eigenen Wert:
+  - sharp/tactical/tech → `--cta-radius: 0` (angular)
+  - bold/ghost/outline/outline-thin/outline-elegant → `--cta-radius: 4px` (leichte Rundung)
+  - rounded/soft/pill → bleibt var(--radius-full) (rund)
+
+---
+
 ## [4.6.7] — 2026-04-05
 
 ### Added

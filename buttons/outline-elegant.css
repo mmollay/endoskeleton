@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Outline Elegant
+:root { --cta-radius: 4px; }
    Inspiriert von survivaltraining.at. Zarter Rahmen, transparent, dezent. */
 
 .btn,

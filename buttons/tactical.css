@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Tactical (Survival-Style, Parallelogramm) */
+:root { --cta-radius: 0; }
 .btn {
   border-radius: 0 !important;
   font-weight: 600 !important;

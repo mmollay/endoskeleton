@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Outline */
+:root { --cta-radius: 4px; }
 .btn {
   background: transparent !important;
   color: var(--primary) !important;

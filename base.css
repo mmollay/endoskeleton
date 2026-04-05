@@ -764,7 +764,7 @@ small {
   background: var(--primary) !important;
   color: var(--text-on-primary) !important;
   padding: 0.45rem 1.25rem !important;
-  border-radius: var(--radius-full) !important;
+  border-radius: var(--cta-radius, var(--radius-full)) !important;
   font-size: var(--fs-sm) !important;
   font-weight: 600;
   white-space: nowrap;
@@ -2346,7 +2346,7 @@ section.section-dark {
   opacity: 0;
   transform: translateY(1.25rem);
   transition: opacity 0.6s ease, transform 0.6s ease;
-  animation: reveal-safety-net 0.6s ease 6s forwards;
+  animation: reveal-safety-net 0.5s ease 0.3s forwards;
 }
 
 .reveal.visible {

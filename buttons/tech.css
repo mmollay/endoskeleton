@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Tech (SSI-Style, abgeschrägte Ecken) */
+:root { --cta-radius: 0; }
 .btn {
   border-radius: 0 !important;
   font-weight: 700 !important;

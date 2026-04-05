@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Ghost */
+:root { --cta-radius: 4px; }
 .btn {
   background: transparent !important;
   color: var(--primary) !important;

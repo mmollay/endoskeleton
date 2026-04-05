@@ -1,4 +1,5 @@
 /* SSI Endoskeleton — Button Preset: Outline Thin */
+:root { --cta-radius: 4px; }
 /* Dünne 1px-Linie statt 2px — edler, dezenter Look */
 .btn {
   background: transparent !important;
