@@ -35,6 +35,17 @@ button[type="submit"]:hover {
   color: var(--text-on-primary);
 }
 
+/* Split hero: Text ist auf hellem Cream Hintergrund - verwende primaerfarben-getoenten Rand */
+.hero--split .btn:not(:first-child) {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: transparent;
+}
+.hero--split .btn:not(:first-child):hover {
+  background: var(--primary);
+  color: var(--text-on-primary);
+}
+
 /* Hero contrast */
 .hero--fullscreen .btn:not(:first-child),
 .hero--banner .btn:not(:first-child) {
