@@ -1,6 +1,6 @@
-/* SSI Endoskeleton — Preset: Survival (v4.7.0)
+/* SSI Endoskeleton — Preset: Survival (v4.8.1)
  * Komplettpaket angelehnt an survivaltraining.at
- * Beige/Warm + Grün + Oswald Big-Type + Wald-Hero
+ * Beige/Warm + Grün + Oswald Big-Type + helles Wald-Hero
  * Wird als LETZTES CSS geladen → höchste Specificity ohne !important.
  */
 
@@ -28,21 +28,34 @@
   --fs-display:      clamp(4rem, 3rem + 8vw, 10rem);
   --fs-hero:         clamp(3.5rem, 2.5rem + 6vw, 8rem);
 
-  /* ─── Hero-Overlay: heller beiger Veil (statt dunkler Gradient) ─── */
+  /* ─── Hero-Overlay: starker beiger Veil (damit Text lesbar) ─── */
   --hero-overlay-gradient: linear-gradient(
     180deg,
-    rgba(245, 242, 235, 0.35) 0%,
-    rgba(245, 242, 235, 0.55) 60%,
-    rgba(245, 242, 235, 0.75) 100%
+    rgba(245, 242, 235, 0.75) 0%,
+    rgba(245, 242, 235, 0.60) 40%,
+    rgba(245, 242, 235, 0.82) 100%
   );
   --hero-title-color: #1a1a1a;
 
   /* ─── Wald-Hero-Hintergrundbild (Fallback via CSS) ─── */
-  --hero-bg-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1920&q=80');
+  --hero-bg-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80');
+}
+
+/* ─── Header/Nav: beige Hintergrund statt weiß ─── */
+.site-header,
+header.site-header,
+.site-nav,
+nav.site-nav {
+  background-color: rgba(245, 242, 235, 0.92) !important;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(217, 211, 197, 0.6);
+}
+
+.site-header a, .site-nav a, .nav-link {
+  color: #1a1a1a;
 }
 
 /* ─── Hero-Title: dunkel, Oswald, uppercase, stark ─── */
-/* Spezifität muss hero-variant-Selektoren schlagen */
 .hero-title,
 .hero--image .hero-title,
 .hero--fullscreen .hero-title,
@@ -56,10 +69,10 @@
   letter-spacing: 0.02em;
   font-weight: 700;
   line-height: 0.95;
-  text-shadow: 0 2px 20px rgba(245, 242, 235, 0.6);
+  text-shadow: 0 2px 24px rgba(245, 242, 235, 0.95), 0 0 40px rgba(245, 242, 235, 0.7);
 }
 
-/* Grüne Akzent-Wörter (strong/em in Headline) */
+/* Grüne Akzent-Wörter */
 .hero-title strong,
 .hero-title em,
 .hero--image .hero-title strong,
@@ -69,8 +82,9 @@
   font-weight: 700;
 }
 
-/* Subtitle: Serif, warmer grey */
+/* Subtitle: Serif italic, dunkel, stark lesbar */
 .hero-subtitle,
+.hero-lead,
 .hero--image .hero-subtitle,
 .hero--fullscreen .hero-subtitle,
 .hero--split .hero-subtitle,
@@ -78,22 +92,25 @@
 .hero--veil .hero-subtitle,
 .hero--minimal .hero-subtitle {
   font-family: var(--font-body);
-  color: var(--text);
+  color: #1a1a1a;
   font-weight: 400;
-  text-shadow: 0 1px 10px rgba(245, 242, 235, 0.5);
+  font-style: italic;
+  text-shadow: 0 1px 16px rgba(245, 242, 235, 0.95), 0 0 24px rgba(245, 242, 235, 0.8);
 }
 
 .hero-eyebrow,
+.hero-kicker,
 .hero--image .hero-eyebrow,
 .hero--fullscreen .hero-eyebrow,
 .hero--split .hero-eyebrow,
 .hero--banner .hero-eyebrow,
 .hero--veil .hero-eyebrow,
 .hero--minimal .hero-eyebrow {
-  color: var(--primary);
+  color: var(--primary-dark);
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 1px 12px rgba(245, 242, 235, 0.9);
 }
 
 /* ─── Hero-Background: Wald-Bild via CSS-Variable ─── */
@@ -105,10 +122,10 @@
   background-position: center;
 }
 
-/* ─── Hero-Overlay: heller Veil statt schwarz ─── */
+/* ─── Hero-Overlay: starker heller Veil ─── */
 .hero .hero-bg::after,
 .hero:not(.hero--veil) .hero-bg::after,
-.hero--fullscreen .hero-bg::after {
+.hero.hero--fullscreen .hero-bg::after {
   background: var(--hero-overlay-gradient);
 }
 
@@ -136,7 +153,6 @@ section:nth-child(even) {
 
 /* Override data-theme body vars (specificity beats base.css [data-theme=dark] body[data-color]) */
 body[data-color], html[data-theme] body[data-color], html body[data-color] {
-  /* ─── Farben: warm beige + survival green ─── */
   --bg:              #f5f2eb;
   --bg-alt:          #ede8dc;
   --bg-dark:         #2a2a2a;
@@ -147,27 +163,20 @@ body[data-color], html[data-theme] body[data-color], html body[data-color] {
   --border:          #d9d3c5;
   --card-bg:         #ffffff;
   --shadow:          rgba(26, 26, 26, 0.08);
-
   --primary:         #2d7a2d;
   --primary-dark:    #1e5c1e;
   --primary-light:   #4a8c3f;
   --primary-rgb:     45, 122, 45;
-
-  /* ─── Typography: Oswald Big-Type ─── */
   --font-heading:    'Oswald', 'Inter', system-ui, sans-serif;
   --font-body:       'Source Serif 4', 'Source Sans 3', Georgia, serif;
   --fs-display:      clamp(4rem, 3rem + 8vw, 10rem);
   --fs-hero:         clamp(3.5rem, 2.5rem + 6vw, 8rem);
-
-  /* ─── Hero-Overlay: heller beiger Veil (statt dunkler Gradient) ─── */
   --hero-overlay-gradient: linear-gradient(
     180deg,
-    rgba(245, 242, 235, 0.35) 0%,
-    rgba(245, 242, 235, 0.55) 60%,
-    rgba(245, 242, 235, 0.75) 100%
+    rgba(245, 242, 235, 0.75) 0%,
+    rgba(245, 242, 235, 0.60) 40%,
+    rgba(245, 242, 235, 0.82) 100%
   );
   --hero-title-color: #1a1a1a;
-
-  /* ─── Wald-Hero-Hintergrundbild (Fallback via CSS) ─── */
-  --hero-bg-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1920&q=80');
+  --hero-bg-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80');
 }
