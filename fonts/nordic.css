@@ -1,0 +1,16 @@
+/* SSI Endoskeleton — Font Module: Nordic (v5.0)
+   DM Serif Display + IBM Plex Sans. Minimalistisch, skandinavisch. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --font-heading: 'DM Serif Display', Georgia, serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --display-weight: 400;
+  --heading-weight: 400;
+  --body-weight: 400;
+  --fs-hero: clamp(3rem, 2rem + 5.5vw, 7.5rem);
+  --fs-display: clamp(4rem, 2.5rem + 8vw, 9.5rem);
+}
+.hero-title { letter-spacing: -0.015em; line-height: 1.05; }
+.hero-subtitle { font-weight: 300; }
+.hero-eyebrow { letter-spacing: 0.28em; text-transform: uppercase; font-weight: 500; font-size: 0.72rem; font-family: var(--font-body); }
+

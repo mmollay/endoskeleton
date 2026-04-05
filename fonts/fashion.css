@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Fashion (v5.0)
+   Bodoni Moda display + Jost body. Hohe Stil-Eleganz für Mode/Luxus. */
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400&family=Jost:wght@300;400;500&display=swap');
+:root {
+  --font-heading: 'Bodoni Moda', 'Didot', serif;
+  --font-body: 'Jost', system-ui, sans-serif;
+  --display-weight: 900;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --fs-hero: clamp(3rem, 2rem + 6vw, 8rem);
+  --fs-display: clamp(4rem, 2.5rem + 9vw, 10rem);
+}
+.hero-title { letter-spacing: 0.01em; line-height: 1.05; font-variation-settings: 'opsz' 96; }
+.hero-eyebrow { letter-spacing: 0.32em; text-transform: uppercase; font-weight: 400; font-size: 0.72rem; font-family: var(--font-body); }

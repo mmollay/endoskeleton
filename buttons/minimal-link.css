@@ -25,7 +25,8 @@
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
-.btn:hover { transform: none; color: var(--primary); }
+.btn:hover { transform: none; color: var(--primary); background: transparent; }
+.btn-primary:hover { background: transparent; }
 .btn:hover::after { transform: scaleX(1); }
 .btn-primary { color: var(--primary); }
 .btn-primary::after { background: var(--primary); transform: scaleX(1); }

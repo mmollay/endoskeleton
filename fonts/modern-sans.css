@@ -1,0 +1,14 @@
+/* SSI Endoskeleton — Font Module: Modern-Sans (v5.0)
+   DM Sans display + body. Modern, SaaS, startup-clean. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+:root {
+  --font-heading: 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --display-weight: 900;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --fs-hero: clamp(2.75rem, 2rem + 5vw, 7rem);
+  --fs-display: clamp(3.5rem, 2.5rem + 7vw, 9rem);
+}
+.hero-title { letter-spacing: -0.03em; line-height: 1.05; }
+.hero-eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem; }

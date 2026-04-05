@@ -1,0 +1,15 @@
+/* SSI Endoskeleton — Font Module: Display-Serif (v5.0)
+   Fraunces 900 display + Inter body. Heavy-contrast editorial. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600&display=swap');
+:root {
+  --font-heading: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --display-weight: 900;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --fs-hero: clamp(3rem, 2rem + 6vw, 8rem);
+  --fs-display: clamp(4rem, 2.5rem + 9vw, 10rem);
+}
+.hero-title { letter-spacing: -0.02em; line-height: 1.0; font-variation-settings: 'SOFT' 30, 'WONK' 1; }
+.hero-eyebrow { letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem; font-family: var(--font-body); }
+
