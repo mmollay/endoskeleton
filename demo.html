@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.7.0 — Template Demo</title>
+  <title>SSI Endoskeleton v4.8.0 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.7.0-b2';
+      var v = '4.8.0';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -1477,9 +1477,10 @@
     };
 
     function getRandomPresetImage(presetKey) {
+      /* Deterministisch: immer erstes Bild (QA-stability) */
       var pool = IMAGE_POOL[presetKey];
       if (!pool || !pool.length) return null;
-      return pool[Math.floor(Math.random() * pool.length)];
+      return pool[0];
     }
 
     function applyHeroImage(imageId, heroType) {
