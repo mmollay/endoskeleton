@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "source": "Unsplash",
+    "license": "Unsplash License (free commercial use, no attribution required)",
+    "base_url": "https://images.unsplash.com/",
+    "recommended_params": "?w=1600&q=80",
+    "version": "1.0.0"
+  },
+  "corporate": {
+    "description": "Modern business, office, professionals",
+    "images": [
+      "photo-1497366216548-37526070297c",
+      "photo-1556761175-5973dc0f32e7",
+      "photo-1542744173-8e7e53415bb0",
+      "photo-1486406146926-c627a92ad1ab",
+      "photo-1497366811353-6870744d04b2"
+    ]
+  },
+  "editorial": {
+    "description": "Magazine, books, typography, writing",
+    "images": [
+      "photo-1519682337058-a94d519337bc",
+      "photo-1455390582262-044cdead277a",
+      "photo-1524995997946-a1c2e315a42f",
+      "photo-1491841550275-ad7854e35ca6",
+      "photo-1457369804613-52c61a468e7d"
+    ]
+  },
+  "minimal": {
+    "description": "Clean, white, minimalist architecture",
+    "images": [
+      "photo-1507003211169-0a1dd7228f2d",
+      "photo-1513506003901-1e6a229e2d15",
+      "photo-1494438639946-1ebd1d20bf85",
+      "photo-1481277542470-605612bd2d61",
+      "photo-1524758631624-e2822e304c36"
+    ]
+  },
+  "tech": {
+    "description": "Dark futuristic, code, circuits, cyberpunk",
+    "images": [
+      "photo-1518770660439-4636190af475",
+      "photo-1461749280684-dccba630e2f6",
+      "photo-1526374965328-7f61d4dc18c5",
+      "photo-1550751827-4bd374c3f58b",
+      "photo-1451187580459-43490279c0fa"
+    ]
+  },
+  "creative": {
+    "description": "Bold colors, art, design, paint",
+    "images": [
+      "photo-1513364776144-60967b0f800f",
+      "photo-1452860606245-08befc0ff44b",
+      "photo-1541701494587-cb58502866ab",
+      "photo-1558655146-9f40138edfeb",
+      "photo-1460661419201-fd4cecdf8a8b"
+    ]
+  },
+  "outdoor": {
+    "description": "Nature, mountains, forests, wilderness",
+    "images": [
+      "photo-1506905925346-21bda4d32df4",
+      "photo-1441974231531-c6227db76b6e",
+      "photo-1464822759023-fed622ff2c3b",
+      "photo-1501554728187-ce583db33af7",
+      "photo-1426604966848-d7adac402bff"
+    ]
+  },
+  "playful": {
+    "description": "Bright colors, families, joy, colorful",
+    "images": [
+      "photo-1503023345310-bd7c1de61c7d",
+      "photo-1513151233558-d860c5398176",
+      "photo-1491438590914-bc09fcaaf77a",
+      "photo-1472162072942-cd5147eb3902",
+      "photo-1530103862676-de8c9debad1d"
+    ]
+  },
+  "elegant": {
+    "description": "Luxury, gold, marble, sophisticated",
+    "images": [
+      "photo-1517604931442-7e0c8ed2963c",
+      "photo-1540541338287-41700207dee6",
+      "photo-1542282088-72c9c27ed0cd",
+      "photo-1519823551278-64ac92734fb1",
+      "photo-1519682337058-a94d519337bc"
+    ]
+  },
+  "food": {
+    "description": "Restaurants, food, wine, coffee",
+    "images": [
+      "photo-1414235077428-338989a2e8c0",
+      "photo-1504754524776-8f4f37790ca0",
+      "photo-1517248135467-4c7edcad34c4",
+      "photo-1510812431401-41d2bd2722f3"
+    ]
+  },
+  "health": {
+    "description": "Medical, wellness, yoga, meditation",
+    "images": [
+      "photo-1544367567-0f2fcb009e0b",
+      "photo-1506126613408-eca07ce68773",
+      "photo-1552664730-d307ca884978",
+      "photo-1544027993-37dbfe43562a"
+    ]
+  },
+  "real_estate": {
+    "description": "Homes, architecture, interiors",
+    "images": [
+      "photo-1560448204-e02f11c3d0e2",
+      "photo-1449844908441-8829872d2607",
+      "photo-1512917774080-9991f1c4c750",
+      "photo-1600585154340-be6161a56a0c"
+    ]
+  },
+  "photography": {
+    "description": "Cameras, studio shots, landscapes",
+    "images": [
+      "photo-1500046307642-a06584fc73f2",
+      "photo-1502920917128-1aa500764cbd",
+      "photo-1516035069371-29a1b244cc32",
+      "photo-1470071459604-3b5ec3a7fe05"
+    ]
+  }
+}

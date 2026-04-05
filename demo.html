@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v4.5.0 — Template Demo</title>
+  <title>SSI Endoskeleton v4.5.1 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '4.5.0';
+      var v = '4.5.1';
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
         'layout-css':    ['layout',    'layouts/',    'modern'],
@@ -537,7 +537,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v4.5.0</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v4.5.1</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.4rem 0.5rem;background:rgba(var(--primary-rgb,46,107,46),0.08);border-radius:6px;margin-bottom:0.5rem;font-size:0.65rem;color:var(--text-muted,#595959);letter-spacing:0.05em;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:700;color:var(--primary,#2e6b2e);">—</span> mögliche Designs
       </div>
@@ -1190,7 +1190,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=4.5.0"></script>
+  <script src="shared.js?v=4.5.1"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1423,6 +1423,33 @@
         + '</div></div>';
     }
 
+    /* ─── Unsplash Image Pool (kuratierte Hero-Bilder) ─── */
+    var IMAGE_POOL = {
+      corporate: ['photo-1497366216548-37526070297c','photo-1556761175-5973dc0f32e7','photo-1542744173-8e7e53415bb0','photo-1486406146926-c627a92ad1ab','photo-1497366811353-6870744d04b2'],
+      editorial: ['photo-1519682337058-a94d519337bc','photo-1455390582262-044cdead277a','photo-1524995997946-a1c2e315a42f','photo-1491841550275-ad7854e35ca6','photo-1457369804613-52c61a468e7d'],
+      minimal:   ['photo-1507003211169-0a1dd7228f2d','photo-1513506003901-1e6a229e2d15','photo-1494438639946-1ebd1d20bf85','photo-1481277542470-605612bd2d61','photo-1524758631624-e2822e304c36'],
+      tech:      ['photo-1518770660439-4636190af475','photo-1461749280684-dccba630e2f6','photo-1526374965328-7f61d4dc18c5','photo-1550751827-4bd374c3f58b','photo-1451187580459-43490279c0fa'],
+      creative:  ['photo-1513364776144-60967b0f800f','photo-1452860606245-08befc0ff44b','photo-1541701494587-cb58502866ab','photo-1558655146-9f40138edfeb','photo-1460661419201-fd4cecdf8a8b'],
+      outdoor:   ['photo-1506905925346-21bda4d32df4','photo-1441974231531-c6227db76b6e','photo-1464822759023-fed622ff2c3b','photo-1501554728187-ce583db33af7','photo-1426604966848-d7adac402bff'],
+      playful:   ['photo-1503023345310-bd7c1de61c7d','photo-1513151233558-d860c5398176','photo-1491438590914-bc09fcaaf77a','photo-1472162072942-cd5147eb3902','photo-1530103862676-de8c9debad1d'],
+      elegant:   ['photo-1517604931442-7e0c8ed2963c','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1']
+    };
+
+    function getRandomPresetImage(presetKey) {
+      var pool = IMAGE_POOL[presetKey];
+      if (!pool || !pool.length) return null;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function applyHeroImage(imageId, heroType) {
+      if (!imageId || !heroType) return;
+      var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
+      var section = document.getElementById('hero-' + heroType);
+      if (!section) return;
+      var bg = section.querySelector('.hero-bg');
+      if (bg) bg.style.backgroundImage = 'url(' + url + ')';
+    }
+
     function renderBuiltinPresets() {
       var grid = document.getElementById('builtin-preset-grid');
       if (!grid) return;
@@ -1560,6 +1587,9 @@
       var p = PRESETS[name];
       if (!p) return;
       applyPreset_config(p);
+      /* Hero-Bild aus Pool (nur Heroes die hero-bg haben) */
+      var imageId = getRandomPresetImage(name);
+      if (imageId) applyHeroImage(imageId, p.hero);
       document.querySelectorAll('.preset-card').forEach(function(c) {
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
