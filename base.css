@@ -15,14 +15,14 @@
   --primary-light:   #4a9e4a;
   --primary-rgb:     46, 107, 46;
   --bg:              #ffffff;
-  --bg-alt:          #f8f9fa;
+  --bg-alt:          #f1f5f9;
   --bg-dark:         #1a1a2e;
-  --text:            #333333;
-  --text-muted:      #595959;
-  --text-light:      #555555;
+  --text:            #2d3748;
+  --text-muted:      #64748b;
+  --text-light:      #475569;
   --text-on-primary: #ffffff;
-  --heading:         #1a1a1a;
-  --border:          #d4d4d4;
+  --heading:         #0f172a;
+  --border:          rgba(15, 23, 42, 0.10);
   --card-bg:         #ffffff;
   --shadow:          rgba(0, 0, 0, 0.08);
   --focus:           #1a6bff;
@@ -316,7 +316,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   line-height: 1.2;
   color: var(--heading);
-  font-weight: 700;
+  font-weight: var(--heading-weight, 600);
   text-wrap: balance;
 }
 

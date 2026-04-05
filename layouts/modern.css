@@ -20,7 +20,7 @@
 /* Bold heading style */
 .layout-modern .section-title {
   font-size: var(--fs-3xl);
-  font-weight: 800;
+  font-weight: var(--heading-weight, 700);
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
@@ -104,7 +104,7 @@
 }
 
 .layout-modern .banner-val {
-  font-size: var(--fs-hero);
+  font-size: var(--fs-2xl);
 }
 
 @media (max-width: 48rem) {

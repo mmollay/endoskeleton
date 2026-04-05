@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap');
 
 :root {
+  --heading-weight: 500;
   --display-weight: 600;
   --font-heading: 'Fredoka', 'Comic Sans MS', cursive;
   --font-body: 'Nunito', system-ui, sans-serif;
