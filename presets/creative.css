@@ -69,11 +69,11 @@
 
 .hero-eyebrow,
 .hero--fullscreen .hero-eyebrow {
-  color: var(--accent-yellow) !important;
+  color: #ffffff !important;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(26,10,34,0.7);
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(26,10,34,0.95), 0 0 18px rgba(26,10,34,0.6);
 }
 
 .hero.hero--fullscreen .hero-bg,
@@ -99,3 +99,12 @@ body, p { font-family: var(--font-body); }
 
 section { background-color: var(--bg); }
 section:nth-child(even) { background-color: var(--bg-alt); }
+
+/* Ensure card text is dark on cream/white cards */
+.card h2, .card h3, [class*=card] h2, [class*=card] h3,
+article h2, article h3 {
+  color: var(--heading) !important;
+}
+.card p, [class*=card] p, article p {
+  color: var(--text) !important;
+}
