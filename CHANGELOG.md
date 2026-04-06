@@ -4,6 +4,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.5.0] — 2026-04-06 — API v1
+
+### Added
+- REST API v1 unter /api/v1/ mit 7 Endpoints
+- GET /catalog — komplettes Design-System als JSON
+- GET /presets — alle Presets mit Detail-Ansicht
+- POST /recommend — KI-Matching-Engine fuer Design-Empfehlungen
+- POST /generate — Seiten aus Parametern + Content erzeugen
+- GET /preview — Live-Vorschau via demo.html Redirect
+- POST /feedback — Feature-Requests loggen
+- GET /schema — OpenAPI 3.0 fuer KI-Autodiscovery
+- CatalogReader liest Module dynamisch aus Dateisystem
+- RecommendEngine mit Branch/Mood/Farb/Keyword-Matching
+- SiteGenerator mit Template-basierter HTML-Generierung
+- Dateibasiertes Rate-Limiting (kein DB noetig)
+- Stuendlicher Cleanup-Cron fuer generierte Seiten
+
+
 ## [5.4.0] — 2026-04-06
 
 ### Added

@@ -36,3 +36,6 @@ package-lock.json
 # QA artifacts
 tests/screenshots/
 tests/qa-report.md
+api/data/generated/*
+!api/data/generated/.gitkeep
+api/data/rate-limits/*.json
