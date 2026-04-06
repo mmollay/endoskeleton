@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var ENDO_VERSION = '5.1.1'; var v = ENDO_VERSION + '-' + Date.now();
+      var ENDO_VERSION = '5.1.2'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -86,7 +86,7 @@
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
-      margin-right: 352px; /* 340px Panel + 12px Tab */
+      margin-right: 348px; /* Panel + slim tab */
       transition: margin-right 0.25s ease;
     }
     body.sidebar-collapsed {
@@ -113,7 +113,7 @@
     .demo-sidebar-wrapper.collapsed { transform: translateX(340px); }
 
     .demo-sidebar-tab {
-      width: 12px;
+      width: 8px;
       background: #f1f5f9;
       color: #64748b;
       border: none;
@@ -146,7 +146,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       background: #fafafa;
-      padding: 0.875rem 1rem;
+      padding: 0.75rem 0.75rem;
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -161,13 +161,9 @@
     .demo-sidebar-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
     .demo-title {
-      margin-bottom: 0.25rem;
       font-weight: 700;
       font-size: 0.95rem;
       color: #0f172a;
-      padding-bottom: 0.875rem;
-      margin-bottom: 0.875rem;
-      border-bottom: 1px solid #e2e8f0;
       letter-spacing: -0.01em;
     }
     .demo-title span { color: #3b82f6; font-weight: 500; font-size: 0.8rem; }
@@ -678,7 +674,10 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span id="endo-version"></span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">
+        <div class="demo-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">SSI Endoskeleton <span id="endo-version"></span></div>
+        <button onclick="if(confirm('Zurücksetzen?')){location.hash='';location.reload();}" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">↺ Reset</button>
+      </div>
       <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
 
 
@@ -691,14 +690,14 @@
       </div>
 
       <!-- ══ Tab: Presets ══ -->
-      <div class="sidebar-tab-panel active" id="tab-presets" style="overflow-y:auto;max-height:calc(100vh - 120px);">
+      <div class="sidebar-tab-panel active" id="tab-presets" style="overflow-y:auto;max-height:calc(100vh - 130px);padding-bottom:1rem;">
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
             <label>Vorlagen</label>
             <div class="preset-grid" id="builtin-preset-grid"></div>
             <div class="preset-section-label" id="custom-presets-label" style="display:none;">Eigene Presets</div>
             <div class="preset-grid" id="custom-preset-grid"></div>
-            <button id="reset-demo-btn" onclick="if(confirm('Alle Einstellungen zurücksetzen?')){location.hash='';location.reload();}" style="width:100%;padding:10px 12px;margin-top:8px;margin-bottom:8px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;color:#64748b;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.background='#fff';this.style.borderColor='#e2e8f0';this.style.color='#64748b';">↺ Zurücksetzen / Reset</button>
+
             <button id="save-preset-btn" onclick="showSaveForm()">+ Aktuelles Design speichern</button>
             <div id="save-preset-form">
               <input type="text" id="save-preset-name" placeholder="Name, z.B. Mein Restaurant" maxlength="30">
@@ -736,6 +735,12 @@
         </div>
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
+            <label>Hintergrundbild</label>
+            <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+              <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
+            </div>
+          </div>
+          <div class="demo-group">
             <label>Max-Breite</label>
             <div class="demo-btn-row">
               <button class="demo-btn" data-width="compact">1000px</button>
@@ -757,7 +762,7 @@
       </div>
 
       <!-- ══ Tab: Stil ══ -->
-      <div class="sidebar-tab-panel" id="tab-stil" style="overflow-y:auto;max-height:calc(100vh - 120px);">
+      <div class="sidebar-tab-panel" id="tab-stil" style="overflow-y:auto;max-height:calc(100vh - 130px);padding-bottom:1rem;">
         <!-- Hidden selects for compatibility -->
         <select id="color-select" style="display:none"></select>
         <select id="charakter-select" style="display:none"></select>
@@ -844,15 +849,6 @@
               <button class="button-preview-card" data-buttons="chip"><span class="btn-mini" style="background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:4px;font-size:0.55rem;padding:0.15rem 0.45rem">Btn</span><span class="btn-label">Chip</span></button>
               <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;font-size:0.55rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
               <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Button</span><span class="btn-label">Minimal Link</span></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="demo-section">
-          <div class="demo-group">
-            <label>Hintergrundbild</label>
-            <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-              <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
             </div>
           </div>
         </div>

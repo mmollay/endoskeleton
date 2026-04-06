@@ -126,9 +126,9 @@
 [data-theme=pastel] .hero.hero--fullscreen .hero-bg::after {
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 82%, transparent) 0%,
-    color-mix(in srgb, var(--bg) 88%, transparent) 40%,
-    color-mix(in srgb, var(--bg) 95%, transparent) 85%,
+    color-mix(in srgb, var(--bg) 50%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 60%, transparent) 40%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 85%,
     var(--bg) 100%
   ) !important;
 }
