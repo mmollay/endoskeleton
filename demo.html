@@ -780,47 +780,50 @@
           </div>
           <div class="demo-group">
             <label>Hero</label>
-            <div class="demo-btn-row">
+            <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;margin-bottom:8px;">
               <button class="demo-btn active" data-hero="fullscreen">Fullscreen</button>
               <button class="demo-btn" data-hero="split">Split</button>
-              <button class="demo-btn" data-hero="minimal">Minimal</button>
               <button class="demo-btn" data-hero="banner">Banner</button>
+              <button class="demo-btn" data-hero="minimal">Minimal</button>
               <button class="demo-btn" data-hero="playful">Playful</button>
             </div>
-          </div>
-        </div>
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
-          <div class="demo-group" id="deco-section">
-            <label>Hero-Dekoration</label>
-            <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;">
-              <button class="demo-btn active" data-deco="off" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Aus</button>
-              <button class="demo-btn" data-deco="waves" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wellen</button>
-              <button class="demo-btn" data-deco="mountains" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Berge</button>
-              <button class="demo-btn" data-deco="blobs" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Blobs</button>
-              <button class="demo-btn" data-deco="geometric" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Geo</button>
-              <button class="demo-btn" data-deco="clouds" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wolken</button>
-              <button class="demo-btn" data-deco="minimal" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Minimal</button>
+
+            <!-- Bild-Controls: nur bei Fullscreen/Split/Banner -->
+            <div id="hero-image-controls">
+              <label style="font-size:0.65rem;color:#64748b;margin-top:4px;display:block;">Bild-Intensität</label>
+              <div class="demo-btn-row" style="margin-bottom:6px;">
+                <button class="demo-btn active" data-intensity="vivid" onclick="setHeroIntensity(this)">Satt</button>
+                <button class="demo-btn" data-intensity="veil" onclick="setHeroIntensity(this)">Zart (Schleier)</button>
+              </div>
+              <label style="font-size:0.65rem;color:#64748b;display:block;">Hintergrundbild</label>
+              <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+                <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
+              </div>
             </div>
-            <div style="display:flex;gap:6px;margin-top:6px;">
-              <button onclick="regenerateDecoration()" style="flex:1;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.65rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Variation</button>
-              <label style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.65rem;color:#64748b;">
-                <input type="checkbox" id="deco-animate" onchange="toggleDecoAnimation(this.checked)" style="margin:0;width:14px;height:14px;"> Bewegen
-              </label>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
-              <label style="font-size:0.65rem;color:#94a3b8;white-space:nowrap;">Farbe:</label>
-              <input type="color" id="deco-color" value="#2e6b2e" onchange="setDecoColor(this.value)" style="width:28px;height:22px;border:1px solid #e2e8f0;border-radius:4px;padding:0;cursor:pointer;">
-              <button onclick="resetDecoColor()" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:0.6rem;cursor:pointer;">Auto</button>
-            </div>
-          </div>
-          <div class="demo-group">
-            <label>Hintergrundbild</label>
-            <div class="demo-btn-row" style="margin-bottom:6px;">
-              <button class="demo-btn active" data-intensity="vivid" onclick="setHeroIntensity(this)">Satt</button>
-              <button class="demo-btn" data-intensity="veil" onclick="setHeroIntensity(this)">Zart (Schleier)</button>
-            </div>
-            <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-              <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
+
+            <!-- Deko-Controls: nur bei Minimal/Playful -->
+            <div id="hero-deko-controls" style="display:none;">
+              <label style="font-size:0.65rem;color:#64748b;margin-top:4px;display:block;">Dekoration</label>
+              <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;">
+                <button class="demo-btn active" data-deco="off" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Aus</button>
+                <button class="demo-btn" data-deco="waves" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wellen</button>
+                <button class="demo-btn" data-deco="mountains" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Berge</button>
+                <button class="demo-btn" data-deco="blobs" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Blobs</button>
+                <button class="demo-btn" data-deco="geometric" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Geo</button>
+                <button class="demo-btn" data-deco="clouds" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wolken</button>
+                <button class="demo-btn" data-deco="minimal" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Minimal</button>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:6px;">
+                <button onclick="regenerateDecoration()" style="flex:1;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.65rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Variation</button>
+                <label style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.65rem;color:#64748b;">
+                  <input type="checkbox" id="deco-animate" onchange="toggleDecoAnimation(this.checked)" style="margin:0;width:14px;height:14px;"> Bewegen
+                </label>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+                <label style="font-size:0.65rem;color:#94a3b8;white-space:nowrap;">Farbe:</label>
+                <input type="color" id="deco-color" value="#2e6b2e" onchange="setDecoColor(this.value)" style="width:28px;height:22px;border:1px solid #e2e8f0;border-radius:4px;padding:0;cursor:pointer;">
+                <button onclick="resetDecoColor()" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:0.6rem;cursor:pointer;">Auto</button>
+              </div>
             </div>
           </div>
           <div class="demo-group">
@@ -1436,8 +1439,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.3.1"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.3.1"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.3.2"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.3.2"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -2096,6 +2099,12 @@
     /* ─── Hero Switcher ───────────────────────── */
     function switchHero(hero) {
       console.log('[Endo] switchHero:', hero);
+      /* Toggle Bild/Deko controls */
+      var isImageHero = (hero === 'fullscreen' || hero === 'split' || hero === 'banner');
+      var imgCtrl = document.getElementById('hero-image-controls');
+      var dekoCtrl = document.getElementById('hero-deko-controls');
+      if (imgCtrl) imgCtrl.style.display = isImageHero ? '' : 'none';
+      if (dekoCtrl) dekoCtrl.style.display = isImageHero ? 'none' : '';
       document.getElementById('hero-css').href = 'heroes/' + hero + '.css?v=' + cssVer;
       ['fullscreen', 'split', 'minimal', 'banner', 'veil', 'playful'].forEach(function(h) {
         var el = document.getElementById('hero-' + h);
@@ -2453,11 +2462,14 @@
 
     renderBuiltinPresets();
       renderWallpaperGrid();
-      /* Hide deco section if hero is not playful/minimal */
+      /* Set correct Bild/Deko controls visibility */
       (function() {
-        var hero = getActiveData("[data-hero]", "hero") || "fullscreen";
-        var ds = document.getElementById("deco-section");
-        if (ds) ds.style.display = (hero === "playful" || hero === "minimal") ? "" : "none";
+        var hero = getActiveData('[data-hero]', 'hero') || 'fullscreen';
+        var isImageHero = (hero === 'fullscreen' || hero === 'split' || hero === 'banner');
+        var imgCtrl = document.getElementById('hero-image-controls');
+        var dekoCtrl = document.getElementById('hero-deko-controls');
+        if (imgCtrl) imgCtrl.style.display = isImageHero ? '' : 'none';
+        if (dekoCtrl) dekoCtrl.style.display = isImageHero ? 'none' : '';
       })();
       /* Restore last active sidebar tab */
       var savedTab = localStorage.getItem('endo-sidebar-tab');
