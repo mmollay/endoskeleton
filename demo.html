@@ -1616,11 +1616,11 @@
       return pool[0];
     }
 
-    var currentHeroImageId = null;
+    window.currentHeroImageId = null;
 
-    function applyHeroImage(imageId, heroType) {
+    window.applyHeroImage = function applyHeroImage(imageId, heroType) {
       if (!imageId) return;
-      currentHeroImageId = imageId;
+      window.currentHeroImageId = imageId;
       var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
       /* Apply to ALL hero types that have a hero-bg (shared image across hero types) */
       ['fullscreen','banner','veil'].forEach(function(h) {
@@ -1648,7 +1648,7 @@
       { id: 'photo-1503023345310-bd7c1de61c7d', label: 'Fun' }
     ];
 
-    function renderWallpaperGrid() {
+    window.renderWallpaperGrid = function renderWallpaperGrid() {
       var grid = document.getElementById('wallpaper-grid');
       if (!grid) return;
       WALLPAPER_POOL.forEach(function(wp) {
@@ -1662,7 +1662,7 @@
       });
     }
 
-    function setWallpaper(btn) {
+    window.setWallpaper = function setWallpaper(btn) {
       document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
         b.classList.remove('active');
         b.style.borderColor = '#e2e8f0';
@@ -1671,7 +1671,7 @@
       btn.style.borderColor = '#3b82f6';
       var wpId = btn.dataset.wallpaper;
       if (wpId === 'none') {
-        currentHeroImageId = null;
+        window.currentHeroImageId = null;
         ['fullscreen','banner','veil'].forEach(function(h) {
           var section = document.getElementById('hero-' + h);
           if (!section) return;
@@ -1830,9 +1830,9 @@
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
       /* Mark matching wallpaper as active */
-      if (currentHeroImageId) {
+      if (window.currentHeroImageId) {
         document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
-          var isMatch = b.dataset.wallpaper === currentHeroImageId;
+          var isMatch = b.dataset.wallpaper === window.currentHeroImageId;
           b.classList.toggle('active', isMatch);
           b.style.borderColor = isMatch ? '#3b82f6' : '#e2e8f0';
         });
