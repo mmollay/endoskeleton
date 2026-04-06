@@ -746,7 +746,17 @@
               <button class="demo-btn" data-deco="clouds" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wolken</button>
               <button class="demo-btn" data-deco="minimal" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Minimal</button>
             </div>
-            <button onclick="regenerateDecoration()" style="width:100%;margin-top:6px;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.7rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Neue Variation</button>
+            <div style="display:flex;gap:6px;margin-top:6px;">
+              <button onclick="regenerateDecoration()" style="flex:1;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.65rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Variation</button>
+              <label style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.65rem;color:#64748b;">
+                <input type="checkbox" id="deco-animate" onchange="toggleDecoAnimation(this.checked)" style="margin:0;width:14px;height:14px;"> Bewegen
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+              <label style="font-size:0.65rem;color:#94a3b8;white-space:nowrap;">Farbe:</label>
+              <input type="color" id="deco-color" value="#2e6b2e" onchange="setDecoColor(this.value)" style="width:28px;height:22px;border:1px solid #e2e8f0;border-radius:4px;padding:0;cursor:pointer;">
+              <button onclick="resetDecoColor()" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:0.6rem;cursor:pointer;">Auto</button>
+            </div>
           </div>
           <div class="demo-group">
             <label>Hintergrundbild</label>
@@ -1704,8 +1714,11 @@
 
     function applyDecoration(style, seed) {
       if (!window.SVGHeroGenerator) return;
-      // Get current primary color from computed style
-      var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2e6b2e';
+      // Use custom color or auto from --primary
+      var primary = window.currentDecoColor || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2e6b2e';
+      // Sync color picker
+      var cp = document.getElementById('deco-color');
+      if (cp) cp.value = primary;
       // Ensure it's a hex color
       if (!primary.startsWith('#')) {
         var temp = document.createElement('div');
@@ -1717,6 +1730,27 @@
       }
       window.SVGHeroGenerator.apply(style, seed, primary);
     }
+
+        window.currentDecoColor = null; // null = auto from --primary
+
+    window.setDecoColor = function(hex) {
+      window.currentDecoColor = hex;
+      if (window.currentDecoStyle !== 'off') {
+        applyDecoration(window.currentDecoStyle, window.currentDecoSeed);
+      }
+    };
+
+    window.resetDecoColor = function() {
+      window.currentDecoColor = null;
+      document.getElementById('deco-color').value = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2e6b2e';
+      if (window.currentDecoStyle !== 'off') {
+        applyDecoration(window.currentDecoStyle, window.currentDecoSeed);
+      }
+    };
+
+    window.toggleDecoAnimation = function(enable) {
+      if (window.SVGHeroGenerator) window.SVGHeroGenerator.animate(enable);
+    };
 
         window.renderWallpaperGrid = function renderWallpaperGrid() {
       var grid = document.getElementById('wallpaper-grid');
