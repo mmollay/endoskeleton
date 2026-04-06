@@ -71,7 +71,7 @@
   function generateWaves(seed, color, w, h) {
     var c = hexToRgb(color);
     var layers = "";
-    var opacities = [0.15, 0.25, 0.45];
+    var opacities = [0.2, 0.35, 0.55];
     for (var L = 0; L < 3; L++) {
       var points = "M0," + h;
       var baseY = h * (0.35 + L * 0.2);
@@ -95,7 +95,7 @@
   function generateMountains(seed, color, w, h) {
     var c = hexToRgb(color);
     var layers = "";
-    var opacities = [0.12, 0.22, 0.4];
+    var opacities = [0.18, 0.3, 0.5];
     for (var L = 0; L < 3; L++) {
       var points = "M0," + h;
       var baseY = h * (0.25 + L * 0.2);
@@ -124,7 +124,7 @@
     for (var i = 0; i < count; i++) {
       var cx = seededRandom(seed + i * 3) * w;
       var cy = h * 0.3 + seededRandom(seed + i * 7) * h * 0.5;
-      var r = 40 + seededRandom(seed + i * 11) * 80;
+      var r = 60 + seededRandom(seed + i * 11) * 100;
       var points = [];
       for (var a = 0; a < Math.PI * 2; a += 0.3) {
         var nr = r * (0.7 + fbm(a * 2, seed + i * 19, 3) * 0.6);
@@ -134,7 +134,7 @@
             (cy + Math.sin(a) * nr).toFixed(1),
         );
       }
-      var opacity = 0.08 + seededRandom(seed + i * 23) * 0.2;
+      var opacity = 0.12 + seededRandom(seed + i * 23) * 0.25;
       shapes +=
         '<polygon points="' +
         points.join(" ") +
@@ -184,7 +184,7 @@
         var y = h * 0.4 + row * ch * 0.8;
         var jx = (seededRandom(seed + col * 7 + row * 31) - 0.5) * cw * 0.6;
         var jy = (seededRandom(seed + col * 13 + row * 41) - 0.5) * ch * 0.6;
-        var opacity = 0.05 + seededRandom(seed + col + row * cols) * 0.2;
+        var opacity = 0.1 + seededRandom(seed + col + row * cols) * 0.25;
         if (y + jy > h * 0.35) {
           shapes +=
             '<polygon points="' +
@@ -328,7 +328,7 @@
         path +
         '" fill="none" stroke="' +
         rgbStr(c.r, c.g, c.b, 0.2) +
-        '" stroke-width="1.5"/>',
+        '" stroke-width="2"/>',
     );
   }
 
@@ -376,7 +376,7 @@
       var decos = document.querySelectorAll('.hero-decoration');
       decos.forEach(function (el) {
         if (enable) {
-          el.style.animation = 'decoFloat 12s ease-in-out infinite alternate';
+          el.style.animation = 'decoFloat 20s ease-in-out infinite';
         } else {
           el.style.animation = '';
         }
@@ -384,7 +384,7 @@
       if (enable && !document.getElementById('deco-anim-style')) {
         var style = document.createElement('style');
         style.id = 'deco-anim-style';
-        style.textContent = '@keyframes decoFloat { 0% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(-8px) scaleX(1.01); } 100% { transform: translateX(8px) scaleX(0.99); } }';
+        style.textContent = '@keyframes decoFloat { 0% { transform: translateX(0) translateY(0) scale(1); opacity:0.9; } 33% { transform: translateX(-15px) translateY(-4px) scale(1.02); opacity:1; } 66% { transform: translateX(12px) translateY(2px) scale(0.98); opacity:0.85; } 100% { transform: translateX(-5px) translateY(-2px) scale(1.01); opacity:0.95; } }';
         document.head.appendChild(style);
       }
     },

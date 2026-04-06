@@ -13,7 +13,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.2.1'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.2.2'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -1377,8 +1377,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.2.1"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.2.1"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.2.2"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.2.2"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -2053,6 +2053,7 @@
 
     /* ─── Sidebar Tab Switcher ───────────────────── */
     window.switchSidebarTab = function switchSidebarTab(tab) {
+      localStorage.setItem('endo-sidebar-tab', tab);
       document.querySelectorAll('.sidebar-tab-panel').forEach(function(p) { p.classList.remove('active'); });
       document.querySelectorAll('.sidebar-tab-btn').forEach(function(b) { b.classList.remove('active'); });
       var panel = document.getElementById('tab-' + tab);
@@ -2317,6 +2318,9 @@
 
     renderBuiltinPresets();
       renderWallpaperGrid();
+      /* Restore last active sidebar tab */
+      var savedTab = localStorage.getItem('endo-sidebar-tab');
+      if (savedTab) switchSidebarTab(savedTab);
       /* Sync wallpaper picker with initial hero image */
       (function() {
         var splitImg = document.querySelector('#hero-split .hero-image img');
