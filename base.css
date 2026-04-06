@@ -468,7 +468,7 @@ small {
    Startet transparent über dem Hero. Wird bei Scroll solid.
    Setzt voraus: class="nav-transparent" wird via JS gesetzt. */
 .site-nav.nav-transparent:not(.nav-solid) {
-  background: transparent;
+  background: transparent !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
@@ -639,7 +639,7 @@ small {
 .site-nav.nav-dark.nav-transparent:not(.nav-solid),
 .site-nav.nav-colored.nav-transparent:not(.nav-solid),
 .site-nav.nav-glass.nav-transparent:not(.nav-solid) {
-  background: transparent;
+  background: transparent !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom-color: transparent;
@@ -759,7 +759,7 @@ small {
 .nav-lang-btn {
   font-family: var(--font-nav);
   appearance: none;
-  background: transparent;
+  background: transparent !important;
   color: var(--text-muted);
   border: 0;
   padding: 0.4rem 0.65rem;
@@ -1180,7 +1180,7 @@ section.section-dark {
 }
 
 .btn-outline {
-  background: transparent;
+  background: transparent !important;
   color: var(--primary);
   border: 0.15rem solid var(--primary);
 }
@@ -1203,7 +1203,7 @@ section.section-dark {
 }
 
 .btn-ghost {
-  background: transparent;
+  background: transparent !important;
   color: var(--text);
   border: 0.0625rem solid var(--border);
 }
@@ -1216,7 +1216,7 @@ section.section-dark {
 /* Ghost on dark / image backgrounds */
 .hero--image .btn-ghost,
 .section-dark .btn-ghost {
-  background: transparent;
+  background: transparent !important;
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.85);
   border-width: 0.125rem;
@@ -2128,7 +2128,7 @@ section.section-dark {
 }
 
 .cb-decline {
-  background: transparent;
+  background: transparent !important;
   color: var(--text-muted);
   border: 0.0625rem solid var(--border);
 }
