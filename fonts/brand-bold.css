@@ -4,6 +4,7 @@
 :root {
   --font-heading: 'Oswald', 'Arial Narrow', sans-serif;
   --font-body: 'Source Serif 4', Georgia, serif;
+  --font-nav: 'Inter', system-ui, -apple-system, sans-serif;
   --display-weight: 700;
   --heading-weight: 600;
   --body-weight: 400;

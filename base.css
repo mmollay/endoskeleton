@@ -41,6 +41,7 @@
 
   /* Typography — fluid with clamp() */
   --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-nav: var(--font-heading);
   --font-body:    'Inter', system-ui, -apple-system, sans-serif;
   --fs-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
   --fs-sm:   clamp(0.8125rem, 0.775rem + 0.2vw, 0.875rem);
@@ -744,7 +745,7 @@ small {
 }
 
 .nav-links a {
-  font-family: var(--font-body);
+  font-family: var(--font-nav);
   color: var(--text-light);
   font-size: 0.9rem;
   font-weight: 500;
@@ -773,7 +774,7 @@ small {
   color: var(--text-on-primary) !important;
   padding: 0.45rem 1.25rem !important;
   border-radius: var(--cta-radius, var(--radius-full)) !important;
-  font-family: var(--font-body);
+  font-family: var(--font-nav);
   font-size: 0.85rem !important;
   font-weight: 600;
   letter-spacing: 0.03em;

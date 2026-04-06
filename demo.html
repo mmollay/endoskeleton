@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.7-1775468839';
+      var v = '5.0.7-1775470625';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
@@ -51,6 +51,27 @@
         for (var k in pc) { if (!(k in p)) p[k] = pc[k]; }
       }
       window.PRESETS = PRESETS;
+
+      /* Font Preloading — preload Google Fonts for selected font module */
+      var fontPreloads = {
+        'brand-bold': 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap',
+        'swiss-precision': 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
+        'editorial-grand': 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&display=swap',
+        'mono-hacker': 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap',
+        'cinematic': 'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap',
+        'geometric-black': 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
+        'luxury-thin': 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap',
+        'rounded-friendly': 'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap',
+        'classic-serif': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
+        'softcraft': 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap',
+        'magazine': 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&display=swap',
+        'survival': 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap'
+      };
+      var fontUrl = fontPreloads[p.font || 'modern'];
+      if (fontUrl) {
+        document.write('<link rel="preload" href="' + fontUrl + '" as="style" onload="this.rel=\'stylesheet\'">');
+        document.write('<link rel="stylesheet" href="' + fontUrl + '" media="print" onload="this.media=\'all\'">');
+      }
       document.write('<link rel="stylesheet" href="base.css?v='+v+'">');
       var ids = Object.keys(defaults);
       for (var i=0; i<ids.length; i++) {
