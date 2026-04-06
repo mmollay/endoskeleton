@@ -13,7 +13,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.2.3'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.3.0'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -667,36 +667,59 @@
     }
 
     /* Hero Veil Overlay — makes image faint on any hero type */
-    .hero--veil-overlay .hero-bg::after {
+    /* Veil overlay — highest specificity to override all hero/theme combinations */
+    section.hero.hero--veil-overlay .hero-bg::after,
+    [data-theme] section.hero.hero--veil-overlay .hero-bg::after,
+    [data-theme] .hero.hero--veil-overlay.hero--fullscreen .hero-bg::after,
+    [data-theme] .hero.hero--veil-overlay.hero--banner .hero-bg::after {
       content: '' !important;
       position: absolute !important;
       inset: 0 !important;
       background: linear-gradient(
         180deg,
-        color-mix(in srgb, var(--bg) 60%, transparent) 0%,
-        color-mix(in srgb, var(--bg) 75%, transparent) 40%,
-        color-mix(in srgb, var(--bg) 92%, transparent) 85%,
+        color-mix(in srgb, var(--bg) 65%, transparent) 0%,
+        color-mix(in srgb, var(--bg) 78%, transparent) 40%,
+        color-mix(in srgb, var(--bg) 93%, transparent) 85%,
         var(--bg) 100%
       ) !important;
       z-index: 1 !important;
     }
-    .hero--veil-overlay .hero-content {
-      position: relative;
-      z-index: 2;
+    section.hero.hero--veil-overlay .hero-content {
+      position: relative !important;
+      z-index: 2 !important;
     }
-    .hero--veil-overlay .hero-title {
+    section.hero.hero--veil-overlay .hero-title {
       color: var(--heading) !important;
       text-shadow: none !important;
     }
-    .hero--veil-overlay .hero-eyebrow {
+    section.hero.hero--veil-overlay .hero-eyebrow {
       color: var(--primary) !important;
     }
-    .hero--veil-overlay .hero-subtitle {
+    section.hero.hero--veil-overlay .hero-subtitle,
+    section.hero.hero--veil-overlay .hero-scroll {
       color: var(--text-muted) !important;
     }
+    /* Veil hero buttons: use theme text colors, not white */
+    section.hero.hero--veil-overlay .btn-ghost,
+    section.hero.hero--veil-overlay .btn-outline {
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+      background: transparent !important;
+    }
+    section.hero.hero--veil-overlay .btn-ghost:hover,
+    section.hero.hero--veil-overlay .btn-outline:hover {
+      color: var(--primary) !important;
+      border-color: var(--primary) !important;
+    }
+    section.hero.hero--veil-overlay .btn-primary {
+      /* Primary button keeps its fill */
+    }
     /* Split hero veil: fade the image */
-    .hero--veil-overlay.hero--split .hero-image {
-      opacity: 0.25;
+    section.hero.hero--veil-overlay.hero--split .hero-image {
+      opacity: 0.2;
+    }
+    section.hero.hero--veil-overlay.hero--split .hero-image img {
+      filter: saturate(0.6);
     }
   </style>
 </head>
@@ -762,7 +785,6 @@
               <button class="demo-btn" data-hero="split">Split</button>
               <button class="demo-btn" data-hero="minimal">Minimal</button>
               <button class="demo-btn" data-hero="banner">Banner</button>
-              <button class="demo-btn" data-hero="veil">Veil</button>
               <button class="demo-btn" data-hero="playful">Playful</button>
             </div>
           </div>
@@ -1414,8 +1436,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.2.3"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.2.3"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.3.0"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.3.0"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1671,6 +1693,7 @@
     window.applyHeroImage = function applyHeroImage(imageId) {
       if (!imageId) return;
       window.currentHeroImageId = imageId;
+      console.log('[Endo] applyHeroImage:', imageId);
       var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
       /* Apply to ALL hero types — bg-image heroes AND split hero img */
       ['fullscreen','banner','veil'].forEach(function(h) {
@@ -1770,13 +1793,14 @@
       btn.classList.add('active');
       var mode = btn.dataset.intensity;
       window.heroVeilMode = (mode === 'veil');
+      console.log('[Endo] setHeroIntensity:', mode, 'veilMode:', window.heroVeilMode);
       applyVeilMode(window.heroVeilMode);
       updateUrlState();
     };
 
     function applyVeilMode(enable) {
       /* Add/remove veil overlay class on all hero sections */
-      ['fullscreen', 'split', 'banner', 'veil'].forEach(function(h) {
+      ['fullscreen', 'split', 'banner', 'veil', 'minimal', 'playful'].forEach(function(h) {
         var el = document.getElementById('hero-' + h);
         if (!el) return;
         if (enable) {
@@ -1785,6 +1809,7 @@
           el.classList.remove('hero--veil-overlay');
         }
       });
+      console.log('[Endo] Veil mode:', enable ? 'ON' : 'OFF');
     }
 
     window.currentDecoColor = null; // null = auto from --primary
@@ -1805,13 +1830,14 @@
       btn.classList.add('active');
       var mode = btn.dataset.intensity;
       window.heroVeilMode = (mode === 'veil');
+      console.log('[Endo] setHeroIntensity:', mode, 'veilMode:', window.heroVeilMode);
       applyVeilMode(window.heroVeilMode);
       updateUrlState();
     };
 
     function applyVeilMode(enable) {
       /* Add/remove veil overlay class on all hero sections */
-      ['fullscreen', 'split', 'banner', 'veil'].forEach(function(h) {
+      ['fullscreen', 'split', 'banner', 'veil', 'minimal', 'playful'].forEach(function(h) {
         var el = document.getElementById('hero-' + h);
         if (!el) return;
         if (enable) {
@@ -1820,6 +1846,7 @@
           el.classList.remove('hero--veil-overlay');
         }
       });
+      console.log('[Endo] Veil mode:', enable ? 'ON' : 'OFF');
     }
 
     window.currentDecoColor = null;
@@ -2011,6 +2038,21 @@
       var p = PRESETS[name];
       if (!p) return;
       applyPreset_config(p);
+      /* If preset uses 'veil' hero, map to fullscreen + zart mode */
+      if (p.hero === 'veil') {
+        switchHero('fullscreen');
+        window.heroVeilMode = true;
+        applyVeilMode(true);
+        var zartBtn = document.querySelector('[data-intensity="veil"]');
+        if (zartBtn) { zartBtn.closest('.demo-btn-row').querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')}); zartBtn.classList.add('active'); }
+        var heroBtn = document.querySelector('[data-hero="fullscreen"]');
+        if (heroBtn) { heroBtn.closest('.demo-btn-row, .visual-btn-row').querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')}); heroBtn.classList.add('active'); }
+      } else {
+        window.heroVeilMode = false;
+        applyVeilMode(false);
+        var sattBtn = document.querySelector('[data-intensity="vivid"]');
+        if (sattBtn) { sattBtn.closest('.demo-btn-row').querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')}); sattBtn.classList.add('active'); }
+      }
       /* Hero-Bild aus Pool (nur Heroes die hero-bg haben) */
       var imageId = getRandomPresetImage(name);
       if (imageId) applyHeroImage(imageId, p.hero);
@@ -2052,6 +2094,7 @@
 
     /* ─── Hero Switcher ───────────────────────── */
     function switchHero(hero) {
+      console.log('[Endo] switchHero:', hero);
       document.getElementById('hero-css').href = 'heroes/' + hero + '.css?v=' + cssVer;
       ['fullscreen', 'split', 'minimal', 'banner', 'veil', 'playful'].forEach(function(h) {
         var el = document.getElementById('hero-' + h);
