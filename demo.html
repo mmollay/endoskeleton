@@ -1618,11 +1618,11 @@
 
     window.currentHeroImageId = null;
 
-    window.applyHeroImage = function applyHeroImage(imageId, heroType) {
+    window.applyHeroImage = function applyHeroImage(imageId) {
       if (!imageId) return;
       window.currentHeroImageId = imageId;
       var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
-      /* Apply to ALL hero types that have a hero-bg (shared image across hero types) */
+      /* Apply to ALL hero types — bg-image heroes AND split hero img */
       ['fullscreen','banner','veil'].forEach(function(h) {
         var section = document.getElementById('hero-' + h);
         if (!section) return;
@@ -1630,6 +1630,11 @@
         if (bg) bg.style.backgroundImage = 'url(' + url + ')';
         section.classList.add('hero--image');
       });
+      /* Split hero uses <img> tag */
+      var splitImg = document.querySelector('#hero-split .hero-image img');
+      if (splitImg) splitImg.src = url.replace('w=1600', 'w=800');
+      /* Sync wallpaper picker */
+      syncWallpaperPicker(imageId);
     }
 
     /* --- Wallpaper Picker --- */
@@ -1648,7 +1653,21 @@
       { id: 'photo-1503023345310-bd7c1de61c7d', label: 'Fun' }
     ];
 
-    window.renderWallpaperGrid = function renderWallpaperGrid() {
+    window.syncWallpaperPicker = function syncWallpaperPicker(imageId) {
+      document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
+        var isMatch = b.dataset.wallpaper === imageId;
+        b.classList.toggle('active', isMatch);
+        b.style.borderColor = isMatch ? '#3b82f6' : '#e2e8f0';
+      });
+      /* If no match found (image not in picker), deselect all */
+      var anyMatch = document.querySelector('.wallpaper-thumb.active');
+      if (!anyMatch) {
+        var noneBtn = document.querySelector('.wallpaper-thumb[data-wallpaper="none"]');
+        if (noneBtn) { noneBtn.classList.add('active'); noneBtn.style.borderColor = '#3b82f6'; }
+      }
+    }
+
+        window.renderWallpaperGrid = function renderWallpaperGrid() {
       var grid = document.getElementById('wallpaper-grid');
       if (!grid) return;
       WALLPAPER_POOL.forEach(function(wp) {
@@ -1679,6 +1698,9 @@
           if (bg) bg.style.backgroundImage = '';
           section.classList.remove('hero--image');
         });
+        /* Also reset split hero */
+        var splitImg = document.querySelector('#hero-split .hero-image img');
+        if (splitImg) splitImg.src = '';
       } else {
         applyHeroImage(wpId);
       }
@@ -1829,14 +1851,7 @@
       document.querySelectorAll('.preset-card').forEach(function(c) {
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
-      /* Mark matching wallpaper as active */
-      if (window.currentHeroImageId) {
-        document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
-          var isMatch = b.dataset.wallpaper === window.currentHeroImageId;
-          b.classList.toggle('active', isMatch);
-          b.style.borderColor = isMatch ? '#3b82f6' : '#e2e8f0';
-        });
-      }
+      /* Wallpaper sync happens in applyHeroImage */
     }
 
     /* ─── Layout Switcher ─────────────────────── */
@@ -2223,6 +2238,21 @@
 
     renderBuiltinPresets();
       renderWallpaperGrid();
+      /* Sync wallpaper picker with initial hero image */
+      (function() {
+        var splitImg = document.querySelector('#hero-split .hero-image img');
+        var bgEl = document.querySelector('.hero-bg');
+        var src = '';
+        if (splitImg && splitImg.src) src = splitImg.src;
+        else if (bgEl && bgEl.style.backgroundImage) src = bgEl.style.backgroundImage;
+        if (src) {
+          var match = src.match(/photo-[a-zA-Z0-9_-]+/);
+          if (match) {
+            window.currentHeroImageId = match[0];
+            syncWallpaperPicker(match[0]);
+          }
+        }
+      })();
     renderCustomPresets();
     restoreUrlState();
 
