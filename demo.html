@@ -1439,8 +1439,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.3.2"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.3.2"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.3.3"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.3.3"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -2101,10 +2101,11 @@
       console.log('[Endo] switchHero:', hero);
       /* Toggle Bild/Deko controls */
       var isImageHero = (hero === 'fullscreen' || hero === 'split' || hero === 'banner');
+      var isDekoHero = (hero === 'playful');
       var imgCtrl = document.getElementById('hero-image-controls');
       var dekoCtrl = document.getElementById('hero-deko-controls');
       if (imgCtrl) imgCtrl.style.display = isImageHero ? '' : 'none';
-      if (dekoCtrl) dekoCtrl.style.display = isImageHero ? 'none' : '';
+      if (dekoCtrl) dekoCtrl.style.display = isDekoHero ? '' : 'none';
       document.getElementById('hero-css').href = 'heroes/' + hero + '.css?v=' + cssVer;
       ['fullscreen', 'split', 'minimal', 'banner', 'veil', 'playful'].forEach(function(h) {
         var el = document.getElementById('hero-' + h);
