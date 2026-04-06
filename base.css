@@ -1216,6 +1216,7 @@ section.section-dark {
 /* Ghost on dark / image backgrounds */
 .hero--image .btn-ghost,
 .section-dark .btn-ghost {
+  background: transparent;
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.85);
   border-width: 0.125rem;
