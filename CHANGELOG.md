@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.0.6] — 2026-04-06
+
+### Improved
+- **Sidebar UX**: Aktives Preset mit blauem Hintergrund + Checkmark hervorgehoben. Preset wird bei URL-Hash-Load korrekt markiert.
+- **Variation-Counter** kompakter und dezenter (grau statt prominent blau).
+- **Tab-Navigation**: Aktiver Tab in blau statt nur fett, besser erkennbar.
+- **Preset-Beschreibungen** kürzer und mit tatsächlichen Font-Namen (z.B. "Bebas Neue" statt "Cinematic Display").
+- **Preset-Reihenfolge** optimiert: Survival und Corporate zuerst (meistgenutzt).
+
 ## [5.0.5] — 2026-04-06
 
 ### Fixed
