@@ -849,6 +849,84 @@ small {
   outline-offset: -2px;
 }
 /* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
+
+/* ─── Dark Theme Contrast Boost ───────────────────────────────────────── */
+/* Ensures readability on all screens including outdoor/bright environments */
+[data-theme="dark"] .card-body p,
+[data-theme="tech"] .card-body p,
+[data-theme="midnight"] .card-body p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .card-body h3,
+[data-theme="tech"] .card-body h3,
+[data-theme="midnight"] .card-body h3 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .card-icon svg,
+[data-theme="tech"] .card-icon svg,
+[data-theme="midnight"] .card-icon svg {
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 1;
+}
+
+[data-theme="dark"] .stat-number,
+[data-theme="dark"] .banner-stat-number,
+[data-theme="midnight"] .stat-number,
+[data-theme="midnight"] .banner-stat-number {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .banner-stat-label,
+[data-theme="midnight"] .stat-label,
+[data-theme="midnight"] .banner-stat-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .section-tag,
+[data-theme="tech"] .section-tag,
+[data-theme="midnight"] .section-tag {
+  color: var(--primary-light, rgba(255, 255, 255, 0.7));
+}
+
+[data-theme="dark"] .section-title,
+[data-theme="tech"] .section-title,
+[data-theme="midnight"] .section-title {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .section-lead,
+[data-theme="tech"] .section-lead,
+[data-theme="midnight"] .section-lead {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .banner-item,
+[data-theme="tech"] .banner-item,
+[data-theme="midnight"] .banner-item {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .pricing-features li,
+[data-theme="tech"] .pricing-features li,
+[data-theme="midnight"] .pricing-features li {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .pricing-period,
+[data-theme="tech"] .pricing-period,
+[data-theme="midnight"] .pricing-period {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .pricing-amount,
+[data-theme="tech"] .pricing-amount,
+[data-theme="midnight"] .pricing-amount {
+  color: #ffffff;
+}
+
 @media (max-width: 48rem) {
   .nav-lang {
   font-family: var(--font-nav); margin: 0 0.35rem; }
@@ -1423,8 +1501,8 @@ section.section-dark {
 
 /* Cards in dark section */
 .section-dark .card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .section-dark .card:hover {
@@ -1437,7 +1515,7 @@ section.section-dark {
 }
 
 .section-dark .card-body p {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* ─── BANNER / STATS STRIP ──────────────────────────────────────────────── */
