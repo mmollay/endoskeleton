@@ -4,6 +4,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.1.0] — 2026-04-06
+
+### Added
+- **Wallpaper-Picker** im Stil-Tab: 12 kuratierte Hintergrundbilder zur Auswahl. Klick setzt Bild sofort auf allen Hero-Typen.
+- **Shared Hero-Hintergrund**: Bilder werden über alle Hero-Typen geteilt. Fullscreen = satt, Veil = zart durch Schleier, Split = Foto links. Bild bleibt beim Hero-Typ-Wechsel erhalten.
+- **ENDO_VERSION Variable**: Version nur noch an einer Stelle (Zeile 15). Cache-Buster, Sidebar-Titel, shared.js lesen alle daraus. Cache-Buster ist dynamisch (ENDO_VERSION + Date.now()).
+- **IMAGE_POOL erweitert**: cinematic, softcraft, startup haben eigene kuratierte Bilder.
+
+### Improved
+- **Dark-Theme Kontrast komplett über Variablen**: ~140 Zeilen hardcoded Overrides entfernt. Stattdessen Theme-Variablen gestärkt (--text, --heading, --border, --card-bg). Alle Komponenten erben automatisch.
+- **Charcoal Primary aufgehellt**: #36454f → #5a7d8f (sichtbar auf dunklem Hintergrund).
+- **Cinematic Preset**: --font-nav auf Manrope (Bebas Neue nur für Headings). navCase = upper.
+- **Pricing Badge**: grid padding-top für Badge-Overflow bei "Empfohlen".
+- **Variation Counter**: Von prominenter Box zu dezenter Zeile unter dem Sidebar-Titel.
+- **section-dark Styles**: Nutzen jetzt var() statt hardcoded rgba-Werte.
+
+### Fixed
+- **Veil-Hero Buttons (Dark-Theme)**: btn-outline hatte weißen Kasten (rgba 0.7 !important). Jetzt transparent für minimal-link Buttons via body.btn-XXX Klasse.
+- **Wallpaper-Picker Scope**: Funktionen waren in IIFE gefangen. Jetzt auf window exportiert.
+- **Wallpaper-Picker Sync**: Zeigt immer das aktive Hintergrundbild an, auch beim Laden und nach Preset-Wechsel.
+- **Split-Hero**: applyHeroImage aktualisiert jetzt auch die Split-Hero <img>.
+
+---
+
 ## [5.0.7] — 2026-04-06
 
 ### Added
