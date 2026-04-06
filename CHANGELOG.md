@@ -4,6 +4,41 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.4.0] — 2026-04-06
+
+### Added
+- **SVG Hero-Dekoration Generator** (svg-generator.js): 6 generative Styles (Wellen, Berge, Blobs, Geometrisch, Wolken, Minimal). Seed-basiert, Farbwahl, Animation. Rein client-seitig.
+- **Satt/Zart Toggle**: Bild-Intensität steuerbar auf allen Bild-Heroes (Fullscreen/Split/Banner). Zart = Schleier-Overlay via CSS color-mix.
+- **Wallpaper-Picker**: 12 kuratierte Hintergrundbilder im Struktur-Tab. Bilder werden über alle Hero-Typen geteilt.
+- **Hero-Bild Persistenz**: Gleiches Bild bleibt beim Hero-Typ-Wechsel erhalten (inkl. Split-Hero <img>).
+- **favicon.svg**: Grünes "E" als SVG-Favicon.
+
+### Improved
+- **Sidebar komplett reorganisiert**: Nav-Verhalten/Schrift/Stil von Details nach Struktur verschoben. Bild-Controls (Fullscreen/Split/Banner) vs Deko-Controls (Playful) getrennt. Reset-Button oben rechts.
+- **Themes von 10 auf 6 reduziert**: earth/sunset/ocean/midnight entfernt (redundant). Behalten: light, dark, warm, tech, pastel, forest.
+- **Dark-Theme Kontrast über CSS-Variablen**: ~140 Zeilen hardcoded Overrides durch gestärkte Theme-Variablen ersetzt.
+- **ENDO_VERSION als zentrale Variable**: Version + Cache-Buster an einer Stelle.
+- **Charcoal Primary aufgehellt**: #36454f → #5a7d8f.
+- **Nav-Stil Dark/Light funktioniert**: CSS !important überschreibt Theme-Defaults.
+- **Sidebar-Tab wird gemerkt**: localStorage-Persistenz beim Reload.
+
+### Fixed
+- **Fullscreen Hero warm-Overlay**: 82/88/95% → 15/20/55% (Bild satt sichtbar).
+- **Ghost-Buttons auf Bild-Heroes**: background: transparent !important (war grau gefüllt).
+- **Veil-Hero Buttons**: Keine weiße Box mehr auf Dark-Themes.
+- **Scroll-Indicator im Zart-Modus**: Sichtbar mit --text-muted Farbe + z-index.
+- **Button-Borders im Zart-Modus**: 2px solid text-muted statt unsichtbar.
+- **Cinematic Preset**: --font-nav auf Manrope, navCase=upper.
+- **WALLPAPER_POOL/SITE_CONFIG Syntax**: Fehlende Kommas nach Theme-Cleanup wiederhergestellt.
+- **Script-Loading**: shared.js + svg-generator.js synchron (async = Menüs fehlten).
+
+### Removed
+- **Veil Hero-Typ**: Ersetzt durch Satt/Zart Toggle auf allen Hero-Typen.
+- **4 redundante Themes**: earth, sunset, ocean, midnight.
+- **~140 Zeilen hardcoded Dark-Theme CSS Overrides**.
+
+---
+
 ## [5.1.0] — 2026-04-06
 
 ### Added
