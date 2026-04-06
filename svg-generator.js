@@ -372,6 +372,23 @@
       return result;
     },
 
+    animate: function (enable) {
+      var decos = document.querySelectorAll('.hero-decoration');
+      decos.forEach(function (el) {
+        if (enable) {
+          el.style.animation = 'decoFloat 12s ease-in-out infinite alternate';
+        } else {
+          el.style.animation = '';
+        }
+      });
+      if (enable && !document.getElementById('deco-anim-style')) {
+        var style = document.createElement('style');
+        style.id = 'deco-anim-style';
+        style.textContent = '@keyframes decoFloat { 0% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(-8px) scaleX(1.01); } 100% { transform: translateX(8px) scaleX(0.99); } }';
+        document.head.appendChild(style);
+      }
+    },
+
     clear: function () {
       var decos = document.querySelectorAll(".hero-decoration");
       decos.forEach(function (el) {
