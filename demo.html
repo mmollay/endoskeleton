@@ -1972,7 +1972,8 @@
         navLayout: getActiveData('[data-nav-layout]', 'navLayout') || 'standard',
         width:     getActiveData('[data-width]', 'width') || 'default',
         footer:    getActiveData('[data-footer-style]', 'footerStyle') || 'dark',
-        theme:     document.documentElement.getAttribute('data-theme') || 'light'
+        theme:     document.documentElement.getAttribute('data-theme') || 'light',
+        navCase:   document.querySelector('.site-nav.nav-upper') ? 'upper' : 'normal'
       };
     }
 
