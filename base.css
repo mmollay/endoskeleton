@@ -791,6 +791,22 @@ small {
   box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
 }
 
+
+/* ─── Nav Case (uppercase option) ─────────────────────────────────────── */
+.site-nav.nav-upper .nav-links a {
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+}
+.site-nav.nav-upper .nav-logo {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.site-nav.nav-upper .nav-cta {
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
 /* ─── LANGUAGE SWITCH ─────────────────────────────────────────────────── */
 /* Kompakter DE/EN-Toggle in der Nav — neutral, themefähig, tastaturbedienbar */
 .nav-lang {

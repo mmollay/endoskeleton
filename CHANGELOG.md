@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.0.7] — 2026-04-06
+
+### Added
+- **Nav-Uppercase (navCase)** — Neuer 16. Config-Parameter.  macht Nav-Links + Logo uppercase mit letter-spacing wie survivaltraining.at. Einstellbar im Details-Tab (Normal/UPPERCASE). Aktiv bei: survival, tech, creative, cinematic, startup.
+
+### Fixed
+- **Sidebar Gap** — Body margin-right exakt auf Sidebar-Breite (352px = 340px Panel + 12px Tab) abgestimmt.
+- **Stil-Tab Overflow** — Tab-Panels bekommen overflow-x:hidden, kein horizontaler Scroll mehr.
+- **Button-Grid** — Von 3 auf 2 Spalten reduziert für bessere Lesbarkeit in der Sidebar.
+- **Cache-Buster** — Timestamp-basiert für zuverlässiges CSS-Reload.
+
 ## [5.0.6] — 2026-04-06
 
 ### Improved

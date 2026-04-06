@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v5.0.6 — Template Demo</title>
+  <title>SSI Endoskeleton v5.0.7 — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,21 +12,21 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.8';
+      var v = '5.0.7-1775468839';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
-        survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
         corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
         minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
-        tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech'  },
-        creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark'  },
+        tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'compact', animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech',  navCase:'upper' },
+        creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark',  navCase:'upper' },
         playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'dynamic', font:'rounded-friendly', buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'sunset' },
         elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'luxury-thin',      buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
         outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'classic-serif',    buttons:'shadow-lift',    navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
-        cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark'  },
+        cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark',  navCase:'upper' },
         softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
-        startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech'  }
+        startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech',  navCase:'upper' }
       };
       var defaults = {
         'color-css':     ['color',     'colors/',     'green'],
@@ -64,7 +64,7 @@
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
-      margin-right: 360px; /* 336px Panel + 24px Tab */
+      margin-right: 352px; /* 340px Panel + 12px Tab */
       transition: margin-right 0.25s ease;
     }
     body.sidebar-collapsed {
@@ -91,8 +91,8 @@
     .demo-sidebar-wrapper.collapsed { transform: translateX(340px); }
 
     .demo-sidebar-tab {
-      width: 14px;
-      background: #fafafa;
+      width: 12px;
+      background: #f1f5f9;
       color: #64748b;
       border: none;
       border-left: 1px solid #e2e8f0;
@@ -440,7 +440,7 @@
 
     .button-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 4px;
     }
     .button-preview-card {
@@ -557,7 +557,7 @@
     }
     .sidebar-tab-btn:hover { color: #0f172a; }
     .sidebar-tab-btn.active { background: #fff; color: #3b82f6; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 700; }
-    .sidebar-tab-panel { display: none; }
+    .sidebar-tab-panel { display: none; overflow-x: hidden; }
     .sidebar-tab-panel.active { display: block; }
 
     /* ─── Export Toast ───────────────────────── */
@@ -614,7 +614,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v5.0.6</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v5.0.7</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.35rem 0.5rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:0.75rem;font-size:0.7rem;color:#94a3b8;">
         <span id="variation-count" style="font-size:0.85rem;font-weight:600;color:#64748b;">—</span> mögliche Designs
       </div>
@@ -816,6 +816,13 @@
               <option value="transparent">Transparent — über Hero</option>
               <option value="shrink">Shrink — wird kleiner</option>
             </select>
+          </div>
+          <div class="demo-group">
+            <label>Nav-Schrift</label>
+            <div class="demo-btn-row">
+              <button class="demo-btn active" data-nav-case="normal" onclick="switchNavCase('normal');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Normal</button>
+              <button class="demo-btn" data-nav-case="upper" onclick="switchNavCase('upper');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">UPPERCASE</button>
+            </div>
           </div>
           <div class="demo-group">
             <label>Nav-Stil</label>
@@ -1654,6 +1661,7 @@
       switchSpacing(p.spacing); switchAnimation(p.animation); switchFont(p.font); switchButtons(p.buttons);
       switchNavBehavior(p.navBehavior); switchNavLayout(p.navLayout); switchNavStyle(p.navStyle);
       switchFooterStyle(p.footerStyle); switchWidth(p.width); switchTheme(p.theme);
+      setTimeout(function(){ switchNavCase(p.navCase || "normal"); }, 50);
       syncUIControls(p);
       updateUrlState();
     }
@@ -1748,6 +1756,13 @@
     /* SITE_CONFIG sicherstellen — ist im Demo nicht vorab gesetzt */
     window.SITE_CONFIG = window.SITE_CONFIG || {};
 
+
+    /* ─── Nav Case Switcher ───────────────────── */
+    window.switchNavCase = function switchNavCase(c) {
+      var nav = document.querySelector('.site-nav');
+      if (!nav) return;
+      nav.classList.toggle('nav-upper', c === 'upper');
+    }
     function switchNavBehavior(behavior) {
       window.SITE_CONFIG.navBehavior = behavior;  /* Immer setzen — auch wenn Nav noch nicht im DOM */
       var nav = document.querySelector('.site-nav');
@@ -2064,6 +2079,13 @@
       var params = {};
       if (h) h.split('&').forEach(function(s){ var kv=s.split('='); if(kv.length===2) params[kv[0]]=kv[1]; });
       if (params.preset) {
+        /* Deferred: Nav wird von shared.js dynamisch gebaut */
+        var _navCase = PRESETS[params.preset].navCase || 'normal';
+        (function waitForNav(tries) {
+          var nav = document.querySelector('.site-nav');
+          if (nav) { switchNavCase(_navCase); }
+          else if (tries < 20) { setTimeout(function(){ waitForNav(tries+1); }, 100); }
+        })(0);
         var card = document.getElementById('preset-' + params.preset);
         if (card) card.classList.add('active');
       }
