@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSI Endoskeleton v5.0.7 — Template Demo</title>
+  <title>SSI Endoskeleton — Template Demo</title>
   <meta name="description" content="SSI Endoskeleton v3.17 — Basis-Template für alle generierten Websites">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,8 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.9-1775477985';
+      var ENDO_VERSION = '5.0.9'; var v = ENDO_VERSION + '-' + Date.now();
+      document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
@@ -651,7 +652,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v5.0.9</span></div>
+      <div class="demo-title">SSI Endoskeleton <span id="endo-version"></span></div>
       <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
 
 
