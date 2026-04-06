@@ -4,11 +4,11 @@
 :root {
   --font-heading: 'Fredoka', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, sans-serif;
-  --display-weight: 700;
+  --display-weight: 600;
   --heading-weight: 600;
   --body-weight: 400;
-  --fs-hero: clamp(2.75rem, 2rem + 4.5vw, 6.5rem);
-  --fs-display: clamp(3.5rem, 2.5rem + 7vw, 9rem);
+  --fs-hero: clamp(2.5rem, 1.75rem + 4vw, 5.5rem);
+  --fs-display: clamp(3rem, 2rem + 6vw, 7.5rem);
 }
 .hero-title { letter-spacing: -0.02em; line-height: 1.05; }
 .hero-eyebrow { letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; font-size: 0.8rem; }

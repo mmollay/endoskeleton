@@ -811,6 +811,7 @@ small {
 /* ─── LANGUAGE SWITCH ─────────────────────────────────────────────────── */
 /* Kompakter DE/EN-Toggle in der Nav — neutral, themefähig, tastaturbedienbar */
 .nav-lang {
+  font-family: var(--font-nav);
   display: inline-flex;
   align-items: center;
   gap: 0;
@@ -821,6 +822,7 @@ small {
   line-height: 1;
 }
 .nav-lang-btn {
+  font-family: var(--font-nav);
   appearance: none;
   background: transparent;
   color: var(--text-muted);
@@ -848,8 +850,10 @@ small {
 }
 /* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
 @media (max-width: 48rem) {
-  .nav-lang { margin: 0 0.35rem; }
-  .nav-lang-btn { padding: 0.35rem 0.5rem; font-size: 0.68rem; min-width: 2rem; }
+  .nav-lang {
+  font-family: var(--font-nav); margin: 0 0.35rem; }
+  .nav-lang-btn {
+  font-family: var(--font-nav); padding: 0.35rem 0.5rem; font-size: 0.68rem; min-width: 2rem; }
 }
 
 /* Dropdown */
