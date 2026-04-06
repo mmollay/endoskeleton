@@ -642,24 +642,34 @@
       color: #ffffff !important;
       border-color: rgba(255, 255, 255, 0.5) !important;
     }
-    /* When minimal-link buttons are active: NO box on veil hero, just text */
-    body.btn-minimal-link .hero--veil .btn-outline,
-    body.btn-minimal-link .hero--veil .btn-ghost {
+    /* When minimal-link buttons are active on dark veil hero: clean text, no box */
+    body.btn-minimal-link .hero--veil .btn {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
       backdrop-filter: none !important;
-      color: rgba(255, 255, 255, 0.7) !important;
       padding: 0.5rem 0 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.1em !important;
       font-size: 0.85rem !important;
+      font-weight: 500 !important;
     }
-    body.btn-minimal-link .hero--veil .btn-outline:hover,
-    body.btn-minimal-link .hero--veil .btn-ghost:hover {
+    [data-theme="dark"] body.btn-minimal-link .hero--veil .btn,
+    [data-theme="tech"] body.btn-minimal-link .hero--veil .btn,
+    [data-theme="midnight"] body.btn-minimal-link .hero--veil .btn {
       color: #ffffff !important;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+    }
+    body.btn-minimal-link .hero--veil .btn-primary {
+      border-bottom: 1px solid currentColor !important;
+    }
+    body.btn-minimal-link .hero--veil .btn:hover {
+      color: var(--primary) !important;
       background: transparent !important;
       border: none !important;
+    }
+    body.btn-minimal-link .hero--veil .btn-primary:hover {
+      border-bottom: 1px solid var(--primary) !important;
     }
   </style>
 </head>
