@@ -1591,6 +1591,11 @@ section.section-dark {
 }
 
 /* ─── PRICING ───────────────────────────────────────────────────────────── */
+/* Pricing grid needs top padding for badge overflow */
+.grid-3:has(.pricing-card) {
+  padding-top: 1rem;
+}
+
 .pricing-card {
   text-align: left;
   transition: transform 0.25s, box-shadow 0.25s;
