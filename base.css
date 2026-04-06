@@ -1279,6 +1279,24 @@ section.section-dark {
   color: rgba(255, 255, 255, 0.8);
   border-color: rgba(255, 255, 255, 0.3);
 }
+
+/* ─── Tech Theme Enhancements ─────────────────────────────────────────── */
+[data-theme="tech"] .stat-number,
+[data-theme="tech"] .banner-stat-number {
+  color: var(--primary);
+}
+[data-theme="tech"] .pricing-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+[data-theme="tech"] .pricing-card:hover {
+  border-color: rgba(var(--primary-rgb), 0.3);
+}
+[data-theme="tech"] .pricing-card.recommended {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.15);
+}
+
 /* Cookie/Accept/Decline buttons */
 .btn-accept {
   background: var(--primary);
