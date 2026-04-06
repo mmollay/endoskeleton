@@ -1325,9 +1325,16 @@
       name: "SSI Demo",
       logo: null,
       nav: [
-        { label: "Über uns",   href: "#about" } { label: "Leistungen", href: "#leistungen", children: [
-          { label: "Webdesign",       href: "#leistungen" } { label: "SEO & Marketing", href: "#leistungen" } { label: "Hosting",         href: "#leistungen" } { label: "Beratung",        href: "#leistungen" }
-        ]} { label: "Preise",     href: "#pricing" } { label: "Kontakt",    href: "#kontakt" } { label: "Jetzt anfragen", href: "#kontakt", cta: true }
+        { label: "Über uns", href: "#about" },
+        { label: "Leistungen", href: "#leistungen", children: [
+          { label: "Webdesign", href: "#leistungen" },
+          { label: "SEO & Marketing", href: "#leistungen" },
+          { label: "Hosting", href: "#leistungen" },
+          { label: "Beratung", href: "#leistungen" }
+        ]},
+        { label: "Preise", href: "#pricing" },
+        { label: "Kontakt", href: "#kontakt" },
+        { label: "Jetzt anfragen", href: "#kontakt", cta: true }
       ],
       contact: {
         name: "Max Muster",
@@ -1346,7 +1353,13 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=5.0.9"></script>
+  <script>
+    (function() {
+      var s = document.createElement('script');
+      s.src = 'shared.js?v=' + ENDO_VERSION;
+      document.head.appendChild(s);
+    })();
+  </script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
