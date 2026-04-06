@@ -1,0 +1,18 @@
+/* SSI Endoskeleton — Charakter: Neutral (v5.0)
+   Moderate Rundung, dezente Schatten, sanfter Hover.
+   Regelt: Cards, Shadows, Blockquotes, Banner, Inputs.
+   Regelt NICHT: Buttons, Hero-Overlay (eigene Module). */
+
+:root { --card-radius: 8px; --card-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+.card {
+  box-shadow: var(--card-shadow);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+.card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.1); transform: translateY(-3px); }
+.blockquote { border-radius: 6px; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+.banner-grid { border-radius: 6px; overflow: hidden; }
+.pricing-card { border-radius: 8px; }
+.form-group input, .form-group textarea, .form-group select { border-radius: 6px; }
