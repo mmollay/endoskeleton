@@ -626,7 +626,7 @@
       background: rgba(255, 255, 255, 0.7) !important;
       backdrop-filter: blur(4px) !important;
     }
-    /* Dark themes on veil hero: transparent buttons, not white boxes */
+    /* Dark themes on veil hero: subtle transparent buttons */
     [data-theme="dark"] .hero--veil .btn-outline,
     [data-theme="tech"] .hero--veil .btn-outline,
     [data-theme="midnight"] .hero--veil .btn-outline {
@@ -641,6 +641,25 @@
       background: rgba(255, 255, 255, 0.15) !important;
       color: #ffffff !important;
       border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+    /* When minimal-link buttons are active: NO box on veil hero, just text */
+    body.btn-minimal-link .hero--veil .btn-outline,
+    body.btn-minimal-link .hero--veil .btn-ghost {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      color: rgba(255, 255, 255, 0.7) !important;
+      padding: 0.5rem 0 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.1em !important;
+      font-size: 0.85rem !important;
+    }
+    body.btn-minimal-link .hero--veil .btn-outline:hover,
+    body.btn-minimal-link .hero--veil .btn-ghost:hover {
+      color: #ffffff !important;
+      background: transparent !important;
+      border: none !important;
     }
   </style>
 </head>
@@ -1835,6 +1854,9 @@
     /* ─── Button Switcher ────────────────────── */
     function switchButtons(preset) {
       cssSwitch('button-css', 'buttons/' + preset + '.css');
+      /* Track button module on body for CSS overrides */
+      document.body.className = document.body.className.replace(/btn-[a-z-]+/g, '').trim();
+      document.body.classList.add('btn-' + preset);
     }
 
     /* ─── Hero Switcher ───────────────────────── */
