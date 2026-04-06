@@ -14,13 +14,36 @@
   gap: 0.6rem;
   min-height: auto;
   transition: color 0.2s ease, gap 0.2s ease;
+  position: relative;
 }
 .btn::after {
-  content: '→';
+  content: →;
   display: inline-block;
   transition: transform 0.25s ease;
 }
 .btn:hover { transform: none; gap: 0.9rem; color: var(--primary); }
 .btn:hover::after { transform: translateX(0.25rem); }
-.btn-primary { color: var(--primary); }
-.btn-outline, .btn-secondary, .btn-ghost { color: var(--text); }
+
+/* Primary: solid background + arrow */
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.25rem;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  color: var(--text-on-primary);
+}
+.btn-primary::after { color: var(--text-on-primary); }
+
+/* Secondary: text only with underline */
+.btn-outline, .btn-secondary, .btn-ghost {
+  color: var(--text);
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 0.35rem;
+}
+.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover {
+  color: var(--primary);
+  background: transparent;
+}

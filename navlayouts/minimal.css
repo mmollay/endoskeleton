@@ -1,10 +1,29 @@
 /* SSI Endoskeleton — Nav Layout: Minimal */
-/* Nur Logo + Hamburger, auch am Desktop. Clean/reduziert. */
+/* Desktop: Logo links, reduzierte Links rechts (keine Submenus). Mobile: Hamburger. */
 
 .site-nav .nav-links {
+  gap: var(--space-lg);
+}
+
+.site-nav .nav-links a {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.site-nav .nav-links a:hover,
+.site-nav .nav-links a.active {
+  opacity: 1;
+}
+
+/* Hide dropdown submenus in minimal */
+.site-nav .nav-sub {
   display: none !important;
 }
 
-.site-nav .nav-hamburger {
-  display: flex !important;
+.site-nav .nav-dropdown > a::after {
+  display: none;
 }

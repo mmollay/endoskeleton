@@ -586,7 +586,8 @@ small {
 }
 .site-nav.nav-dark .nav-logo { color: #ffffff; }
 .site-nav.nav-dark .nav-logo img { filter: brightness(0) invert(1); }
-.site-nav.nav-dark .nav-links a { color: rgba(255, 255, 255, 0.8); }
+.site-nav.nav-dark .nav-links a {
+  font-family: var(--font-body); color: rgba(255, 255, 255, 0.8); }
 .site-nav.nav-dark .nav-links a:hover,
 .site-nav.nav-dark .nav-links a.active { color: #ffffff; }
 .site-nav.nav-dark .nav-hamburger span { background: #ffffff; }
@@ -604,7 +605,8 @@ small {
 }
 .site-nav.nav-colored .nav-logo { color: #ffffff; }
 .site-nav.nav-colored .nav-logo img { filter: brightness(0) invert(1); }
-.site-nav.nav-colored .nav-links a { color: rgba(255, 255, 255, 0.85); }
+.site-nav.nav-colored .nav-links a {
+  font-family: var(--font-body); color: rgba(255, 255, 255, 0.85); }
 .site-nav.nav-colored .nav-links a:hover,
 .site-nav.nav-colored .nav-links a.active { color: #ffffff; }
 .site-nav.nav-colored .nav-links a.active { border-bottom-color: #ffffff; }
@@ -624,7 +626,8 @@ small {
   border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.35);
 }
 .site-nav.nav-glass .nav-logo { color: var(--heading); }
-.site-nav.nav-glass .nav-links a { color: var(--text-light); }
+.site-nav.nav-glass .nav-links a {
+  font-family: var(--font-body); color: var(--text-light); }
 .site-nav.nav-glass.scrolled:not(.nav-transparent) {
   background: rgba(255, 255, 255, 0.75);
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
@@ -681,14 +684,16 @@ small {
 [data-theme="midnight"] .site-nav { background: rgba(20, 20, 40, 0.92); border-bottom: 0.0625rem solid var(--border); }
 [data-theme="midnight"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(20, 20, 40, 0.98); }
 [data-theme="midnight"] .site-nav .nav-logo { color: #e8e8f8; }
-[data-theme="midnight"] .site-nav .nav-links a { color: #a0a0c0; }
+[data-theme="midnight"] .site-nav .nav-links a {
+  font-family: var(--font-body); color: #a0a0c0; }
 [data-theme="midnight"] .site-nav .nav-links a:hover { color: #e8e8f8; }
 [data-theme="midnight"] .site-nav .nav-hamburger span { background: #e8e8f8; }
 
 [data-theme="forest"] .site-nav { background: rgba(13, 26, 13, 0.92); border-bottom: 0.0625rem solid var(--border); }
 [data-theme="forest"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(13, 26, 13, 0.98); }
 [data-theme="forest"] .site-nav .nav-logo { color: #e0f0e0; }
-[data-theme="forest"] .site-nav .nav-links a { color: #a0c0a0; }
+[data-theme="forest"] .site-nav .nav-links a {
+  font-family: var(--font-body); color: #a0c0a0; }
 [data-theme="forest"] .site-nav .nav-links a:hover { color: #e0f0e0; }
 [data-theme="forest"] .site-nav .nav-hamburger span { background: #e0f0e0; }
 
@@ -710,8 +715,9 @@ small {
   gap: var(--space-sm);
   text-decoration: none;
   font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.3rem;
+  font-weight: var(--heading-weight, 700);
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
   color: var(--heading);
   flex-shrink: 0;
   white-space: nowrap;
@@ -738,10 +744,11 @@ small {
 }
 
 .nav-links a {
+  font-family: var(--font-body);
   color: var(--text-light);
-  font-size: var(--fs-sm);
+  font-size: 0.9rem;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-decoration: none;
   transition: color 0.2s;
   padding: var(--space-xs) 0;
@@ -766,8 +773,10 @@ small {
   color: var(--text-on-primary) !important;
   padding: 0.45rem 1.25rem !important;
   border-radius: var(--cta-radius, var(--radius-full)) !important;
-  font-size: var(--fs-sm) !important;
+  font-family: var(--font-body);
+  font-size: 0.85rem !important;
   font-weight: 600;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   line-height: 1.4;
   transition: background 0.2s, box-shadow 0.2s;
@@ -1184,7 +1193,7 @@ section.section-dark {
 .btn-outline {
   background: transparent;
   color: var(--primary);
-  border: 0.125rem solid var(--primary);
+  border: 0.15rem solid var(--primary);
 }
 
 .btn-outline:hover {
@@ -1195,7 +1204,7 @@ section.section-dark {
 .btn-secondary {
   background: var(--bg-alt);
   color: var(--text);
-  border: 0.0625rem solid var(--border);
+  border: 0.125rem solid var(--border);
 }
 
 .btn-secondary:hover {
@@ -1219,7 +1228,8 @@ section.section-dark {
 .hero--image .btn-ghost,
 .section-dark .btn-ghost {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.85);
+  border-width: 0.125rem;
 }
 
 .hero--image .btn-ghost:hover,
@@ -1228,6 +1238,26 @@ section.section-dark {
   color: #ffffff;
 }
 
+
+/* ─── Dark Theme Button Fixes ─────────────────────────────────────────── */
+[data-theme=dark] .btn-secondary,
+[data-theme=tech] .btn-secondary,
+[data-theme=midnight] .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+[data-theme=dark] .btn-secondary:hover,
+[data-theme=tech] .btn-secondary:hover,
+[data-theme=midnight] .btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+[data-theme=dark] .btn-ghost,
+[data-theme=tech] .btn-ghost,
+[data-theme=midnight] .btn-ghost {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+}
 /* Cookie/Accept/Decline buttons */
 .btn-accept {
   background: var(--primary);
@@ -1271,7 +1301,7 @@ section.section-dark {
   display: flex;
   flex-direction: column;
   background: var(--card-bg);
-  border: none;
+  border: 1px solid var(--border, rgba(0,0,0,0.06));
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -1329,7 +1359,7 @@ section.section-dark {
   width: 3.25rem;
   height: 3.25rem;
   background: rgba(var(--primary-rgb), 0.08);
-  border: 0.0625rem solid rgba(var(--primary-rgb), 0.15);
+  border: 1.5px solid rgba(var(--primary-rgb), 0.25);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -1355,11 +1385,12 @@ section.section-dark {
 /* Cards in dark section */
 .section-dark .card {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .section-dark .card:hover {
   background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .section-dark .card-body h3 {

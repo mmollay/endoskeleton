@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [5.0.5] — 2026-04-06
+
+### Fixed
+- **Nav-Font professioneller**: Nav-Links nutzen jetzt var(--font-body) statt System-Font. Logo nutzt var(--heading-weight). Nav-CTA mit expliziter font-family.
+- **Button-Kontrast**: Secondary-Buttons mit stärkerer Border (0.125rem statt 0.0625rem). Dark-Theme Buttons mit expliziter Sichtbarkeit.
+- **CTA-Arrow Buttons**: Primary hat jetzt Solid-Background statt nur Text. Secondary mit Underline-Differenzierung.
+- **Feature-Cards Dark Themes**: Cards haben jetzt sichtbare Borders auf allen Dark-Themes (tech/dark/midnight). Card-Icons mit stärkerer Border (1.5px, 25% opacity).
+- **Minimal NavLayout**: Zeigt jetzt Links auf Desktop (minimalistisch, uppercase, 0.8rem) statt nur Hamburger.
+- **Luxury-Thin Font**: Heading-Weight von 400 auf 600 erhöht für bessere Lesbarkeit. Display-Weight von 300 auf 400.
+- **Outdoor Preset**: Differenzierung von Survival — jetzt classic-serif Font + shadow-lift Buttons statt brand-bold + rect-solid.
+
+
 ## [5.0.0] — 2026-04-05
 
 ### BREAKING

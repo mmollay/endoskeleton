@@ -4,9 +4,10 @@
 :root {
   --font-heading: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Lato', system-ui, sans-serif;
-  --display-weight: 300;
-  --heading-weight: 400;
+  --display-weight: 400;
+  --heading-weight: 600;
   --body-weight: 400;
+  --fs-body: 1.05rem;
   --fs-hero: clamp(3.5rem, 2.5rem + 7vw, 9rem);
   --fs-display: clamp(4.5rem, 3rem + 9vw, 10.5rem);
 }
