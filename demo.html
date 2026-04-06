@@ -1290,7 +1290,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=5.0.0"></script>
+  <script src="shared.js?v=5.0.7"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1698,20 +1698,29 @@
 
     /* ─── Layout Switcher ─────────────────────── */
     var cssVer = Date.now();
+
+    /* --- CSS Switch Guard (prevents double-loading) --- */
+    function cssSwitch(id, path) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.href.indexOf(path) !== -1) return;
+      el.href = path + "?v=" + cssVer;
+    }
+
     function switchLayout(layout) {
-      document.getElementById('layout-css').href = 'layouts/' + layout + '.css?v=' + cssVer;
+      cssSwitch('layout-css', 'layouts/' + layout + '.css');
       document.body.className = document.body.className.replace(/layout-\w+/, 'layout-' + layout);
     }
 
     /* ─── Color Switcher ─────────────────────── */
     function switchColor(color) {
-      document.getElementById("color-css").href = "colors/" + color + ".css?v=" + cssVer;
+      cssSwitch("color-css", "colors/" + color + ".css");
       document.body.setAttribute("data-color", color);
     }
 
     /* ─── Button Switcher ────────────────────── */
     function switchButtons(preset) {
-      document.getElementById('button-css').href = 'buttons/' + preset + '.css?v=' + cssVer;
+      cssSwitch('button-css', 'buttons/' + preset + '.css');
     }
 
     /* ─── Hero Switcher ───────────────────────── */
@@ -1734,22 +1743,22 @@
 
     /* ─── Charakter Switcher ──────────────────── */
     function switchCharakter(preset) {
-      document.getElementById('charakter-css').href = 'softness/' + preset + '.css?v=' + cssVer;
+      cssSwitch('charakter-css', 'softness/' + preset + '.css');
     }
 
     /* ─── Font Switcher ──────────────────────── */
     function switchFont(preset) {
-      document.getElementById('font-css').href = 'fonts/' + preset + '.css?v=' + cssVer;
+      cssSwitch('font-css', 'fonts/' + preset + '.css');
     }
 
     /* ─── Spacing Switcher ────────────────────── */
     function switchSpacing(preset) {
-      document.getElementById('spacing-css').href = 'spacing/' + preset + '.css?v=' + cssVer;
+      cssSwitch('spacing-css', 'spacing/' + preset + '.css');
     }
 
     /* ─── Animation Switcher ──────────────────── */
     function switchAnimation(preset) {
-      document.getElementById('animation-css').href = 'animation/' + preset + '.css?v=' + cssVer;
+      cssSwitch('animation-css', 'animation/' + preset + '.css');
     }
 
     /* ─── Nav Behavior Switcher ───────────────── */
@@ -1783,12 +1792,12 @@
 
     /* ─── Nav Layout Switcher ────────────────── */
     function switchNavLayout(layout) {
-      document.getElementById('navlayout-css').href = 'navlayouts/' + layout + '.css?v=' + cssVer;
+      cssSwitch('navlayout-css', 'navlayouts/' + layout + '.css');
     }
 
     /* ─── Width Switcher ─────────────────────── */
     function switchWidth(width) {
-      document.getElementById('width-css').href = 'widths/' + width + '.css?v=' + cssVer;
+      cssSwitch('width-css', 'widths/' + width + '.css');
     }
 
     /* ─── Footer Style Switcher ───────────────── */
