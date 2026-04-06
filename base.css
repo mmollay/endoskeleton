@@ -77,14 +77,15 @@
   --bg:            #0f0f1a;
   --bg-alt:        #1a1a2e;
   --bg-dark:       #0a0a14;
-  --text:          #e0e0e0;
-  --text-muted:    #a0a0a0;
-  --text-light:    #b0b0b0;
-  --heading:       #f0f0f0;
-  --border:        #2a2a3e;
-  --card-bg:       #1a1a2e;
-  --shadow:        rgba(0, 0, 0, 0.3);
+  --text:          #e8e8e8;
+  --text-muted:    #b0b0b8;
+  --text-light:    #c0c0c8;
+  --heading:       #ffffff;
+  --border:        rgba(255, 255, 255, 0.12);
+  --card-bg:       rgba(255, 255, 255, 0.05);
+  --shadow:        rgba(0, 0, 0, 0.4);
   --focus:         #4d94ff;
+  --text-on-primary: #ffffff;
 }
 
 /* ─── TECH THEME ────────────────────────────────────────────────────────── */
@@ -94,13 +95,14 @@
   --bg-alt:     #12121a;
   --bg-dark:    #05050a;
   --text:       #e8e8f0;
-  --text-muted: #9090a8;
-  --text-light: #b0b0c8;
-  --heading:    #f0f0f8;
-  --border:     rgba(100, 120, 255, 0.12);
-  --card-bg:    #12121a;
+  --text-muted: #a0a0b8;
+  --text-light: #c0c0d8;
+  --heading:    #ffffff;
+  --border:     rgba(100, 120, 255, 0.15);
+  --card-bg:    rgba(255, 255, 255, 0.04);
   --shadow:     rgba(0, 0, 0, 0.5);
   --focus:      #22d3ee;
+  --text-on-primary: #ffffff;
 }
 
 /* ─── WARM THEME ────────────────────────────────────────────────────────── */
@@ -850,137 +852,7 @@ small {
 }
 /* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
 
-/* ─── Dark Theme Contrast Boost ───────────────────────────────────────── */
-/* Ensures readability on all screens including outdoor/bright environments */
-[data-theme="dark"] .card-body p,
-[data-theme="tech"] .card-body p,
-[data-theme="midnight"] .card-body p {
-  color: rgba(255, 255, 255, 0.85);
-}
 
-[data-theme="dark"] .card-body h3,
-[data-theme="tech"] .card-body h3,
-[data-theme="midnight"] .card-body h3 {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .card-icon svg,
-[data-theme="tech"] .card-icon svg,
-[data-theme="midnight"] .card-icon svg {
-  color: rgba(255, 255, 255, 0.9);
-  opacity: 1;
-}
-
-[data-theme="dark"] .stat-number,
-[data-theme="dark"] .banner-stat-number,
-[data-theme="midnight"] .stat-number,
-[data-theme="midnight"] .banner-stat-number {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .stat-label,
-[data-theme="dark"] .banner-stat-label,
-[data-theme="midnight"] .stat-label,
-[data-theme="midnight"] .banner-stat-label {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-[data-theme="dark"] .section-tag,
-[data-theme="tech"] .section-tag,
-[data-theme="midnight"] .section-tag {
-  color: var(--primary-light, rgba(255, 255, 255, 0.7));
-}
-
-[data-theme="dark"] .section-title,
-[data-theme="tech"] .section-title,
-[data-theme="midnight"] .section-title {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .section-lead,
-[data-theme="tech"] .section-lead,
-[data-theme="midnight"] .section-lead {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-[data-theme="dark"] .banner-item,
-[data-theme="tech"] .banner-item,
-[data-theme="midnight"] .banner-item {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .pricing-features li,
-[data-theme="tech"] .pricing-features li,
-[data-theme="midnight"] .pricing-features li {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-[data-theme="dark"] .pricing-period,
-[data-theme="tech"] .pricing-period,
-[data-theme="midnight"] .pricing-period {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-[data-theme="dark"] .pricing-amount,
-[data-theme="tech"] .pricing-amount,
-[data-theme="midnight"] .pricing-amount {
-  color: #ffffff;
-}
-
-
-/* ─── Dark Theme Pricing Cards ────────────────────────────────────────── */
-[data-theme="dark"] .pricing-card,
-[data-theme="tech"] .pricing-card,
-[data-theme="midnight"] .pricing-card {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-[data-theme="dark"] .pricing-card:hover,
-[data-theme="tech"] .pricing-card:hover,
-[data-theme="midnight"] .pricing-card:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-[data-theme="dark"] .pricing-card.pricing-featured,
-[data-theme="tech"] .pricing-card.pricing-featured,
-[data-theme="midnight"] .pricing-card.pricing-featured {
-  border: 2px solid var(--primary-light, var(--primary));
-  box-shadow: 0 0 1.5rem rgba(var(--primary-rgb), 0.2);
-}
-
-/* Dark theme: ALL pricing buttons white + visible */
-[data-theme="dark"] .pricing-card .btn,
-[data-theme="tech"] .pricing-card .btn,
-[data-theme="midnight"] .pricing-card .btn {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .pricing-card .btn-primary,
-[data-theme="tech"] .pricing-card .btn-primary,
-[data-theme="midnight"] .pricing-card .btn-primary {
-  color: var(--primary-light, #ffffff) !important;
-}
-
-[data-theme="dark"] .pricing-card .btn:hover,
-[data-theme="tech"] .pricing-card .btn:hover,
-[data-theme="midnight"] .pricing-card .btn:hover {
-  color: var(--primary-light, var(--primary)) !important;
-}
-
-/* Dark theme kantig: brighter card borders */
-[data-theme="dark"] .card,
-[data-theme="tech"] .card,
-[data-theme="midnight"] .card {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-[data-theme="dark"] .card:hover,
-[data-theme="tech"] .card:hover,
-[data-theme="midnight"] .card:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-}
 
 @media (max-width: 48rem) {
   .nav-lang {
@@ -1556,21 +1428,21 @@ section.section-dark {
 
 /* Cards in dark section */
 .section-dark .card {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--card-bg, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
 }
 
 .section-dark .card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--card-bg, rgba(255, 255, 255, 0.06));
+  border-color: var(--primary, rgba(255, 255, 255, 0.25));
 }
 
 .section-dark .card-body h3 {
-  color: #ffffff;
+  color: var(--heading, #ffffff);
 }
 
 .section-dark .card-body p {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-muted, rgba(255, 255, 255, 0.8));
 }
 
 /* ─── BANNER / STATS STRIP ──────────────────────────────────────────────── */
