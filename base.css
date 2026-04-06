@@ -785,6 +785,38 @@ small {
 }
 /* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
 
+
+/* ─── Nav-Style overrides Theme defaults ──────────────────────────────── */
+[data-theme] .site-nav.nav-dark,
+.site-nav.nav-dark {
+  background: rgba(10, 10, 20, 0.96) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme] .site-nav.nav-dark .nav-logo,
+.site-nav.nav-dark .nav-logo { color: #ffffff !important; }
+[data-theme] .site-nav.nav-dark .nav-links a,
+.site-nav.nav-dark .nav-links a { color: rgba(255, 255, 255, 0.8) !important; }
+[data-theme] .site-nav.nav-dark .nav-links a:hover,
+.site-nav.nav-dark .nav-links a:hover { color: #ffffff !important; }
+[data-theme] .site-nav.nav-dark .nav-hamburger span,
+.site-nav.nav-dark .nav-hamburger span { background: #ffffff !important; }
+
+[data-theme] .site-nav.nav-colored,
+.site-nav.nav-colored {
+  background: var(--primary) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+}
+[data-theme] .site-nav.nav-colored .nav-logo,
+.site-nav.nav-colored .nav-logo { color: #ffffff !important; }
+[data-theme] .site-nav.nav-colored .nav-links a,
+.site-nav.nav-colored .nav-links a { color: rgba(255, 255, 255, 0.85) !important; }
+
+.site-nav.nav-glass {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(1.5rem) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(1.5rem) saturate(200%) !important;
+}
+
 @media (max-width: 48rem) {
   .nav-lang {
   font-family: var(--font-nav); margin: 0 0.35rem; }

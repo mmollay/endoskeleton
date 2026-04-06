@@ -695,16 +695,27 @@
     section.hero.hero--veil-overlay .hero-eyebrow {
       color: var(--primary) !important;
     }
-    section.hero.hero--veil-overlay .hero-subtitle,
+    section.hero.hero--veil-overlay .hero-subtitle {
+      color: var(--text-muted) !important;
+    }
     section.hero.hero--veil-overlay .hero-scroll {
       color: var(--text-muted) !important;
+      z-index: 3 !important;
+    }
+    section.hero.hero--veil-overlay .hero-scroll::after {
+      background: var(--text-muted) !important;
     }
     /* Veil hero buttons: use theme text colors, not white */
     section.hero.hero--veil-overlay .btn-ghost,
     section.hero.hero--veil-overlay .btn-outline {
       color: var(--text) !important;
-      border-color: var(--border) !important;
+      border: 2px solid var(--text-muted) !important;
       background: transparent !important;
+    }
+    section.hero.hero--veil-overlay .btn-ghost:hover,
+    section.hero.hero--veil-overlay .btn-outline:hover {
+      color: var(--primary) !important;
+      border-color: var(--primary) !important;
     }
     section.hero.hero--veil-overlay .btn-ghost:hover,
     section.hero.hero--veil-overlay .btn-outline:hover {
@@ -844,6 +855,34 @@
               <button class="demo-btn" data-nav-layout="club">Club</button>
             </div>
           </div>
+
+        <div class="demo-section">
+          <div class="demo-group">
+            <label>Nav-Verhalten</label>
+            <select class="demo-select" id="nav-select">
+              <option value="sticky">Sticky — immer sichtbar</option>
+              <option value="autohide">Autohide — versteckt sich</option>
+              <option value="transparent">Transparent — über Hero</option>
+              <option value="shrink">Shrink — wird kleiner</option>
+            </select>
+          </div>
+          <div class="demo-group">
+            <label>Nav-Schrift</label>
+            <div class="demo-btn-row">
+              <button class="demo-btn active" data-nav-case="normal" onclick="switchNavCase('normal');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Normal</button>
+              <button class="demo-btn" data-nav-case="upper" onclick="switchNavCase('upper');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">UPPERCASE</button>
+            </div>
+          </div>
+          <div class="demo-group">
+            <label>Nav-Stil</label>
+            <div class="demo-btn-row">
+              <button class="demo-btn active" data-nav-style="light">Light</button>
+              <button class="demo-btn" data-nav-style="dark">Dark</button>
+              <button class="demo-btn" data-nav-style="colored">Color</button>
+              <button class="demo-btn" data-nav-style="glass">Glass</button>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -962,31 +1001,9 @@
       <!-- ══ Tab: Details ══ -->
       <div class="sidebar-tab-panel" id="tab-details">
         <div class="demo-section">
-          <div class="demo-group">
-            <label>Nav-Verhalten</label>
-            <select class="demo-select" id="nav-select">
-              <option value="sticky">Sticky — immer sichtbar</option>
-              <option value="autohide">Autohide — versteckt sich</option>
-              <option value="transparent">Transparent — über Hero</option>
-              <option value="shrink">Shrink — wird kleiner</option>
-            </select>
-          </div>
-          <div class="demo-group">
-            <label>Nav-Schrift</label>
-            <div class="demo-btn-row">
-              <button class="demo-btn active" data-nav-case="normal" onclick="switchNavCase('normal');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Normal</button>
-              <button class="demo-btn" data-nav-case="upper" onclick="switchNavCase('upper');this.parentNode.querySelectorAll('.demo-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">UPPERCASE</button>
-            </div>
-          </div>
-          <div class="demo-group">
-            <label>Nav-Stil</label>
-            <div class="demo-btn-row">
-              <button class="demo-btn active" data-nav-style="light">Light</button>
-              <button class="demo-btn" data-nav-style="dark">Dark</button>
-              <button class="demo-btn" data-nav-style="colored">Color</button>
-              <button class="demo-btn" data-nav-style="glass">Glass</button>
-            </div>
-          </div>
+          
+          
+          
           <div class="demo-group">
             <label>Footer-Stil</label>
             <div class="demo-btn-row">
@@ -1439,8 +1456,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.3.3"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.3.3"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.4.0"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.4.0"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
