@@ -19,6 +19,11 @@
   # Option B: Force www (uncomment if preferred, comment out Option A)
   # RewriteCond %{HTTP_HOST} !^www\. [NC]
   # RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ─── API Routing ──────────────────────────────────────────────────────
+  # Let /api/ handle its own routing
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^ - [L]
 </IfModule>
 
 # ─── SECURITY HEADERS ──────────────────────────────────────────────────

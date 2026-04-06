@@ -1,0 +1,21 @@
+# ─── Endoskeleton API v1 ─────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /api/
+
+  # CORS Preflight
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^(.*)$ index.php [L]
+
+  # Route all /api/v1/* to index.php
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^v1/(.*)$ index.php?route=$1 [L,QSA]
+</IfModule>
+
+# CORS Headers
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, X-API-Key"
+  Header always set Access-Control-Max-Age "86400"
+</IfModule>
