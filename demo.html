@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var ENDO_VERSION = '5.1.0'; var v = ENDO_VERSION + '-' + Date.now();
+      var ENDO_VERSION = '5.1.1'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -628,16 +628,14 @@
     }
     /* Dark themes on veil hero: subtle transparent buttons */
     [data-theme="dark"] .hero--veil .btn-outline,
-    [data-theme="tech"] .hero--veil .btn-outline,
-    [data-theme="midnight"] .hero--veil .btn-outline {
+    [data-theme="tech"] .hero--veil .btn-outline {
       background: rgba(255, 255, 255, 0.08) !important;
       color: rgba(255, 255, 255, 0.85) !important;
       border-color: rgba(255, 255, 255, 0.3) !important;
       backdrop-filter: blur(4px) !important;
     }
     [data-theme="dark"] .hero--veil .btn-outline:hover,
-    [data-theme="tech"] .hero--veil .btn-outline:hover,
-    [data-theme="midnight"] .hero--veil .btn-outline:hover {
+    [data-theme="tech"] .hero--veil .btn-outline:hover {
       background: rgba(255, 255, 255, 0.15) !important;
       color: #ffffff !important;
       border-color: rgba(255, 255, 255, 0.5) !important;
@@ -655,8 +653,7 @@
       font-weight: 500 !important;
     }
     [data-theme="dark"] body.btn-minimal-link .hero--veil .btn,
-    [data-theme="tech"] body.btn-minimal-link .hero--veil .btn,
-    [data-theme="midnight"] body.btn-minimal-link .hero--veil .btn {
+    [data-theme="tech"] body.btn-minimal-link .hero--veil .btn {
       color: #ffffff !important;
       text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
     }
@@ -926,12 +923,7 @@
               <button class="demo-btn" data-theme-switch="dark" style="font-size:0.58rem">Dunkel</button>
               <button class="demo-btn" data-theme-switch="warm" style="font-size:0.58rem">Warm</button>
               <button class="demo-btn" data-theme-switch="tech" style="font-size:0.58rem">Tech</button>
-              <button class="demo-btn" data-theme-switch="pastel" style="font-size:0.58rem">Pastel</button>
-              <button class="demo-btn" data-theme-switch="earth" style="font-size:0.58rem">Earth</button>
-              <button class="demo-btn" data-theme-switch="ocean" style="font-size:0.58rem">Ocean</button>
-              <button class="demo-btn" data-theme-switch="sunset" style="font-size:0.58rem">Sunset</button>
-              <button class="demo-btn" data-theme-switch="midnight" style="font-size:0.58rem">Midnight</button>
-              <button class="demo-btn" data-theme-switch="forest" style="font-size:0.58rem">Forest</button>
+              <button class="demo-btn" data-theme-switch="pastel" style="font-size:0.58rem">Pastel</button>              <button class="demo-btn" data-theme-switch="forest" style="font-size:0.58rem">Forest</button>
             </div>
           </div>
           <div class="demo-group">
@@ -1337,16 +1329,9 @@
       name: "SSI Demo",
       logo: null,
       nav: [
-        { label: "Über uns",   href: "#about" },
-        { label: "Leistungen", href: "#leistungen", children: [
-          { label: "Webdesign",       href: "#leistungen" },
-          { label: "SEO & Marketing", href: "#leistungen" },
-          { label: "Hosting",         href: "#leistungen" },
-          { label: "Beratung",        href: "#leistungen" }
-        ]},
-        { label: "Preise",     href: "#pricing" },
-        { label: "Kontakt",    href: "#kontakt" },
-        { label: "Jetzt anfragen", href: "#kontakt", cta: true }
+        { label: "Über uns",   href: "#about" } { label: "Leistungen", href: "#leistungen", children: [
+          { label: "Webdesign",       href: "#leistungen" } { label: "SEO & Marketing", href: "#leistungen" } { label: "Hosting",         href: "#leistungen" } { label: "Beratung",        href: "#leistungen" }
+        ]} { label: "Preise",     href: "#pricing" } { label: "Kontakt",    href: "#kontakt" } { label: "Jetzt anfragen", href: "#kontakt", cta: true }
       ],
       contact: {
         name: "Max Muster",
@@ -1639,18 +1624,7 @@
 
     /* --- Wallpaper Picker --- */
     var WALLPAPER_POOL = [
-      { id: 'photo-1448375240586-882707db888b', label: 'Wald' },
-      { id: 'photo-1497366216548-37526070297c', label: 'Office' },
-      { id: 'photo-1506905925346-21bda4d32df4', label: 'Berge' },
-      { id: 'photo-1518770660439-4636190af475', label: 'Tech' },
-      { id: 'photo-1536440136628-849c177e76a1', label: 'Kino' },
-      { id: 'photo-1513364776144-60967b0f800f', label: 'Kreativ' },
-      { id: 'photo-1517604931442-7e0c8ed2963c', label: 'Elegant' },
-      { id: 'photo-1441974231531-c6227db76b6e', label: 'Natur' },
-      { id: 'photo-1519389950473-47ba0277781c', label: 'Startup' },
-      { id: 'photo-1455390582262-044cdead277a', label: 'Buch' },
-      { id: 'photo-1489599849927-2ee91cede3ba', label: 'Cinema' },
-      { id: 'photo-1503023345310-bd7c1de61c7d', label: 'Fun' }
+      { id: 'photo-1448375240586-882707db888b', label: 'Wald' } { id: 'photo-1497366216548-37526070297c', label: 'Office' } { id: 'photo-1506905925346-21bda4d32df4', label: 'Berge' } { id: 'photo-1518770660439-4636190af475', label: 'Tech' } { id: 'photo-1536440136628-849c177e76a1', label: 'Kino' } { id: 'photo-1513364776144-60967b0f800f', label: 'Kreativ' } { id: 'photo-1517604931442-7e0c8ed2963c', label: 'Elegant' } { id: 'photo-1441974231531-c6227db76b6e', label: 'Natur' } { id: 'photo-1519389950473-47ba0277781c', label: 'Startup' } { id: 'photo-1455390582262-044cdead277a', label: 'Buch' } { id: 'photo-1489599849927-2ee91cede3ba', label: 'Cinema' } { id: 'photo-1503023345310-bd7c1de61c7d', label: 'Fun' }
     ];
 
     window.syncWallpaperPicker = function syncWallpaperPicker(imageId) {

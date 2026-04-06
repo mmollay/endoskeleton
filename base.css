@@ -135,66 +135,13 @@
   --shadow:     rgba(100, 80, 160, 0.06);
 }
 
-/* ─── EARTH THEME ───────────────────────────────────────────────────────── */
 /* Natur, organisch — Sand, Lehm, erdige Toene */
-[data-theme="earth"] {
-  --bg:         #f4f1ec;
-  --bg-alt:     #ece7df;
-  --bg-dark:    #2c2418;
-  --text:       #4a3f30;
-  --text-muted: #7a6e58;
-  --text-light: #6a5e48;
-  --heading:    #332a1e;
-  --border:     rgba(120, 90, 50, 0.15);
-  --card-bg:    #f9f6f1;
-  --shadow:     rgba(60, 40, 15, 0.07);
-}
 
-/* ─── OCEAN THEME ───────────────────────────────────────────────────────── */
 /* Frisch, kuehl — Eisblau, maritime Klarheit */
-[data-theme="ocean"] {
-  --bg:         #f0f7fa;
-  --bg-alt:     #e4f0f6;
-  --bg-dark:    #0d2a3a;
-  --text:       #2a4050;
-  --text-muted: #5a7888;
-  --text-light: #4a6878;
-  --heading:    #1a3040;
-  --border:     rgba(40, 120, 180, 0.12);
-  --card-bg:    #f6fafe;
-  --shadow:     rgba(20, 60, 100, 0.06);
-}
 
-/* ─── SUNSET THEME ──────────────────────────────────────────────────────── */
 /* Warm, lebhaft — Pfirsich-Hauch, goldene Stunde */
-[data-theme="sunset"] {
-  --bg:         #fff8f0;
-  --bg-alt:     #fff0e0;
-  --bg-dark:    #3a2010;
-  --text:       #4a3528;
-  --text-muted: #8a7060;
-  --text-light: #7a6050;
-  --heading:    #3a2518;
-  --border:     rgba(180, 100, 40, 0.14);
-  --card-bg:    #fffaf5;
-  --shadow:     rgba(120, 60, 20, 0.06);
-}
 
-/* ─── MIDNIGHT THEME ────────────────────────────────────────────────────── */
 /* Edel-Dunkel — Tiefblau, silberne Akzente */
-[data-theme="midnight"] {
-  --bg:         #141428;
-  --bg-alt:     #1e1e38;
-  --bg-dark:    #0a0a18;
-  --text:       #c8c8e0;
-  --text-muted: #8888a8;
-  --text-light: #a0a0c0;
-  --heading:    #e8e8f8;
-  --border:     rgba(140, 140, 200, 0.12);
-  --card-bg:    #1e1e38;
-  --shadow:     rgba(0, 0, 20, 0.4);
-  --focus:      #818cf8;
-}
 
 /* ─── FOREST THEME ──────────────────────────────────────────────────────── */
 /* Natur-Dunkel — Tiefgruen, Moos, Waldatmosphaere */
@@ -676,21 +623,8 @@ small {
 /* ─── Nav-Overrides für neue helle Themes ─── */
 [data-theme="pastel"] .site-nav { background: rgba(248, 245, 255, 0.92); }
 [data-theme="pastel"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(248, 245, 255, 0.98); }
-[data-theme="earth"] .site-nav { background: rgba(244, 241, 236, 0.92); border-bottom: 0.0625rem solid var(--border); }
-[data-theme="earth"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(244, 241, 236, 0.98); }
-[data-theme="ocean"] .site-nav { background: rgba(240, 247, 250, 0.92); }
-[data-theme="ocean"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(240, 247, 250, 0.98); }
-[data-theme="sunset"] .site-nav { background: rgba(255, 248, 240, 0.92); border-bottom: 0.0625rem solid var(--border); }
-[data-theme="sunset"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(255, 248, 240, 0.98); }
 
 /* ─── Nav-Overrides für neue dunkle Themes ─── */
-[data-theme="midnight"] .site-nav { background: rgba(20, 20, 40, 0.92); border-bottom: 0.0625rem solid var(--border); }
-[data-theme="midnight"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(20, 20, 40, 0.98); }
-[data-theme="midnight"] .site-nav .nav-logo { color: #e8e8f8; }
-[data-theme="midnight"] .site-nav .nav-links a {
-  font-family: var(--font-body); color: #a0a0c0; }
-[data-theme="midnight"] .site-nav .nav-links a:hover { color: #e8e8f8; }
-[data-theme="midnight"] .site-nav .nav-hamburger span { background: #e8e8f8; }
 
 [data-theme="forest"] .site-nav { background: rgba(13, 26, 13, 0.92); border-bottom: 0.0625rem solid var(--border); }
 [data-theme="forest"] .site-nav.scrolled:not(.nav-transparent) { background: rgba(13, 26, 13, 0.98); }
@@ -794,7 +728,6 @@ small {
   box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
 }
 
-
 /* ─── Nav Case (uppercase option) ─────────────────────────────────────── */
 .site-nav.nav-upper .nav-links a {
   text-transform: uppercase !important;
@@ -851,8 +784,6 @@ small {
   outline-offset: -2px;
 }
 /* Mobile: verkleinere den Switch, verstecke ihn NICHT — Sichtbarkeit ist kritisch */
-
-
 
 @media (max-width: 48rem) {
   .nav-lang {
@@ -1264,23 +1195,19 @@ section.section-dark {
   color: #ffffff;
 }
 
-
 /* ─── Dark Theme Button Fixes ─────────────────────────────────────────── */
 [data-theme=dark] .btn-secondary,
 [data-theme=tech] .btn-secondary,
-[data-theme=midnight] .btn-secondary {
   border-color: rgba(255, 255, 255, 0.25);
   color: rgba(255, 255, 255, 0.85);
 }
 [data-theme=dark] .btn-secondary:hover,
 [data-theme=tech] .btn-secondary:hover,
-[data-theme=midnight] .btn-secondary:hover {
   border-color: var(--primary);
   color: var(--primary);
 }
 [data-theme=dark] .btn-ghost,
 [data-theme=tech] .btn-ghost,
-[data-theme=midnight] .btn-ghost {
   color: rgba(255, 255, 255, 0.8);
   border-color: rgba(255, 255, 255, 0.3);
 }
@@ -2693,20 +2620,17 @@ body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
 
 /* ─── HARMONIE-RESET: Dunkle Themes brauchen helle Textfarben ─── */
 /* Die body[data-color] Regeln oben setzen dunkle, farbgetönte Textwerte
-   für helle Themes. Bei dunklen Themes (dark/tech/midnight/forest)
+   für helle Themes. Bei dunklen Themes (dark/tech/forest)
    entsteht dadurch dark-on-dark (WCAG FAIL 1.0-1.7:1). Diese Regeln
    stellen für dunkle Themes wieder helle Textwerte her, passend zum
    jeweiligen Theme-BG. Specificity 0,2,1 schlägt body[data-color] (0,1,1). */
 [data-theme="dark"] body[data-color]     { --text: #e0e0e0; --text-muted: #a0a0a0; --text-light: #b0b0b0; --heading: #f0f0f0; }
 [data-theme="tech"] body[data-color]     { --text: #e8e8f0; --text-muted: #9090a8; --text-light: #b0b0c8; --heading: #f0f0f8; }
-[data-theme="midnight"] body[data-color] { --text: #c8c8e0; --text-muted: #8888a8; --text-light: #a0a0c0; --heading: #e8e8f8; }
 [data-theme="forest"] body[data-color]   { --text: #d0e0d0; --text-muted: #8ca88c; --text-light: #a8c0a8; --heading: #e8f0e8; }
-
 
 /* ─── KONTRAST-SCHUTZ: Section-Tag Sichtbarkeit auf dunklen Themes ─── */
 [data-theme="dark"] .section-tag,
 [data-theme="tech"] .section-tag,
-[data-theme="midnight"] .section-tag,
 [data-theme="forest"] .section-tag {
   color: var(--primary-light, color-mix(in srgb, var(--primary) 60%, white));
   filter: brightness(1.4) saturate(1.1);
@@ -2715,11 +2639,9 @@ body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
 /* Card headings auf dunklen Themes - sicherstellen dass sie sichtbar sind */
 [data-theme="dark"] .card h3,
 [data-theme="tech"] .card h3,
-[data-theme="midnight"] .card h3,
 [data-theme="forest"] .card h3,
 [data-theme="dark"] .service-card h3,
 [data-theme="tech"] .service-card h3,
-[data-theme="midnight"] .service-card h3,
 [data-theme="forest"] .service-card h3 {
   color: var(--heading);
 }
