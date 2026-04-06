@@ -927,6 +927,61 @@ small {
   color: #ffffff;
 }
 
+
+/* ─── Dark Theme Pricing Cards ────────────────────────────────────────── */
+[data-theme="dark"] .pricing-card,
+[data-theme="tech"] .pricing-card,
+[data-theme="midnight"] .pricing-card {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .pricing-card:hover,
+[data-theme="tech"] .pricing-card:hover,
+[data-theme="midnight"] .pricing-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .pricing-card.pricing-featured,
+[data-theme="tech"] .pricing-card.pricing-featured,
+[data-theme="midnight"] .pricing-card.pricing-featured {
+  border: 2px solid var(--primary-light, var(--primary));
+  box-shadow: 0 0 1.5rem rgba(var(--primary-rgb), 0.2);
+}
+
+/* Dark theme: ALL pricing buttons white + visible */
+[data-theme="dark"] .pricing-card .btn,
+[data-theme="tech"] .pricing-card .btn,
+[data-theme="midnight"] .pricing-card .btn {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .pricing-card .btn-primary,
+[data-theme="tech"] .pricing-card .btn-primary,
+[data-theme="midnight"] .pricing-card .btn-primary {
+  color: var(--primary-light, #ffffff) !important;
+}
+
+[data-theme="dark"] .pricing-card .btn:hover,
+[data-theme="tech"] .pricing-card .btn:hover,
+[data-theme="midnight"] .pricing-card .btn:hover {
+  color: var(--primary-light, var(--primary)) !important;
+}
+
+/* Dark theme kantig: brighter card borders */
+[data-theme="dark"] .card,
+[data-theme="tech"] .card,
+[data-theme="midnight"] .card {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .card:hover,
+[data-theme="tech"] .card:hover,
+[data-theme="midnight"] .card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 @media (max-width: 48rem) {
   .nav-lang {
   font-family: var(--font-nav); margin: 0 0.35rem; }
