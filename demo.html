@@ -12,7 +12,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      var v = '5.0.8-1775476153';
+      var v = '5.0.9-1775477985';
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
@@ -651,7 +651,7 @@
       onclick="var w=document.getElementById('demo-sidebar-wrapper');w.classList.toggle('collapsed');document.body.classList.toggle('sidebar-collapsed');"
       title="Demo-Einstellungen ein-/ausblenden"><span class="tab-arrow">›</span></button>
     <div class="demo-sidebar-panel">
-      <div class="demo-title">SSI Endoskeleton <span>v5.0.8</span></div>
+      <div class="demo-title">SSI Endoskeleton <span>v5.0.9</span></div>
       <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
 
 
@@ -817,6 +817,15 @@
               <button class="button-preview-card" data-buttons="chip"><span class="btn-mini" style="background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:4px;font-size:0.55rem;padding:0.15rem 0.45rem">Btn</span><span class="btn-label">Chip</span></button>
               <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;font-size:0.55rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
               <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Button</span><span class="btn-label">Minimal Link</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-section">
+          <div class="demo-group">
+            <label>Hintergrundbild</label>
+            <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+              <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
             </div>
           </div>
         </div>
@@ -1326,7 +1335,7 @@
       modules: []
     };
   </script>
-  <script src="shared.js?v=5.0.8"></script>
+  <script src="shared.js?v=5.0.9"></script>
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1564,7 +1573,10 @@
       outdoor:   ['photo-1506905925346-21bda4d32df4','photo-1441974231531-c6227db76b6e','photo-1464822759023-fed622ff2c3b','photo-1501554728187-ce583db33af7','photo-1426604966848-d7adac402bff'],
       playful:   ['photo-1503023345310-bd7c1de61c7d','photo-1513151233558-d860c5398176','photo-1491438590914-bc09fcaaf77a','photo-1472162072942-cd5147eb3902','photo-1530103862676-de8c9debad1d'],
       elegant:   ['photo-1517604931442-7e0c8ed2963c','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1'],
-      survival:  ["photo-1448375240586-882707db888b","photo-1473773508845-188df298d2d1","photo-1473448912268-2022ce9509d8","photo-1542601906990-b4d3fb778b09","photo-1441974231531-c6227db76b6e"]
+      survival:  ["photo-1448375240586-882707db888b","photo-1473773508845-188df298d2d1","photo-1473448912268-2022ce9509d8","photo-1542601906990-b4d3fb778b09","photo-1441974231531-c6227db76b6e"],
+      cinematic: ["photo-1536440136628-849c177e76a1","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
+      softcraft: ["photo-1507003211169-0a1dd7228f2d","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
+      startup:   ["photo-1519389950473-47ba0277781c","photo-1553877522-43269d4ea984","photo-1460925895917-afdab827c52f"]
     };
 
     function getRandomPresetImage(presetKey) {
@@ -1574,16 +1586,73 @@
       return pool[0];
     }
 
+    var currentHeroImageId = null;
+
     function applyHeroImage(imageId, heroType) {
-      if (!imageId || !heroType) return;
-      if (heroType === "playful" || heroType === "minimal") return;
+      if (!imageId) return;
+      currentHeroImageId = imageId;
       var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
-      var section = document.getElementById('hero-' + heroType);
-      if (!section) return;
-      var bg = section.querySelector('.hero-bg');
-      if (bg) bg.style.backgroundImage = 'url(' + url + ')';
-      /* Signal that this hero now renders over an image — CSS uses .hero--image to flip text/buttons to white */
-      section.classList.add('hero--image');
+      /* Apply to ALL hero types that have a hero-bg (shared image across hero types) */
+      ['fullscreen','banner','veil'].forEach(function(h) {
+        var section = document.getElementById('hero-' + h);
+        if (!section) return;
+        var bg = section.querySelector('.hero-bg');
+        if (bg) bg.style.backgroundImage = 'url(' + url + ')';
+        section.classList.add('hero--image');
+      });
+    }
+
+    /* --- Wallpaper Picker --- */
+    var WALLPAPER_POOL = [
+      { id: 'photo-1448375240586-882707db888b', label: 'Wald' },
+      { id: 'photo-1497366216548-37526070297c', label: 'Office' },
+      { id: 'photo-1506905925346-21bda4d32df4', label: 'Berge' },
+      { id: 'photo-1518770660439-4636190af475', label: 'Tech' },
+      { id: 'photo-1536440136628-849c177e76a1', label: 'Kino' },
+      { id: 'photo-1513364776144-60967b0f800f', label: 'Kreativ' },
+      { id: 'photo-1517604931442-7e0c8ed2963c', label: 'Elegant' },
+      { id: 'photo-1441974231531-c6227db76b6e', label: 'Natur' },
+      { id: 'photo-1519389950473-47ba0277781c', label: 'Startup' },
+      { id: 'photo-1455390582262-044cdead277a', label: 'Buch' },
+      { id: 'photo-1489599849927-2ee91cede3ba', label: 'Cinema' },
+      { id: 'photo-1503023345310-bd7c1de61c7d', label: 'Fun' }
+    ];
+
+    function renderWallpaperGrid() {
+      var grid = document.getElementById('wallpaper-grid');
+      if (!grid) return;
+      WALLPAPER_POOL.forEach(function(wp) {
+        var btn = document.createElement('button');
+        btn.className = 'wallpaper-thumb';
+        btn.dataset.wallpaper = wp.id;
+        btn.title = wp.label;
+        btn.onclick = function() { setWallpaper(this); };
+        btn.style.cssText = 'width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #e2e8f0;cursor:pointer;background-size:cover;background-position:center;background-image:url(https://images.unsplash.com/' + wp.id + '?w=120&q=40);transition:border-color 0.2s;';
+        grid.appendChild(btn);
+      });
+    }
+
+    function setWallpaper(btn) {
+      document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
+        b.classList.remove('active');
+        b.style.borderColor = '#e2e8f0';
+      });
+      btn.classList.add('active');
+      btn.style.borderColor = '#3b82f6';
+      var wpId = btn.dataset.wallpaper;
+      if (wpId === 'none') {
+        currentHeroImageId = null;
+        ['fullscreen','banner','veil'].forEach(function(h) {
+          var section = document.getElementById('hero-' + h);
+          if (!section) return;
+          var bg = section.querySelector('.hero-bg');
+          if (bg) bg.style.backgroundImage = '';
+          section.classList.remove('hero--image');
+        });
+      } else {
+        applyHeroImage(wpId);
+      }
+      updateUrlState();
     }
 
     function renderBuiltinPresets() {
@@ -1730,6 +1799,14 @@
       document.querySelectorAll('.preset-card').forEach(function(c) {
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
+      /* Mark matching wallpaper as active */
+      if (currentHeroImageId) {
+        document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
+          var isMatch = b.dataset.wallpaper === currentHeroImageId;
+          b.classList.toggle('active', isMatch);
+          b.style.borderColor = isMatch ? '#3b82f6' : '#e2e8f0';
+        });
+      }
     }
 
     /* ─── Layout Switcher ─────────────────────── */
@@ -1766,11 +1843,7 @@
         var el = document.getElementById('hero-' + h);
         if (el) {
           el.style.display = (h === hero) ? '' : 'none';
-          /* Reset hero-bg Inline-Styles um Sticky-State-Bugs zu verhindern */
-          if (h !== hero) {
-            var bg = el.querySelector('.hero-bg');
-            if (bg) bg.style.backgroundImage = '';
-          }
+          /* Hero-bg bleibt bestehen — Bilder werden über alle Hero-Typen geteilt */
         }
       });
       /* Re-apply language to new hero elements */
@@ -2116,6 +2189,7 @@
     });
 
     renderBuiltinPresets();
+      renderWallpaperGrid();
     renderCustomPresets();
     restoreUrlState();
 
