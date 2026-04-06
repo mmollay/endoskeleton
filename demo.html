@@ -790,7 +790,7 @@
           </div>
         </div>
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
-          <div class="demo-group">
+          <div class="demo-group" id="deco-section">
             <label>Hero-Dekoration</label>
             <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;">
               <button class="demo-btn active" data-deco="off" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Aus</button>
@@ -1436,8 +1436,8 @@
       modules: []
     };
   </script>
-  <script src="svg-generator.js?v=5.3.0"></script> <!-- bump with ENDO_VERSION -->
-  <script src="shared.js?v=5.3.0"></script> <!-- bump with ENDO_VERSION -->
+  <script src="svg-generator.js?v=5.3.1"></script> <!-- bump with ENDO_VERSION -->
+  <script src="shared.js?v=5.3.1"></script> <!-- bump with ENDO_VERSION -->
 
   <!-- ═══ Demo Controller ═══ -->
   <script>
@@ -1747,6 +1747,7 @@
     window.setDecoration = function setDecoration(btn) {
       var style = btn.dataset.deco;
       window.currentDecoStyle = style;
+      console.log("[Endo] setDecoration:", style);
       // Update active button
       btn.closest('.demo-btn-row').querySelectorAll('.demo-btn').forEach(function(b) {
         b.classList.remove('active');
@@ -2452,6 +2453,12 @@
 
     renderBuiltinPresets();
       renderWallpaperGrid();
+      /* Hide deco section if hero is not playful/minimal */
+      (function() {
+        var hero = getActiveData("[data-hero]", "hero") || "fullscreen";
+        var ds = document.getElementById("deco-section");
+        if (ds) ds.style.display = (hero === "playful" || hero === "minimal") ? "" : "none";
+      })();
       /* Restore last active sidebar tab */
       var savedTab = localStorage.getItem('endo-sidebar-tab');
       if (savedTab) switchSidebarTab(savedTab);
