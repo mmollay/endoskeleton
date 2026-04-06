@@ -13,7 +13,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.1.2'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.2.0'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -736,6 +736,19 @@
         </div>
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
+            <label>Hero-Dekoration</label>
+            <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;">
+              <button class="demo-btn active" data-deco="off" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Aus</button>
+              <button class="demo-btn" data-deco="waves" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wellen</button>
+              <button class="demo-btn" data-deco="mountains" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Berge</button>
+              <button class="demo-btn" data-deco="blobs" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Blobs</button>
+              <button class="demo-btn" data-deco="geometric" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Geo</button>
+              <button class="demo-btn" data-deco="clouds" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wolken</button>
+              <button class="demo-btn" data-deco="minimal" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Minimal</button>
+            </div>
+            <button onclick="regenerateDecoration()" style="width:100%;margin-top:6px;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.7rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Neue Variation</button>
+          </div>
+          <div class="demo-group">
             <label>Hintergrundbild</label>
             <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
               <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
@@ -1354,6 +1367,7 @@
       modules: []
     };
   </script>
+  <script src="svg-generator.js"></script>
   <script>
     (function() {
       var s = document.createElement('script');
@@ -1660,6 +1674,48 @@
         var noneBtn = document.querySelector('.wallpaper-thumb[data-wallpaper="none"]');
         if (noneBtn) { noneBtn.classList.add('active'); noneBtn.style.borderColor = '#3b82f6'; }
       }
+    }
+
+        /* ─── SVG Decoration Controls ─────────────── */
+    window.currentDecoSeed = Math.floor(Math.random() * 99999);
+    window.currentDecoStyle = 'off';
+
+    window.setDecoration = function setDecoration(btn) {
+      var style = btn.dataset.deco;
+      window.currentDecoStyle = style;
+      // Update active button
+      btn.closest('.demo-btn-row').querySelectorAll('.demo-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      // Apply
+      if (style === 'off') {
+        if (window.SVGHeroGenerator) window.SVGHeroGenerator.clear();
+      } else {
+        applyDecoration(style, window.currentDecoSeed);
+      }
+    };
+
+    window.regenerateDecoration = function regenerateDecoration() {
+      if (window.currentDecoStyle === 'off') return;
+      window.currentDecoSeed = Math.floor(Math.random() * 99999);
+      applyDecoration(window.currentDecoStyle, window.currentDecoSeed);
+    };
+
+    function applyDecoration(style, seed) {
+      if (!window.SVGHeroGenerator) return;
+      // Get current primary color from computed style
+      var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2e6b2e';
+      // Ensure it's a hex color
+      if (!primary.startsWith('#')) {
+        var temp = document.createElement('div');
+        temp.style.color = primary;
+        document.body.appendChild(temp);
+        var rgb = getComputedStyle(temp).color.match(/\d+/g);
+        document.body.removeChild(temp);
+        if (rgb) primary = '#' + rgb.slice(0,3).map(function(x){return parseInt(x).toString(16).padStart(2,'0')}).join('');
+      }
+      window.SVGHeroGenerator.apply(style, seed, primary);
     }
 
         window.renderWallpaperGrid = function renderWallpaperGrid() {
