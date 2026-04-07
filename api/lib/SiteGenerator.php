@@ -276,11 +276,11 @@ SCRIPT;
         $html = preg_replace("/\\{\\{[A-Z_]+\\}\\}/", "", $html);
         $html = preg_replace("/\\{\\{#\\w+\\}\\}.*?\\{\\{\\/\\w+\\}\\}/s", "", $html);
 
-        // Inject SITE_CONFIG before shared.js
+        // Replace template SITE_CONFIG block with generated one
         $configScript = $this->buildSiteConfigScript($preset, $content);
-        $html = str_replace(
-            '<script src="shared.js"></script>',
-            $configScript . "\n  <script src=\"shared.js\"></script>",
+        $html = preg_replace(
+            '/  <script>\s*window\.SITE_CONFIG\s*=\s*\{.*?\};\s*<\/script>/s',
+            $configScript,
             $html
         );
 
