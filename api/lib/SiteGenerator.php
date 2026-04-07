@@ -83,13 +83,126 @@ final class SiteGenerator
         }
     }
 
+    private function adjustBrightness(string $hex, int $amount): string
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+        $r = max(0, min(255, hexdec(substr($hex, 0, 2)) + $amount));
+        $g = max(0, min(255, hexdec(substr($hex, 2, 2)) + $amount));
+        $b = max(0, min(255, hexdec(substr($hex, 4, 2)) + $amount));
+        return sprintf('#%02x%02x%02x', (int)$r, (int)$g, (int)$b);
+    }
+
     private function generateThemeCss(array $preset, array $content, string $dir): void
     {
         $theme = $preset["theme"] ?? "light";
-        $css = "/* Endoskeleton Generated Theme */\n:root {\n";
-        $css .= "  --theme: $theme;\n";
-        $css .= "}\n";
+        $colors = $content["colors"] ?? [];
+        $primary = $colors["primary"] ?? "#3b82f6";
+        $accent = $colors["accent"] ?? $primary;
+        $bg = $colors["bg"] ?? ($theme === "dark" ? "#0f172a" : "#ffffff");
+
+        $primaryLight = $this->adjustBrightness($primary, 30);
+        $primaryDark = $this->adjustBrightness($primary, -30);
+
+        $css = "/* Endoskeleton Generated Theme — from Scanner data */\n";
+        $css .= ":root {\n";
+        $css .= "  --theme: {$theme};\n";
+        $css .= "  --color-primary: {$primary};\n";
+        $css .= "  --color-primary-light: {$primaryLight};\n";
+        $css .= "  --color-primary-dark: {$primaryDark};\n";
+        $css .= "  --color-accent: {$accent};\n";
+
+        if (in_array($theme, ["light", "warm", "pastel"], true)) {
+            $css .= "  --color-bg: {$bg};\n";
+            $css .= "  --color-text: #1e293b;\n";
+            $css .= "  --color-text-muted: #64748b;\n";
+            $css .= "  --color-surface: #f8fafc;\n";
+            $css .= "  --color-border: #e2e8f0;\n";
+        } else {
+            $css .= "  --color-bg: {$bg};\n";
+            $css .= "  --color-text: #e2e8f0;\n";
+            $css .= "  --color-text-muted: #94a3b8;\n";
+            $css .= "  --color-surface: #1e293b;\n";
+            $css .= "  --color-border: #334155;\n";
+        }
+        $css .= "}\n\n";
+
+        if (in_array($theme, ["light", "warm", "pastel"], true)) {
+            $css .= "[data-theme=\"dark\"] {\n";
+            $css .= "  --color-bg: #0f172a;\n";
+            $css .= "  --color-text: #e2e8f0;\n";
+            $css .= "  --color-text-muted: #94a3b8;\n";
+            $css .= "  --color-surface: #1e293b;\n";
+            $css .= "  --color-border: #334155;\n";
+            $css .= "}\n";
+        } else {
+            $css .= "[data-theme=\"light\"] {\n";
+            $css .= "  --color-bg: #ffffff;\n";
+            $css .= "  --color-text: #1e293b;\n";
+            $css .= "  --color-text-muted: #64748b;\n";
+            $css .= "  --color-surface: #f8fafc;\n";
+            $css .= "  --color-border: #e2e8f0;\n";
+            $css .= "}\n";
+        }
+
         file_put_contents($dir . "/theme.css", $css);
+    }
+
+    private function buildSiteConfigScript(array $preset, array $content): string
+    {
+        $company = addslashes($content["company"] ?? "Website");
+        $logo = addslashes($content["logo_url"] ?? "img/logo.png");
+
+        $navItems = [];
+        foreach ($content["pages"] ?? [] as $p) {
+            $slug = addslashes($p["slug"] ?? "index");
+            $title = addslashes($p["title"] ?? "Seite");
+            $navItems[] = "      {label: \"{$title}\", href: \"{$slug}.html\"}";
+        }
+        $navJs = implode(",\n", $navItems);
+
+        $contact = $content["contact"] ?? [];
+        $email = addslashes($contact["email"] ?? "");
+        $phone = addslashes($contact["phone"] ?? "");
+        $address = addslashes($contact["address"] ?? "");
+        $contactName = addslashes($contact["name"] ?? $content["company"] ?? "");
+
+        $social = $content["social_media"] ?? [];
+        $socialItems = [];
+        foreach ($social as $name => $url) {
+            $n = addslashes($name);
+            $u = addslashes($url);
+            $socialItems[] = "{$n}: \"{$u}\"";
+        }
+        $socialJs = implode(", ", $socialItems);
+
+        $footer = $content["footer"] ?? [];
+        $tagline = addslashes($footer["tagline"] ?? "");
+
+        return <<<SCRIPT
+<script>
+  window.SITE_CONFIG = {
+    name: "{$company}",
+    logo: "{$logo}",
+    nav: [
+{$navJs}
+    ],
+    contact: {
+      name: "{$contactName}",
+      email: "{$email}",
+      phone: "{$phone}",
+      address: "{$address}"
+    },
+    social: {{$socialJs}},
+    footer: {
+      tagline: "{$tagline}",
+      credit: true
+    }
+  };
+</script>
+SCRIPT;
     }
 
     private function buildPage(array $preset, array $content, array $page): string
@@ -146,9 +259,30 @@ final class SiteGenerator
         }
         $replacements["{{NAV_ITEMS}}"] = implode(",\n        ", $navItems);
 
+        // Scanner images
+        $images = $content["images"] ?? [];
+        if (!empty($images) && empty($replacements["{{HERO_IMAGE}}"])) {
+            $replacements["{{HERO_IMAGE}}"] = $images[0]["url"] ?? "";
+        }
+        if (isset($images[1]) && empty($replacements["{{ABOUT_IMAGE}}"])) {
+            $replacements["{{ABOUT_IMAGE}}"] = $images[1]["url"] ?? "";
+            $replacements["{{ABOUT_IMAGE_ALT}}"] = $images[1]["alt"] ?? "";
+        }
+        if (!empty($content["logo_url"])) {
+            $replacements["{{LOGO_URL}}"] = $content["logo_url"];
+        }
+
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
         $html = preg_replace("/\\{\\{[A-Z_]+\\}\\}/", "", $html);
         $html = preg_replace("/\\{\\{#\\w+\\}\\}.*?\\{\\{\\/\\w+\\}\\}/s", "", $html);
+
+        // Inject SITE_CONFIG before shared.js
+        $configScript = $this->buildSiteConfigScript($preset, $content);
+        $html = str_replace(
+            '<script src="shared.js"></script>',
+            $configScript . "\n  <script src=\"shared.js\"></script>",
+            $html
+        );
 
         return $html;
     }
