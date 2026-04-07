@@ -1035,6 +1035,7 @@
         </div>
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <button class="demo-btn" id="export-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#3b82f6;color:#fff;border-color:#3b82f6;font-weight:500;" onclick="exportConfig()">Config exportieren</button>
+          <button class="demo-btn" id="endo-cmd-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#22c55e;color:#fff;border-color:#22c55e;font-weight:500;margin-top:0.375rem;" onclick="copyEndoCommand()">🤖 /endo Befehl kopieren</button>
           <div id="export-toast">✓ In Zwischenablage kopiert</div>
           <pre id="config-export" style="display:none;margin-top:0.5rem;padding:0.5rem;background:#1e293b;border-radius:4px;font-size:0.6rem;color:#94a3b8;max-height:12rem;overflow:auto;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent)" title="Klick zum Kopieren"></pre>
         </div>
@@ -2254,6 +2255,30 @@
         toast.style.display = 'block';
         setTimeout(function() { toast.style.display = 'none'; }, 2500);
       }).catch(function() { /* clipboard not available, pre still shows */ });
+    }
+
+    window.copyEndoCommand = function copyEndoCommand() {
+      var s = getState();
+      var parts = [];
+      var params = ['layout','hero','color','charakter','spacing','animation','font','buttons','width'];
+      var preset = s.preset || '';
+      if (preset) parts.push('preset=' + preset);
+      params.forEach(function(p) {
+        if (s[p]) parts.push(p + '=' + s[p]);
+      });
+      if (s.nav) parts.push('navBehavior=' + s.nav);
+      if (s.navLayout) parts.push('navLayout=' + s.navLayout);
+      if (s.navStyle) parts.push('navStyle=' + s.navStyle);
+      if (s.footer) parts.push('footerStyle=' + s.footer);
+      if (s.theme) parts.push('theme=' + s.theme);
+      var hash = '#' + parts.join('&');
+      var cmd = '/endo DOMAIN.at de,en ' + hash;
+      var toast = document.getElementById('export-toast');
+      navigator.clipboard.writeText(cmd).then(function() {
+        toast.textContent = '✓ /endo Befehl kopiert! Ersetze DOMAIN.at';
+        toast.style.display = 'block';
+        setTimeout(function() { toast.style.display = 'none'; toast.textContent = '✓ In Zwischenablage kopiert'; }, 4000);
+      });
     }
 
     /* ─── Theme Switcher ──────────────────────── */
