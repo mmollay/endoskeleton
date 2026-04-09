@@ -155,7 +155,8 @@
 }
 
 /* ── Mobile: stack vertically ── */
-@media (max-width: 48rem) {
+/* Mobile: stack vertically */
+@media (max-width: 64rem) {
   .hero--split {
     grid-template-columns: 1fr;
     min-height: auto;
