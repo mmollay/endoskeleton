@@ -198,7 +198,7 @@
     /* Mobile links */
     var mobileHtml = "";
     CONFIG.nav.forEach(function (item) {
-      mobileHtml +=
+      mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +=
         '<a href="' +
         escapeHtml(item.href) +
         '"' +
@@ -211,7 +211,7 @@
         "</a>";
       if (item.children) {
         item.children.forEach(function (child) {
-          mobileHtml +=
+          mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +=
             '<a href="' +
             escapeHtml(child.href) +
             '" style="padding-left:1.5rem;font-size:1.1rem;"' +
@@ -248,7 +248,7 @@
       "<span></span><span></span><span></span></button>" +
       "</div></nav>" +
       '<div class="nav-mobile" role="navigation" aria-label="Mobile Navigation">' +
-      mobileHtml +
+      mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +
       "</div>";
 
     /* Language switch handlers */
