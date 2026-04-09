@@ -198,7 +198,7 @@
     /* Mobile links */
     var mobileHtml = "";
     CONFIG.nav.forEach(function (item) {
-      mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +=
+      mobileHtml +=
         '<a href="' +
         escapeHtml(item.href) +
         '"' +
@@ -211,7 +211,7 @@
         "</a>";
       if (item.children) {
         item.children.forEach(function (child) {
-          mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +=
+          mobileHtml +=
             '<a href="' +
             escapeHtml(child.href) +
             '" style="padding-left:1.5rem;font-size:1.1rem;"' +
