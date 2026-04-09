@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 final class RecommendEngine
 {
+    /* ── Branche → Preset-Scores ──────────────────────────────────────────
+       Jede Branche mappt auf Presets mit Gewichten (0.0-1.0).
+       Zusaetzlich: empfohlene Detail-Overrides pro Branche. */
     private const BRANCH_MAP = [
+        // Originale
         "gastronomie" => ["outdoor" => 0.8, "elegant" => 0.7, "softcraft" => 0.6, "corporate" => 0.4],
         "tourismus"   => ["outdoor" => 0.8, "cinematic" => 0.75, "elegant" => 0.7, "softcraft" => 0.5],
         "natur"       => ["softcraft" => 0.8, "outdoor" => 0.75, "playful" => 0.6, "elegant" => 0.5],
@@ -17,6 +21,61 @@ final class RecommendEngine
         "mode"        => ["elegant" => 0.9, "minimal" => 0.75, "creative" => 0.6, "editorial" => 0.5],
         "recht"       => ["corporate" => 0.9, "minimal" => 0.75, "elegant" => 0.6],
         "immobilien"  => ["corporate" => 0.8, "elegant" => 0.75, "minimal" => 0.65, "cinematic" => 0.5],
+        // Neu hinzugefuegt
+        "tierdienstleistung" => ["softcraft" => 0.85, "playful" => 0.7, "outdoor" => 0.65, "elegant" => 0.4],
+        "tier"        => ["softcraft" => 0.85, "playful" => 0.7, "outdoor" => 0.65, "elegant" => 0.4],
+        "veterinär"   => ["softcraft" => 0.8, "minimal" => 0.7, "corporate" => 0.6],
+        "soziales"    => ["softcraft" => 0.85, "playful" => 0.7, "elegant" => 0.5, "corporate" => 0.4],
+        "verein"      => ["softcraft" => 0.8, "playful" => 0.75, "outdoor" => 0.5, "corporate" => 0.4],
+        "fotografie"  => ["cinematic" => 0.9, "elegant" => 0.8, "minimal" => 0.7, "creative" => 0.5],
+        "medien"      => ["editorial" => 0.9, "creative" => 0.75, "tech" => 0.6, "startup" => 0.5],
+        "beratung"    => ["corporate" => 0.85, "minimal" => 0.7, "elegant" => 0.65, "softcraft" => 0.4],
+        "finanzen"    => ["corporate" => 0.9, "minimal" => 0.75, "elegant" => 0.6],
+        "versicherung"=> ["corporate" => 0.85, "minimal" => 0.7, "tech" => 0.5],
+        "agentur"     => ["creative" => 0.85, "startup" => 0.8, "tech" => 0.6, "minimal" => 0.5],
+        "events"      => ["cinematic" => 0.85, "creative" => 0.75, "elegant" => 0.7, "playful" => 0.5],
+        "hochzeit"    => ["elegant" => 0.95, "softcraft" => 0.7, "cinematic" => 0.65],
+        "beauty"      => ["elegant" => 0.9, "minimal" => 0.75, "softcraft" => 0.6],
+        "wellness"    => ["softcraft" => 0.9, "elegant" => 0.8, "minimal" => 0.5],
+        "restaurant"  => ["outdoor" => 0.8, "elegant" => 0.75, "softcraft" => 0.6, "cinematic" => 0.4],
+        "hotel"       => ["elegant" => 0.85, "cinematic" => 0.8, "outdoor" => 0.6, "softcraft" => 0.5],
+        "arzt"        => ["minimal" => 0.85, "softcraft" => 0.75, "corporate" => 0.6],
+        "therapie"    => ["softcraft" => 0.9, "playful" => 0.65, "minimal" => 0.6],
+        "yoga"        => ["softcraft" => 0.9, "elegant" => 0.7, "minimal" => 0.6],
+        "musik"       => ["creative" => 0.85, "cinematic" => 0.8, "editorial" => 0.6],
+        "kunst"       => ["creative" => 0.9, "editorial" => 0.75, "minimal" => 0.7, "cinematic" => 0.5],
+        "bau"         => ["survival" => 0.8, "outdoor" => 0.75, "corporate" => 0.6],
+        "landwirtschaft" => ["outdoor" => 0.85, "softcraft" => 0.75, "survival" => 0.6],
+        "energie"     => ["tech" => 0.85, "corporate" => 0.7, "startup" => 0.6, "minimal" => 0.5],
+        "logistik"    => ["corporate" => 0.8, "tech" => 0.7, "minimal" => 0.6],
+        "automotive"  => ["tech" => 0.85, "cinematic" => 0.75, "corporate" => 0.6, "survival" => 0.5],
+        "lebensmittel"=> ["softcraft" => 0.8, "outdoor" => 0.7, "playful" => 0.6, "elegant" => 0.5],
+        "wein"        => ["elegant" => 0.9, "editorial" => 0.7, "softcraft" => 0.6, "cinematic" => 0.5],
+        "dienstleistung" => ["corporate" => 0.75, "softcraft" => 0.7, "minimal" => 0.65],
+    ];
+
+    /* ── Detail-Overrides pro Branche ─────────────────────────────────── */
+    private const BRANCH_OVERRIDES = [
+        "tierdienstleistung" => ["buttons" => "soft-round",  "font" => "rounded-friendly", "charakter" => "sanft",  "hero" => "split",  "spacing" => "spacious"],
+        "tier"        => ["buttons" => "soft-round",  "font" => "rounded-friendly", "charakter" => "sanft",  "hero" => "split",  "spacing" => "spacious"],
+        "gastronomie" => ["buttons" => "soft",         "font" => "classic-serif",     "charakter" => "neutral", "hero" => "veil",   "spacing" => "spacious"],
+        "hotel"       => ["buttons" => "outline-elegant", "font" => "luxury-thin",    "charakter" => "elegant", "hero" => "fullscreen", "spacing" => "spacious"],
+        "hochzeit"    => ["buttons" => "outline-elegant", "font" => "luxury-thin",    "charakter" => "elegant", "hero" => "fullscreen", "spacing" => "spacious"],
+        "beauty"      => ["buttons" => "pill-thin",    "font" => "elegant",           "charakter" => "elegant", "hero" => "split",  "spacing" => "normal"],
+        "wellness"    => ["buttons" => "soft-round",  "font" => "rounded-friendly",  "charakter" => "sanft",  "hero" => "veil",   "spacing" => "spacious"],
+        "sport"       => ["buttons" => "rect-solid",  "font" => "brand-bold",         "charakter" => "kantig", "hero" => "fullscreen", "spacing" => "compact"],
+        "tech"        => ["buttons" => "tech",         "font" => "mono",               "charakter" => "markant", "hero" => "minimal", "spacing" => "compact"],
+        "kreativ"     => ["buttons" => "gradient-cta", "font" => "playful",           "charakter" => "markant", "hero" => "split",  "spacing" => "normal"],
+        "agentur"     => ["buttons" => "cta-arrow",   "font" => "modern-sans",        "charakter" => "markant", "hero" => "split",  "spacing" => "normal"],
+        "recht"       => ["buttons" => "rect-outline", "font" => "swiss-precision",   "charakter" => "markant", "hero" => "minimal", "spacing" => "normal"],
+        "finanzen"    => ["buttons" => "rect-outline", "font" => "swiss-precision",   "charakter" => "markant", "hero" => "minimal", "spacing" => "normal"],
+        "corporate"   => ["buttons" => "rect-outline", "font" => "swiss-precision",   "charakter" => "neutral", "hero" => "split",  "spacing" => "normal"],
+        "fotografie"  => ["buttons" => "ghost",        "font" => "modern",             "charakter" => "elegant", "hero" => "fullscreen", "spacing" => "spacious"],
+        "musik"       => ["buttons" => "brutalist",    "font" => "display-serif",     "charakter" => "markant", "hero" => "fullscreen", "spacing" => "spacious"],
+        "arzt"        => ["buttons" => "soft",         "font" => "humanist",           "charakter" => "sanft",  "hero" => "split",  "spacing" => "normal"],
+        "therapie"    => ["buttons" => "soft-round",  "font" => "rounded-friendly",  "charakter" => "sanft",  "hero" => "split",  "spacing" => "spacious"],
+        "bildung"     => ["buttons" => "rounded",      "font" => "rounded",            "charakter" => "neutral", "hero" => "banner", "spacing" => "normal"],
+        "medien"      => ["buttons" => "cta-arrow",   "font" => "editorial",          "charakter" => "neutral", "hero" => "banner", "spacing" => "normal"],
     ];
 
     private const MOOD_MAP = [
@@ -29,6 +88,12 @@ final class RecommendEngine
         "serioes"   => ["charakter" => "markant",   "theme" => "light",  "animation" => "none"],
         "natuerlich"=> ["charakter" => "sanft",     "theme" => "warm",   "animation" => "subtle"],
         "minimalistisch" => ["charakter" => "elegant", "theme" => "light", "animation" => "none"],
+        // Neu
+        "freundlich"=> ["charakter" => "sanft",     "theme" => "warm",   "animation" => "subtle"],
+        "professionell" => ["charakter" => "neutral", "theme" => "light", "animation" => "subtle"],
+        "verspielt" => ["charakter" => "sanft",     "theme" => "pastel", "animation" => "dynamic"],
+        "kraftvoll" => ["charakter" => "kantig",    "theme" => "dark",   "animation" => "dynamic"],
+        "ruhig"     => ["charakter" => "sanft",     "theme" => "warm",   "animation" => "none"],
     ];
 
     private const COLOR_HUES = [
@@ -38,6 +103,21 @@ final class RecommendEngine
         "pink" => 330, "electric" => 255, "neon-pink" => 320, "navy" => 225,
         "wine" => 345, "coral" => 16, "olive" => 80, "mint" => 155,
         "slate" => 210, "lavender" => 260, "charcoal" => 0, "survival" => 35,
+    ];
+
+    /* ── Keyword → Charakter-Mapping (erweitert) ───────────────────── */
+    private const KEYWORD_MAP = [
+        "luxus" => "elegant", "spa" => "elegant", "premium" => "elegant", "mode" => "elegant",
+        "exklusiv" => "elegant", "hochwertig" => "elegant", "edel" => "elegant",
+        "natur" => "sanft", "gesundheit" => "sanft", "beratung" => "sanft", "bio" => "sanft",
+        "pflege" => "sanft", "hund" => "sanft", "tier" => "sanft", "kinder" => "sanft",
+        "sozial" => "sanft", "hilfe" => "sanft", "therapie" => "sanft",
+        "outdoor" => "kantig", "sport" => "kantig", "technik" => "kantig", "handwerk" => "kantig",
+        "abenteuer" => "kantig", "kraft" => "kantig", "survival" => "kantig",
+        "industrie" => "markant", "architektur" => "markant", "finanzen" => "markant",
+        "business" => "markant", "startup" => "markant", "innovation" => "markant",
+        "traditionell" => "neutral", "einladend" => "neutral", "gemuetlich" => "neutral",
+        "familiär" => "neutral", "regional" => "neutral", "lokal" => "neutral",
     ];
 
     private array $presets;
@@ -54,16 +134,59 @@ final class RecommendEngine
             $scores[$name] = ["score" => 0.0, "reasons" => [], "overrides" => []];
         }
 
+        // ── 1. Branche (40%) ──────────────────────────────────────────────
         $branch = strtolower($input["branch"] ?? "");
+        $branchMatched = false;
+
+        // Exakter Match
         if ($branch !== "" && isset(self::BRANCH_MAP[$branch])) {
+            $branchMatched = true;
             foreach (self::BRANCH_MAP[$branch] as $preset => $weight) {
                 if (isset($scores[$preset])) {
                     $scores[$preset]["score"] += $weight * 0.4;
-                    $scores[$preset]["reasons"][] = "Branche " . $branch . " passt gut";
+                    $scores[$preset]["reasons"][] = "Branche " . $branch . " passt";
                 }
             }
         }
 
+        // Fuzzy-Match: Branche als Substring in bekannten Branchen suchen
+        if (!$branchMatched && $branch !== "") {
+            foreach (self::BRANCH_MAP as $known => $presetMap) {
+                if (str_contains($branch, $known) || str_contains($known, $branch)) {
+                    $branchMatched = true;
+                    foreach ($presetMap as $preset => $weight) {
+                        if (isset($scores[$preset])) {
+                            $scores[$preset]["score"] += $weight * 0.35;
+                            $scores[$preset]["reasons"][] = "Branche aehnlich zu " . $known;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Detail-Overrides aus Branche anwenden
+        $branchOverrides = [];
+        if ($branch !== "" && isset(self::BRANCH_OVERRIDES[$branch])) {
+            $branchOverrides = self::BRANCH_OVERRIDES[$branch];
+        } elseif ($branchMatched) {
+            // Fuzzy: naechste passende Overrides suchen
+            foreach (self::BRANCH_OVERRIDES as $known => $ov) {
+                if (str_contains($branch, $known) || str_contains($known, $branch)) {
+                    $branchOverrides = $ov;
+                    break;
+                }
+            }
+        }
+
+        if (!empty($branchOverrides)) {
+            foreach ($scores as &$s) {
+                $s["overrides"] = array_merge($s["overrides"], $branchOverrides);
+            }
+            unset($s);
+        }
+
+        // ── 2. Stimmung (25%) ─────────────────────────────────────────────
         $mood = strtolower($input["mood"] ?? "");
         if ($mood !== "" && isset(self::MOOD_MAP[$mood])) {
             $moodParams = self::MOOD_MAP[$mood];
@@ -80,12 +203,17 @@ final class RecommendEngine
                 if ($moodScore > 0.5) {
                     $scores[$name]["reasons"][] = "Stimmung " . $mood . " passt";
                 }
-                foreach ($moodParams as $param => $val) {
-                    $scores[$name]["overrides"][$param] = $val;
+            }
+            // Mood-Overrides nur wenn keine Branche-Overrides vorhanden
+            if (empty($branchOverrides)) {
+                foreach ($scores as &$s) {
+                    $s["overrides"] = array_merge($s["overrides"], $moodParams);
                 }
+                unset($s);
             }
         }
 
+        // ── 3. Farben (20%) ───────────────────────────────────────────────
         $inputColors = $input["colors"] ?? [];
         if (!empty($inputColors)) {
             $bestColor = $this->matchColor($inputColors);
@@ -103,11 +231,22 @@ final class RecommendEngine
             }
         }
 
+        // ── 4. Keywords (15%) ─────────────────────────────────────────────
         $keywords = array_map("strtolower", $input["style_keywords"] ?? []);
         if (!empty($keywords)) {
             $this->matchKeywords($keywords, $scores);
         }
 
+        // ── 5. Zielgruppe als Keywords verwenden ──────────────────────────
+        $audience = strtolower($input["target_audience"] ?? "");
+        if ($audience !== "") {
+            $audienceWords = array_filter(explode(" ", preg_replace("/[^a-zäöüß ]/", "", $audience)));
+            if (!empty($audienceWords)) {
+                $this->matchKeywords($audienceWords, $scores, 0.1);
+            }
+        }
+
+        // ── Sortieren + Top 3 ─────────────────────────────────────────────
         uasort($scores, fn($a, $b) => $b["score"] <=> $a["score"]);
 
         $top = array_slice($scores, 0, 3, true);
@@ -192,23 +331,15 @@ final class RecommendEngine
         return array_sum($hues) / count($hues);
     }
 
-    private function matchKeywords(array $keywords, array &$scores): void
+    private function matchKeywords(array $keywords, array &$scores, float $weight = 0.15): void
     {
-        $charakterKeywords = [
-            "luxus" => "elegant", "spa" => "elegant", "premium" => "elegant", "mode" => "elegant",
-            "natur" => "sanft", "gesundheit" => "sanft", "beratung" => "sanft", "bio" => "sanft",
-            "outdoor" => "kantig", "sport" => "kantig", "technik" => "kantig", "handwerk" => "kantig",
-            "industrie" => "markant", "architektur" => "markant", "finanzen" => "markant",
-            "traditionell" => "neutral", "einladend" => "neutral", "gemuetlich" => "neutral",
-        ];
-
         foreach ($keywords as $kw) {
-            foreach ($charakterKeywords as $match => $charakter) {
+            foreach (self::KEYWORD_MAP as $match => $charakter) {
                 if (str_contains($kw, $match)) {
                     foreach ($this->presets as $name => $config) {
                         if (isset($config["charakter"]) && $config["charakter"] === $charakter) {
-                            $scores[$name]["score"] += 0.15;
-                            $scores[$name]["reasons"][] = "Keyword " . $kw . " matcht";
+                            $scores[$name]["score"] += $weight;
+                            $scores[$name]["reasons"][] = "Keyword " . $kw;
                         }
                     }
                     break;
