@@ -13,7 +13,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.6.3'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.6.4'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -731,6 +731,27 @@
     }
     section.hero.hero--veil-overlay.hero--split .hero-image img {
       filter: saturate(0.6);
+    }
+    /* Mobile: Sidebar als Full-Width Overlay */
+    @media (max-width: 64rem) {
+      .demo-sidebar-wrapper {
+        width: 100vw;
+      }
+      .demo-sidebar-wrapper.collapsed {
+        transform: translateX(calc(100vw - 24px));
+      }
+      .demo-sidebar-panel {
+        width: 100%;
+      }
+      .site-nav {
+        right: 0 !important;
+      }
+      body:not(.sidebar-collapsed) .site-nav {
+        right: 0 !important;
+      }
+      body:not(.sidebar-collapsed) {
+        overflow: hidden;
+      }
     }
   </style>
 </head>
