@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI Endoskeleton — Hero: Split
    50/50 image + text side by side. Bild links, Text rechts.
+   Supports both .hero-image (with <img>) and .hero-bg (background-image).
    Load via: <link rel="stylesheet" href="heroes/split.css">
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -11,9 +12,10 @@
   min-height: 70vh;
   margin-top: calc(var(--nav-height) * -1);
   overflow: hidden;
+  position: relative;
 }
 
-/* ── Bildseite ── */
+/* ── Bildseite (mit <img>) ── */
 .hero--split .hero-image {
   position: relative;
   overflow: hidden;
@@ -26,7 +28,6 @@
   display: block;
 }
 
-/* Gradient-Edge: rechte Seite des Bildes blendet sanft in die Textseite über */
 .hero--split .hero-image::after {
   content: '';
   position: absolute;
@@ -44,7 +45,29 @@
   pointer-events: none;
 }
 
-/* ── Textseite: subtiler Primärfarb-Tint für Charakter ── */
+/* ── Bildseite (mit background-image via .hero-bg) ── */
+.hero--split .hero-bg {
+  position: relative;
+  inset: auto;
+  min-height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero--split .hero-bg::after {
+  background:
+    linear-gradient(90deg,
+      transparent 60%,
+      rgba(var(--bg-rgb, 255, 255, 255), 0.25) 80%,
+      rgba(var(--bg-rgb, 255, 255, 255), 0.55) 100%
+    ),
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0.15) 0%,
+      transparent 30%
+    );
+}
+
+/* ── Textseite ── */
 .hero--split .hero-content {
   display: flex;
   flex-direction: column;
@@ -61,7 +84,6 @@
   position: relative;
 }
 
-/* Dezente vertikale Linie links in der Textseite */
 .hero--split .hero-content::before {
   content: '';
   position: absolute;
@@ -104,7 +126,7 @@
   flex-wrap: wrap;
 }
 
-/* ── Reverse variant: Text links, Bild rechts ── */
+/* ── Reverse variant ── */
 .hero--split-reverse {
   direction: rtl;
 }
@@ -113,8 +135,8 @@
   direction: ltr;
 }
 
-/* Bei reverse: Gradient spiegeln (Bild jetzt rechts, Blend nach links) */
-.hero--split-reverse .hero-image::after {
+.hero--split-reverse .hero-image::after,
+.hero--split-reverse .hero-bg::after {
   background:
     linear-gradient(270deg,
       transparent 60%,
@@ -127,20 +149,20 @@
     );
 }
 
-/* Bei reverse: Linie rechts statt links */
 .hero--split-reverse .hero-content::before {
   left: auto;
   right: 0;
 }
 
-/* ── Responsive ── */
+/* ── Mobile: stack vertically ── */
 @media (max-width: 48rem) {
   .hero--split {
     grid-template-columns: 1fr;
     min-height: auto;
   }
 
-  .hero--split .hero-image {
+  .hero--split .hero-image,
+  .hero--split .hero-bg {
     height: 50vh;
     min-height: 18.75rem;
   }
