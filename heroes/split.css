@@ -156,8 +156,9 @@
 
 /* ── Mobile: stack vertically ── */
 /* Mobile: stack vertically */
+/* Mobile: stack vertically */
 @media (max-width: 64rem) {
-  .hero--split {
+  .hero.hero--split {
     grid-template-columns: 1fr;
     min-height: auto;
   }
