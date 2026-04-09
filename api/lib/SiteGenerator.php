@@ -224,6 +224,8 @@ SCRIPT;
             "{{ANIMATION}}"       => $preset["animation"] ?? "subtle",
             "{{WIDTH}}"           => $preset["width"] ?? "default",
             "{{FONT}}"            => "Inter:wght@300;400;500;600;700",
+            "{{FONT_MODULE}}"     => $preset["font"] ?? "modern",
+            "{{COLOR_MODULE}}"    => $preset["color"] ?? "blue",
             "{{MODULES}}"         => "",
             "{{MODULES_LIST}}"    => "",
         ];
