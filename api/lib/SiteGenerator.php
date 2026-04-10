@@ -158,6 +158,7 @@ final class SiteGenerator
         $navItems = [];
         foreach ($content["pages"] ?? [] as $p) {
             $slug = addslashes($p["slug"] ?? "index");
+            if (in_array($slug, ["impressum", "datenschutz", "disclaimer"], true)) continue;
             $title = addslashes($p["title"] ?? "Seite");
             $navItems[] = "      {label: \"{$title}\", href: \"{$slug}.html\"}";
         }
@@ -363,6 +364,8 @@ SCRIPT;
         $navItems = [];
         foreach ($content["pages"] ?? [] as $p) {
             $s = $p["slug"] ?? "index";
+            $skipNav = ["impressum", "datenschutz", "disclaimer"];
+            if (in_array($s, $skipNav, true)) continue;
             $t = $p["title"] ?? "Seite";
             $navItems[] = "{label: \"" . addslashes($t) . "\", href: \"" . $s . ".html\"}";
         }
