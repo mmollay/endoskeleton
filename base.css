@@ -1230,34 +1230,45 @@ section.section-dark {
   color: var(--primary);
 }
 
-/* Ghost on dark / image backgrounds */
+/* ─── Hero Button Contrast System ────────────────────────────────────── */
+
+/* Ghost on dark / image backgrounds (fullscreen, banner, veil) */
 .hero--image .btn-ghost,
 .section-dark .btn-ghost {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.85);
-  border-width: 0.125rem;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
 }
-
 .hero--image .btn-ghost:hover,
 .section-dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.25);
   border-color: #ffffff;
   color: #ffffff;
 }
 
-/* Split hero: text side has light bg — don't force white */
-.hero--split.hero--image .btn-ghost {
-  color: var(--text);
-  border-color: var(--primary);
-  background: transparent;
+/* Accent text on image backgrounds */
+.hero--image .hero-title strong,
+.hero--image .hero-title em,
+.hero--image .hero-title .accent {
+  color: rgba(255, 255, 255, 0.9);
 }
-.hero--split.hero--image .btn-ghost:hover {
+
+/* ── Split Hero Exception: text side has light background ── */
+.hero--split .hero-content .btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--primary);
+  backdrop-filter: none;
+}
+.hero--split .hero-content .btn-ghost:hover {
   background: var(--primary);
   color: var(--text-on-primary, #fff);
   border-color: var(--primary);
 }
 .hero--split .hero-title strong,
-.hero--split .hero-title em {
+.hero--split .hero-title em,
+.hero--split .hero-title .accent {
   color: var(--primary);
 }
 

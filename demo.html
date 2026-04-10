@@ -10,14 +10,14 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.9.2'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.9.3'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         'default': { layout:'modern',  hero:'fullscreen', color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'modern',           buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
         corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-        editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+        editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'outline-thin',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
         minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
         tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'normal',  animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech',  navCase:'upper' },
         creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark',  navCase:'upper' },
@@ -26,11 +26,11 @@
         outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'classic-serif',    buttons:'shadow-lift',    navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
         cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark',  navCase:'upper' },
         softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
-        boutique:  { layout:'modern',  hero:'split',      color:'wine',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
-        gastro:    { layout:'classic', hero:'banner',     color:'brown',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
-        architekt: { layout:'modern',  hero:'banner',     color:'slate',     charakter:'kantig',  spacing:'spacious',animation:'none',    font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
-        portfolio: { layout:'modern',  hero:'minimal',    color:'charcoal',  charakter:'markant', spacing:'compact', animation:'subtle',  font:'geometric-black',  buttons:'brutalist',      navBehavior:'sticky',      navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'default', theme:'dark'  },
-        wellness:  { layout:'modern',  hero:'minimal',    color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',         buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
+        boutique:  { layout:'modern',  hero:'split',      color:'wine',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'pill-thin',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+        gastro:    { layout:'classic', hero:'banner',     color:'brown',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'outline-elegant',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        architekt: { layout:'modern',  hero:'banner',     color:'slate',     charakter:'kantig',  spacing:'spacious',animation:'none',    font:'swiss-precision',  buttons:'sharp',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+        portfolio: { layout:'modern',  hero:'minimal',    color:'charcoal',  charakter:'markant', spacing:'compact', animation:'subtle',  font:'geometric-black',  buttons:'tech-angle',      navBehavior:'sticky',      navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'default', theme:'dark'  },
+        wellness:  { layout:'modern',  hero:'minimal',    color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',         buttons:'pill-solid',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
         startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech',  navCase:'upper' }
       };
       var defaults = {
@@ -603,42 +603,6 @@
     /* Cookie-Banner verstecken */
     #cookie-banner { display: none !important; }
 
-    /* Hero mit echtem Bild-Hintergrund: Accent-Wort + Ghost-Button weiß/hell für Lesbarkeit */
-    .hero--image .hero-title strong,
-    .hero--image .hero-title em,
-    .hero--image .hero-title .accent {
-      color: #ffffff !important;
-      opacity: 0.92;
-    }
-    /* Split: text is on light bg, NOT on image — use primary color instead */
-    .hero--image.hero--split .hero-title strong,
-    .hero--image.hero--split .hero-title em,
-    .hero--image.hero--split .hero-title .accent {
-      color: var(--primary) !important;
-      opacity: 1;
-    }
-    .hero--image.hero--fullscreen .btn-ghost,
-    .hero--image.hero--banner .btn-ghost {
-      color: #ffffff !important;
-      border: 2px solid rgba(255, 255, 255, 0.85) !important;
-      background: rgba(255, 255, 255, 0.12) !important;
-      backdrop-filter: blur(4px) !important;
-    }
-    .hero--image.hero--fullscreen .btn-ghost:hover,
-    .hero--image.hero--banner .btn-ghost:hover {
-      border-color: #ffffff !important;
-      background: rgba(255, 255, 255, 0.22) !important;
-    }
-    /* Split: text side has light bg — use normal dark button styles */
-    .hero--image.hero--split .btn-ghost {
-      color: var(--text) !important;
-      border: 2px solid var(--primary) !important;
-      background: transparent !important;
-    }
-    .hero--image.hero--split .btn-ghost:hover {
-      background: var(--primary) !important;
-      color: var(--text-on-primary, #fff) !important;
-    }
     /* Veil-Hero: heller Hintergrund → Outline-Button statt Ghost */
     .hero--veil .btn-outline {
       border-color: var(--primary) !important;
