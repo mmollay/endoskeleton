@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.4'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.5'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -2425,7 +2425,8 @@
         width:     getActiveData('[data-width]', 'width') || 'default',
         footer:    getActiveData('[data-footer-style]', 'footerStyle') || 'dark',
         theme:     document.documentElement.getAttribute('data-theme') || 'light',
-        navCase:   document.querySelector('.site-nav.nav-upper') ? 'upper' : 'normal'
+        navCase:   document.querySelector('.site-nav.nav-upper') ? 'upper' : 'normal',
+        wallpaper: window.currentHeroImageId || ''
       };
     }
 
@@ -2446,11 +2447,15 @@
       if (params.preset && PRESETS && PRESETS[params.preset]) {
         var pc = PRESETS[params.preset];
         for (var k in pc) { if (!(k in params)) params[k] = pc[k]; }
-        /* navBehavior and footerStyle use shorter URL param names */
         if (!('nav' in params) && pc.navBehavior) params.nav = pc.navBehavior;
         if (!('footer' in params) && pc.footerStyle) params.footer = pc.footerStyle;
+      }
+      /* Restore wallpaper — from URL param or preset default */
+      if (params.wallpaper) {
+        applyHeroImage(params.wallpaper);
+      } else if (params.preset) {
         var imgId = getRandomPresetImage(params.preset);
-        if (imgId) applyHeroImage(imgId, params.hero || 'fullscreen');
+        if (imgId) applyHeroImage(imgId);
       }
       if (params.layout) {
         var btn = document.querySelector('[data-layout="' + params.layout + '"]');
