@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.9.0'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.9.1'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -602,8 +602,14 @@
       color: #ffffff !important;
       opacity: 0.92;
     }
+    /* Split: text is on light bg, NOT on image — use primary color instead */
+    .hero--image.hero--split .hero-title strong,
+    .hero--image.hero--split .hero-title em,
+    .hero--image.hero--split .hero-title .accent {
+      color: var(--primary) !important;
+      opacity: 1;
+    }
     .hero--image.hero--fullscreen .btn-ghost,
-    .hero--image.hero--split .btn-ghost,
     .hero--image.hero--banner .btn-ghost {
       color: #ffffff !important;
       border: 2px solid rgba(255, 255, 255, 0.85) !important;
@@ -611,10 +617,19 @@
       backdrop-filter: blur(4px) !important;
     }
     .hero--image.hero--fullscreen .btn-ghost:hover,
-    .hero--image.hero--split .btn-ghost:hover,
     .hero--image.hero--banner .btn-ghost:hover {
       border-color: #ffffff !important;
       background: rgba(255, 255, 255, 0.22) !important;
+    }
+    /* Split: text side has light bg — use normal dark button styles */
+    .hero--image.hero--split .btn-ghost {
+      color: var(--text) !important;
+      border: 2px solid var(--primary) !important;
+      background: transparent !important;
+    }
+    .hero--image.hero--split .btn-ghost:hover {
+      background: var(--primary) !important;
+      color: var(--text-on-primary, #fff) !important;
     }
     /* Veil-Hero: heller Hintergrund → Outline-Button statt Ghost */
     .hero--veil .btn-outline {

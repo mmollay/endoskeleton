@@ -1245,6 +1245,22 @@ section.section-dark {
   color: #ffffff;
 }
 
+/* Split hero: text side has light bg — don't force white */
+.hero--split.hero--image .btn-ghost {
+  color: var(--text);
+  border-color: var(--primary);
+  background: transparent;
+}
+.hero--split.hero--image .btn-ghost:hover {
+  background: var(--primary);
+  color: var(--text-on-primary, #fff);
+  border-color: var(--primary);
+}
+.hero--split .hero-title strong,
+.hero--split .hero-title em {
+  color: var(--primary);
+}
+
 /* ─── Dark Theme Button Fixes ─────────────────────────────────────────── */
 [data-theme=dark] .btn-secondary,
 [data-theme=tech] .btn-secondary,
