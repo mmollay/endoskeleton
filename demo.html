@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.9.1'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.9.2'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -27,6 +27,10 @@
         cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark',  navCase:'upper' },
         softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
         boutique:  { layout:'modern',  hero:'split',      color:'wine',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+        gastro:    { layout:'classic', hero:'banner',     color:'brown',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        architekt: { layout:'modern',  hero:'banner',     color:'slate',     charakter:'kantig',  spacing:'spacious',animation:'none',    font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
+        portfolio: { layout:'modern',  hero:'minimal',    color:'charcoal',  charakter:'markant', spacing:'compact', animation:'subtle',  font:'geometric-black',  buttons:'brutalist',      navBehavior:'sticky',      navLayout:'minimal',  navStyle:'dark',    footerStyle:'dark',    width:'default', theme:'dark'  },
+        wellness:  { layout:'modern',  hero:'minimal',    color:'mint',      charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'humanist',         buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
         startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech',  navCase:'upper' }
       };
       var defaults = {
@@ -67,6 +71,10 @@
         'softcraft': 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap',
         'magazine': 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&display=swap',
         'boutique': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
+        'gastro': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
+        'architekt': 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
+        'portfolio': 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
+        'wellness': 'https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Nunito+Sans:wght@300;400;500;600&display=swap',
         'survival': 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap'
       };
       var fontUrl = fontPreloads[p.font || 'modern'];
@@ -1698,6 +1706,10 @@
       cinematic: { dot:'#1e1e1e', desc:'Kino · Dark · Bebas Neue' },
       softcraft: { dot:'#4d7c0f', desc:'Handwerk · Olive · EB Garamond' },
       boutique:  { dot:'#881337', desc:'Wein · Klassisch · Lora Serif' },
+      gastro:    { dot:'#78350f', desc:'Kulinarik · Braun · Lora Serif' },
+      architekt: { dot:'#475569', desc:'Architektur · Slate · Inter' },
+      portfolio: { dot:'#1e1e1e', desc:'Portfolio · Dark · Space Grotesk' },
+      wellness:  { dot:'#10b981', desc:'Wellness · Mint · Nunito' },
       startup:   { dot:'#6366f1', desc:'Startup · Electric · Space Grotesk' }
     };
 
@@ -1736,6 +1748,10 @@
       cinematic: ["photo-1489599849927-2ee91cede3ba","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
       softcraft: ["photo-1494438639946-1ebd1d20bf85","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
       boutique:  ["photo-1540541338287-41700207dee6","photo-1519823551278-64ac92734fb1","photo-1542282088-72c9c27ed0cd"],
+      gastro:    ["photo-1414235077428-338989a2e8c0","photo-1504674900247-0877df9cc836","photo-1517248135467-4c7edcad34c4"],
+      architekt: ["photo-1486406146926-c627a92ad1ab","photo-1487958449943-2429e8be8625","photo-1431576901776-e539bd916ba2"],
+      portfolio: ["photo-1558618666-fcd25c85f82e","photo-1542744094-3a31f272c490","photo-1517430816045-df4b7de11d1d"],
+      wellness:  ["photo-1544161515-4ab6ce6db874","photo-1540555700478-4be289fbec6d","photo-1545205597-3d9d02c29597"],
       startup:   ["photo-1519389950473-47ba0277781c","photo-1553877522-43269d4ea984","photo-1460925895917-afdab827c52f"]
     };
 
