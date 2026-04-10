@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.3'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.4'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -1084,9 +1084,7 @@
 
     <!-- Split Hero (versteckt) -->
     <section class="hero hero--split" id="hero-split" style="display:none;">
-      <div class="hero-image">
-        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" alt="Office" loading="eager">
-      </div>
+      <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80');"></div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
         <h1 class="hero-title" data-i18n="hero.title">Ihr Auftritt im <strong>Web</strong></h1>
@@ -1738,33 +1736,25 @@
       var preload = new Image();
       preload.onload = function() {
         /* Apply to bg-image heroes */
-        ['fullscreen','banner','veil'].forEach(function(h) {
+        ['fullscreen','banner','veil','split'].forEach(function(h) {
           var section = document.getElementById('hero-' + h);
           if (!section) return;
           var bg = section.querySelector('.hero-bg');
           if (bg) bg.style.backgroundImage = 'url(' + url + ')';
           section.classList.add('hero--image');
         });
-        /* Split hero uses <img> tag — also preload small version */
-        var splitImg = document.querySelector('#hero-split .hero-image img');
-        if (splitImg) {
-          var preloadSmall = new Image();
-          preloadSmall.onload = function() { splitImg.src = smallUrl; };
-          preloadSmall.onerror = function() { splitImg.src = smallUrl; };
-          preloadSmall.src = smallUrl;
-        }
+
       };
       preload.onerror = function() {
         /* Fallback: set anyway even if preload fails */
-        ['fullscreen','banner','veil'].forEach(function(h) {
+        ['fullscreen','banner','veil','split'].forEach(function(h) {
           var section = document.getElementById('hero-' + h);
           if (!section) return;
           var bg = section.querySelector('.hero-bg');
           if (bg) bg.style.backgroundImage = 'url(' + url + ')';
           section.classList.add('hero--image');
         });
-        var splitImg = document.querySelector('#hero-split .hero-image img');
-        if (splitImg) splitImg.src = smallUrl;
+
       };
       preload.src = url;
       /* Sync wallpaper picker */
@@ -1946,16 +1936,14 @@
       var wpId = btn.dataset.wallpaper;
       if (wpId === 'none') {
         window.currentHeroImageId = null;
-        ['fullscreen','banner','veil'].forEach(function(h) {
+        ['fullscreen','banner','veil','split'].forEach(function(h) {
           var section = document.getElementById('hero-' + h);
           if (!section) return;
           var bg = section.querySelector('.hero-bg');
           if (bg) bg.style.backgroundImage = '';
           section.classList.remove('hero--image');
         });
-        /* Also reset split hero */
-        var splitImg = document.querySelector('#hero-split .hero-image img');
-        if (splitImg) splitImg.src = '';
+
       } else {
         applyHeroImage(wpId);
       }
