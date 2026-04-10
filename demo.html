@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.7'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.8'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -1978,7 +1978,7 @@
         keys.forEach(function(key) {
           var meta = PRESET_META[key];
           var config = PRESETS[key];
-          html += '<button class="preset-card" id="preset-' + key + "" onclick="applyPreset('" + key + "')">"
+          html += '<button class="preset-card" id="preset-' + key + '" onclick="applyPreset(\'' + key + '\')">' 
             + buildPreviewHTML(config)
             + '<div class="preset-text">'
             + '<span class="preset-name"><span class="preset-dot" style="background:' + meta.dot + '"></span>' + key.charAt(0).toUpperCase() + key.slice(1) + '</span>'
