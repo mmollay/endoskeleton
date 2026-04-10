@@ -1732,19 +1732,41 @@
     window.applyHeroImage = function applyHeroImage(imageId) {
       if (!imageId) return;
       window.currentHeroImageId = imageId;
-      console.log('[Endo] applyHeroImage:', imageId);
       var url = 'https://images.unsplash.com/' + imageId + '?w=1600&q=80';
-      /* Apply to ALL hero types — bg-image heroes AND split hero img */
-      ['fullscreen','banner','veil'].forEach(function(h) {
-        var section = document.getElementById('hero-' + h);
-        if (!section) return;
-        var bg = section.querySelector('.hero-bg');
-        if (bg) bg.style.backgroundImage = 'url(' + url + ')';
-        section.classList.add('hero--image');
-      });
-      /* Split hero uses <img> tag */
-      var splitImg = document.querySelector('#hero-split .hero-image img');
-      if (splitImg) splitImg.src = url.replace('w=1600', 'w=800');
+      var smallUrl = url.replace('w=1600', 'w=800');
+      /* Preload image before applying — prevents flicker */
+      var preload = new Image();
+      preload.onload = function() {
+        /* Apply to bg-image heroes */
+        ['fullscreen','banner','veil'].forEach(function(h) {
+          var section = document.getElementById('hero-' + h);
+          if (!section) return;
+          var bg = section.querySelector('.hero-bg');
+          if (bg) bg.style.backgroundImage = 'url(' + url + ')';
+          section.classList.add('hero--image');
+        });
+        /* Split hero uses <img> tag — also preload small version */
+        var splitImg = document.querySelector('#hero-split .hero-image img');
+        if (splitImg) {
+          var preloadSmall = new Image();
+          preloadSmall.onload = function() { splitImg.src = smallUrl; };
+          preloadSmall.onerror = function() { splitImg.src = smallUrl; };
+          preloadSmall.src = smallUrl;
+        }
+      };
+      preload.onerror = function() {
+        /* Fallback: set anyway even if preload fails */
+        ['fullscreen','banner','veil'].forEach(function(h) {
+          var section = document.getElementById('hero-' + h);
+          if (!section) return;
+          var bg = section.querySelector('.hero-bg');
+          if (bg) bg.style.backgroundImage = 'url(' + url + ')';
+          section.classList.add('hero--image');
+        });
+        var splitImg = document.querySelector('#hero-split .hero-image img');
+        if (splitImg) splitImg.src = smallUrl;
+      };
+      preload.src = url;
       /* Sync wallpaper picker */
       syncWallpaperPicker(imageId);
     }
