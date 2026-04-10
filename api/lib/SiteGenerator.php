@@ -155,12 +155,38 @@ final class SiteGenerator
         $company = addslashes($content["company"] ?? "Website");
         $logo = addslashes($content["logo_url"] ?? "img/logo.png");
 
-        $navItems = [];
+        $skipNav = ["impressum", "datenschutz", "disclaimer", "kontakt"];
+        $navPages = [];
         foreach ($content["pages"] ?? [] as $p) {
             $slug = addslashes($p["slug"] ?? "index");
-            if (in_array($slug, ["impressum", "datenschutz", "disclaimer"], true)) continue;
+            if (in_array($slug, $skipNav, true)) continue;
             $title = addslashes($p["title"] ?? "Seite");
-            $navItems[] = "      {label: \"{$title}\", href: \"{$slug}.html\"}";
+            $navPages[] = ["slug" => $slug, "title" => $title];
+        }
+        $navItems = [];
+        if (count($navPages) <= 5) {
+            foreach ($navPages as $p) {
+                $navItems[] = "      {label: \"{$p['title']}\", href: \"{$p['slug']}.html\"}";
+            }
+        } else {
+            $main = array_slice($navPages, 0, 4);
+            $more = array_slice($navPages, 4);
+            foreach ($main as $p) {
+                $navItems[] = "      {label: \"{$p['title']}\", href: \"{$p['slug']}.html\"}";
+            }
+            $ch = [];
+            foreach ($more as $p) {
+                $ch[] = "{label: \"{$p['title']}\", href: \"{$p['slug']}.html\"}";
+            }
+            $navItems[] = "      {label: \"Mehr\", href: \"#\", children: [" . implode(", ", $ch) . "]}";
+        }
+        // Kontakt always last
+        $hasKontakt = false;
+        foreach ($content["pages"] ?? [] as $p) {
+            if (($p["slug"] ?? "") === "kontakt") { $hasKontakt = true; break; }
+        }
+        if ($hasKontakt) {
+            $navItems[] = "      {label: \"Kontakt\", href: \"kontakt.html\"}";
         }
         $navJs = implode(",\n", $navItems);
 
@@ -361,7 +387,7 @@ SCRIPT;
         $replacements["{{SOCIAL_LINKS}}"]   = "";
 
         // Nav items (grouped when > 6 pages)
-        $skipNav = ["impressum", "datenschutz", "disclaimer"];
+        $skipNav = ["impressum", "datenschutz", "disclaimer", "kontakt"];
         $navPages = [];
         foreach ($content["pages"] ?? [] as $p) {
             $s = $p["slug"] ?? "index";
@@ -369,7 +395,7 @@ SCRIPT;
             $navPages[] = ["slug" => $s, "title" => $p["title"] ?? "Seite"];
         }
         $navItems = [];
-        if (count($navPages) <= 6) {
+        if (count($navPages) <= 5) {
             foreach ($navPages as $p) {
                 $navItems[] = '{ label: "' . addslashes($p["title"]) . '", href: "' . $p["slug"] . '.html" }';
             }
