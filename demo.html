@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.8'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.9'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -1706,17 +1706,17 @@
 
     /* ─── Unsplash Image Pool (kuratierte Hero-Bilder) ─── */
     var IMAGE_POOL = {
-      corporate: ['photo-1497366216548-37526070297c','photo-15.7.11175-5973dc0f32e7','photo-1542744173-8e7e53415bb0','photo-1486406146926-c627a92ad1ab','photo-1497366811353-6870744d04b2'],
+      corporate: ['photo-1497366216548-37526070297c','photo-1497215728101-856f4ea42174','photo-1542744173-8e7e53415bb0','photo-1486406146926-c627a92ad1ab','photo-1497366811353-6870744d04b2'],
       editorial: ['photo-1519682337058-a94d519337bc','photo-1455390582262-044cdead277a','photo-1524995997946-a1c2e315a42f','photo-1491841550275-ad7854e35ca6','photo-1457369804613-52c61a468e7d'],
-      minimal:   ['photo-15.7.13211169-0a1dd7228f2d','photo-1513506003901-1e6a229e2d15','photo-1494438639946-1ebd1d20bf85','photo-1481277542470-605612bd2d61','photo-1524758631624-e2822e304c36'],
+      minimal:   ['photo-1494438639946-1ebd1d20bf85','photo-1513506003901-1e6a229e2d15','photo-1494438639946-1ebd1d20bf85','photo-1481277542470-605612bd2d61','photo-1524758631624-e2822e304c36'],
       tech:      ['photo-1518770660439-4636190af475','photo-1461749280684-dccba630e2f6','photo-1526374965328-7f61d4dc18c5','photo-1550751827-4bd374c3f58b','photo-1451187580459-43490279c0fa'],
       creative:  ['photo-1513364776144-60967b0f800f','photo-1452860606245-08befc0ff44b','photo-1541701494587-cb58502866ab','photo-155.7.1146-9f40138edfeb','photo-1460661419201-fd4cecdf8a8b'],
       outdoor:   ['photo-1506905925346-21bda4d32df4','photo-1441974231531-c6227db76b6e','photo-1464822759023-fed622ff2c3b','photo-1501554728187-ce583db33af7','photo-1426604966848-d7adac402bff'],
       playful:   ['photo-1503023345310-bd7c1de61c7d','photo-1513151233558-d860c5398176','photo-1491438590914-bc09fcaaf77a','photo-1472162072942-cd5147eb3902','photo-1530103862676-de8c9debad1d'],
-      elegant:   ['photo-15.7.14931442-7e0c8ed2963c','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1'],
+      elegant:   ['photo-1540541338287-41700207dee6','photo-1540541338287-41700207dee6','photo-1542282088-72c9c27ed0cd','photo-1519823551278-64ac92734fb1'],
       survival:  ["photo-1448375240586-882707db888b","photo-1473773508845-188df298d2d1","photo-1473448912268-2022ce9509d8","photo-1542601906990-b4d3fb778b09","photo-1441974231531-c6227db76b6e"],
-      cinematic: ["photo-15.7.10136628-849c177e76a1","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
-      softcraft: ["photo-15.7.13211169-0a1dd7228f2d","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
+      cinematic: ["photo-1489599849927-2ee91cede3ba","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
+      softcraft: ["photo-1494438639946-1ebd1d20bf85","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
       startup:   ["photo-1519389950473-47ba0277781c","photo-1553877522-43269d4ea984","photo-1460925895917-afdab827c52f"]
     };
 
@@ -1769,9 +1769,9 @@
       { id: 'photo-1497366216548-37526070297c', label: 'Office' },
       { id: 'photo-1506905925346-21bda4d32df4', label: 'Berge' },
       { id: 'photo-1518770660439-4636190af475', label: 'Tech' },
-      { id: 'photo-15.7.10136628-849c177e76a1', label: 'Kino' },
+      { id: 'photo-1489599849927-2ee91cede3ba', label: 'Kino' },
       { id: 'photo-1513364776144-60967b0f800f', label: 'Kreativ' },
-      { id: 'photo-15.7.14931442-7e0c8ed2963c', label: 'Elegant' },
+      { id: 'photo-1540541338287-41700207dee6', label: 'Elegant' },
       { id: 'photo-1441974231531-c6227db76b6e', label: 'Natur' },
       { id: 'photo-1519389950473-47ba0277781c', label: 'Startup' },
       { id: 'photo-1455390582262-044cdead277a', label: 'Buch' },
