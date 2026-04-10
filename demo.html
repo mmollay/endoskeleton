@@ -10,10 +10,11 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.5'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.7'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
+        'default': { layout:'modern',  hero:'fullscreen', color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'modern',           buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
         corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
@@ -1667,6 +1668,7 @@
     var PRESETS = window.PRESETS;
 
     var PRESET_META = {
+      "default":   { dot:"#3b82f6", desc:"Standard · Blau · Inter" },
       survival:  { dot:'#2d7a2d', desc:'Outdoor · Grün · Oswald' },
       corporate: { dot:'#2563eb', desc:'Business · Blau · Inter' },
       editorial: { dot:'#881337', desc:'Magazin · Wine · Playfair' },
@@ -1953,17 +1955,36 @@
     function renderBuiltinPresets() {
       var grid = document.getElementById('builtin-preset-grid');
       if (!grid) return;
-      var html = '';
+      var heroLabels = {
+        fullscreen: 'Fullscreen',
+        split: 'Split',
+        minimal: 'Minimal',
+        banner: 'Banner'
+      };
+      var groups = {};
       Object.keys(PRESETS).forEach(function(key) {
         var meta = PRESET_META[key];
         if (!meta) return;
-        var config = PRESETS[key];
-        html += '<button class="preset-card" id="preset-' + key + '" onclick="applyPreset(\'' + key + '\')">'
-          + buildPreviewHTML(config)
-          + '<div class="preset-text">'
-          + '<span class="preset-name"><span class="preset-dot" style="background:' + meta.dot + '"></span>' + key.charAt(0).toUpperCase() + key.slice(1) + '</span>'
-          + '<span class="preset-desc">' + meta.desc + '</span>'
-          + '</div></button>';
+        var hero = PRESETS[key].hero || 'fullscreen';
+        if (hero === 'veil') hero = 'fullscreen';
+        if (!groups[hero]) groups[hero] = [];
+        groups[hero].push(key);
+      });
+      var html = '';
+      ['fullscreen', 'split', 'minimal', 'banner'].forEach(function(hero) {
+        var keys = groups[hero];
+        if (!keys || keys.length === 0) return;
+        html += '<div class="preset-group-label" style="grid-column:1/-1;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:12px 0 4px;padding:0 2px;">' + heroLabels[hero] + '</div>';
+        keys.forEach(function(key) {
+          var meta = PRESET_META[key];
+          var config = PRESETS[key];
+          html += '<button class="preset-card" id="preset-' + key + "" onclick="applyPreset('" + key + "')">"
+            + buildPreviewHTML(config)
+            + '<div class="preset-text">'
+            + '<span class="preset-name"><span class="preset-dot" style="background:' + meta.dot + '"></span>' + key.charAt(0).toUpperCase() + key.slice(1) + '</span>'
+            + '<span class="preset-desc">' + meta.desc + '</span>'
+            + '</div></button>';
+        });
       });
       grid.innerHTML = html;
     }
@@ -2109,7 +2130,8 @@
       document.querySelectorAll('.preset-card').forEach(function(c) {
         c.classList.toggle('active', c.id === 'preset-' + name);
       });
-      /* Wallpaper sync happens in applyHeroImage */
+      window.currentPreset = name;
+      updateUrlState();
     }
 
     /* ─── Layout Switcher ─────────────────────── */
@@ -2426,7 +2448,8 @@
         footer:    getActiveData('[data-footer-style]', 'footerStyle') || 'dark',
         theme:     document.documentElement.getAttribute('data-theme') || 'light',
         navCase:   document.querySelector('.site-nav.nav-upper') ? 'upper' : 'normal',
-        wallpaper: window.currentHeroImageId || ''
+        wallpaper: window.currentHeroImageId || '',
+        preset:    window.currentPreset || ''
       };
     }
 
@@ -2438,7 +2461,12 @@
 
     function restoreUrlState() {
       var hash = location.hash.replace(/^#/, '');
-      if (!hash) return;
+      if (!hash) {
+        /* No hash — select Default preset */
+        var defBtn = document.getElementById('preset-default');
+        if (defBtn) defBtn.classList.add('active');
+        return;
+      }
       var params = {};
       hash.split('&').forEach(function(p) {
         var kv = p.split('=');
@@ -2449,6 +2477,12 @@
         for (var k in pc) { if (!(k in params)) params[k] = pc[k]; }
         if (!('nav' in params) && pc.navBehavior) params.nav = pc.navBehavior;
         if (!('footer' in params) && pc.footerStyle) params.footer = pc.footerStyle;
+        window.currentPreset = params.preset;
+        var presetBtn = document.getElementById('preset-' + params.preset);
+        if (presetBtn) {
+          document.querySelectorAll('.preset-card').forEach(function(c){ c.classList.remove('active'); });
+          presetBtn.classList.add('active');
+        }
       }
       /* Restore wallpaper — from URL param or preset default */
       if (params.wallpaper) {
@@ -2568,6 +2602,11 @@
     renderCustomPresets();
     restoreUrlState();
 
+      /* If no preset selected after restore, highlight Default */
+      if (!document.querySelector('.preset-card.active')) {
+        var defBtn = document.getElementById('preset-default');
+        if (defBtn) defBtn.classList.add('active');
+      }
     /* Mark active preset from URL hash */
     (function() {
       var h = location.hash.replace(/^#/,'');
