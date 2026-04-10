@@ -360,14 +360,38 @@ SCRIPT;
         $replacements["{{FOOTER_TAGLINE}}"] = $content["footer"]["tagline"] ?? "";
         $replacements["{{SOCIAL_LINKS}}"]   = "";
 
-        // Nav items
-        $navItems = [];
+        // Nav items (grouped when > 6 pages)
+        $skipNav = ["impressum", "datenschutz", "disclaimer"];
+        $navPages = [];
         foreach ($content["pages"] ?? [] as $p) {
             $s = $p["slug"] ?? "index";
-            $skipNav = ["impressum", "datenschutz", "disclaimer"];
             if (in_array($s, $skipNav, true)) continue;
-            $t = $p["title"] ?? "Seite";
-            $navItems[] = "{label: \"" . addslashes($t) . "\", href: \"" . $s . ".html\"}";
+            $navPages[] = ["slug" => $s, "title" => $p["title"] ?? "Seite"];
+        }
+        $navItems = [];
+        if (count($navPages) <= 6) {
+            foreach ($navPages as $p) {
+                $navItems[] = '{ label: "' . addslashes($p["title"]) . '", href: "' . $p["slug"] . '.html" }';
+            }
+        } else {
+            $mainPages = array_slice($navPages, 0, 4);
+            $morePages = array_slice($navPages, 4);
+            foreach ($mainPages as $p) {
+                $navItems[] = '{ label: "' . addslashes($p["title"]) . '", href: "' . $p["slug"] . '.html" }';
+            }
+            $children = [];
+            foreach ($morePages as $p) {
+                $children[] = '{ label: "' . addslashes($p["title"]) . '", href: "' . $p["slug"] . '.html" }';
+            }
+            $navItems[] = '{ label: "Mehr", href: "#", children: [' . implode(", ", $children) . '] }';
+        }
+        // Kontakt always as last visible nav item
+        $hasKontakt = false;
+        foreach ($content["pages"] ?? [] as $p) {
+            if (($p["slug"] ?? "") === "kontakt") { $hasKontakt = true; break; }
+        }
+        if ($hasKontakt) {
+            $navItems[] = '{ label: "Kontakt", href: "kontakt.html" }';
         }
         $replacements["{{NAV_ITEMS}}"] = implode(",\n        ", $navItems);
 
