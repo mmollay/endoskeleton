@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.9'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.9.0'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -22,10 +22,11 @@
         tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'normal',  animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech',  navCase:'upper' },
         creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark',  navCase:'upper' },
         playful:   { layout:'modern',  hero:'minimal',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'rounded-friendly', buttons:'soft-round',    navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
-        elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'luxury-thin',      buttons:'cta-arrow',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
+        elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'elegant',          buttons:'soft-round',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
         outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'classic-serif',    buttons:'shadow-lift',    navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
         cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark',  navCase:'upper' },
         softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
+        boutique:  { layout:'modern',  hero:'split',      color:'wine',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         startup:   { layout:'modern',  hero:'fullscreen', color:'electric',  charakter:'markant', spacing:'normal',  animation:'dynamic', font:'geometric-black',  buttons:'brutalist',      navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'tech',  navCase:'upper' }
       };
       var defaults = {
@@ -65,6 +66,7 @@
         'classic-serif': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
         'softcraft': 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap',
         'magazine': 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&display=swap',
+        'boutique': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
         'survival': 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap'
       };
       var fontUrl = fontPreloads[p.font || 'modern'];
@@ -1676,10 +1678,11 @@
       tech:      { dot:'#06b6d4', desc:'Cyber · Cyan · JetBrains Mono' },
       creative:  { dot:'#f97316', desc:'Bold · Orange · Playfair Contrast' },
       playful:   { dot:'#f97316', desc:'Verspielt · Fredoka · Orange' },
-      elegant:   { dot:'#b45309', desc:'Luxus · Gold · Cormorant' },
+      elegant:   { dot:'#b45309', desc:'Luxus · Gold · Playfair' },
       outdoor:   { dot:'#78350f', desc:'Kraft · Braun · Lora Serif' },
       cinematic: { dot:'#1e1e1e', desc:'Kino · Dark · Bebas Neue' },
       softcraft: { dot:'#4d7c0f', desc:'Handwerk · Olive · EB Garamond' },
+      boutique:  { dot:'#881337', desc:'Wein · Klassisch · Lora Serif' },
       startup:   { dot:'#6366f1', desc:'Startup · Electric · Space Grotesk' }
     };
 
@@ -1717,6 +1720,7 @@
       survival:  ["photo-1448375240586-882707db888b","photo-1473773508845-188df298d2d1","photo-1473448912268-2022ce9509d8","photo-1542601906990-b4d3fb778b09","photo-1441974231531-c6227db76b6e"],
       cinematic: ["photo-1489599849927-2ee91cede3ba","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
       softcraft: ["photo-1494438639946-1ebd1d20bf85","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
+      boutique:  ["photo-1540541338287-41700207dee6","photo-1519823551278-64ac92734fb1","photo-1542282088-72c9c27ed0cd"],
       startup:   ["photo-1519389950473-47ba0277781c","photo-1553877522-43269d4ea984","photo-1460925895917-afdab827c52f"]
     };
 
