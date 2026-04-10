@@ -847,8 +847,8 @@ small {
   content: '▾';
   display: inline-block;
   margin-left: 0.35em;
-  font-size: 0.75em;
-  opacity: 0.6;
+  font-size: 0.85em;
+  opacity: 0.7;
   transition: transform 0.2s, opacity 0.2s;
 }
 
