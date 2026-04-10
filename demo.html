@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.9.3'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.9.4'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -21,11 +21,13 @@
         minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
         tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'normal',  animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech',  navCase:'upper' },
         creative:  { layout:'magazine',hero:'fullscreen', color:'orange',    charakter:'markant', spacing:'spacious',animation:'dynamic', font:'magazine',         buttons:'brutalist',      navBehavior:'transparent', navLayout:'club',     navStyle:'dark',    footerStyle:'dark',    width:'wide',    theme:'dark',  navCase:'upper' },
-        playful:   { layout:'modern',  hero:'minimal',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'rounded-friendly', buttons:'soft-round',    navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
+        playful:   { layout:'modern',  hero:'playful',    color:'orange',    charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'rounded-friendly', buttons:'soft-round',    navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
         elegant:   { layout:'modern',  hero:'split',      color:'gold',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'elegant',          buttons:'soft-round',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
         outdoor:   { layout:'modern',  hero:'fullscreen', color:'brown',     charakter:'markant', spacing:'normal',  animation:'dynamic', font:'classic-serif',    buttons:'shadow-lift',    navBehavior:'shrink',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'warm'  },
         cinematic: { layout:'modern',  hero:'veil',       color:'charcoal',  charakter:'kantig',  spacing:'spacious',animation:'dynamic', font:'cinematic',        buttons:'minimal-link',   navBehavior:'transparent', navLayout:'centered', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'dark',  navCase:'upper' },
         softcraft: { layout:'magazine',hero:'split',      color:'olive',     charakter:'sanft',   spacing:'normal',  animation:'subtle',  font:'softcraft',        buttons:'pill-thin',      navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
+        kinder:    { layout:'modern',  hero:'playful',    color:'pink',      charakter:'sanft',   spacing:'spacious',animation:'dynamic', font:'playful',          buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'pastel' },
+        natur:     { layout:'modern',  hero:'playful',    color:'forest',    charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'rounded',          buttons:'pill-solid',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'colored', width:'default', theme:'warm'  },
         boutique:  { layout:'modern',  hero:'split',      color:'wine',      charakter:'elegant', spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'pill-thin',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         gastro:    { layout:'classic', hero:'banner',     color:'brown',     charakter:'sanft',   spacing:'spacious',animation:'subtle',  font:'classic-serif',    buttons:'outline-elegant',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm'  },
         architekt: { layout:'modern',  hero:'banner',     color:'slate',     charakter:'kantig',  spacing:'spacious',animation:'none',    font:'swiss-precision',  buttons:'sharp',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
@@ -71,6 +73,8 @@
         'softcraft': 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap',
         'magazine': 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&display=swap',
         'boutique': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
+        'kinder': 'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap',
+        'natur': 'https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap',
         'gastro': 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap',
         'architekt': 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
         'portfolio': 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
@@ -1669,6 +1673,8 @@
       outdoor:   { dot:'#78350f', desc:'Kraft · Braun · Lora Serif' },
       cinematic: { dot:'#1e1e1e', desc:'Kino · Dark · Bebas Neue' },
       softcraft: { dot:'#4d7c0f', desc:'Handwerk · Olive · EB Garamond' },
+      kinder:    { dot:'#ec4899', desc:'Kinder · Pink · Fredoka' },
+      natur:     { dot:'#166534', desc:'Natur · Wald · Nunito' },
       boutique:  { dot:'#881337', desc:'Wein · Klassisch · Lora Serif' },
       gastro:    { dot:'#78350f', desc:'Kulinarik · Braun · Lora Serif' },
       architekt: { dot:'#475569', desc:'Architektur · Slate · Inter' },
@@ -1711,6 +1717,8 @@
       survival:  ["photo-1448375240586-882707db888b","photo-1473773508845-188df298d2d1","photo-1473448912268-2022ce9509d8","photo-1542601906990-b4d3fb778b09","photo-1441974231531-c6227db76b6e"],
       cinematic: ["photo-1489599849927-2ee91cede3ba","photo-1489599849927-2ee91cede3ba","photo-1478720568477-152d9b164e26","photo-1485846234645-a62644f84728"],
       softcraft: ["photo-1494438639946-1ebd1d20bf85","photo-1513506003901-1e6a229e2d15","photo-1494438639946-1ebd1d20bf85"],
+      kinder:    ["photo-1503454537195-1dcabb73ffb9","photo-1484820540004-14229fe36ca4","photo-1472162072942-cd5147eb3902"],
+      natur:     ["photo-1441974231531-c6227db76b6e","photo-1501854140801-50d01698950b","photo-1426604966848-d7adac402bff"],
       boutique:  ["photo-1540541338287-41700207dee6","photo-1519823551278-64ac92734fb1","photo-1542282088-72c9c27ed0cd"],
       gastro:    ["photo-1414235077428-338989a2e8c0","photo-1504674900247-0877df9cc836","photo-1517248135467-4c7edcad34c4"],
       architekt: ["photo-1486406146926-c627a92ad1ab","photo-1487958449943-2429e8be8625","photo-1431576901776-e539bd916ba2"],
@@ -1957,6 +1965,7 @@
       var heroLabels = {
         fullscreen: 'Fullscreen',
         split: 'Split',
+        playful: 'Playful',
         minimal: 'Minimal',
         banner: 'Banner'
       };
@@ -1970,7 +1979,7 @@
         groups[hero].push(key);
       });
       var html = '';
-      ['fullscreen', 'split', 'minimal', 'banner'].forEach(function(hero) {
+      ['fullscreen', 'split', 'playful', 'minimal', 'banner'].forEach(function(hero) {
         var keys = groups[hero];
         if (!keys || keys.length === 0) return;
         html += '<div class="preset-group-label" style="grid-column:1/-1;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:12px 0 4px;padding:0 2px;">' + heroLabels[hero] + '</div>';
