@@ -237,7 +237,7 @@ SCRIPT;
      */
     private function renderRepeatingBlocks(string $html, array $sections, array $page): string
     {
-        $defaultIcon = "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5";
+        $defaultIcon = "";
 
         // Services repeating block
         if (preg_match('/\{\{#SERVICES\}\}(.*?)\{\{\/SERVICES\}\}/s', $html, $m)) {
@@ -250,6 +250,10 @@ SCRIPT;
                         $block = str_replace("{{SERVICE_TITLE}}", $item["title"] ?? "", $block);
                         $block = str_replace("{{SERVICE_TEXT}}", $item["text"] ?? "", $block);
                         $block = str_replace("{{SERVICE_ICON_PATH}}", $item["icon_path"] ?? $defaultIcon, $block);
+                        // Remove empty card-icon div
+                        if (empty($item["icon_path"] ?? "")) {
+                            $block = preg_replace('#<div class="card-icon">.*?</div>#s', '', $block);
+                        }
                         $rendered .= $block;
                     }
                 }
@@ -285,6 +289,9 @@ SCRIPT;
                     $block = str_replace("{{FEATURE_TITLE}}", $item["title"] ?? "", $block);
                     $block = str_replace("{{FEATURE_TEXT}}", $item["text"] ?? "", $block);
                     $block = str_replace("{{FEATURE_ICON_PATH}}", $item["icon_path"] ?? $defaultIcon, $block);
+                    if (empty($item["icon_path"] ?? "")) {
+                        $block = preg_replace('#<div class="card-icon">.*?</div>#s', '', $block);
+                    }
                     $rendered .= $block;
                 }
             }
