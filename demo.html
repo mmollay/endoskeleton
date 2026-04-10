@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.8.2'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '5.8.3'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -1085,7 +1085,7 @@
     <!-- Split Hero (versteckt) -->
     <section class="hero hero--split" id="hero-split" style="display:none;">
       <div class="hero-image">
-        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" alt="Office" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" alt="Office" loading="eager">
       </div>
       <div class="hero-content">
         <p class="hero-eyebrow" data-i18n="hero.eyebrow">Willkommen</p>
