@@ -66,5 +66,13 @@ if ! echo "$INJECTOR_JS" | grep -F "hero_image" > /dev/null; then
 fi
 echo "OK"
 
+# 6) content-injector.js has services-cards injection block (B2)
+echo -n "6) content-injector.js references services-card selector ... "
+if ! echo "$INJECTOR_JS" | grep -F "services-card" > /dev/null; then
+  echo "FAIL (services-card selector not found)"
+  exit 1
+fi
+echo "OK"
+
 echo
 echo "✓ All smoke tests passed"

@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.32.0] — 2026-04-11
+
+### Added
+- **Services-Cards Injection** — `content-injector.js` füllt jetzt `.services-card img` / `.service-item img` / `.service-card img` / `.services-grid img` Elemente mit den Scan-Bildern die `role === "services"` tragen (Scanner v1.5.0+)
+- Helper `_getImagesByRole(scanData, role)` — Role-basierter Bild-Filter mit Fallback zu leerem Array für alte Scans
+
+### Changed
+- **About-Section-Bild** bevorzugt jetzt `role === "about"` Bilder über die bisherige `contentImages[1]` Index-Logik. Zero Regression: wenn kein role-getaggtes Bild existiert, greift der alte Codepfad
+- `konfigurator.html` — Cache-Buster von `v=3.31.3` auf `v=3.32.0`
+
+---
+
 ## [3.31.3] — 2026-04-11
 
 ### Changed
