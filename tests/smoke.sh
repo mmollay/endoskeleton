@@ -57,5 +57,14 @@ if [ "$PRESET" = "missing" ]; then
 fi
 echo "OK (recommended: $PRESET)"
 
+# 5) content-injector.js references scan.hero_image (consumer update landed)
+echo -n "5) content-injector.js references hero_image ... "
+INJECTOR_JS=$(curl -sS -m 10 "https://skeleton.ssi.at/js/content-injector.js?v=$EXPECTED_VERSION")
+if ! echo "$INJECTOR_JS" | grep -F "hero_image" > /dev/null; then
+  echo "FAIL (hero_image string not found in content-injector.js — deploy did not land)"
+  exit 1
+fi
+echo "OK"
+
 echo
 echo "✓ All smoke tests passed"
