@@ -351,8 +351,12 @@
 
     // ── Hero images from scan ────────────────────────────────────────────────
     var contentImages = _getContentImages(scanData);
-    if (contentImages.length > 0) {
-      var heroImg = contentImages[0];
+    var heroImg =
+      (scanData.hero_image &&
+        typeof scanData.hero_image.src === "string" &&
+        scanData.hero_image.src) ||
+      contentImages[0];
+    if (heroImg) {
       // 1. Background-Image on hero wrappers (fullscreen, banner, veil)
       var heroBgElements = document.querySelectorAll(
         ".hero--fullscreen, .hero--banner, .hero--veil, " +
