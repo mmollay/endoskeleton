@@ -294,18 +294,23 @@
    */
   function _injectPageContent(scanData) {
     var pages = scanData.pages || [];
-    if (!pages.length) return;
+    var selected = scanData.selected || {};
 
-    // ── Find pages by type ─────────────────────────────────────────────────
-    var homepage = null,
-      aboutPage = null,
-      servicesPage = null;
-    for (var i = 0; i < pages.length; i++) {
-      var page = pages[i];
-      if (!homepage && _isHomepage(page)) homepage = page;
-      if (!aboutPage && _isAboutPage(page)) aboutPage = page;
-      if (!servicesPage && _isServicesPage(page)) servicesPage = page;
+    // ── Find pages by type — prefer scan.selected (Scanner v1.6.0+) ──────
+    var homepage = null;
+    var aboutPage = selected.about || null;
+    var servicesPage = selected.services || null;
+
+    if (!homepage || !aboutPage || !servicesPage) {
+      for (var i = 0; i < pages.length; i++) {
+        var page = pages[i];
+        if (!homepage && _isHomepage(page)) homepage = page;
+        if (!aboutPage && _isAboutPage(page)) aboutPage = page;
+        if (!servicesPage && _isServicesPage(page)) servicesPage = page;
+      }
     }
+
+    if (!pages.length && !aboutPage && !servicesPage) return;
 
     // ── Extract paragraphs from available pages ─────────────────────────────
     var homePars = homepage
@@ -398,23 +403,26 @@
         heroImgEls[k].src = heroImg;
         heroImgEls[k].removeAttribute("srcset");
       }
-      // 3. About section image — prefer role="about", fall back to contentImages[1]
+      // 3. About section image — prefer scan.selected.about.image,
+      //    then role="about", then contentImages[1]
       var aboutImgEl = document.querySelector(
         ".about-image img, .section-about img, #about img",
       );
       if (aboutImgEl) {
+        var preselectedAbout = scanData.selected && scanData.selected.about;
         var aboutRoleImgs = _getImagesByRole(scanData, "about");
         var aboutSrc =
-          aboutRoleImgs.length > 0
-            ? aboutRoleImgs[0].src
-            : contentImages.length > 1
-              ? contentImages[1]
-              : null;
+          (preselectedAbout && preselectedAbout.image) ||
+          (aboutRoleImgs.length > 0 ? aboutRoleImgs[0].src : null) ||
+          (contentImages.length > 1 ? contentImages[1] : null);
+        var aboutAlt =
+          (preselectedAbout && preselectedAbout.image_alt) ||
+          (aboutRoleImgs.length > 0 ? aboutRoleImgs[0].alt : "");
         if (aboutSrc) {
           aboutImgEl.src = aboutSrc;
           aboutImgEl.removeAttribute("srcset");
-          if (aboutRoleImgs.length > 0 && aboutRoleImgs[0].alt) {
-            aboutImgEl.alt = aboutRoleImgs[0].alt;
+          if (aboutAlt) {
+            aboutImgEl.alt = aboutAlt;
           }
         }
       }
