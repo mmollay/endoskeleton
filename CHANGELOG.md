@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.31.3] — 2026-04-11
+
+### Changed
+- **content-injector.js** — Hero-Bild-Auswahl nutzt jetzt `scan.hero_image.src` wenn der Scanner dieses Feld geliefert hat (Scanner v1.4.0+). Fällt auf die bestehende `contentImages[0]` Heuristik zurück, wenn das Feld absent oder malformed ist. Zero Regression für alte Scans.
+- **content-injector.js** — Hero-Injection-Guard nutzt jetzt `if (heroImg)` statt `if (contentImages.length > 0)`, sodass Sites die nur `scan.hero_image` liefern aber keine anderen Content-Bilder haben trotzdem ihr Hero injiziert bekommen.
+- `konfigurator.html` — Cache-Buster von `v=3.31.2` auf `v=3.31.3` für konfigurator.css, scanner-client.js, content-injector.js, konfigurator.js
+
+---
+
 ## [3.31.2] — 2026-04-10
 
 ### Fixed
