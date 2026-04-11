@@ -74,5 +74,13 @@ if ! echo "$INJECTOR_JS" | grep -F "services-card" > /dev/null; then
 fi
 echo "OK"
 
+# 7) content-injector.js references scan.selected (B3)
+echo -n "7) content-injector.js references scan.selected ... "
+if ! echo "$INJECTOR_JS" | grep -F "selected.about" > /dev/null; then
+  echo "FAIL (selected.about reference not found)"
+  exit 1
+fi
+echo "OK"
+
 echo
 echo "✓ All smoke tests passed"

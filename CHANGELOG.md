@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.33.0] — 2026-04-11
+
+### Changed
+- **content-injector.js** — `_injectPageContent` nutzt jetzt zuerst `scan.selected.{about,services}` (Scanner v1.6.0+), fällt nur noch zur Iteration über `pages[]` zurück wenn das Feld absent ist
+- **About-Section-Bild** — Reihenfolge: `scan.selected.about.image` → `_getImagesByRole("about")` → `contentImages[1]` Index-Fallback
+- `konfigurator.html` — Cache-Buster v=3.32.0 → v=3.33.0
+
+---
+
 ## [3.32.0] — 2026-04-11
 
 ### Added
