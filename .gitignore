@@ -24,7 +24,7 @@ error_log
 # Uploads (site-specific)
 uploads/
 
-# Node (if using build tools)
+# Node
 node_modules/
 package-lock.json
 
@@ -33,7 +33,14 @@ package-lock.json
 *.min.js
 *.map
 
-# QA artifacts
+# QA screenshots & playwright artifacts (not source)
+.playwright-mcp/
+/after-fix*.png
+/nav-check.png
+/preset-tech.png
+/before-*.png
+
+# Runtime caches
 tests/screenshots/
 tests/qa-report.md
 api/data/generated/*

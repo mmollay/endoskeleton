@@ -1,0 +1,449 @@
+/* ============================================================
+   konfigurator.css — Scanner-Konfigurator SPA Styles
+   Matches the dark theme (#0f172a) of the demo.html sidebar
+   ============================================================ */
+
+/* Global font override for all konfigurator elements */
+#konfig-welcome,
+#konfig-scanning,
+#konfig-preview,
+#konfig-domain-bar,
+.konfig-sidebar-actions,
+#konfig-preset-recommendation {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   STATE VISIBILITY
+   ============================================================ */
+
+#konfig-welcome,
+#konfig-scanning,
+#konfig-preview {
+  display: none;
+}
+
+#konfig-preview.active {
+  display: block;
+}
+
+/* Hide sidebar margin when not in preview state */
+#konfig-welcome.active ~ #konfig-preview,
+#konfig-scanning.active ~ #konfig-preview {
+  display: none;
+}
+
+/* Override body margin from demo inline styles when welcome/scanning is active */
+body:has(#konfig-welcome.active),
+body:has(#konfig-scanning.active) {
+  margin-right: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden;
+}
+
+#konfig-domain-bar {
+  display: none;
+}
+
+#konfig-domain-bar.active {
+  display: flex;
+}
+
+/* ============================================================
+   WELCOME SCREEN (#konfig-welcome)
+   ============================================================ */
+
+#konfig-welcome {
+  min-height: 100vh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+#konfig-welcome.active {
+  display: flex;
+}
+
+.konfig-welcome-logo {
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+.konfig-welcome-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  text-align: center;
+}
+
+.konfig-welcome-subtitle {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.konfig-input-group {
+  display: flex;
+  flex-direction: row;
+  max-width: 480px;
+  width: 100%;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.konfig-input-group input {
+  flex: 1;
+  padding: 0.875rem;
+  border: 2px solid #334155;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.konfig-input-group input::placeholder {
+  color: #64748b;
+}
+
+.konfig-input-group input:focus {
+  border-color: #2563eb;
+}
+
+.konfig-input-group button {
+  padding: 0.875rem 1.25rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.konfig-input-group button:hover {
+  background-color: #1d4ed8;
+}
+
+.konfig-history {
+  text-align: center;
+  width: 100%;
+  max-width: 520px;
+  margin-top: 1rem;
+}
+
+.konfig-history-label {
+  color: #475569;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+#konfig-history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.konfig-history-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  background: rgba(30, 41, 59, 0.6);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.konfig-history-item:hover {
+  border-color: #2563eb;
+  color: #e2e8f0;
+  background: rgba(37, 99, 235, 0.15);
+  transform: translateY(-1px);
+}
+
+.konfig-history-item::before {
+  content: "↗";
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.konfig-history-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.konfig-history-wrapper .konfig-history-item {
+  padding-right: 2rem;
+}
+
+.konfig-history-delete {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.konfig-history-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* ============================================================
+   SCANNING SCREEN (#konfig-scanning)
+   ============================================================ */
+
+#konfig-scanning {
+  min-height: 100vh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  padding: 2rem;
+  box-sizing: border-box;
+  gap: 1.5rem;
+}
+
+#konfig-scanning.active {
+  display: flex;
+}
+
+.konfig-scan-domain {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.konfig-scan-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #334155;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: konfig-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes konfig-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   DOMAIN BAR (#konfig-domain-bar)
+   ============================================================ */
+
+#konfig-domain-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  z-index: 10001;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.75rem;
+  box-sizing: border-box;
+}
+
+#konfig-domain-select {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-width: 180px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+#konfig-domain-select:focus {
+  border-color: #2563eb;
+}
+
+#konfig-domain-badge {
+  background-color: #1e293b;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+#konfig-add-domain {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px dashed #334155;
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  margin-left: auto;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+#konfig-add-domain:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+/* ============================================================
+   BODY ADJUSTMENT — preview active
+   ============================================================ */
+
+/* When domain bar is visible, push nav + sidebar + content down 48px */
+body.konfig-has-bar .site-nav {
+  top: 48px !important;
+}
+
+body.konfig-has-bar .demo-sidebar-wrapper {
+  top: 48px !important;
+  height: calc(100vh - 48px) !important;
+}
+
+body.konfig-has-bar #konfig-preview {
+  padding-top: 48px;
+}
+
+/* ============================================================
+   SIDEBAR ACTION BUTTONS (.konfig-sidebar-actions)
+   ============================================================ */
+
+.konfig-sidebar-actions {
+  padding: 12px;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#konfig-deepen-btn {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  text-align: center;
+}
+
+#konfig-deepen-btn:hover:not(:disabled) {
+  background-color: #334155;
+  border-color: #475569;
+}
+
+#konfig-generate-btn {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+#konfig-generate-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+#konfig-deepen-btn:disabled,
+#konfig-generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   PRESET RECOMMENDATION (#konfig-preset-recommendation)
+   ============================================================ */
+
+#konfig-preset-recommendation {
+  display: none;
+  background-color: #166534;
+  color: #bbf7d0;
+  border-radius: 6px;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+#konfig-preset-recommendation.active {
+  display: block;
+}
+
+.preset-card.recommended {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   SIDEBAR COLLAPSED STATE
+   ============================================================ */
+
+.sidebar-collapsed #konfig-domain-bar {
+  right: 0;
+}

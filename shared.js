@@ -105,18 +105,23 @@
   }
   function setLang(lang) {
     document.documentElement.setAttribute("lang", lang);
-    try { localStorage.setItem("siteLang", lang); } catch(e){}
+    try {
+      localStorage.setItem("siteLang", lang);
+    } catch (e) {}
     /* Sync all lang-switch buttons across the page */
-    document
-      .querySelectorAll("[data-nav-lang]")
-      .forEach(function (b) {
-        b.classList.toggle("active", b.getAttribute("data-nav-lang") === lang);
-        b.setAttribute("aria-pressed", String(b.getAttribute("data-nav-lang") === lang));
-      });
+    document.querySelectorAll("[data-nav-lang]").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-nav-lang") === lang);
+      b.setAttribute(
+        "aria-pressed",
+        String(b.getAttribute("data-nav-lang") === lang),
+      );
+    });
     /* Custom event for host integration */
     try {
-      window.dispatchEvent(new CustomEvent("sssi:langchange", { detail: { lang: lang } }));
-    } catch(e){}
+      window.dispatchEvent(
+        new CustomEvent("sssi:langchange", { detail: { lang: lang } }),
+      );
+    } catch (e) {}
     /* Hook for host page translation loader */
     if (typeof window.applyLang === "function") window.applyLang(lang);
   }
@@ -130,9 +135,15 @@
         return (
           '<button type="button" class="nav-lang-btn' +
           (active ? " active" : "") +
-          '" data-nav-lang="' + escapeHtml(l) + '"' +
-          ' aria-pressed="' + (active ? "true" : "false") + '"' +
-          ' aria-label="' + escapeHtml(l.toUpperCase()) + '">' +
+          '" data-nav-lang="' +
+          escapeHtml(l) +
+          '"' +
+          ' aria-pressed="' +
+          (active ? "true" : "false") +
+          '"' +
+          ' aria-label="' +
+          escapeHtml(l.toUpperCase()) +
+          '">' +
           escapeHtml(l.toUpperCase()) +
           "</button>"
         );
@@ -248,7 +259,8 @@
       "<span></span><span></span><span></span></button>" +
       "</div></nav>" +
       '<div class="nav-mobile" role="navigation" aria-label="Mobile Navigation">' +
-      mobileHtml + buildLangSwitch().replace('nav-lang', 'nav-lang nav-lang-mobile') +
+      mobileHtml +
+      buildLangSwitch().replace("nav-lang", "nav-lang nav-lang-mobile") +
       "</div>";
 
     /* Language switch handlers */
@@ -833,4 +845,62 @@
     initContactForm();
     loadModules();
   });
+
+  /* ─── PUBLIC API (for Konfigurator / external callers) ───────────────── */
+
+  /**
+   * Re-render navigation from current CONFIG.
+   * Call after modifying window.SITE_CONFIG.
+   */
+  window.renderNav = function () {
+    mergeConfig();
+    buildNavigation();
+  };
+
+  /**
+   * Re-render footer from current CONFIG.
+   * Call after modifying window.SITE_CONFIG.
+   */
+  window.renderFooter = function () {
+    mergeConfig();
+    buildFooter();
+    /* Re-apply footer style */
+    var style = CONFIG.footerStyle;
+    if (style) {
+      var footerEl = document.querySelector(".site-footer");
+      if (footerEl) {
+        footerEl.classList.remove(
+          "site-footer--light",
+          "footer-dark",
+          "footer-minimal",
+          "footer-colored",
+        );
+        if (style === "light") footerEl.classList.add("site-footer--light");
+        else if (style !== "dark") footerEl.classList.add("footer-" + style);
+      }
+    }
+  };
+
+  /**
+   * Update SITE_CONFIG and re-render nav + footer.
+   * @param {Object} updates — partial config to merge into SITE_CONFIG
+   */
+  window.updateSiteConfig = function (updates) {
+    if (!updates) return;
+    var sc = window.SITE_CONFIG || {};
+    for (var key in updates) {
+      if (
+        typeof updates[key] === "object" &&
+        updates[key] !== null &&
+        !Array.isArray(updates[key])
+      ) {
+        sc[key] = Object.assign({}, sc[key] || {}, updates[key]);
+      } else {
+        sc[key] = updates[key];
+      }
+    }
+    window.SITE_CONFIG = sc;
+    window.renderNav();
+    window.renderFooter();
+  };
 })();
