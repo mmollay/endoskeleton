@@ -265,6 +265,31 @@
   }
 
   /**
+   * Return images filtered by role (Scanner v1.5.0+). If scan.images[i].role
+   * does not exist (old scan), returns an empty array so callers can fall
+   * back to index-based selection.
+   */
+  function _getImagesByRole(scanData, role) {
+    if (!scanData.images) return [];
+    var out = [];
+    for (var i = 0; i < scanData.images.length; i++) {
+      var img = scanData.images[i];
+      if (!img) continue;
+      var src = typeof img === "string" ? img : img.url;
+      if (!src) continue;
+      if (img.role === role) {
+        out.push({
+          src: src,
+          alt: img.alt || "",
+          width: img.width || 0,
+          height: img.height || 0,
+        });
+      }
+    }
+    return out;
+  }
+
+  /**
    * Inject real content from scanned pages into DOM sections.
    */
   function _injectPageContent(scanData) {
@@ -373,14 +398,44 @@
         heroImgEls[k].src = heroImg;
         heroImgEls[k].removeAttribute("srcset");
       }
-      // 3. About section image
-      if (contentImages.length > 1) {
-        var aboutImg = document.querySelector(
-          ".about-image img, .section-about img, #about img",
+      // 3. About section image — prefer role="about", fall back to contentImages[1]
+      var aboutImgEl = document.querySelector(
+        ".about-image img, .section-about img, #about img",
+      );
+      if (aboutImgEl) {
+        var aboutRoleImgs = _getImagesByRole(scanData, "about");
+        var aboutSrc =
+          aboutRoleImgs.length > 0
+            ? aboutRoleImgs[0].src
+            : contentImages.length > 1
+              ? contentImages[1]
+              : null;
+        if (aboutSrc) {
+          aboutImgEl.src = aboutSrc;
+          aboutImgEl.removeAttribute("srcset");
+          if (aboutRoleImgs.length > 0 && aboutRoleImgs[0].alt) {
+            aboutImgEl.alt = aboutRoleImgs[0].alt;
+          }
+        }
+      }
+
+      // 4. Services cards — inject up to 6 role="services" images
+      var serviceImgs = _getImagesByRole(scanData, "services").slice(0, 6);
+      if (serviceImgs.length > 0) {
+        var cardImgEls = document.querySelectorAll(
+          ".services-card img, .service-item img, .service-card img, " +
+            "[data-service-card] img, .services-grid img",
         );
-        if (aboutImg) {
-          aboutImg.src = contentImages[1];
-          aboutImg.removeAttribute("srcset");
+        for (
+          var ci = 0;
+          ci < cardImgEls.length && ci < serviceImgs.length;
+          ci++
+        ) {
+          cardImgEls[ci].src = serviceImgs[ci].src;
+          cardImgEls[ci].removeAttribute("srcset");
+          if (serviceImgs[ci].alt) {
+            cardImgEls[ci].alt = serviceImgs[ci].alt;
+          }
         }
       }
     }
