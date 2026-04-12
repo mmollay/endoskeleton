@@ -16,6 +16,22 @@
   transform: translate(2px, 2px);
 }
 
+/* Ghost: override border:none from .btn */
+.btn-ghost,
+.btn-outline,
+.btn-secondary {
+  border: 2px solid var(--primary) !important;
+  box-shadow: 4px 4px 0 var(--primary-dark) !important;
+  background: transparent !important;
+  color: var(--primary) !important;
+}
+.btn-ghost:hover,
+.btn-outline:hover,
+.btn-secondary:hover {
+  background: var(--primary) !important;
+  color: var(--text-on-primary, #fff) !important;
+}
+
 /* Hero contrast: dark backgrounds */
 .hero--image:not(.hero--split) .btn-ghost,
 .hero--image:not(.hero--split) .btn-outline,

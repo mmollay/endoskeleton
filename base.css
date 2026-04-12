@@ -1223,13 +1223,14 @@ section.section-dark {
 
 .btn-ghost {
   background: transparent;
-  color: var(--text);
-  border: 0.0625rem solid var(--border);
+  color: var(--primary);
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
 }
 
 .btn-ghost:hover {
   border-color: var(--primary);
   color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.06);
 }
 
 /* ─── Hero Button Contrast System ────────────────────────────────────── */
