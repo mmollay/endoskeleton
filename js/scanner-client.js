@@ -121,7 +121,7 @@
      * Returns refined text content for hero, about, services sections.
      */
     refine: function (domain, scanData, sections) {
-      var url = BASE_URL + "?path=refine";
+      var url = "api/refine.php";
       var payload = {
         domain: domain,
         scan_data: scanData,
