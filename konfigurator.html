@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.36.8'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.36.9'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.8">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.9">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -114,36 +114,26 @@
     .hero-title {
       font-size: clamp(2rem, 1.25rem + 3vw, 3.25rem) !important;
     }
-    /* Force consistent ghost button on split hero — button modules
-       override .btn-ghost with wildly different styles (some remove
-       border, some remove padding, some use clip-path). The ghost
-       button on the light text-side of split heroes MUST always
-       be readable regardless of active button module. */
+    /* Fix ghost button on split hero — only force what's BROKEN,
+       let button modules control the aesthetic (radius, font, spacing).
+       Problems fixed: missing border, clip-path, text-decoration. */
     .hero--split .hero-content .btn-ghost,
     .hero--split .hero-content .btn-outline {
       border: 2px solid var(--primary, #147070) !important;
       color: var(--primary, #147070) !important;
       background: transparent !important;
-      padding: 0.75rem 1.5rem !important;
-      border-radius: 8px !important;
       clip-path: none !important;
       text-decoration: none !important;
-      box-shadow: none !important;
-      font-size: 0.9rem !important;
-      letter-spacing: 0.01em !important;
+      min-padding: 0.6rem 1.2rem;
     }
     .hero--split .hero-content .btn-ghost:hover,
     .hero--split .hero-content .btn-outline:hover {
       background: var(--primary, #147070) !important;
       color: #fff !important;
     }
-    /* Also normalize the primary button to match */
+    /* Only fix clip-path on primary (for tech-angle module) */
     .hero--split .hero-content .btn-primary {
-      padding: 0.75rem 1.5rem !important;
-      border-radius: 8px !important;
       clip-path: none !important;
-      font-size: 0.9rem !important;
-      letter-spacing: 0.01em !important;
     }
     body.sidebar-collapsed {
       margin-right: 24px;
@@ -1516,9 +1506,9 @@
 
 </div><!-- /konfig-preview -->
 
-  <script src="js/scanner-client.js?v=3.36.8"></script>
-  <script src="js/content-injector.js?v=3.36.8"></script>
-  <script src="js/konfigurator.js?v=3.36.8"></script>
+  <script src="js/scanner-client.js?v=3.36.9"></script>
+  <script src="js/content-injector.js?v=3.36.9"></script>
+  <script src="js/konfigurator.js?v=3.36.9"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
