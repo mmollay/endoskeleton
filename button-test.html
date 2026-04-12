@@ -352,15 +352,22 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #f1f1f1; padding
     return card;
   }
 
+  // Collect all cards first, then show at once (no flickering)
+  var pendingCards = [];
+
   function processNext() {
     if (currentIdx >= MODULES.length) {
+      // All done — show everything at once
+      var frag = document.createDocumentFragment();
+      pendingCards.forEach(function(card) { frag.appendChild(card); });
+      grid.appendChild(frag);
       statusEl.style.display = 'none';
       document.getElementById('render').style.display = 'none';
       return;
     }
 
     var mod = MODULES[currentIdx];
-    statusEl.textContent = 'Lade Module... ' + (currentIdx + 1) + '/' + MODULES.length + ' (' + mod + ')';
+    statusEl.textContent = 'Lade Module... ' + (currentIdx + 1) + '/' + MODULES.length;
 
     loadModule(mod, function () {
       var lpS = snap(document.getElementById('rl-p'));
@@ -368,10 +375,10 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #f1f1f1; padding
       var dpS = snap(document.getElementById('rd-p'));
       var dgS = snap(document.getElementById('rd-g'));
 
-      grid.appendChild(buildModuleCard(mod, lpS, lgS, dpS, dgS));
+      pendingCards.push(buildModuleCard(mod, lpS, lgS, dpS, dgS));
 
       currentIdx++;
-      setTimeout(processNext, 50);
+      setTimeout(processNext, 30);
     });
   }
 
