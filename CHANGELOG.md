@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.41.0] — 2026-04-12
+
+### Added
+- **Icon Picker im Konfigurator** — Dropdown nach dem Button-Grid in der Sidebar mit 17 Lucide-Icons (arrow-right, chevron-right, phone, mail, calendar, download, external-link, heart, star, check, search, user, home, map-pin, shield, zap, globe). Icon wird live in alle `.hero-ctas .btn` Buttons eingefügt.
+
+---
+
 ## [3.40.0] — 2026-04-12
 
 ### Changed

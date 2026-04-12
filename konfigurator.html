@@ -1034,6 +1034,29 @@
               <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;font-size:0.55rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
               <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Button</span><span class="btn-label">Minimal Link</span></button>
             </div>
+            <div class="control-group" style="margin-top:8px;">
+              <label class="control-label" style="font-size:0.65rem;color:#64748b;margin-bottom:4px;display:block;">Button-Icon</label>
+              <select id="btn-icon-select" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:0.75rem;font-family:inherit;background:#fff;cursor:pointer;">
+                <option value="">Kein Icon</option>
+                <option value="arrow-right">Arrow Right →</option>
+                <option value="chevron-right">Chevron Right ›</option>
+                <option value="phone">Phone</option>
+                <option value="mail">Mail</option>
+                <option value="calendar">Calendar</option>
+                <option value="download">Download</option>
+                <option value="external-link">External Link</option>
+                <option value="heart">Heart</option>
+                <option value="star">Star</option>
+                <option value="check">Check</option>
+                <option value="search">Search</option>
+                <option value="user">User</option>
+                <option value="home">Home</option>
+                <option value="map-pin">Map Pin</option>
+                <option value="shield">Shield</option>
+                <option value="zap">Zap</option>
+                <option value="globe">Globe</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -2469,6 +2492,20 @@
         switchButtons(card.dataset.buttons);
         updateUrlState();
       });
+    });
+    /* Icon Picker */
+    document.getElementById('btn-icon-select').addEventListener('change', function() {
+      var icon = this.value;
+      document.querySelectorAll('.hero-ctas .btn').forEach(function(btn) {
+        var existing = btn.querySelector('[data-lucide]');
+        if (existing) existing.remove();
+        if (icon) {
+          var i = document.createElement('i');
+          i.setAttribute('data-lucide', icon);
+          btn.insertBefore(i, btn.firstChild);
+        }
+      });
+      if (window.lucide) lucide.createIcons();
     });
     document.querySelectorAll('.charakter-card[data-charakter]').forEach(function(card) {
       card.addEventListener('click', function() {
