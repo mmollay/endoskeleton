@@ -1269,6 +1269,7 @@ section.hero.hero--split .hero-content .btn.btn-primary {
   clip-path: none;
   text-decoration: none;
   border: none;
+  padding: 0.75rem 1.75rem;
   min-height: 2.5rem;
 }
 section.hero.hero--split .hero-content .btn.btn-primary:hover {
@@ -1288,6 +1289,7 @@ section.hero.hero--split .hero-content .btn.btn-secondary {
   backdrop-filter: none;
   clip-path: none;
   text-decoration: none;
+  padding: 0.75rem 1.75rem;
   min-height: 2.5rem;
 }
 section.hero.hero--split .hero-content .btn.btn-ghost::after,
