@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Navy (Dunkelblau/Marine) */
 :root {
-  --primary:       #1b3a5c;
-  --primary-dark:  #0f2440;
+  --primary: #1b3a5c;
+  --primary-dark: #0f2440;
   --primary-light: #2c5a8a;
-  --primary-rgb:   27, 58, 92;
+  --primary-rgb: 27, 58, 92;
+
+  --btn-success: #1b5c3a;
+  --btn-success-dark: #124228;
+  --btn-danger: #5c2a2a;
+  --btn-danger-dark: #421e1e;
+  --btn-warning: #5c4a1b;
+  --btn-warning-dark: #423612;
 }

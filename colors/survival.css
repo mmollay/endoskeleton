@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Survival (survivaltraining.at Ember-Green) */
 :root {
-  --primary:       #2d7a2d;
-  --primary-dark:  #1e5c1e;
+  --primary: #2d7a2d;
+  --primary-dark: #1e5c1e;
   --primary-light: #4a8c3f;
-  --primary-rgb:   45, 122, 45;
+  --primary-rgb: 45, 122, 45;
+
+  --btn-success: #3d8a4a;
+  --btn-success-dark: #2d6836;
+  --btn-danger: #8a3a3a;
+  --btn-danger-dark: #682a2a;
+  --btn-warning: #8a7a2d;
+  --btn-warning-dark: #685a20;
 }

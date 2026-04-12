@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Teal */
 :root {
-  --primary:       #0e7a7a;
-  --primary-dark:  #075454;
+  --primary: #0e7a7a;
+  --primary-dark: #075454;
   --primary-light: #1fa8a8;
-  --primary-rgb:   14, 122, 122;
+  --primary-rgb: 14, 122, 122;
+
+  --btn-success: #1a7a4a;
+  --btn-success-dark: #125c36;
+  --btn-danger: #7a3a3a;
+  --btn-danger-dark: #5c2a2a;
+  --btn-warning: #7a6a1e;
+  --btn-warning-dark: #5c4e16;
 }

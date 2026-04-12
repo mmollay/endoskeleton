@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Slate (Schiefergrau/Kühl) */
 :root {
-  --primary:       #4a5568;
-  --primary-dark:  #2d3748;
+  --primary: #4a5568;
+  --primary-dark: #2d3748;
   --primary-light: #64748b;
-  --primary-rgb:   74, 85, 104;
+  --primary-rgb: 74, 85, 104;
+
+  --btn-success: #3a6a4a;
+  --btn-success-dark: #2a4e36;
+  --btn-danger: #683a3a;
+  --btn-danger-dark: #4e2a2a;
+  --btn-warning: #685a3a;
+  --btn-warning-dark: #4e422a;
 }

@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Pink (Beauty/Fashion) */
 :root {
-  --primary:       #c4387a;
-  --primary-dark:  #9a2a5f;
+  --primary: #c4387a;
+  --primary-dark: #9a2a5f;
   --primary-light: #e05a9c;
-  --primary-rgb:   196, 56, 122;
+  --primary-rgb: 196, 56, 122;
+
+  --btn-success: #3a8a5a;
+  --btn-success-dark: #2a6842;
+  --btn-danger: #c43838;
+  --btn-danger-dark: #962828;
+  --btn-warning: #c48a3a;
+  --btn-warning-dark: #96682a;
 }

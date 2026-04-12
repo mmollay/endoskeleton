@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Gold (Premium/Luxury) */
 :root {
-  --primary:       #b8860b;
-  --primary-dark:  #8b6508;
+  --primary: #b8860b;
+  --primary-dark: #8b6508;
   --primary-light: #d4a017;
-  --primary-rgb:   184, 134, 11;
+  --primary-rgb: 184, 134, 11;
+
+  --btn-success: #4a8a42;
+  --btn-success-dark: #366830;
+  --btn-danger: #a83a2a;
+  --btn-danger-dark: #7a2a1e;
+  --btn-warning: #b89a2a;
+  --btn-warning-dark: #8a7420;
 }

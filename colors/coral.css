@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Coral (Koralle/Warm) */
 :root {
-  --primary:       #e07a5f;
-  --primary-dark:  #b85a42;
+  --primary: #e07a5f;
+  --primary-dark: #b85a42;
   --primary-light: #f0967e;
-  --primary-rgb:   224, 122, 95;
+  --primary-rgb: 224, 122, 95;
+
+  --btn-success: #5faa7a;
+  --btn-success-dark: #428a5c;
+  --btn-danger: #c04a4a;
+  --btn-danger-dark: #963636;
+  --btn-warning: #c0963a;
+  --btn-warning-dark: #967228;
 }

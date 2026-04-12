@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Lavender (Lavendel/Sanft) */
 :root {
-  --primary:       #7c5cbf;
-  --primary-dark:  #5a3d96;
+  --primary: #7c5cbf;
+  --primary-dark: #5a3d96;
   --primary-light: #9b7ed8;
-  --primary-rgb:   124, 92, 191;
+  --primary-rgb: 124, 92, 191;
+
+  --btn-success: #4a8a5c;
+  --btn-success-dark: #366844;
+  --btn-danger: #bf4a4a;
+  --btn-danger-dark: #963636;
+  --btn-warning: #bf8a3a;
+  --btn-warning-dark: #96682a;
 }

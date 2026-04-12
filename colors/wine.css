@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Wine (Weinrot/Burgund) */
 :root {
-  --primary:       #722f37;
-  --primary-dark:  #4a1e24;
+  --primary: #722f37;
+  --primary-dark: #4a1e24;
   --primary-light: #9b4049;
-  --primary-rgb:   114, 47, 55;
+  --primary-rgb: 114, 47, 55;
+
+  --btn-success: #3a7242;
+  --btn-success-dark: #2a5430;
+  --btn-danger: #723030;
+  --btn-danger-dark: #542222;
+  --btn-warning: #72602f;
+  --btn-warning-dark: #544622;
 }

@@ -1,7 +1,14 @@
 /* SSI Endoskeleton — Color Preset: Charcoal (Anthrazit/Dunkel) */
 :root {
-  --primary:       #5a7d8f;
-  --primary-dark:  #1e2d36;
+  --primary: #5a7d8f;
+  --primary-dark: #1e2d36;
   --primary-light: #7a9daf;
-  --primary-rgb:   54, 69, 79;
+  --primary-rgb: 54, 69, 79;
+
+  --btn-success: #4a7a5f;
+  --btn-success-dark: #365c46;
+  --btn-danger: #8f5a5a;
+  --btn-danger-dark: #6d4242;
+  --btn-warning: #8f7a4a;
+  --btn-warning-dark: #6d5c36;
 }
