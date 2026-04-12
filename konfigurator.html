@@ -821,6 +821,14 @@
       <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
 
 
+      <!-- KI Refinement — always visible above tabs -->
+      <div style="padding:0 0.5rem 0.5rem;">
+        <button id="btn-ki-refine" class="btn btn-primary btn-sm" disabled style="width:100%;">
+          <i data-lucide="sparkles"></i> KI optimieren
+        </button>
+        <div id="ki-refine-status" style="font-size:0.65rem;color:#64748b;margin-top:4px;display:none;"></div>
+      </div>
+
       <!-- Tab Navigation -->
       <div class="sidebar-tabs">
         <button class="sidebar-tab-btn active" onclick="switchSidebarTab('presets')">Presets</button>
@@ -1074,15 +1082,6 @@
           </div>
         </div>
 
-        <div class="demo-section">
-          <div class="demo-group">
-            <label>KI-Refinement</label>
-            <button id="btn-ki-refine" class="btn btn-primary btn-sm" disabled style="width:100%;margin-top:4px;">
-              <i data-lucide="sparkles"></i> KI optimieren
-            </button>
-            <div id="ki-refine-status" style="font-size:0.65rem;color:#64748b;margin-top:4px;display:none;"></div>
-          </div>
-        </div>
 
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
