@@ -16,45 +16,45 @@ p.sub { text-align: center; color: #888; margin-bottom: 1.5rem; font-size: 0.8re
 .card-head code { font-size: 0.65rem; color: #aaa; }
 .row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 14px; min-height: 64px; position: relative; }
 .row-light { background: #fafafa; }
-.row-dark { background: #222; overflow: hidden; }
-.row-dark-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=40') center/cover; }
-.row-dark-bg::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
-.row-dark .snap-btn { position: relative; z-index: 1; }
-.lbl { position: absolute; top: 3px; right: 6px; font-size: 0.55rem; color: #ccc; z-index: 2; }
-.row-dark .lbl { color: #666; }
-.loading { text-align: center; padding: 3rem; color: #999; font-size: 1rem; }
-/* Hidden render area */
-#render-area { position: absolute; left: -9999px; top: -9999px; visibility: hidden; }
-#render-area .hero { min-height: auto; padding: 20px; overflow: visible; margin: 0; }
-#render-area .hero-content { padding: 0; max-width: none; text-align: center; }
-#render-area .hero-ctas { display: flex; gap: 14px; }
+.row-dark { overflow: hidden; position: relative; background: #111; }
+.dark-img { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=40') center/cover; }
+.dark-img::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.row-dark .snap { position: relative; z-index: 1; }
+.status { text-align: center; padding: 2rem; color: #aaa; }
+
+/* Hidden render area — off-screen but rendered */
+#render { position: fixed; left: -5000px; top: 0; width: 800px; }
+#render .hero { min-height: auto !important; padding: 16px !important; overflow: visible !important; margin: 0 !important; background: transparent !important; }
+#render .hero-bg { display: none !important; }
+#render .hero-content { position: relative; z-index: 1; text-align: center; max-width: none; padding: 0; }
+#render .hero-ctas { display: flex; gap: 14px; justify-content: center; }
 </style>
 </head>
 <body>
 
 <h1>Button Module Test</h1>
-<p class="sub">Oben: hell | Unten: dunkler Bild-Hintergrund</p>
+<p class="sub">Oben: hell | Unten: Hero-Bild (dunkel) — Primary + Ghost pro Modul</p>
 
-<div id="loading" class="loading">Module werden geladen...</div>
+<div id="status" class="status">Lade Module... 0/24</div>
 <div class="grid" id="grid"></div>
 
-<!-- Hidden area to render buttons and capture styles -->
-<div id="render-area">
-  <div id="render-light">
-    <a href="#" class="btn btn-primary" id="rnd-lp">Button</a>
-    <a href="#" class="btn btn-ghost" id="rnd-lg">Ghost</a>
+<!-- Render area for capturing computed styles -->
+<div id="render">
+  <!-- Light context -->
+  <div id="r-light" style="background:#fafafa;padding:16px;">
+    <a href="#" class="btn btn-primary" id="rl-p">B</a>
+    <a href="#" class="btn btn-ghost" id="rl-g">G</a>
   </div>
-  <section class="hero hero--fullscreen hero--image" id="render-dark-section">
+  <!-- Dark/hero context -->
+  <section class="hero hero--fullscreen hero--image" id="r-dark">
     <div class="hero-content">
       <div class="hero-ctas">
-        <a href="#" class="btn btn-primary" id="rnd-dp">Button</a>
-        <a href="#" class="btn btn-ghost" id="rnd-dg">Ghost</a>
+        <a href="#" class="btn btn-primary" id="rd-p">B</a>
+        <a href="#" class="btn btn-ghost" id="rd-g">G</a>
       </div>
     </div>
   </section>
 </div>
-
-<link id="module-css" rel="stylesheet" href="">
 
 <script>
 var MODULES = [
@@ -66,57 +66,81 @@ var MODULES = [
   'ghost', 'outline', 'outline-thin', 'outline-elegant'
 ];
 
-var STYLE_PROPS = [
-  'background', 'backgroundColor', 'color', 'border', 'borderRadius',
-  'borderWidth', 'borderStyle', 'borderColor',
-  'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-  'fontSize', 'fontWeight', 'fontFamily', 'letterSpacing', 'textTransform',
-  'textDecoration', 'textDecorationLine', 'textDecorationColor',
-  'boxShadow', 'clipPath', 'opacity', 'backdropFilter',
-  'display', 'minHeight', 'lineHeight'
+var PROPS = [
+  'color','backgroundColor','backgroundImage',
+  'borderTopWidth','borderTopStyle','borderTopColor',
+  'borderBottomWidth','borderBottomStyle','borderBottomColor',
+  'borderLeftWidth','borderLeftStyle','borderLeftColor',
+  'borderRightWidth','borderRightStyle','borderRightColor',
+  'borderRadius','padding','fontSize','fontWeight','fontFamily',
+  'letterSpacing','textTransform','textDecoration','textDecorationLine',
+  'boxShadow','clipPath','opacity','backdropFilter','display','lineHeight'
 ];
 
 var grid = document.getElementById('grid');
-var moduleLink = document.getElementById('module-css');
-var idx = 0;
+var statusEl = document.getElementById('status');
+var currentIdx = 0;
 
-function captureStyles(el) {
+function snap(el) {
   var s = getComputedStyle(el);
-  var result = {};
-  STYLE_PROPS.forEach(function(p) { result[p] = s[p]; });
-  return result;
+  var o = {};
+  PROPS.forEach(function(p) { o[p] = s.getPropertyValue(p.replace(/([A-Z])/g, '-$1').toLowerCase()); });
+  return o;
 }
 
-function applyStyles(el, styles) {
-  STYLE_PROPS.forEach(function(p) {
-    try { el.style[p] = styles[p]; } catch(e) {}
-  });
-}
-
-function createSnappedBtn(text, styles, extraClass) {
-  var btn = document.createElement('span');
-  btn.className = 'snap-btn';
-  btn.textContent = text;
-  applyStyles(btn, styles);
-  btn.style.display = 'inline-block';
-  btn.style.cursor = 'pointer';
-  btn.style.textAlign = 'center';
-  if (!btn.style.minHeight || btn.style.minHeight === 'auto' || btn.style.minHeight === '0px') {
-    // ensure button is visible
+function applySnap(el, o) {
+  for (var p in o) {
+    var cssProp = p.replace(/([A-Z])/g, '-$1').toLowerCase();
+    el.style.setProperty(cssProp, o[p]);
   }
-  return btn;
 }
 
-function processModule(modName) {
-  moduleLink.href = 'buttons/' + modName + '.css?t=' + Date.now();
+function makeBtn(text, styles) {
+  var el = document.createElement('span');
+  el.className = 'snap';
+  el.textContent = text;
+  applySnap(el, styles);
+  el.style.display = 'inline-block';
+  el.style.cursor = 'pointer';
+  el.style.textAlign = 'center';
+  return el;
+}
 
-  setTimeout(function() {
-    // Capture light styles
-    var lpStyles = captureStyles(document.getElementById('rnd-lp'));
-    var lgStyles = captureStyles(document.getElementById('rnd-lg'));
-    // Capture dark/hero styles
-    var dpStyles = captureStyles(document.getElementById('rnd-dp'));
-    var dgStyles = captureStyles(document.getElementById('rnd-dg'));
+function loadModule(name, cb) {
+  // Remove old module link
+  var old = document.getElementById('test-module-css');
+  if (old) old.remove();
+
+  var link = document.createElement('link');
+  link.id = 'test-module-css';
+  link.rel = 'stylesheet';
+  link.onload = function() {
+    // Extra frame for style recalc
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { cb(); });
+    });
+  };
+  link.onerror = function() { cb(); };
+  link.href = 'buttons/' + name + '.css?t=' + Date.now();
+  document.head.appendChild(link);
+}
+
+function processNext() {
+  if (currentIdx >= MODULES.length) {
+    statusEl.style.display = 'none';
+    document.getElementById('render').style.display = 'none';
+    return;
+  }
+
+  var mod = MODULES[currentIdx];
+  statusEl.textContent = 'Lade Module... ' + (currentIdx + 1) + '/' + MODULES.length + ' (' + mod + ')';
+
+  loadModule(mod, function() {
+    // Capture styles
+    var lpS = snap(document.getElementById('rl-p'));
+    var lgS = snap(document.getElementById('rl-g'));
+    var dpS = snap(document.getElementById('rd-p'));
+    var dgS = snap(document.getElementById('rd-g'));
 
     // Build card
     var card = document.createElement('div');
@@ -125,54 +149,42 @@ function processModule(modName) {
     var head = document.createElement('div');
     head.className = 'card-head';
     var b = document.createElement('b');
-    b.textContent = modName;
+    b.textContent = mod;
     var c = document.createElement('code');
-    c.textContent = modName + '.css';
+    c.textContent = mod + '.css';
     head.appendChild(b);
     head.appendChild(c);
     card.appendChild(head);
 
     // Light row
-    var lightRow = document.createElement('div');
-    lightRow.className = 'row row-light';
-    var ll = document.createElement('span');
-    ll.className = 'lbl';
-    ll.textContent = 'hell';
-    lightRow.appendChild(ll);
-    lightRow.appendChild(createSnappedBtn('Button', lpStyles));
-    lightRow.appendChild(createSnappedBtn('Ghost', lgStyles));
-    card.appendChild(lightRow);
+    var lr = document.createElement('div');
+    lr.className = 'row row-light';
+    lr.appendChild(makeBtn('Button', lpS));
+    lr.appendChild(makeBtn('Ghost', lgS));
+    card.appendChild(lr);
 
     // Dark row
-    var darkRow = document.createElement('div');
-    darkRow.className = 'row row-dark';
-    var dbg = document.createElement('div');
-    dbg.className = 'row-dark-bg';
-    darkRow.appendChild(dbg);
-    var dl = document.createElement('span');
-    dl.className = 'lbl';
-    dl.textContent = 'dunkel';
-    darkRow.appendChild(dl);
-    darkRow.appendChild(createSnappedBtn('Button', dpStyles));
-    darkRow.appendChild(createSnappedBtn('Ghost', dgStyles));
-    card.appendChild(darkRow);
+    var dr = document.createElement('div');
+    dr.className = 'row row-dark';
+    var di = document.createElement('div');
+    di.className = 'dark-img';
+    dr.appendChild(di);
+    dr.appendChild(makeBtn('Button', dpS));
+    dr.appendChild(makeBtn('Ghost', dgS));
+    card.appendChild(dr);
 
     grid.appendChild(card);
 
-    // Next module
-    idx++;
-    if (idx < MODULES.length) {
-      processModule(MODULES[idx]);
-    } else {
-      document.getElementById('loading').style.display = 'none';
-      // Clean up
-      moduleLink.href = '';
-    }
-  }, 150);
+    currentIdx++;
+    // Small delay between modules to avoid race conditions
+    setTimeout(processNext, 50);
+  });
 }
 
-// Start processing
-processModule(MODULES[0]);
+// Start after base.css is fully loaded
+window.addEventListener('load', function() {
+  setTimeout(processNext, 200);
+});
 </script>
 
 </body>
