@@ -549,6 +549,7 @@
     var contact = scanData.contact || {};
     var seo = scanData.seo || {};
     var heroImage = scanData.hero_image || {};
+    var heroText = scanData.hero_text || {};
     var logo = scanData.logo || {};
 
     var rawTitle =
@@ -559,10 +560,17 @@
     var company = rawTitle.split(/\s*[–|]\s*/)[0].trim();
     if (company.length > 50) company = company.substring(0, 50);
 
+    // Hero headline: prefer extracted h1 over SEO title
+    var heroHeadline = heroText.headline || company;
+    var heroSubtitle = heroText.subtitle || "";
+    var heroEyebrow = heroText.eyebrow || scanData.branch || "";
+
     var description =
+      heroSubtitle ||
       (seo.description && typeof seo.description === "string"
         ? seo.description
-        : seo.description && seo.description.text) || "";
+        : seo.description && seo.description.text) ||
+      "";
 
     var aboutTitle = aboutPage.title || "Ueber uns";
     var aboutText = _cleanPageText(aboutPage.text || "");
@@ -579,11 +587,11 @@
         sections: [
           {
             type: "hero",
-            eyebrow: scanData.branch || "",
-            headline: company,
+            eyebrow: heroEyebrow,
+            headline: heroHeadline,
             subline: description || aboutText.substring(0, 200),
             image: heroImage.src || "",
-            cta: "Kontakt",
+            cta: "Jetzt starten",
             cta_href: "kontakt.html",
             cta2: "Mehr erfahren",
             cta2_href: "#about",

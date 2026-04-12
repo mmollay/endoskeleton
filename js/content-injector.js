@@ -484,13 +484,19 @@
       if (!scanData) return;
 
       // ── Hero title ──────────────────────────────────────────────────────────
-      if (scanData.title) {
-        _setTextAndLock('[data-i18n="hero.title"]', scanData.title);
-        _setAllText('[data-i18n-original="hero.title"]', scanData.title);
+      // Prefer hero_text.headline (extracted from <h1>) over scanData.title (SEO <title>)
+      var heroHeadline =
+        (scanData.hero_text && scanData.hero_text.headline) || scanData.title;
+      if (heroHeadline) {
+        _setTextAndLock('[data-i18n="hero.title"]', heroHeadline);
+        _setAllText('[data-i18n-original="hero.title"]', heroHeadline);
       }
 
       // ── Hero subtitle / description ─────────────────────────────────────────
-      var description = scanData.description;
+      // Prefer hero_text.subtitle, then SEO description, then page text
+      var description =
+        (scanData.hero_text && scanData.hero_text.subtitle) ||
+        scanData.description;
       if (!description && scanData.seo && scanData.seo.meta_description) {
         description = scanData.seo.meta_description.text;
       }
@@ -502,7 +508,6 @@
       ) {
         description = scanData.pages[0].meta.description;
       }
-      // Fallback: extract first meaningful paragraph from homepage text
       if (!description && scanData.pages && scanData.pages[0]) {
         var homeText = scanData.pages[0].text || "";
         if (homeText) {
@@ -517,28 +522,27 @@
         _setAllText('[data-i18n-original="hero.subtitle"]', description);
       }
 
-      // ── Hero eyebrow / branch ───────────────────────────────────────────────
-      // API returns: branch (string) or ki_analysis.analysis.branch
-      var branch = scanData.branch;
-      if (!branch || branch.indexOf("Unbekannt") !== -1) {
-        branch = null;
-        if (scanData.ki_analysis && scanData.ki_analysis.analysis) {
-          branch = scanData.ki_analysis.analysis.branch;
+      // ── Hero eyebrow ───────────────────────────────────────────────────────
+      // Prefer hero_text.eyebrow, then branch, then domain
+      var eyebrowText =
+        (scanData.hero_text && scanData.hero_text.eyebrow) || null;
+      if (!eyebrowText) {
+        var branch = scanData.branch;
+        if (!branch || branch.indexOf("Unbekannt") !== -1) {
+          branch = null;
+          if (scanData.ki_analysis && scanData.ki_analysis.analysis) {
+            branch = scanData.ki_analysis.analysis.branch;
+          }
+        }
+        if (branch && branch.indexOf("Unbekannt") === -1) {
+          eyebrowText = BRANCH_LABELS[branch] || branch;
+        } else if (scanData.domain) {
+          eyebrowText = scanData.domain.toUpperCase();
         }
       }
-      if (branch && branch.indexOf("Unbekannt") === -1) {
-        var label = BRANCH_LABELS[branch] || branch;
-        _setTextAndLock('[data-i18n="hero.eyebrow"]', label);
-        _setAllText('[data-i18n-original="hero.eyebrow"]', label);
-      } else if (scanData.domain) {
-        _setTextAndLock(
-          '[data-i18n="hero.eyebrow"]',
-          scanData.domain.toUpperCase(),
-        );
-        _setAllText(
-          '[data-i18n-original="hero.eyebrow"]',
-          scanData.domain.toUpperCase(),
-        );
+      if (eyebrowText) {
+        _setTextAndLock('[data-i18n="hero.eyebrow"]', eyebrowText);
+        _setAllText('[data-i18n-original="hero.eyebrow"]', eyebrowText);
       }
 
       // ── Primary color ───────────────────────────────────────────────────────
