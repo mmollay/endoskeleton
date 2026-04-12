@@ -479,38 +479,241 @@
     window.open(previewUrl, "_blank");
   }
 
+  function _cleanPageText(text) {
+    if (!text) return "";
+    var lines = text.split("\n");
+    var start = 0;
+    for (var i = 0; i < Math.min(lines.length, 15); i++) {
+      var line = lines[i].trim();
+      if (
+        line.length < 30 &&
+        (line === line.toUpperCase() || line.length < 3)
+      ) {
+        start = i + 1;
+      } else {
+        break;
+      }
+    }
+    return lines.slice(start).join("\n").trim().substring(0, 5000);
+  }
+
+  function _extractServiceItems(text) {
+    if (!text) return [];
+    var paragraphs = text.split(/\n\n+/).filter(function (p) {
+      return p.trim().length > 20;
+    });
+    var items = [];
+    for (var i = 0; i < Math.min(paragraphs.length, 6); i++) {
+      var p = paragraphs[i].trim();
+      var firstLine = p.split("\n")[0].trim();
+      var rest = p.split("\n").slice(1).join(" ").trim();
+      items.push({
+        title: firstLine.substring(0, 80),
+        text: (rest || firstLine).substring(0, 300),
+        icon_path: "",
+      });
+    }
+    return items;
+  }
+
+  function _findPrimaryColor(scanData) {
+    var colors = scanData.colors || [];
+    for (var i = 0; i < colors.length; i++) {
+      var c = (colors[i] || "").toLowerCase().trim();
+      if (!c) continue;
+      if (c.indexOf("#") === 0) {
+        if (c === "#ffffff" || c === "#fff" || c === "#000000" || c === "#000")
+          continue;
+        return c;
+      }
+      if (c.indexOf("rgb") === 0) {
+        var nums = c.match(/\d+/g);
+        if (!nums || nums.length < 3) continue;
+        var r = parseInt(nums[0]),
+          g = parseInt(nums[1]),
+          b = parseInt(nums[2]);
+        if ((r > 240 && g > 240 && b > 240) || (r < 15 && g < 15 && b < 15))
+          continue;
+        var hex =
+          "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        return hex;
+      }
+    }
+    return null;
+  }
+
+  function _buildContentFromScan(scanData, presetName) {
+    var sel = scanData.selected || {};
+    var aboutPage = sel.about || {};
+    var servicesPage = sel.services || {};
+    var contact = scanData.contact || {};
+    var seo = scanData.seo || {};
+    var heroImage = scanData.hero_image || {};
+    var logo = scanData.logo || {};
+
+    var rawTitle =
+      (seo.title && seo.title.text) ||
+      scanData.title ||
+      scanData.domain ||
+      "Website";
+    var company = rawTitle.split(/\s*[–|]\s*/)[0].trim();
+    if (company.length > 50) company = company.substring(0, 50);
+
+    var description =
+      (seo.description && typeof seo.description === "string"
+        ? seo.description
+        : seo.description && seo.description.text) || "";
+
+    var aboutTitle = aboutPage.title || "Ueber uns";
+    var aboutText = _cleanPageText(aboutPage.text || "");
+    var servicesTitle = servicesPage.title || "Unsere Leistungen";
+    var servicesText = _cleanPageText(servicesPage.text || "");
+    var serviceItems = _extractServiceItems(servicesText);
+
+    var primaryColor = _findPrimaryColor(scanData);
+
+    var pages = [
+      {
+        slug: "index",
+        title: "Home",
+        sections: [
+          {
+            type: "hero",
+            eyebrow: scanData.branch || "",
+            headline: company,
+            subline: description || aboutText.substring(0, 200),
+            image: heroImage.src || "",
+            cta: "Kontakt",
+            cta_href: "kontakt.html",
+            cta2: "Mehr erfahren",
+            cta2_href: "#about",
+          },
+          {
+            type: "about",
+            tag: "Ueber uns",
+            title: aboutTitle,
+            text: aboutText.substring(0, 2000),
+            image: aboutPage.image || "",
+            image_alt: aboutPage.image_alt || "",
+            cta: "",
+            cta_href: "#",
+          },
+          {
+            type: "services",
+            tag: "Leistungen",
+            title: servicesTitle,
+            lead: servicesText.substring(0, 300),
+            items: serviceItems,
+          },
+        ],
+      },
+      { slug: "kontakt", title: "Kontakt", sections: [] },
+      { slug: "impressum", title: "Impressum", sections: [] },
+      { slug: "datenschutz", title: "Datenschutz", sections: [] },
+    ];
+
+    // Add sub-pages from scan (exclude homepage, about, services, legal)
+    var skipUrls = ["kontakt", "impressum", "datenschutz", "agb", "disclaimer"];
+    var scanPages = scanData.pages || [];
+    for (var i = 0; i < scanPages.length && pages.length < 15; i++) {
+      var sp = scanPages[i];
+      var url = (sp.url || "").toLowerCase();
+      if (!url || url === scanData.start_url) continue;
+      if (aboutPage.url && url === aboutPage.url.toLowerCase()) continue;
+      if (servicesPage.url && url === servicesPage.url.toLowerCase()) continue;
+      var slug = url
+        .split("/")
+        .pop()
+        .replace(/\.html?$/, "")
+        .replace(/[^a-z0-9-]/g, "");
+      if (!slug || skipUrls.indexOf(slug) >= 0) continue;
+      var title = (sp.title || slug).split(/\s*[–|]\s*/)[0].trim();
+      if (title.length > 50) title = title.substring(0, 50);
+      pages.push({
+        slug: slug,
+        title: title,
+        sections: [
+          {
+            type: "about",
+            tag: "",
+            title: title,
+            text: _cleanPageText(sp.text || "").substring(0, 2000),
+            image: "",
+            image_alt: "",
+          },
+        ],
+      });
+    }
+
+    return {
+      company: company,
+      description: description,
+      logo_url: logo.src || "",
+      primary_color: primaryColor,
+      contact: {
+        name: company,
+        email: (contact.emails || [])[0] || "",
+        phone: (contact.phones || [])[0] || "",
+        address: (contact.cities || [])[0] || "",
+      },
+      footer: { tagline: description.substring(0, 100) },
+      social_media: {},
+      pages: pages,
+    };
+  }
+
   function _onGenerate() {
-    // Export current config as JSON (for /endo pipeline or Panel)
     var preset = _getSelectedPreset();
     var domain = _currentDomain;
     var cached = domain ? _scanCache[domain] : null;
+
+    if (!cached) {
+      alert("Bitte zuerst eine Domain scannen.");
+      return;
+    }
+
+    var btn = _el.generateBtn;
+    var originalText = btn.textContent;
+    btn.textContent = "Generiere...";
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+
+    var content = _buildContentFromScan(cached, preset);
     var state = typeof getState === "function" ? getState() : {};
 
-    var config = {
-      domain: domain,
+    var body = {
       preset: preset,
       overrides: state,
-      scan: cached || null,
-      generated: new Date().toISOString(),
+      content: content,
     };
 
-    // Copy to clipboard
-    var json = JSON.stringify(config, null, 2);
-    navigator.clipboard
-      .writeText(json)
-      .then(function () {
-        alert(
-          "Konfiguration kopiert! (" +
-            domain +
-            ", Preset: " +
-            preset +
-            ")\n\nVerwende /endo " +
-            domain +
-            " oder Panel zur Generierung.",
-        );
+    fetch("api/v1/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().then(function (err) {
+            throw new Error(err.error || "Fehler " + res.status);
+          });
+        }
+        return res.json();
       })
-      .catch(function () {
-        prompt("Konfiguration (Ctrl+C zum Kopieren):", json);
+      .then(function (data) {
+        if (data.download_url) {
+          window.location.href = data.download_url;
+        } else {
+          alert("Generierung erfolgreich, aber kein Download-Link erhalten.");
+        }
+      })
+      .catch(function (err) {
+        alert("Fehler bei der Generierung: " + err.message);
+      })
+      .finally(function () {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = "1";
       });
   }
 
