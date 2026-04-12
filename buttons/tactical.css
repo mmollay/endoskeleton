@@ -1,14 +1,23 @@
 /* SSI Endoskeleton — Button Preset: Tactical (Survival-Style, Parallelogramm) */
-:root { --cta-radius: 0; }
+:root {
+  --cta-radius: 0;
+}
 .btn {
   border-radius: 0 !important;
   font-weight: 500 !important;
   letter-spacing: 0.18em !important;
   text-transform: uppercase !important;
   padding: 0.9rem 2.5rem !important;
-  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%) !important;
+  clip-path: polygon(
+    10px 0%,
+    100% 0%,
+    calc(100% - 10px) 100%,
+    0% 100%
+  ) !important;
   box-shadow: none !important;
-  transition: background 0.2s ease, transform 0.2s ease !important;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease !important;
 }
 .btn:hover {
   transform: translateY(-1px);
@@ -27,4 +36,26 @@
   border-color: var(--primary) !important;
   color: var(--primary) !important;
   transform: translateY(-1px);
+}
+
+/* Hero contrast: dark backgrounds */
+.hero--image .btn-ghost,
+.hero--image .btn-secondary,
+.hero--image .btn-outline,
+.section-dark .btn-ghost,
+.section-dark .btn-secondary,
+.section-dark .btn-outline {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
+  background: transparent !important;
+}
+.hero--image .btn-ghost:hover,
+.hero--image .btn-secondary:hover,
+.hero--image .btn-outline:hover,
+.section-dark .btn-ghost:hover,
+.section-dark .btn-secondary:hover,
+.section-dark .btn-outline:hover {
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }

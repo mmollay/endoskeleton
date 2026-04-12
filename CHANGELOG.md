@@ -4,6 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.38.0] — 2026-04-12
+
+### Changed
+- **Hero-Buttons respektieren Button-Module** — Safety-Net (Spezifitaet 0,5,0) aus base.css entfernt. Jedes der 24 Button-Module zeigt jetzt seinen eigenen Stil im Hero.
+- **base.css Hero-Kontrast erweitert** — btn-outline und btn-secondary werden auf dunklen Hero-Hintergruenden jetzt automatisch weiss dargestellt (zusaetzlich zu btn-ghost)
+- **6 Module mit Hero-Kontrast-Regeln** — bold, tactical, tech, minimal-link, cta-arrow, tech-angle haben eigene Dark-Hero-Regeln fuer Sichtbarkeit auf Bild-Hintergruenden
+- **Playwright-Test** — `tests/hero-buttons-test.mjs` prueft alle 24 Module auf fullscreen + split Hero (48 Tests)
+
+---
+
 ## [3.34.0] — 2026-04-12
 
 ### Added

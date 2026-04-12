@@ -13,7 +13,9 @@
   color: var(--text);
   gap: 0.6rem;
   min-height: auto;
-  transition: color 0.2s ease, gap 0.2s ease;
+  transition:
+    color 0.2s ease,
+    gap 0.2s ease;
   position: relative;
 }
 .btn::after {
@@ -21,8 +23,14 @@
   display: inline-block;
   transition: transform 0.25s ease;
 }
-.btn:hover { transform: none; gap: 0.9rem; color: var(--primary); }
-.btn:hover::after { transform: translateX(0.25rem); }
+.btn:hover {
+  transform: none;
+  gap: 0.9rem;
+  color: var(--primary);
+}
+.btn:hover::after {
+  transform: translateX(0.25rem);
+}
 
 /* Primary: solid background + arrow */
 .btn-primary {
@@ -35,15 +43,62 @@
   background: var(--primary-dark);
   color: var(--text-on-primary);
 }
-.btn-primary::after { color: var(--text-on-primary); }
+.btn-primary::after {
+  color: var(--text-on-primary);
+}
 
 /* Secondary: text only with underline */
-.btn-outline, .btn-secondary, .btn-ghost {
+.btn-outline,
+.btn-secondary,
+.btn-ghost {
   color: var(--text);
   border-bottom: 1.5px solid currentColor;
   padding-bottom: 0.35rem;
 }
-.btn-outline:hover, .btn-secondary:hover, .btn-ghost:hover {
+.btn-outline:hover,
+.btn-secondary:hover,
+.btn-ghost:hover {
   color: var(--primary);
+  background: transparent;
+}
+
+/* Hero contrast: dark backgrounds */
+.hero--image .btn,
+.section-dark .btn {
+  color: #ffffff;
+}
+.hero--image .btn::after,
+.section-dark .btn::after {
+  color: #ffffff;
+}
+.hero--image .btn:hover,
+.section-dark .btn:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+.hero--image .btn-primary,
+.section-dark .btn-primary {
+  background: var(--primary);
+  color: var(--text-on-primary, #fff);
+}
+.hero--image .btn-primary::after,
+.section-dark .btn-primary::after {
+  color: var(--text-on-primary, #fff);
+}
+.hero--image .btn-outline,
+.hero--image .btn-secondary,
+.hero--image .btn-ghost,
+.section-dark .btn-outline,
+.section-dark .btn-secondary,
+.section-dark .btn-ghost {
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.7);
+}
+.hero--image .btn-outline:hover,
+.hero--image .btn-secondary:hover,
+.hero--image .btn-ghost:hover,
+.section-dark .btn-outline:hover,
+.section-dark .btn-secondary:hover,
+.section-dark .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.8);
   background: transparent;
 }

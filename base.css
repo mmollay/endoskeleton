@@ -1234,16 +1234,24 @@ section.section-dark {
 
 /* ─── Hero Button Contrast System ────────────────────────────────────── */
 
-/* Ghost on dark / image backgrounds (fullscreen, banner, veil) */
+/* Ghost/outline/secondary on dark / image backgrounds */
 .hero--image .btn-ghost,
-.section-dark .btn-ghost {
+.hero--image .btn-outline,
+.hero--image .btn-secondary,
+.section-dark .btn-ghost,
+.section-dark .btn-outline,
+.section-dark .btn-secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   border: 2px solid rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(4px);
 }
 .hero--image .btn-ghost:hover,
-.section-dark .btn-ghost:hover {
+.hero--image .btn-outline:hover,
+.hero--image .btn-secondary:hover,
+.section-dark .btn-ghost:hover,
+.section-dark .btn-outline:hover,
+.section-dark .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.25);
   border-color: #ffffff;
   color: #ffffff;
@@ -1256,54 +1264,6 @@ section.section-dark {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ── Hero Button Safety Net ──────────────────────────────────────────────
-   Some button modules (Minimal Link, Tech Angle) make buttons invisible
-   by removing background/border. Hero CTAs MUST always be visible.
-   High specificity (0,5,0) beats module rules (0,1,0-0,2,0).
-   Only forces visibility — padding, radius, font come from the module. */
-
-/* PRIMARY: always filled on split hero (light bg) */
-section.hero.hero--split .hero-content .btn.btn-primary {
-  background: var(--primary);
-  color: var(--text-on-primary, #fff);
-  clip-path: none;
-  text-decoration: none;
-  border: none;
-  padding: 0.75rem 1.75rem;
-  min-height: 2.5rem;
-}
-section.hero.hero--split .hero-content .btn.btn-primary:hover {
-  opacity: 0.85;
-}
-section.hero.hero--split .hero-content .btn.btn-primary::after {
-  display: none;
-}
-
-/* GHOST: always bordered on split hero (light bg) */
-section.hero.hero--split .hero-content .btn.btn-ghost,
-section.hero.hero--split .hero-content .btn.btn-outline,
-section.hero.hero--split .hero-content .btn.btn-secondary {
-  border: 2px solid var(--primary);
-  color: var(--text);
-  background: transparent;
-  backdrop-filter: none;
-  clip-path: none;
-  text-decoration: none;
-  padding: 0.75rem 1.75rem;
-  min-height: 2.5rem;
-}
-section.hero.hero--split .hero-content .btn.btn-ghost::after,
-section.hero.hero--split .hero-content .btn.btn-outline::after,
-section.hero.hero--split .hero-content .btn.btn-secondary::after {
-  display: none;
-}
-section.hero.hero--split .hero-content .btn.btn-ghost:hover,
-section.hero.hero--split .hero-content .btn.btn-outline:hover,
-section.hero.hero--split .hero-content .btn.btn-secondary:hover {
-  background: var(--primary);
-  color: var(--text-on-primary, #fff);
-  border-color: var(--primary);
-}
 .hero--split .hero-title strong,
 .hero--split .hero-title em,
 .hero--split .hero-title .accent {

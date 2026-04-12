@@ -1,5 +1,7 @@
 /* SSI Endoskeleton — Button Preset: Bold */
-:root { --cta-radius: 4px; }
+:root {
+  --cta-radius: 4px;
+}
 .btn {
   border-radius: 4px !important;
   text-transform: uppercase !important;
@@ -12,4 +14,31 @@
 .btn:hover {
   box-shadow: 2px 2px 0 var(--primary-dark) !important;
   transform: translate(2px, 2px);
+}
+
+/* Hero contrast: dark backgrounds */
+.hero--image .btn-ghost,
+.hero--image .btn-outline,
+.hero--image .btn-secondary,
+.section-dark .btn-ghost,
+.section-dark .btn-outline,
+.section-dark .btn-secondary {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3) !important;
+}
+.hero--image .btn-ghost:hover,
+.hero--image .btn-outline:hover,
+.hero--image .btn-secondary:hover,
+.section-dark .btn-ghost:hover,
+.section-dark .btn-outline:hover,
+.section-dark .btn-secondary:hover {
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+.hero--image .btn-primary,
+.section-dark .btn-primary {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3) !important;
 }

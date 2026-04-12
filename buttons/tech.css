@@ -1,11 +1,20 @@
 /* SSI Endoskeleton — Button Preset: Tech (SSI-Style, abgeschrägte Ecken) */
-:root { --cta-radius: 0; }
+:root {
+  --cta-radius: 0;
+}
 .btn {
   border-radius: 0 !important;
   font-weight: 700 !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)) !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  ) !important;
 }
 .btn:hover {
   box-shadow: 0 4px 24px rgba(var(--primary-rgb), 0.3) !important;
@@ -20,4 +29,18 @@
 }
 .btn-ghost:hover {
   background: rgba(var(--primary-rgb), 0.08) !important;
+}
+
+/* Hero contrast: dark backgrounds */
+.hero--image .btn-ghost,
+.section-dark .btn-ghost {
+  border: 2px solid rgba(255, 255, 255, 0.7) !important;
+  color: #ffffff !important;
+  background: transparent !important;
+}
+.hero--image .btn-ghost:hover,
+.section-dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
 }
