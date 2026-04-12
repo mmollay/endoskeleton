@@ -17,7 +17,7 @@ if (empty($path)) {
 }
 
 // Whitelist allowed paths
-if (!preg_match('/^(scans\/[a-z0-9.\-]+|scan)$/i', $path)) {
+if (!preg_match('/^(scans\/[a-z0-9.\-]+|scan|refine)$/i', $path)) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid path']);
     exit;

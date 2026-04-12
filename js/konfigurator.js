@@ -62,6 +62,9 @@
     if (_el.generateBtn) {
       _el.generateBtn.addEventListener("click", _onGenerate);
     }
+
+    var _refineBtn = document.getElementById("btn-ki-refine");
+    if (_refineBtn) _refineBtn.addEventListener("click", _onRefine);
   }
 
   // --- State machine ----------------------------------------------------------
@@ -192,6 +195,9 @@
     }
 
     _switchState(STATES.PREVIEW);
+
+    var _rb = document.getElementById("btn-ki-refine");
+    if (_rb) _rb.disabled = false;
 
     _updateDomainSelect(domain);
     _updateBadge(scanData);
@@ -726,6 +732,95 @@
         btn.textContent = originalText;
         btn.disabled = false;
         btn.style.opacity = "1";
+      });
+  }
+
+  // --- KI Refinement -----------------------------------------------------------
+
+  function _onRefine() {
+    var btn = document.getElementById("btn-ki-refine");
+    var statusEl = document.getElementById("ki-refine-status");
+    var domain = _currentDomain;
+    var scanData = domain ? _scanCache[domain] : null;
+
+    if (!scanData || !domain) {
+      statusEl.style.display = "block";
+      statusEl.style.color = "#ef4444";
+      statusEl.textContent = "Bitte zuerst eine Domain scannen.";
+      return;
+    }
+
+    btn.classList.add("btn-loading");
+    btn.disabled = true;
+    statusEl.style.display = "block";
+    statusEl.style.color = "#64748b";
+    statusEl.textContent = "KI analysiert und optimiert...";
+
+    ScannerClient.refine(domain, scanData, ["all"])
+      .then(function (result) {
+        if (result.status !== "ok" || !result.refined) {
+          throw new Error(result.message || "Kein Ergebnis");
+        }
+
+        var refined = result.refined;
+
+        // Merge hero
+        if (refined.hero) {
+          if (!scanData.hero_text) scanData.hero_text = {};
+          if (refined.hero.headline)
+            scanData.hero_text.headline = refined.hero.headline;
+          if (refined.hero.subtitle)
+            scanData.hero_text.subtitle = refined.hero.subtitle;
+          if (refined.hero.eyebrow)
+            scanData.hero_text.eyebrow = refined.hero.eyebrow;
+        }
+
+        // Merge about
+        if (refined.about) {
+          if (!scanData.selected) scanData.selected = {};
+          if (!scanData.selected.about) scanData.selected.about = {};
+          if (refined.about.title)
+            scanData.selected.about.title = refined.about.title;
+          if (refined.about.text)
+            scanData.selected.about.text = refined.about.text;
+        }
+
+        // Merge services
+        if (refined.services) {
+          if (!scanData.selected) scanData.selected = {};
+          if (!scanData.selected.services) scanData.selected.services = {};
+          if (refined.services.title)
+            scanData.selected.services.title = refined.services.title;
+          if (refined.services.lead && refined.services.items) {
+            var parts = [refined.services.lead];
+            refined.services.items.forEach(function (item) {
+              parts.push(item.title + ": " + item.text);
+            });
+            scanData.selected.services.text = parts.join("\n\n");
+          } else if (refined.services.text) {
+            scanData.selected.services.text = refined.services.text;
+          }
+        }
+
+        scanData.refined = true;
+
+        // Re-inject
+        if (window.ContentInjector) ContentInjector.inject(scanData);
+        if (window.lucide) lucide.createIcons();
+
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+        if (window.btnSuccess) btnSuccess(btn, 2000);
+        statusEl.style.color = "#16a34a";
+        statusEl.textContent =
+          "Texte optimiert! (" + (result.duration_ms / 1000).toFixed(1) + "s)";
+        if (result.cached) statusEl.textContent += " (cached)";
+      })
+      .catch(function (err) {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+        statusEl.style.color = "#ef4444";
+        statusEl.textContent = "Fehler: " + err.message;
       });
   }
 

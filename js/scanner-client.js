@@ -116,6 +116,37 @@
     },
 
     /**
+     * Refine scan data with KI (Gemini).
+     * POST /api/v1/refine
+     * Returns refined text content for hero, about, services sections.
+     */
+    refine: function (domain, scanData, sections) {
+      var url = BASE_URL + "?path=refine";
+      var payload = {
+        domain: domain,
+        scan_data: scanData,
+        sections: sections || ["all"],
+      };
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }).then(function (response) {
+        if (!response.ok) {
+          return response.json().then(function (err) {
+            throw new Error(
+              err.error || err.message || "Refinement fehlgeschlagen",
+            );
+          });
+        }
+        return response.json();
+      });
+    },
+
+    /**
      * Poll the cache every 5 seconds.
      * Calls onUpdate(result) on each successful response.
      * Stops automatically when result.status === 'complete'.

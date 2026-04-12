@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.42.0] — 2026-04-12
+
+### Added
+- **KI optimieren Button im Konfigurator** — Neuer "KI optimieren" Button in der Struktur-Sidebar (nach dem Button-Picker). Aktiviert sich nach erfolgreichem Scan. Ruft `ScannerClient.refine()` auf und merged verfeinerte Hero/About/Services-Texte direkt in die Vorschau.
+- **ScannerClient.refine()** — Neue Methode in `scanner-client.js` für POST-Requests an `/api/v1/refine` (via scan-proxy).
+- **scan-proxy: refine-Pfad** — `api/scan-proxy.php` Whitelist um `refine` erweitert.
+
+---
+
 ## [3.41.0] — 2026-04-12
 
 ### Added

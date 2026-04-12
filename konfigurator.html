@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.41.0'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.42.0'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.41.0">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.42.0">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -1074,6 +1074,16 @@
           </div>
         </div>
 
+        <div class="demo-section">
+          <div class="demo-group">
+            <label>KI-Refinement</label>
+            <button id="btn-ki-refine" class="btn btn-primary btn-sm" disabled style="width:100%;margin-top:4px;">
+              <i data-lucide="sparkles"></i> KI optimieren
+            </button>
+            <div id="ki-refine-status" style="font-size:0.65rem;color:#64748b;margin-top:4px;display:none;"></div>
+          </div>
+        </div>
+
         <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
           <div class="demo-group">
             <label>Dichte</label>
@@ -1525,9 +1535,9 @@
 </div><!-- /konfig-preview -->
 
   <script src="js/lucide.min.js"></script>
-  <script src="js/scanner-client.js?v=3.41.0"></script>
-  <script src="js/content-injector.js?v=3.41.0"></script>
-  <script src="js/konfigurator.js?v=3.41.0"></script>
+  <script src="js/scanner-client.js?v=3.42.0"></script>
+  <script src="js/content-injector.js?v=3.42.0"></script>
+  <script src="js/konfigurator.js?v=3.42.0"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
