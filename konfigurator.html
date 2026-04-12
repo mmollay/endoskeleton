@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.35.2">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.0">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -409,17 +409,19 @@
     /* ─── Visual Pickers (Stil-Tab) ─────────── */
     .color-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 4px;
     }
     .color-swatch {
       width: 100%; aspect-ratio: 1;
       border-radius: 50%;
-      border: 2px solid #fff;
+      border: 1.5px solid #fff;
       cursor: pointer;
       transition: all 0.15s;
       position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      max-width: 28px;
+      max-height: 28px;
     }
     .color-swatch:hover { transform: scale(1.15); z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .color-swatch.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
@@ -1478,9 +1480,9 @@
 
 </div><!-- /konfig-preview -->
 
-  <script src="js/scanner-client.js?v=3.35.2"></script>
-  <script src="js/content-injector.js?v=3.35.2"></script>
-  <script src="js/konfigurator.js?v=3.35.2"></script>
+  <script src="js/scanner-client.js?v=3.36.0"></script>
+  <script src="js/content-injector.js?v=3.36.0"></script>
+  <script src="js/konfigurator.js?v=3.36.0"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
@@ -2225,6 +2227,9 @@
     function switchColor(color) {
       cssSwitch("color-css", "colors/" + color + ".css");
       document.body.setAttribute("data-color", color);
+      // Remove inline --primary override from content-injector so the
+      // color module's --primary can take effect
+      document.documentElement.style.removeProperty("--primary");
     }
 
     /* ─── Button Switcher ────────────────────── */
