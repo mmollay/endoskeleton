@@ -381,11 +381,15 @@
 
     // ── Hero images from scan ────────────────────────────────────────────────
     var contentImages = _getContentImages(scanData);
+    // Only use an explicit hero_image from the scanner — never fall back to
+    // a random content image, because that can pick up reference screenshots
+    // or portfolio images (like survivaltraining.jpg on ssi.at/referenzen)
     var heroImg =
-      (scanData.hero_image &&
-        typeof scanData.hero_image.src === "string" &&
-        scanData.hero_image.src) ||
-      contentImages[0];
+      scanData.hero_image &&
+      typeof scanData.hero_image.src === "string" &&
+      scanData.hero_image.src
+        ? scanData.hero_image.src
+        : null;
     if (heroImg) {
       // 1. Background-Image on hero wrappers (fullscreen, banner, veil)
       var heroBgElements = document.querySelectorAll(
