@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '5.9.5'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.36.5'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,22 +102,34 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.4">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.5">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
-      margin-right: 348px; /* Panel + slim tab */
+      margin-right: 340px; /* Panel width — no gap */
       transition: margin-right 0.25s ease;
+      overflow-x: hidden;
     }
     /* Cap hero title size — font modules set --fs-hero up to 9rem */
     .hero-title {
       font-size: clamp(2rem, 1.25rem + 3vw, 3.25rem) !important;
     }
+    /* Ghost button on split hero: thicker border, primary color */
+    .hero--split .btn-ghost,
+    .hero .btn-ghost {
+      border: 2px solid var(--primary, #147070) !important;
+      color: var(--primary, #147070) !important;
+    }
+    .hero--split .btn-ghost:hover,
+    .hero .btn-ghost:hover {
+      background: var(--primary, #147070) !important;
+      color: #fff !important;
+    }
     body.sidebar-collapsed {
       margin-right: 24px;
     }
     .site-nav {
-      right: 348px !important;
+      right: 340px !important;
       transition: right 0.25s ease, background 0.3s, box-shadow 0.3s, transform 0.35s ease, color 0.3s !important;
     }
     body.sidebar-collapsed .site-nav {
@@ -1484,9 +1496,9 @@
 
 </div><!-- /konfig-preview -->
 
-  <script src="js/scanner-client.js?v=3.36.4"></script>
-  <script src="js/content-injector.js?v=3.36.4"></script>
-  <script src="js/konfigurator.js?v=3.36.4"></script>
+  <script src="js/scanner-client.js?v=3.36.5"></script>
+  <script src="js/content-injector.js?v=3.36.5"></script>
+  <script src="js/konfigurator.js?v=3.36.5"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
