@@ -43,26 +43,6 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #f1f1f1; padding
 .state-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 .state-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* ---- Module Grid ---- */
-.modules-status { text-align: center; padding: 2rem; color: #aaa; font-size: 0.85rem; }
-.modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
-.module-card { background: #fff; border-radius: 10px; border: 1px solid #eee; overflow: hidden; }
-.module-card-head { padding: 8px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-.module-card-head b { font-size: 0.8rem; }
-.module-card-head code { font-size: 0.65rem; color: #aaa; }
-.module-row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 14px; min-height: 64px; position: relative; }
-.module-row-light { background: #fafafa; }
-.module-row-dark { background: #111; overflow: hidden; }
-.dark-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=40') center/cover; }
-.dark-bg::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
-.module-row-dark .snap { position: relative; z-index: 1; }
-
-/* Hidden render area */
-#render { position: fixed; left: -5000px; top: 0; width: 800px; visibility: hidden; }
-#render .hero { min-height: auto !important; padding: 16px !important; overflow: visible !important; margin: 0 !important; background: transparent !important; }
-#render .hero-bg { display: none !important; }
-#render .hero-content { position: relative; z-index: 1; text-align: center; max-width: none; padding: 0; }
-#render .hero-ctas { display: flex; gap: 14px; justify-content: center; }
 </style>
 </head>
 <body>
@@ -201,195 +181,23 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #f1f1f1; padding
     </div>
   </div>
 
-  <!-- ===== SECTION 5: MODULE GRID ===== -->
-  <div class="section-card">
-    <div class="section-title">
-      <h2>Module Preview</h2>
-      <span>Alle 24 Button-Module — hell + dunkel</span>
-    </div>
-    <div class="section-body" style="padding: 1rem;">
-      <div id="modules-status" class="modules-status">Lade Module... 0/24</div>
-      <div class="modules-grid" id="modules-grid"></div>
-    </div>
-  </div>
-
 </div><!-- .sections -->
-
-<!-- Hidden render area for computed style capture -->
-<div id="render">
-  <div id="r-light" style="background:#fafafa;padding:16px;">
-    <a href="#" class="btn btn-primary" id="rl-p">B</a>
-    <a href="#" class="btn btn-ghost" id="rl-g">G</a>
-  </div>
-  <section class="hero hero--fullscreen hero--image" id="r-dark">
-    <div class="hero-content">
-      <div class="hero-ctas">
-        <a href="#" class="btn btn-primary" id="rd-p">B</a>
-        <a href="#" class="btn btn-ghost" id="rd-g">G</a>
-      </div>
-    </div>
-  </section>
-</div>
 
 <script>
 (function () {
   'use strict';
 
-  // ── Palette switcher ──────────────────────────────────────────────────────
   var colorLink = document.getElementById('color-css');
   var paletteSelect = document.getElementById('palette-select');
 
   paletteSelect.addEventListener('change', function () {
     colorLink.href = 'colors/' + paletteSelect.value + '.css';
-    // Re-run lucide after a short delay so icons remain rendered
     setTimeout(function () {
       if (window.lucide) { window.lucide.createIcons(); }
     }, 100);
   });
 
-  // ── Module grid ───────────────────────────────────────────────────────────
-  var MODULES = [
-    'rect-solid', 'rect-outline', 'pill-solid', 'pill-thin',
-    'soft-round', 'ghost-tint', 'brutalist', 'cta-arrow',
-    'tech-angle', 'shadow-lift', 'gradient-cta', 'chip',
-    'heavy-bold', 'minimal-link', 'bold', 'tactical',
-    'tech', 'sharp', 'rounded', 'soft',
-    'ghost', 'outline', 'outline-thin', 'outline-elegant'
-  ];
-
-  var PROPS = [
-    'color', 'backgroundColor', 'backgroundImage',
-    'borderTopWidth', 'borderTopStyle', 'borderTopColor',
-    'borderBottomWidth', 'borderBottomStyle', 'borderBottomColor',
-    'borderLeftWidth', 'borderLeftStyle', 'borderLeftColor',
-    'borderRightWidth', 'borderRightStyle', 'borderRightColor',
-    'borderRadius', 'padding', 'fontSize', 'fontWeight', 'fontFamily',
-    'letterSpacing', 'textTransform', 'textDecoration', 'textDecorationLine',
-    'boxShadow', 'clipPath', 'opacity', 'backdropFilter', 'display', 'lineHeight'
-  ];
-
-  var grid = document.getElementById('modules-grid');
-  var statusEl = document.getElementById('modules-status');
-  var currentIdx = 0;
-
-  function toCssProp(camel) {
-    return camel.replace(/([A-Z])/g, '-$1').toLowerCase();
-  }
-
-  function snap(el) {
-    var s = window.getComputedStyle(el);
-    var o = {};
-    PROPS.forEach(function (p) { o[p] = s.getPropertyValue(toCssProp(p)); });
-    return o;
-  }
-
-  function applySnap(el, styles) {
-    Object.keys(styles).forEach(function (p) {
-      el.style.setProperty(toCssProp(p), styles[p]);
-    });
-  }
-
-  function makeSnapBtn(text, styles) {
-    var el = document.createElement('span');
-    el.className = 'snap';
-    el.textContent = text;
-    applySnap(el, styles);
-    el.style.display = 'inline-block';
-    el.style.cursor = 'pointer';
-    el.style.textAlign = 'center';
-    return el;
-  }
-
-  function loadModule(name, cb) {
-    var old = document.getElementById('test-module-css');
-    if (old) { old.remove(); }
-
-    var link = document.createElement('link');
-    link.id = 'test-module-css';
-    link.rel = 'stylesheet';
-    link.onload = function () {
-      requestAnimationFrame(function () {
-        requestAnimationFrame(cb);
-      });
-    };
-    link.onerror = cb;
-    link.href = 'buttons/' + name + '.css?t=' + Date.now();
-    document.head.appendChild(link);
-  }
-
-  function buildModuleCard(mod, lpS, lgS, dpS, dgS) {
-    var card = document.createElement('div');
-    card.className = 'module-card';
-
-    // Head
-    var head = document.createElement('div');
-    head.className = 'module-card-head';
-    var b = document.createElement('b');
-    b.textContent = mod;
-    var c = document.createElement('code');
-    c.textContent = mod + '.css';
-    head.appendChild(b);
-    head.appendChild(c);
-    card.appendChild(head);
-
-    // Light row
-    var lr = document.createElement('div');
-    lr.className = 'module-row module-row-light';
-    lr.appendChild(makeSnapBtn('Primary', lpS));
-    lr.appendChild(makeSnapBtn('Ghost', lgS));
-    card.appendChild(lr);
-
-    // Dark row
-    var dr = document.createElement('div');
-    dr.className = 'module-row module-row-dark';
-    var dbg = document.createElement('div');
-    dbg.className = 'dark-bg';
-    dr.appendChild(dbg);
-    dr.appendChild(makeSnapBtn('Primary', dpS));
-    dr.appendChild(makeSnapBtn('Ghost', dgS));
-    card.appendChild(dr);
-
-    return card;
-  }
-
-  // Collect all cards first, then show at once (no flickering)
-  var pendingCards = [];
-
-  function processNext() {
-    if (currentIdx >= MODULES.length) {
-      // All done — show everything at once
-      var frag = document.createDocumentFragment();
-      pendingCards.forEach(function(card) { frag.appendChild(card); });
-      grid.appendChild(frag);
-      statusEl.style.display = 'none';
-      document.getElementById('render').style.display = 'none';
-      return;
-    }
-
-    var mod = MODULES[currentIdx];
-    statusEl.textContent = 'Lade Module... ' + (currentIdx + 1) + '/' + MODULES.length;
-
-    loadModule(mod, function () {
-      var lpS = snap(document.getElementById('rl-p'));
-      var lgS = snap(document.getElementById('rl-g'));
-      var dpS = snap(document.getElementById('rd-p'));
-      var dgS = snap(document.getElementById('rd-g'));
-
-      pendingCards.push(buildModuleCard(mod, lpS, lgS, dpS, dgS));
-
-      currentIdx++;
-      setTimeout(processNext, 30);
-    });
-  }
-
-  // ── Init ──────────────────────────────────────────────────────────────────
-  window.addEventListener('load', function () {
-    // Init Lucide icons
-    if (window.lucide) { window.lucide.createIcons(); }
-    // Start module grid loading
-    setTimeout(processNext, 200);
-  });
-
+  if (window.lucide) { window.lucide.createIcons(); }
 }());
 </script>
 </body>
