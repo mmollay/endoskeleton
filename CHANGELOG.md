@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.39.0] — 2026-04-12
+
+### Added
+- **Semantic Button Colors** — `.btn-success`, `.btn-danger`, `.btn-warning` Klassen in `base.css` mit Outline-/Ghost-Varianten (kombinierbar: `.btn-outline.btn-success` etc.)
+- **Button Disabled State** — `.btn:disabled` / `.btn.btn-disabled` mit opacity, cursor-not-allowed, pointer-events: none
+- **Button Loading Spinner** — `.btn-loading` zeigt animierten Spinner, transparent für ghost/outline Varianten
+- **Button Success Flash** — `.btn-success-flash` + `window.btnSuccess(btn, ms)` Helper in `shared.js` — zeigt Checkmark-Icon, revertiert nach Ablauf automatisch
+- **Focus Visible** — `.btn:focus-visible` mit outline für Keyboard-Navigation
+
+---
+
 ## [3.38.0] — 2026-04-12
 
 ### Changed

@@ -1233,6 +1233,44 @@ section.section-dark {
   background: rgba(var(--primary-rgb), 0.06);
 }
 
+/* ─── Semantic Button Colors ─────────────────────────────────────────── */
+.btn-success { background: var(--btn-success); color: #fff; border-color: var(--btn-success); }
+.btn-success:hover { background: var(--btn-success-dark); border-color: var(--btn-success-dark); }
+
+.btn-danger { background: var(--btn-danger); color: #fff; border-color: var(--btn-danger); }
+.btn-danger:hover { background: var(--btn-danger-dark); border-color: var(--btn-danger-dark); }
+
+.btn-warning { background: var(--btn-warning); color: #fff; border-color: var(--btn-warning); }
+.btn-warning:hover { background: var(--btn-warning-dark); border-color: var(--btn-warning-dark); }
+
+/* Outline variants */
+.btn-outline.btn-success,
+.btn-ghost.btn-success {
+  background: transparent;
+  color: var(--btn-success);
+  border: 2px solid var(--btn-success);
+}
+.btn-outline.btn-success:hover,
+.btn-ghost.btn-success:hover { background: var(--btn-success); color: #fff; }
+
+.btn-outline.btn-danger,
+.btn-ghost.btn-danger {
+  background: transparent;
+  color: var(--btn-danger);
+  border: 2px solid var(--btn-danger);
+}
+.btn-outline.btn-danger:hover,
+.btn-ghost.btn-danger:hover { background: var(--btn-danger); color: #fff; }
+
+.btn-outline.btn-warning,
+.btn-ghost.btn-warning {
+  background: transparent;
+  color: var(--btn-warning);
+  border: 2px solid var(--btn-warning);
+}
+.btn-outline.btn-warning:hover,
+.btn-ghost.btn-warning:hover { background: var(--btn-warning); color: #fff; }
+
 /* ─── Hero Button Contrast System ────────────────────────────────────── */
 
 /* Ghost/outline/secondary on dark / image backgrounds
@@ -1383,6 +1421,57 @@ section.section-dark {
 .btn-icon-only.btn-sm { width: 2.15rem; height: 2.15rem; }
 .btn-icon-only.btn-lg { width: 3.25rem; height: 3.25rem; }
 .btn-icon-only.btn-xl { width: 3.75rem; height: 3.75rem; }
+
+/* ─── Button States ──────────────────────────────────────────────────── */
+
+/* Disabled */
+.btn:disabled,
+.btn.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading spinner */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn-loading * { visibility: hidden; }
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+.btn-ghost.btn-loading::after,
+.btn-outline.btn-loading::after {
+  border-color: rgba(var(--primary-rgb), 0.2);
+  border-top-color: var(--primary);
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* Success flash */
+.btn-success-flash {
+  background: var(--btn-success) !important;
+  color: #fff !important;
+  border-color: var(--btn-success) !important;
+  pointer-events: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Focus visible */
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 
 /* ─── CARDS ─────────────────────────────────────────────────────────────── */
 .card {

@@ -909,3 +909,33 @@
 if (window.lucide) {
   lucide.createIcons();
 }
+
+/* Button success flash — shows check, then reverts */
+window.btnSuccess = function (btn, ms) {
+  var origChildren = [];
+  while (btn.firstChild) {
+    origChildren.push(btn.removeChild(btn.firstChild));
+  }
+  btn.classList.add("btn-success-flash");
+  var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "1em");
+  svg.setAttribute("height", "1em");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "2.5");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", "M20 6L9 17l-5-5");
+  svg.appendChild(path);
+  btn.appendChild(svg);
+  setTimeout(function () {
+    btn.classList.remove("btn-success-flash");
+    while (btn.firstChild) btn.removeChild(btn.firstChild);
+    origChildren.forEach(function (child) {
+      btn.appendChild(child);
+    });
+    if (window.lucide) lucide.createIcons();
+  }, ms || 2000);
+};
