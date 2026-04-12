@@ -10,13 +10,13 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.36.6'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.36.7'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
         'default': { layout:'modern',  hero:'fullscreen', color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'modern',           buttons:'rounded',        navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         survival:  { layout:'modern',  hero:'veil',       color:'survival',  charakter:'markant', spacing:'spacious',animation:'dynamic', font:'brand-bold',       buttons:'rect-solid',     navBehavior:'solid',       navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'warm',  navCase:'upper' },
-        corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'rect-outline',   navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
+        corporate: { layout:'modern',  hero:'split',      color:'blue',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'swiss-precision',  buttons:'soft-round',     navBehavior:'sticky',      navLayout:'standard', navStyle:'light',   footerStyle:'dark',    width:'default', theme:'light' },
         editorial: { layout:'magazine',hero:'banner',     color:'wine',      charakter:'neutral', spacing:'normal',  animation:'subtle',  font:'editorial-grand',  buttons:'outline-thin',      navBehavior:'sticky',      navLayout:'centered', navStyle:'light',   footerStyle:'dark',    width:'wide',    theme:'light' },
         minimal:   { layout:'modern',  hero:'minimal',    color:'gray',      charakter:'elegant', spacing:'compact', animation:'none',    font:'swiss-precision',  buttons:'minimal-link',   navBehavior:'sticky',      navLayout:'minimal',  navStyle:'light',   footerStyle:'minimal', width:'default', theme:'light' },
         tech:      { layout:'modern',  hero:'fullscreen', color:'cyan',      charakter:'kantig',  spacing:'normal',  animation:'dynamic', font:'mono-hacker',      buttons:'rect-outline',   navBehavior:'transparent', navLayout:'standard', navStyle:'dark',    footerStyle:'dark',    width:'full',    theme:'tech',  navCase:'upper' },
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.6">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.36.7">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -139,10 +139,10 @@
 
     .demo-sidebar-tab {
       width: 8px;
-      background: #f1f5f9;
+      background: transparent;
       color: #64748b;
       border: none;
-      border-left: 1px solid #e2e8f0;
+      border-left: none;
       cursor: pointer;
       font-size: 0.75rem;
       font-family: 'Inter', system-ui, sans-serif;
@@ -1485,9 +1485,9 @@
 
 </div><!-- /konfig-preview -->
 
-  <script src="js/scanner-client.js?v=3.36.6"></script>
-  <script src="js/content-injector.js?v=3.36.6"></script>
-  <script src="js/konfigurator.js?v=3.36.6"></script>
+  <script src="js/scanner-client.js?v=3.36.7"></script>
+  <script src="js/content-injector.js?v=3.36.7"></script>
+  <script src="js/konfigurator.js?v=3.36.7"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
