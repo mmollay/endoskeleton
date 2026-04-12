@@ -460,10 +460,28 @@
      *         contact email/phone, nav + footer logo src, --primary CSS var.
      */
     captureOriginals: function () {
+      // Capture hero background images from all variants
+      var heroBgEls = document.querySelectorAll(
+        ".hero-bg, .hero-image, .hero-fullscreen, [data-hero-bg]",
+      );
+      var heroBgImages = [];
+      for (var i = 0; i < heroBgEls.length; i++) {
+        heroBgImages.push(heroBgEls[i].style.backgroundImage || "");
+      }
+      var heroSplitImgs = document.querySelectorAll(
+        ".hero--split img, .hero-split img, .hero-media img",
+      );
+      var heroSplitSrcs = [];
+      for (var j = 0; j < heroSplitImgs.length; j++) {
+        heroSplitSrcs.push(heroSplitImgs[j].src || "");
+      }
+
       _originals = {
         heroTitle: _getText('[data-i18n="hero.title"]'),
         heroSubtitle: _getText('[data-i18n="hero.subtitle"]'),
         heroEyebrow: _getText('[data-i18n="hero.eyebrow"]'),
+        heroBgImages: heroBgImages,
+        heroSplitSrcs: heroSplitSrcs,
         aboutTitle: _getText('[data-i18n="about.title"]'),
         aboutText: _getText('[data-i18n="about.text"]'),
         contactEmail: _getText(".contact-email"),
@@ -482,6 +500,10 @@
      */
     inject: function (scanData) {
       if (!scanData) return;
+
+      // Reset previous scan's injected content (especially images) so
+      // switching from domain A to domain B doesn't show A's hero in B
+      this.reset();
 
       // ── Hero title ──────────────────────────────────────────────────────────
       // Prefer hero_text.headline (extracted from <h1>) over scanData.title (SEO <title>)
@@ -686,6 +708,22 @@
       _setAllAttr(".contact-email-link", "href", _originals.contactEmailHref);
       _setAllAttr(".site-nav .logo img", "src", _originals.navLogoSrc);
       _setAllAttr(".site-footer .logo img", "src", _originals.footerLogoSrc);
+
+      // Restore hero images to original (preset default)
+      var heroBgEls = document.querySelectorAll(
+        ".hero-bg, .hero-image, .hero-fullscreen, [data-hero-bg]",
+      );
+      for (var bi = 0; bi < heroBgEls.length; bi++) {
+        heroBgEls[bi].style.backgroundImage =
+          (_originals.heroBgImages && _originals.heroBgImages[bi]) || "";
+      }
+      var heroSplitImgs = document.querySelectorAll(
+        ".hero--split img, .hero-split img, .hero-media img",
+      );
+      for (var si = 0; si < heroSplitImgs.length; si++) {
+        heroSplitImgs[si].src =
+          (_originals.heroSplitSrcs && _originals.heroSplitSrcs[si]) || "";
+      }
 
       if (_originals.primaryColor) {
         _setCSSVar("--primary", _originals.primaryColor);
