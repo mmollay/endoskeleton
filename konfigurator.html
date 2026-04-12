@@ -503,11 +503,17 @@
     }
     .button-preview-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(59,130,246,0.08); }
     .button-preview-card.active { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    .button-preview-card .btn-pair {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      align-items: center;
+    }
     .button-preview-card .btn-mini {
       display: inline-block;
       max-width: 100%;
-      font-size: 0.625rem;
-      padding: 0.22rem 0.5rem;
+      font-size: 0.55rem;
+      padding: 0.18rem 0.4rem;
       color: #fff;
       line-height: 1.3;
       font-family: 'Inter', sans-serif;
@@ -515,6 +521,14 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .button-preview-card .btn-mini-ghost {
+      background: transparent !important;
+      color: #3b82f6 !important;
+      border: 1px solid rgba(59,130,246,0.4) !important;
+      box-shadow: none !important;
+      clip-path: none !important;
+      text-decoration: none !important;
     }
     .button-preview-card .btn-label {
       display: block;
@@ -1019,20 +1033,20 @@
           <div class="demo-group">
             <label>Buttons</label>
             <div class="button-grid">
-              <button class="button-preview-card active" data-buttons="rect-solid"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;letter-spacing:0.1em;font-size:0.55rem">BTN</span><span class="btn-label">Rect Solid</span></button>
-              <button class="button-preview-card" data-buttons="rect-outline"><span class="btn-mini" style="background:transparent;border:1px solid #3b82f6;border-radius:0;color:#3b82f6;text-transform:uppercase;letter-spacing:0.1em;font-size:0.55rem">BTN</span><span class="btn-label">Rect Outline</span></button>
-              <button class="button-preview-card" data-buttons="pill-solid"><span class="btn-mini" style="background:#3b82f6;border-radius:999px;font-weight:600">Button</span><span class="btn-label">Pill Solid</span></button>
-              <button class="button-preview-card" data-buttons="pill-thin"><span class="btn-mini" style="background:transparent;border:1.5px solid rgba(0,0,0,0.3);border-radius:999px;color:#333;font-weight:500">Button</span><span class="btn-label">Pill Thin</span></button>
-              <button class="button-preview-card" data-buttons="soft-round"><span class="btn-mini" style="background:#3b82f6;border-radius:8px;font-weight:600">Button</span><span class="btn-label">Soft Round</span></button>
-              <button class="button-preview-card" data-buttons="ghost-tint"><span class="btn-mini" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;color:#3b82f6;font-weight:500">Button</span><span class="btn-label">Ghost Tint</span></button>
-              <button class="button-preview-card" data-buttons="brutalist"><span class="btn-mini" style="background:#3b82f6;border-radius:0;border:2px solid #000;box-shadow:3px 3px 0 #000;font-weight:700">Button</span><span class="btn-label">Brutalist</span></button>
-              <button class="button-preview-card" data-buttons="cta-arrow"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:600">Button →</span><span class="btn-label">CTA Arrow</span></button>
-              <button class="button-preview-card" data-buttons="tech-angle"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);text-transform:uppercase;letter-spacing:0.08em;font-size:0.55rem">BTN</span><span class="btn-label">Tech Angle</span></button>
-              <button class="button-preview-card" data-buttons="shadow-lift"><span class="btn-mini" style="background:#3b82f6;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-weight:700">Button</span><span class="btn-label">Shadow Lift</span></button>
-              <button class="button-preview-card" data-buttons="gradient-cta"><span class="btn-mini" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:8px;font-weight:700">Button</span><span class="btn-label">Gradient</span></button>
-              <button class="button-preview-card" data-buttons="chip"><span class="btn-mini" style="background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:4px;font-size:0.55rem;padding:0.15rem 0.45rem">Btn</span><span class="btn-label">Chip</span></button>
-              <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;font-size:0.55rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
-              <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Button</span><span class="btn-label">Minimal Link</span></button>
+              <button class="button-preview-card active" data-buttons="rect-solid"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;letter-spacing:0.08em">BTN</span><span class="btn-mini btn-mini-ghost" style="border-radius:0;text-transform:uppercase;letter-spacing:0.08em">BTN</span></span><span class="btn-label">Rect Solid</span></button>
+              <button class="button-preview-card" data-buttons="rect-outline"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;letter-spacing:0.08em">BTN</span><span class="btn-mini btn-mini-ghost" style="border-radius:0;text-transform:uppercase;letter-spacing:0.08em">BTN</span></span><span class="btn-label">Rect Outline</span></button>
+              <button class="button-preview-card" data-buttons="pill-solid"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:999px">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:999px">Btn</span></span><span class="btn-label">Pill Solid</span></button>
+              <button class="button-preview-card" data-buttons="pill-thin"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:999px">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:999px;border-width:1px">Btn</span></span><span class="btn-label">Pill Thin</span></button>
+              <button class="button-preview-card" data-buttons="soft-round"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:8px">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:8px">Btn</span></span><span class="btn-label">Soft Round</span></button>
+              <button class="button-preview-card" data-buttons="ghost-tint"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:6px">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:6px;background:rgba(59,130,246,0.08) !important">Btn</span></span><span class="btn-label">Ghost Tint</span></button>
+              <button class="button-preview-card" data-buttons="brutalist"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:0;border:2px solid #000;box-shadow:2px 2px 0 #000">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:0;border:2px solid #000 !important;color:#000 !important;box-shadow:2px 2px 0 #000">Btn</span></span><span class="btn-label">Brutalist</span></button>
+              <button class="button-preview-card" data-buttons="cta-arrow"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:4px">Btn →</span><span class="btn-mini btn-mini-ghost" style="border-radius:0;border:none !important;text-decoration:underline !important;padding:0.18rem 0.1rem">Btn →</span></span><span class="btn-label">CTA Arrow</span></button>
+              <button class="button-preview-card" data-buttons="tech-angle"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);text-transform:uppercase;font-size:0.5rem">BTN</span><span class="btn-mini btn-mini-ghost" style="text-transform:uppercase;font-size:0.5rem;background:rgba(59,130,246,0.1) !important">BTN</span></span><span class="btn-label">Tech Angle</span></button>
+              <button class="button-preview-card" data-buttons="shadow-lift"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.12)">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:10px;background:#fff !important;color:#3b82f6 !important;border:1px solid rgba(0,0,0,0.08) !important">Btn</span></span><span class="btn-label">Shadow Lift</span></button>
+              <button class="button-preview-card" data-buttons="gradient-cta"><span class="btn-pair"><span class="btn-mini" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:8px">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:8px">Btn</span></span><span class="btn-label">Gradient</span></button>
+              <button class="button-preview-card" data-buttons="chip"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-size:0.5rem">Btn</span><span class="btn-mini btn-mini-ghost" style="border-radius:4px;font-size:0.5rem;background:#fff !important;color:#334155 !important;border:1px solid #cbd5e1 !important">Btn</span></span><span class="btn-label">Chip</span></button>
+              <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-pair"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;font-size:0.5rem">BTN</span><span class="btn-mini btn-mini-ghost" style="border-radius:4px;font-weight:900;text-transform:uppercase;font-size:0.5rem">BTN</span></span><span class="btn-label">Heavy Bold</span></button>
+              <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-pair"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:none;text-decoration:underline;padding:0.18rem 0.1rem">Btn</span><span class="btn-mini" style="background:transparent;color:#888;border:none;text-decoration:underline;padding:0.18rem 0.1rem">Btn</span></span><span class="btn-label">Minimal Link</span></button>
             </div>
             <div class="control-group" style="margin-top:8px;">
               <label class="control-label" style="font-size:0.65rem;color:#64748b;margin-bottom:4px;display:block;">Button-Icon</label>
