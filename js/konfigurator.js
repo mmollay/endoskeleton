@@ -756,7 +756,26 @@
     statusEl.style.color = "#64748b";
     statusEl.textContent = "KI analysiert und optimiert...";
 
-    ScannerClient.refine(domain, scanData, ["all"])
+    // Nur relevante Felder senden (nicht alle Seitentexte — verhindert Timeout)
+    var trimmed = {
+      title: scanData.title || "",
+      branch: scanData.branch || "",
+      hero_text: scanData.hero_text || {},
+      selected: scanData.selected || {},
+      contact: scanData.contact || {},
+      ai_analysis: scanData.ai_analysis || scanData.ki_analysis || {},
+      seo: scanData.seo || {},
+      colors: scanData.colors || [],
+      pages: (scanData.pages || []).slice(0, 3).map(function (p) {
+        return {
+          url: p.url,
+          title: p.title,
+          text: (p.text || p.content || "").substring(0, 800),
+        };
+      }),
+    };
+
+    ScannerClient.refine(domain, trimmed, ["all"])
       .then(function (result) {
         if (result.status !== "ok" || !result.refined) {
           throw new Error(result.message || "Kein Ergebnis");
