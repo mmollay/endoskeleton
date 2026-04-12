@@ -778,7 +778,7 @@
     ScannerClient.refine(domain, trimmed, ["all"])
       .then(function (result) {
         if (result.status !== "ok" || !result.refined) {
-          throw new Error(result.message || "Kein Ergebnis");
+          throw new Error(result.message || result.error || "Kein Ergebnis");
         }
 
         var refined = result.refined;

@@ -92,14 +92,14 @@ $output = shell_exec($cmd);
 
 $result = json_decode($output, true);
 
+// WICHTIG: Niemals HTTP 502 zurueckgeben — Cloudflare ersetzt den Body mit HTML!
+// Immer 200 mit status:"error" im JSON.
 if (!$result) {
-    http_response_code(502);
-    echo json_encode(['error' => 'KI-Verarbeitung fehlgeschlagen. Bitte erneut versuchen.']);
+    echo json_encode(['status' => 'error', 'error' => 'KI-Verarbeitung fehlgeschlagen. Bitte erneut versuchen.']);
     exit;
 }
 
 if (($result['status'] ?? '') === 'error') {
-    http_response_code(502);
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
     exit;
 }
