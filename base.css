@@ -1256,17 +1256,29 @@ section.section-dark {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ── Split Hero Exception: text side has light background ── */
-.hero--split .hero-content .btn-ghost {
-  background: transparent;
-  color: var(--text);
+/* ── Split Hero Exception: text side has light background ──
+   High specificity (0,5,0) so this BEATS button module rules (0,1,0-0,2,0)
+   but only sets border/color. Padding, radius, font come from the module. */
+section.hero.hero--split .hero-content .btn.btn-ghost,
+section.hero.hero--split .hero-content .btn.btn-outline,
+section.hero.hero--split .hero-content .btn.btn-secondary {
   border: 2px solid var(--primary);
+  color: var(--text);
+  background: transparent;
   backdrop-filter: none;
+  clip-path: none;
+  text-decoration: none;
 }
-.hero--split .hero-content .btn-ghost:hover {
+section.hero.hero--split .hero-content .btn.btn-ghost:hover,
+section.hero.hero--split .hero-content .btn.btn-outline:hover,
+section.hero.hero--split .hero-content .btn.btn-secondary:hover {
   background: var(--primary);
   color: var(--text-on-primary, #fff);
   border-color: var(--primary);
+}
+/* Split hero primary: only fix clip-path (for tech-angle module) */
+section.hero.hero--split .hero-content .btn.btn-primary {
+  clip-path: none;
 }
 .hero--split .hero-title strong,
 .hero--split .hero-title em,
