@@ -46,3 +46,4 @@ tests/qa-report.md
 api/data/generated/*
 !api/data/generated/.gitkeep
 api/data/rate-limits/*.json
+.superpowers/
