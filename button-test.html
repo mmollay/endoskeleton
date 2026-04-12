@@ -3,26 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Button Module Test</title>
+<title>Button Module Test — Alle 24 Module</title>
 <link rel="stylesheet" href="base.css">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', system-ui, sans-serif; background: #f5f5f5; padding: 2rem; }
-h1 { text-align: center; margin-bottom: 0.5rem; font-size: 1.5rem; }
-.subtitle { text-align: center; color: #666; margin-bottom: 2rem; font-size: 0.9rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; max-width: 1400px; margin: 0 auto; }
-.card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.card-header { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-.card-header h3 { font-size: 0.85rem; font-weight: 600; }
-.card-header code { font-size: 0.7rem; color: #999; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #f1f1f1; padding: 1.5rem; margin: 0; }
+h1 { text-align: center; margin-bottom: 0.25rem; font-size: 1.4rem; }
+p.sub { text-align: center; color: #888; margin-bottom: 1.5rem; font-size: 0.8rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1rem; max-width: 1600px; margin: 0 auto; }
+.card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.card-head { padding: 8px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.card-head b { font-size: 0.8rem; }
+.card-head code { font-size: 0.65rem; color: #aaa; }
+.row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 14px; min-height: 64px; position: relative; }
+.row-light { background: #fafafa; }
+.row-dark { background: #222; overflow: hidden; }
+.row-dark-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=40') center/cover; }
+.row-dark-bg::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.row-dark .snap-btn { position: relative; z-index: 1; }
+.lbl { position: absolute; top: 3px; right: 6px; font-size: 0.55rem; color: #ccc; z-index: 2; }
+.row-dark .lbl { color: #666; }
+.loading { text-align: center; padding: 3rem; color: #999; font-size: 1rem; }
+/* Hidden render area */
+#render-area { position: absolute; left: -9999px; top: -9999px; visibility: hidden; }
+#render-area .hero { min-height: auto; padding: 20px; overflow: visible; margin: 0; }
+#render-area .hero-content { padding: 0; max-width: none; text-align: center; }
+#render-area .hero-ctas { display: flex; gap: 14px; }
 </style>
 </head>
 <body>
 
-<h1>Button Module Test — Alle 24 Module</h1>
-<p class="subtitle">Oben: heller Hintergrund | Unten: dunkler Hero-Bild-Hintergrund</p>
+<h1>Button Module Test</h1>
+<p class="sub">Oben: hell | Unten: dunkler Bild-Hintergrund</p>
 
+<div id="loading" class="loading">Module werden geladen...</div>
 <div class="grid" id="grid"></div>
+
+<!-- Hidden area to render buttons and capture styles -->
+<div id="render-area">
+  <div id="render-light">
+    <a href="#" class="btn btn-primary" id="rnd-lp">Button</a>
+    <a href="#" class="btn btn-ghost" id="rnd-lg">Ghost</a>
+  </div>
+  <section class="hero hero--fullscreen hero--image" id="render-dark-section">
+    <div class="hero-content">
+      <div class="hero-ctas">
+        <a href="#" class="btn btn-primary" id="rnd-dp">Button</a>
+        <a href="#" class="btn btn-ghost" id="rnd-dg">Ghost</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<link id="module-css" rel="stylesheet" href="">
 
 <script>
 var MODULES = [
@@ -34,38 +66,113 @@ var MODULES = [
   'ghost', 'outline', 'outline-thin', 'outline-elegant'
 ];
 
+var STYLE_PROPS = [
+  'background', 'backgroundColor', 'color', 'border', 'borderRadius',
+  'borderWidth', 'borderStyle', 'borderColor',
+  'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+  'fontSize', 'fontWeight', 'fontFamily', 'letterSpacing', 'textTransform',
+  'textDecoration', 'textDecorationLine', 'textDecorationColor',
+  'boxShadow', 'clipPath', 'opacity', 'backdropFilter',
+  'display', 'minHeight', 'lineHeight'
+];
+
 var grid = document.getElementById('grid');
+var moduleLink = document.getElementById('module-css');
+var idx = 0;
 
-MODULES.forEach(function(mod) {
-  var card = document.createElement('div');
-  card.className = 'card';
+function captureStyles(el) {
+  var s = getComputedStyle(el);
+  var result = {};
+  STYLE_PROPS.forEach(function(p) { result[p] = s[p]; });
+  return result;
+}
 
-  var header = document.createElement('div');
-  header.className = 'card-header';
-  var h3 = document.createElement('h3');
-  h3.textContent = mod;
-  var code = document.createElement('code');
-  code.textContent = mod + '.css';
-  header.appendChild(h3);
-  header.appendChild(code);
-  card.appendChild(header);
+function applyStyles(el, styles) {
+  STYLE_PROPS.forEach(function(p) {
+    try { el.style[p] = styles[p]; } catch(e) {}
+  });
+}
 
-  // Light row iframe
-  var iframeLight = document.createElement('iframe');
-  iframeLight.style.cssText = 'border:none;width:100%;height:70px;display:block;';
-  iframeLight.setAttribute('scrolling', 'no');
-  iframeLight.src = 'button-test-frame.html?mod=' + mod + '&bg=light';
-  card.appendChild(iframeLight);
+function createSnappedBtn(text, styles, extraClass) {
+  var btn = document.createElement('span');
+  btn.className = 'snap-btn';
+  btn.textContent = text;
+  applyStyles(btn, styles);
+  btn.style.display = 'inline-block';
+  btn.style.cursor = 'pointer';
+  btn.style.textAlign = 'center';
+  if (!btn.style.minHeight || btn.style.minHeight === 'auto' || btn.style.minHeight === '0px') {
+    // ensure button is visible
+  }
+  return btn;
+}
 
-  // Dark row iframe
-  var iframeDark = document.createElement('iframe');
-  iframeDark.style.cssText = 'border:none;width:100%;height:70px;display:block;';
-  iframeDark.setAttribute('scrolling', 'no');
-  iframeDark.src = 'button-test-frame.html?mod=' + mod + '&bg=dark';
-  card.appendChild(iframeDark);
+function processModule(modName) {
+  moduleLink.href = 'buttons/' + modName + '.css?t=' + Date.now();
 
-  grid.appendChild(card);
-});
+  setTimeout(function() {
+    // Capture light styles
+    var lpStyles = captureStyles(document.getElementById('rnd-lp'));
+    var lgStyles = captureStyles(document.getElementById('rnd-lg'));
+    // Capture dark/hero styles
+    var dpStyles = captureStyles(document.getElementById('rnd-dp'));
+    var dgStyles = captureStyles(document.getElementById('rnd-dg'));
+
+    // Build card
+    var card = document.createElement('div');
+    card.className = 'card';
+
+    var head = document.createElement('div');
+    head.className = 'card-head';
+    var b = document.createElement('b');
+    b.textContent = modName;
+    var c = document.createElement('code');
+    c.textContent = modName + '.css';
+    head.appendChild(b);
+    head.appendChild(c);
+    card.appendChild(head);
+
+    // Light row
+    var lightRow = document.createElement('div');
+    lightRow.className = 'row row-light';
+    var ll = document.createElement('span');
+    ll.className = 'lbl';
+    ll.textContent = 'hell';
+    lightRow.appendChild(ll);
+    lightRow.appendChild(createSnappedBtn('Button', lpStyles));
+    lightRow.appendChild(createSnappedBtn('Ghost', lgStyles));
+    card.appendChild(lightRow);
+
+    // Dark row
+    var darkRow = document.createElement('div');
+    darkRow.className = 'row row-dark';
+    var dbg = document.createElement('div');
+    dbg.className = 'row-dark-bg';
+    darkRow.appendChild(dbg);
+    var dl = document.createElement('span');
+    dl.className = 'lbl';
+    dl.textContent = 'dunkel';
+    darkRow.appendChild(dl);
+    darkRow.appendChild(createSnappedBtn('Button', dpStyles));
+    darkRow.appendChild(createSnappedBtn('Ghost', dgStyles));
+    card.appendChild(darkRow);
+
+    grid.appendChild(card);
+
+    // Next module
+    idx++;
+    if (idx < MODULES.length) {
+      processModule(MODULES[idx]);
+    } else {
+      document.getElementById('loading').style.display = 'none';
+      // Clean up
+      moduleLink.href = '';
+    }
+  }, 150);
+}
+
+// Start processing
+processModule(MODULES[0]);
 </script>
 
 </body>
