@@ -1344,6 +1344,31 @@ section.section-dark {
   width: 100%;
 }
 
+/* ─── Button Icons ───────────────────────────────────────────────────── */
+.btn svg {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.btn-icon-right {
+  flex-direction: row-reverse;
+}
+
+.btn-icon-only {
+  padding: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+.btn-icon-only svg {
+  width: 1.25em;
+  height: 1.25em;
+}
+.btn-icon-only.btn-xs { width: 1.75rem; height: 1.75rem; }
+.btn-icon-only.btn-sm { width: 2.15rem; height: 2.15rem; }
+.btn-icon-only.btn-lg { width: 3.25rem; height: 3.25rem; }
+.btn-icon-only.btn-xl { width: 3.75rem; height: 3.75rem; }
+
 /* ─── CARDS ─────────────────────────────────────────────────────────────── */
 .card {
   display: flex;

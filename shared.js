@@ -904,3 +904,8 @@
     window.renderFooter();
   };
 })();
+
+/* Lucide Icons — render all data-lucide elements */
+if (window.lucide) {
+  lucide.createIcons();
+}
