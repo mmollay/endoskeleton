@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.40.0] — 2026-04-12
+
+### Changed
+- **button-test.html komplett neugeschrieben** — Umfassende Showcase-Seite mit Palette-Switcher (alle 24 Paletten), Sizes-Section, Color-Variants, Icons mit Lucide, States (normal/loading/disabled/success) und Module Preview Grid mit computed-style Capture
+
+---
+
 ## [3.39.0] — 2026-04-12
 
 ### Added
