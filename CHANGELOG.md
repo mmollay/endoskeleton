@@ -4,6 +4,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.34.0] — 2026-04-12
+
+### Added
+- **Website-Download im Konfigurator** — der "Website generieren"-Button erzeugt jetzt tatsaechlich ein ZIP mit der kompletten Website (Home + Unterseiten + CSS/JS). Die Scan-Daten werden serverseitig in das SiteGenerator-Content-Format uebersetzt und via `/api/v1/generate` verarbeitet.
+- `_buildContentFromScan()` — Adapter-Funktion die Scanner-Daten (hero_image, selected.about, selected.services, contact, colors) in das content-Format mapped das SiteGenerator.php erwartet
+- `_cleanPageText()` — entfernt Navigations-Prefixe aus Scanner-Texten (die ersten Zeilen sind oft kurze Nav-Labels in Grossbuchstaben)
+- `_extractServiceItems()` — splittet Fliesstext in einzelne Service-Card-Items (Titel + Text)
+- `_findPrimaryColor()` — findet die erste brauchbare Farbe aus `scan.colors` (ueberspringt Weiss/Schwarz, wandelt rgb() in hex um)
+
+### Changed
+- `_onGenerate()` ist nicht mehr ein Clipboard-Copy sondern ruft `/api/v1/generate` auf und startet den ZIP-Download
+- `konfigurator.html` — Cache-Buster v=3.33.0 -> v=3.34.0
+
+---
+
 ## [3.33.0] — 2026-04-11
 
 ### Changed

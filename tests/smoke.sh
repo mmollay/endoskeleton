@@ -82,5 +82,14 @@ if ! echo "$INJECTOR_JS" | grep -F "selected.about" > /dev/null; then
 fi
 echo "OK"
 
+# 8) konfigurator.js has _buildContentFromScan (C — download button)
+echo -n "8) konfigurator.js has _buildContentFromScan ... "
+KONFIG_JS=$(curl -sS -m 10 "https://skeleton.ssi.at/js/konfigurator.js?v=$EXPECTED_VERSION")
+if ! echo "$KONFIG_JS" | grep -F "_buildContentFromScan" > /dev/null; then
+  echo "FAIL (_buildContentFromScan not found)"
+  exit 1
+fi
+echo "OK"
+
 echo
 echo "✓ All smoke tests passed"
