@@ -32,13 +32,13 @@
 }
 
 /* Hero contrast: dark backgrounds */
-.hero--image .btn-ghost,
+.hero--image:not(.hero--split) .btn-ghost,
 .section-dark .btn-ghost {
   border: 2px solid rgba(255, 255, 255, 0.7) !important;
   color: #ffffff !important;
   background: transparent !important;
 }
-.hero--image .btn-ghost:hover,
+.hero--image:not(.hero--split) .btn-ghost:hover,
 .section-dark .btn-ghost:hover {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: #ffffff !important;

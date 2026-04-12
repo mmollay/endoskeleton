@@ -51,23 +51,23 @@
 }
 
 /* Hero contrast: dark backgrounds — text links need white color */
-.hero--image .btn,
+.hero--image:not(.hero--split) .btn,
 .section-dark .btn {
   color: #ffffff;
 }
-.hero--image .btn:hover,
+.hero--image:not(.hero--split) .btn:hover,
 .section-dark .btn:hover {
   color: rgba(255, 255, 255, 0.7);
 }
-.hero--image .btn-primary,
+.hero--image:not(.hero--split) .btn-primary,
 .section-dark .btn-primary {
   color: #ffffff;
 }
-.hero--image .btn-primary::after,
+.hero--image:not(.hero--split) .btn-primary::after,
 .section-dark .btn-primary::after {
   background: #ffffff;
 }
-.hero--image .btn-primary:hover::after,
+.hero--image:not(.hero--split) .btn-primary:hover::after,
 .section-dark .btn-primary:hover::after {
   background: rgba(255, 255, 255, 0.7);
 }

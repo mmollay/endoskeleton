@@ -39,9 +39,9 @@
 }
 
 /* Hero contrast: dark backgrounds */
-.hero--image .btn-ghost,
-.hero--image .btn-secondary,
-.hero--image .btn-outline,
+.hero--image:not(.hero--split) .btn-ghost,
+.hero--image:not(.hero--split) .btn-secondary,
+.hero--image:not(.hero--split) .btn-outline,
 .section-dark .btn-ghost,
 .section-dark .btn-secondary,
 .section-dark .btn-outline {
@@ -49,9 +49,9 @@
   color: #ffffff !important;
   background: transparent !important;
 }
-.hero--image .btn-ghost:hover,
-.hero--image .btn-secondary:hover,
-.hero--image .btn-outline:hover,
+.hero--image:not(.hero--split) .btn-ghost:hover,
+.hero--image:not(.hero--split) .btn-secondary:hover,
+.hero--image:not(.hero--split) .btn-outline:hover,
 .section-dark .btn-ghost:hover,
 .section-dark .btn-secondary:hover,
 .section-dark .btn-outline:hover {

@@ -1234,10 +1234,11 @@ section.section-dark {
 
 /* ─── Hero Button Contrast System ────────────────────────────────────── */
 
-/* Ghost/outline/secondary on dark / image backgrounds */
-.hero--image .btn-ghost,
-.hero--image .btn-outline,
-.hero--image .btn-secondary,
+/* Ghost/outline/secondary on dark / image backgrounds
+   NICHT fuer split hero — dort ist die Textseite hell! */
+.hero--image:not(.hero--split) .btn-ghost,
+.hero--image:not(.hero--split) .btn-outline,
+.hero--image:not(.hero--split) .btn-secondary,
 .section-dark .btn-ghost,
 .section-dark .btn-outline,
 .section-dark .btn-secondary {
@@ -1246,9 +1247,9 @@ section.section-dark {
   border: 2px solid rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(4px);
 }
-.hero--image .btn-ghost:hover,
-.hero--image .btn-outline:hover,
-.hero--image .btn-secondary:hover,
+.hero--image:not(.hero--split) .btn-ghost:hover,
+.hero--image:not(.hero--split) .btn-outline:hover,
+.hero--image:not(.hero--split) .btn-secondary:hover,
 .section-dark .btn-ghost:hover,
 .section-dark .btn-outline:hover,
 .section-dark .btn-secondary:hover {

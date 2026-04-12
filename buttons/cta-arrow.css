@@ -63,39 +63,39 @@
 }
 
 /* Hero contrast: dark backgrounds */
-.hero--image .btn,
+.hero--image:not(.hero--split) .btn,
 .section-dark .btn {
   color: #ffffff;
 }
-.hero--image .btn::after,
+.hero--image:not(.hero--split) .btn::after,
 .section-dark .btn::after {
   color: #ffffff;
 }
-.hero--image .btn:hover,
+.hero--image:not(.hero--split) .btn:hover,
 .section-dark .btn:hover {
   color: rgba(255, 255, 255, 0.8);
 }
-.hero--image .btn-primary,
+.hero--image:not(.hero--split) .btn-primary,
 .section-dark .btn-primary {
   background: var(--primary);
   color: var(--text-on-primary, #fff);
 }
-.hero--image .btn-primary::after,
+.hero--image:not(.hero--split) .btn-primary::after,
 .section-dark .btn-primary::after {
   color: var(--text-on-primary, #fff);
 }
-.hero--image .btn-outline,
-.hero--image .btn-secondary,
-.hero--image .btn-ghost,
+.hero--image:not(.hero--split) .btn-outline,
+.hero--image:not(.hero--split) .btn-secondary,
+.hero--image:not(.hero--split) .btn-ghost,
 .section-dark .btn-outline,
 .section-dark .btn-secondary,
 .section-dark .btn-ghost {
   color: #ffffff;
   border-bottom-color: rgba(255, 255, 255, 0.7);
 }
-.hero--image .btn-outline:hover,
-.hero--image .btn-secondary:hover,
-.hero--image .btn-ghost:hover,
+.hero--image:not(.hero--split) .btn-outline:hover,
+.hero--image:not(.hero--split) .btn-secondary:hover,
+.hero--image:not(.hero--split) .btn-ghost:hover,
 .section-dark .btn-outline:hover,
 .section-dark .btn-secondary:hover,
 .section-dark .btn-ghost:hover {
