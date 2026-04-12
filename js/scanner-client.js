@@ -135,14 +135,23 @@
         },
         body: JSON.stringify(payload),
       }).then(function (response) {
-        if (!response.ok) {
-          return response.json().then(function (err) {
+        return response.text().then(function (text) {
+          try {
+            var data = JSON.parse(text);
+          } catch (e) {
             throw new Error(
-              err.error || err.message || "Refinement fehlgeschlagen",
+              "Server-Fehler (Status " +
+                response.status +
+                "). Bitte erneut versuchen.",
             );
-          });
-        }
-        return response.json();
+          }
+          if (!response.ok) {
+            throw new Error(
+              data.error || data.message || "Refinement fehlgeschlagen",
+            );
+          }
+          return data;
+        });
       });
     },
 
