@@ -104,6 +104,10 @@
       return;
     }
 
+    // Immediately clear previous domain's injected content (hero images, text, colors)
+    // so the old domain's data doesn't persist during the scan loading phase
+    ContentInjector.reset();
+
     _currentDomain = domain;
     _switchState(STATES.SCANNING);
 
