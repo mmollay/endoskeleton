@@ -363,56 +363,78 @@ body.konfig-has-bar #konfig-preview {
 
 .konfig-sidebar-actions {
   padding: 12px;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
-#konfig-deepen-btn {
-  width: 100%;
-  padding: 0.625rem 1rem;
-  background-color: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #e2e8f0;
-  font-size: 0.875rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
-  text-align: center;
-}
-
-#konfig-deepen-btn:hover:not(:disabled) {
-  background-color: #334155;
-  border-color: #475569;
-}
-
+#konfig-deepen-btn,
 #konfig-generate-btn {
   width: 100%;
-  padding: 0.625rem 1rem;
-  background-color: #2563eb;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 8px;
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 500;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.15s ease;
   text-align: center;
+  line-height: 1.2;
 }
 
+/* Secondary: subtle outline, smaller, lower visual weight */
+#konfig-deepen-btn {
+  padding: 0.5rem 0.875rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+#konfig-deepen-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+#konfig-deepen-btn i[data-lucide] {
+  width: 14px;
+  height: 14px;
+}
+
+/* Primary: the real CTA — big, solid, with subtle shadow */
+#konfig-generate-btn {
+  padding: 0.75rem 1rem;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 1px 2px rgba(37, 99, 235, 0.25),
+    0 2px 8px rgba(37, 99, 235, 0.15);
+}
 #konfig-generate-btn:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow:
+    0 2px 4px rgba(37, 99, 235, 0.3),
+    0 4px 12px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+}
+#konfig-generate-btn i[data-lucide] {
+  width: 16px;
+  height: 16px;
 }
 
 #konfig-deepen-btn:disabled,
 #konfig-generate-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* ============================================================

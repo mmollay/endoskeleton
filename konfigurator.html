@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.43.0'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.43.2'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.43.0">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.43.2">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -196,11 +196,47 @@
     .demo-title span { color: #3b82f6; font-weight: 500; font-size: 0.8rem; }
 
     .demo-section {
-      padding-bottom: 0.75rem;
-      margin-bottom: 0.75rem;
-      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.625rem 0.75rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
     }
-    .demo-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .demo-section:last-child { margin-bottom: 0; }
+
+    /* Utility button row — secondary/icon actions inside a section */
+    .util-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .util-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px 8px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: #334155;
+      font-size: 0.7rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1.2;
+    }
+    .util-btn:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+      background: #eff6ff;
+    }
+    .util-btn i[data-lucide] {
+      width: 13px;
+      height: 13px;
+    }
 
     .demo-group { margin-bottom: 0.625rem; }
     .demo-group:last-child { margin-bottom: 0; }
@@ -869,7 +905,7 @@
       <!-- ══ Tab: Presets ══ -->
       <div class="sidebar-tab-panel active" id="tab-presets" style="overflow-y:auto;max-height:calc(100vh - 130px);padding-bottom:1rem;">
         <div id="konfig-preset-recommendation"></div>
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+        <div class="demo-section">
           <div class="demo-group">
             <label>Vorlagen</label>
             <div class="preset-grid" id="builtin-preset-grid"></div>
@@ -1174,7 +1210,7 @@
         </div>
 
 
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+        <div class="demo-section">
           <div class="demo-group">
             <label>Dichte</label>
             <div class="visual-btn-row">
@@ -1229,17 +1265,20 @@
             </div>
           </div>
         </div>
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
-          <button class="demo-btn" id="export-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#3b82f6;color:#fff;border-color:#3b82f6;font-weight:500;" onclick="exportConfig()">Config exportieren</button>
-          <button class="demo-btn" id="endo-cmd-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#22c55e;color:#fff;border-color:#22c55e;font-weight:500;margin-top:0.375rem;" onclick="copyEndoCommand()">🤖 /endo Befehl kopieren</button>
+        <div class="demo-section">
+          <label>Aktionen</label>
+          <div class="util-row">
+            <button class="util-btn" id="export-btn" onclick="exportConfig()" title="Config als JSON exportieren"><i data-lucide="download"></i><span>Config</span></button>
+            <button class="util-btn" id="endo-cmd-btn" onclick="copyEndoCommand()" title="/endo DOMAIN.at Befehl in Zwischenablage kopieren"><i data-lucide="terminal"></i><span>/endo</span></button>
+          </div>
           <div id="export-toast">✓ In Zwischenablage kopiert</div>
           <pre id="config-export" style="display:none;margin-top:0.5rem;padding:0.5rem;background:#1e293b;border-radius:4px;font-size:0.6rem;color:#94a3b8;max-height:12rem;overflow:auto;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent)" title="Klick zum Kopieren"></pre>
         </div>
       </div>
 
       <div class="konfig-sidebar-actions">
-          <button id="konfig-deepen-btn">Ansicht vertiefen</button>
-          <button id="konfig-generate-btn">Website generieren</button>
+          <button id="konfig-deepen-btn" title="Weitere Seiten aus dem Scan laden"><i data-lucide="layers"></i><span>Ansicht vertiefen</span></button>
+          <button id="konfig-generate-btn" title="HTML + CSS + ZIP generieren"><i data-lucide="rocket"></i><span>Website generieren</span></button>
       </div>
 
     </div>
@@ -1625,9 +1664,9 @@
 </div><!-- /konfig-preview -->
 
   <script src="js/lucide.min.js"></script>
-  <script src="js/scanner-client.js?v=3.43.0"></script>
-  <script src="js/content-injector.js?v=3.43.0"></script>
-  <script src="js/konfigurator.js?v=3.43.0"></script>
+  <script src="js/scanner-client.js?v=3.43.2"></script>
+  <script src="js/content-injector.js?v=3.43.2"></script>
+  <script src="js/konfigurator.js?v=3.43.2"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
@@ -2848,6 +2887,7 @@
     });
 
     renderBuiltinPresets();
+      if (window.lucide) lucide.createIcons();
       renderWallpaperGrid();
       /* Set correct Bild/Deko controls visibility */
       (function() {

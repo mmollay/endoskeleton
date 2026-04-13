@@ -4,6 +4,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.43.2] — 2026-04-13
+
+### Changed
+- **Action-Buttons entwirrt** — Das Button-Chaos am unteren Sidebar-Rand aufgeräumt. Klare Hierarchie: **Website generieren** ist jetzt die einzige große primäre CTA (solid-blau, Schatten, Icon 🚀). **Ansicht vertiefen** ist sekundär (outline, kleiner). **Config exportieren** und **/endo Befehl** wurden zu kompakten Utility-Buttons (outline, 2-Spalten-Row, Icons statt Emoji 🤖) im Details-Tab zusammengefasst. Die 4 konkurrierenden Vollflächen-Buttons sind damit ersetzt durch ein klares Primär-/Sekundär-/Utility-Muster.
+- **Icons auf Action-Buttons** — Lucide-Icons (`download`, `terminal`, `layers`, `rocket`) statt Text-only für schnellere visuelle Erkennung.
+
+---
+
+## [3.43.1] — 2026-04-13
+
+### Changed
+- **Sidebar-Sektionen als Cards** — `.demo-section` hat jetzt einen dezenten Card-Look (heller Hintergrund `#f8fafc`, 1px Border, 8px Border-Radius, subtle Shadow). Statt thin-line-Separatoren sind Farbe/Schrift/Buttons und alle anderen Sektionen visuell klar abgeteilt, schneller wahrnehmbar.
+
+---
+
 ## [3.43.0] — 2026-04-13
 
 ### Added
