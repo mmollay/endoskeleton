@@ -4,10 +4,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
-## [3.45.4] — 2026-04-13
+## [3.45.5] — 2026-04-13
 
 ### Fixed
-- **Leere Sections: dritter Anlauf, jetzt korrekt** — `removeEmptySections()` nutzt HTML-Kommentare als Section-Grenzen (Comment-to-Comment-Cutting). Kein fragiles Tag-Matching mehr. Schneidet von `<!-- Stats -->` bis zum nächsten `<!-- Comment -->` und prüft ob dazwischen sichtbarer Text ist. Rückwärts-Iteration hält Offsets valide.
+- **Leere Sections auch in Subpages entfernt** — `removeEmptySections()` erkennt jetzt `<div id="site-footer">` und `<script>` als Section-Grenzen. Damit werden auch leere CTA/Features-Sections in Subpages korrekt entfernt, wo kein HTML-Kommentar als Folge-Marker existiert.
 
 ---
 

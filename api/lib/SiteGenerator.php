@@ -539,8 +539,8 @@ SCRIPT;
      */
     private function removeEmptySections(string $html): string
     {
-        // Find all HTML comment positions to use as section boundaries
-        preg_match_all('/<!--[^>]+-->/', $html, $matches, PREG_OFFSET_CAPTURE);
+        // Find all HTML comments AND footer/script landmarks as section boundaries
+        preg_match_all('/<!--[^>]+-->|<div id="site-footer">|<script>/', $html, $matches, PREG_OFFSET_CAPTURE);
         $comments = $matches[0]; // [[text, offset], ...]
 
         // Optional sections that should be removed when empty
@@ -583,8 +583,8 @@ SCRIPT;
                 $lineStart = strrpos(substr($html, 0, $sectionStart), "\n");
                 $lineStart = ($lineStart === false) ? 0 : $lineStart;
                 $html = substr($html, 0, $lineStart) . substr($html, $sectionEnd);
-                // Recalculate comment positions (we changed the string)
-                preg_match_all('/<!--[^>]+-->/', $html, $matches, PREG_OFFSET_CAPTURE);
+                // Recalculate boundary positions (we changed the string)
+                preg_match_all('/<!--[^>]+-->|<div id="site-footer">|<script>/', $html, $matches, PREG_OFFSET_CAPTURE);
                 $comments = $matches[0];
                 $c = min($c, count($comments)); // Adjust index
             }
