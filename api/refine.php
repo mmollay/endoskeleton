@@ -43,7 +43,7 @@ if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 300) {
 
 // Paths — scanner and endoskeleton are on the same server
 $scannerDir = '/home/pawbot/projects/scanner';
-$python = $scannerDir . '/../core/venv/bin/python3';
+$python = '/home/pawbot/core/venv/bin/python3';
 $script = $scannerDir . '/scripts/refine.py';
 
 if (!file_exists($script)) {

@@ -827,6 +827,9 @@
         if (window.ContentInjector) ContentInjector.inject(scanData);
         if (window.lucide) lucide.createIcons();
 
+        // Show result panel so user sees WHAT changed
+        _showRefineResults(refined, result.duration_ms, result.cached);
+
         btn.classList.remove("btn-loading");
         btn.disabled = false;
         if (window.btnSuccess) btnSuccess(btn, 2000);
@@ -841,6 +844,238 @@
         statusEl.style.color = "#ef4444";
         statusEl.textContent = "Fehler: " + err.message;
       });
+  }
+
+  // --- Refine result panel -----------------------------------------------------
+
+  function _truncate(s, n) {
+    s = String(s || "");
+    return s.length > n ? s.substring(0, n - 1) + "…" : s;
+  }
+
+  function _mkEl(tag, opts, children) {
+    var e = document.createElement(tag);
+    if (opts) {
+      if (opts.text) e.textContent = opts.text;
+      if (opts.style) e.style.cssText = opts.style;
+      if (opts.href) e.href = opts.href;
+      if (opts.onclick) e.onclick = opts.onclick;
+      if (opts.id) e.id = opts.id;
+    }
+    if (children) {
+      for (var i = 0; i < children.length; i++) {
+        if (children[i]) e.appendChild(children[i]);
+      }
+    }
+    return e;
+  }
+
+  function _section(label, linkHref, titleText, bodyText) {
+    var header = _mkEl("div", {
+      style:
+        "display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;",
+    });
+    header.appendChild(
+      _mkEl("div", {
+        text: label,
+        style:
+          "font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;font-weight:600;",
+      }),
+    );
+    if (linkHref) {
+      header.appendChild(
+        _mkEl("a", {
+          text: "→ Sektion",
+          href: linkHref,
+          style: "font-size:10px;color:#3b82f6;text-decoration:none;",
+        }),
+      );
+    }
+    var wrapper = _mkEl("div", {
+      style:
+        "margin-bottom:14px;padding-top:10px;border-top:1px solid #f1f5f9;",
+    });
+    wrapper.appendChild(header);
+    if (titleText) {
+      wrapper.appendChild(
+        _mkEl("div", {
+          text: titleText,
+          style: "font-weight:600;color:#0f172a;margin:2px 0;",
+        }),
+      );
+    }
+    if (bodyText) {
+      wrapper.appendChild(
+        _mkEl("div", {
+          text: bodyText,
+          style: "color:#475569;font-size:12px;",
+        }),
+      );
+    }
+    return wrapper;
+  }
+
+  function _showRefineResults(refined, durationMs, cached) {
+    var existing = document.getElementById("ki-refine-results");
+    if (existing) existing.remove();
+
+    var panel = _mkEl("div", {
+      id: "ki-refine-results",
+      style:
+        "position:fixed;top:16px;right:16px;width:360px;max-height:calc(100vh - 32px);" +
+        "overflow-y:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;" +
+        "box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:9999;font-family:system-ui,sans-serif;" +
+        "font-size:13px;line-height:1.5;",
+    });
+
+    var hero = refined.hero || {};
+    var about = refined.about || {};
+    var services = refined.services || {};
+    var items = services.items || [];
+    var meta = refined.meta || {};
+
+    var durationText = cached
+      ? "aus Cache"
+      : "in " + (durationMs / 1000).toFixed(1) + "s";
+
+    // Header
+    var header = _mkEl("div", {
+      style:
+        "padding:14px 16px 10px;border-bottom:1px solid #f1f5f9;display:flex;" +
+        "align-items:center;justify-content:space-between;",
+    });
+    var titleRow = _mkEl("div", {
+      style:
+        "font-weight:600;color:#0f172a;display:flex;align-items:center;gap:8px;",
+    });
+    titleRow.appendChild(
+      _mkEl("span", {
+        style:
+          "width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block;",
+      }),
+    );
+    titleRow.appendChild(document.createTextNode("KI hat optimiert "));
+    titleRow.appendChild(
+      _mkEl("span", {
+        text: "(" + durationText + ")",
+        style: "font-size:11px;color:#94a3b8;font-weight:400;",
+      }),
+    );
+    header.appendChild(titleRow);
+    header.appendChild(
+      _mkEl("button", {
+        text: "×",
+        style:
+          "background:none;border:none;color:#94a3b8;font-size:18px;" +
+          "cursor:pointer;padding:0 4px;line-height:1;",
+        onclick: function () {
+          panel.remove();
+        },
+      }),
+    );
+    panel.appendChild(header);
+
+    var body = _mkEl("div", { style: "padding:12px 16px;" });
+
+    // Hero block
+    var heroWrap = _mkEl("div", { style: "margin-bottom:14px;" });
+    heroWrap.appendChild(
+      _mkEl("div", {
+        text: "Hero",
+        style:
+          "font-size:10px;text-transform:uppercase;letter-spacing:0.05em;" +
+          "color:#94a3b8;font-weight:600;margin-bottom:4px;",
+      }),
+    );
+    if (hero.eyebrow) {
+      heroWrap.appendChild(
+        _mkEl("div", {
+          text: hero.eyebrow,
+          style: "font-size:11px;color:#64748b;font-style:italic;",
+        }),
+      );
+    }
+    heroWrap.appendChild(
+      _mkEl("div", {
+        text: hero.headline || "—",
+        style: "font-weight:600;color:#0f172a;margin:2px 0;",
+      }),
+    );
+    if (hero.subtitle) {
+      heroWrap.appendChild(
+        _mkEl("div", {
+          text: _truncate(hero.subtitle, 140),
+          style: "color:#475569;font-size:12px;",
+        }),
+      );
+    }
+    body.appendChild(heroWrap);
+
+    // About + Services
+    body.appendChild(
+      _section("Über uns", "#about", about.title, _truncate(about.text, 180)),
+    );
+
+    var servicesBlock = _section(
+      "Leistungen",
+      "#leistungen",
+      services.title,
+      _truncate(services.lead, 140),
+    );
+    if (items.length) {
+      var ul = _mkEl("ul", {
+        style: "list-style:none;padding:0;margin:4px 0 0;font-size:11px;",
+      });
+      items.forEach(function (item) {
+        var li = _mkEl("li", { style: "margin:4px 0;" });
+        li.appendChild(_mkEl("strong", { text: item.title || "" }));
+        li.appendChild(_mkEl("br"));
+        li.appendChild(
+          _mkEl("span", {
+            text: _truncate(item.text, 100),
+            style: "color:#64748b;",
+          }),
+        );
+        ul.appendChild(li);
+      });
+      servicesBlock.appendChild(ul);
+    }
+    body.appendChild(servicesBlock);
+
+    // SEO Meta
+    if (meta.seo_title || meta.seo_description) {
+      var seoBlock = _mkEl("div", {
+        style: "padding-top:10px;border-top:1px solid #f1f5f9;",
+      });
+      seoBlock.appendChild(
+        _mkEl("div", {
+          text: "SEO Meta",
+          style:
+            "font-size:10px;text-transform:uppercase;letter-spacing:0.05em;" +
+            "color:#94a3b8;font-weight:600;margin-bottom:4px;",
+        }),
+      );
+      if (meta.seo_title) {
+        seoBlock.appendChild(
+          _mkEl("div", {
+            text: meta.seo_title,
+            style: "font-size:12px;color:#0f172a;",
+          }),
+        );
+      }
+      if (meta.seo_description) {
+        seoBlock.appendChild(
+          _mkEl("div", {
+            text: _truncate(meta.seo_description, 160),
+            style: "font-size:11px;color:#64748b;margin-top:2px;",
+          }),
+        );
+      }
+      body.appendChild(seoBlock);
+    }
+
+    panel.appendChild(body);
+    document.body.appendChild(panel);
   }
 
   // --- Preset recommendation ---------------------------------------------------

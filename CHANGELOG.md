@@ -4,6 +4,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.43.0] — 2026-04-13
+
+### Added
+- **Kategorien-Tabs im Konfigurator** — Farben, Schriften und Buttons sind jetzt in Tabs pro Kategorie gegliedert (kleine Chips über dem Grid). Spart ~60% vertikalen Platz in der Sidebar und macht die Auswahl künstlerisch statt technisch.
+  - **Farben (5 Tabs):** Warm · Grün · Blau · Neutral · Neon (24 Swatches)
+  - **Schriften (5 Tabs):** Sans · Serif · Display · Verspielt · Mono (**alle 27 Schriften** — 11 fehlende im Picker ergänzt: contrast, editorial, elegant, humanist, modern, mono, playful, rounded, serif, survival, system)
+  - **Buttons (5 Tabs):** Eckig · Rund · Soft · Outline · Special (**alle 24 Buttons** — 10 fehlende ergänzt: bold, ghost, outline, outline-thin, outline-elegant, rounded, sharp, soft, tactical, tech)
+- **Auto-Tab-Switch bei Preset-Wechsel** — Beim Anwenden eines Presets oder Laden via URL-Hash wechselt der Tab automatisch in die Kategorie der aktiven Karte.
+- **KI-Refinement Ergebnis-Panel** (aus v3.42.2) — Schwebendes Panel rechts oben zeigt nach dem KI-Klick die neuen Hero/About/Services/SEO-Texte + Links zu den Sektionen (`_showRefineResults` in `js/konfigurator.js`).
+
+### Fixed
+- **refine.php Python-venv-Pfad** (aus v3.42.1) — Hart verdrahtet auf `/home/pawbot/core/venv/bin/python3` (vorher relativer Pfad `$scannerDir/../core/venv/bin/python3`, was auf server7 ins Leere zeigte und KI-Refinement stillschweigend fehlschlagen ließ).
+
+---
+
 ## [3.42.0] — 2026-04-12
 
 ### Added
