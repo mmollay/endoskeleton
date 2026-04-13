@@ -681,11 +681,23 @@
 
     // Add sub-pages from scan (exclude homepage, about, services, legal)
     var skipUrls = ["kontakt", "impressum", "datenschutz", "agb", "disclaimer"];
+    var usedSlugs = {
+      index: true,
+      kontakt: true,
+      impressum: true,
+      datenschutz: true,
+    };
     var scanPages = scanData.pages || [];
     for (var i = 0; i < scanPages.length && pages.length < 15; i++) {
       var sp = scanPages[i];
       var url = (sp.url || "").toLowerCase();
       if (!url || url === scanData.start_url) continue;
+      // Skip www-variant of start_url
+      if (
+        url.replace("://www.", "://") ===
+        (scanData.start_url || "").replace("://www.", "://")
+      )
+        continue;
       if (aboutPage.url && url === aboutPage.url.toLowerCase()) continue;
       if (servicesPage.url && url === servicesPage.url.toLowerCase()) continue;
       var slug = url
@@ -694,6 +706,9 @@
         .replace(/\.html?$/, "")
         .replace(/[^a-z0-9-]/g, "");
       if (!slug || skipUrls.indexOf(slug) >= 0) continue;
+      // Deduplicate slugs (www vs non-www, with/without .html)
+      if (usedSlugs[slug]) continue;
+      usedSlugs[slug] = true;
       var title = (sp.title || slug).split(/\s*[–|]\s*/)[0].trim();
       if (title.length > 50) title = title.substring(0, 50);
       pages.push({

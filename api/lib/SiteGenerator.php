@@ -29,8 +29,13 @@ final class SiteGenerator
         $files = ["base.css", "theme.css", "shared.js"];
         $pages = $content["pages"] ?? [["slug" => "index", "title" => "Home", "sections" => []]];
 
+        // Deduplicate pages by slug — first occurrence wins (index page with hero/about/services
+        // must not be overwritten by a sub-page that also normalizes to slug "index")
+        $seenSlugs = [];
         foreach ($pages as $page) {
             $slug = preg_replace("/[^a-z0-9-]/", "", strtolower($page["slug"] ?? "index"));
+            if (isset($seenSlugs[$slug])) continue;
+            $seenSlugs[$slug] = true;
             $filename = $slug . ".html";
             $html = $this->buildPage($preset, $content, $page);
             file_put_contents($dir . "/" . $filename, $html);

@@ -4,6 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.4] — 2026-04-13
+
+### Fixed
+- **Leere index.html bei Generierung — Root Cause gefunden und behoben** — Scanner liefert für manche Domains duplizierte URLs (`blindenhund.at`, `www.blindenhund.at/index.html`, `blindenhund.at/index.html`), die alle zum Slug "index" normalisiert werden. Die foreach-Schleife in `SiteGenerator.generate()` überschrieb die korrekte index.html (mit Hero/About/Services) mit einer späteren Subpage-Version (nur About). Fix: Slug-Deduplizierung in JS (`_buildContentFromScan`) UND PHP (`SiteGenerator.generate()`). Erste Occurrence gewinnt — die index-Seite mit 3 Sections bleibt erhalten.
+- **www-Varianten in Subpage-Liste** — `_buildContentFromScan` vergleicht jetzt URLs auch ohne `www.` gegen die start_url, um doppelte Homepage-Einträge zu vermeiden.
+
+---
+
 ## [3.44.3] — 2026-04-13
 
 ### Fixed
