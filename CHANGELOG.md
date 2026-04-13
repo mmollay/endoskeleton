@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.1] — 2026-04-13
+
+### Fixed
+- **Empty-Element Cleanup zu aggressiv** — Regex entfernte auch `<div class="hero-bg" style="background-image:..."></div>` weil Div "leer" war (kein Textinhalt). Fix: `div` und `section` aus dem Cleanup entfernt, nur semantische Text-Elemente (h1-h6, p, span, a, li, figcaption, cite) werden gecleant.
+
+---
+
 ## [3.45.0] — 2026-04-13
 
 ### Fixed
@@ -11,7 +18,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - **About-Bild aus Scanner-Images** — About-Section bekommt Bilder mit `role:"about"` aus dem Image-Index.
 - **Subpage-Bilder per page_url zugeordnet** — Jede Unterseite bekommt das passende Bild aus `imagesByPage[url]`.
 - **Subpages leer (BUG 2)** — Sections als `type: "text"` statt `type: "about"` gesendet, damit `PAGE_CONTENT` befüllt wird.
-- **Leere HTML-Elemente (BUG 4)** — Nach Placeholder-Cleanup werden leere h1-h6, p, span, a, li, div, figcaption und leere sections entfernt.
+- **Leere HTML-Elemente (BUG 4)** — Nach Placeholder-Cleanup werden leere h1-h6, p, span, a, li, figcaption, cite entfernt.
 
 ---
 

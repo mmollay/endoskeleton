@@ -514,11 +514,10 @@ SCRIPT;
         $html = preg_replace('/background-image:\s*url\([\'"]?[\'"]?\)\s*;?/', '', $html);
 
         // Remove empty content elements left after placeholder cleanup
-        $html = preg_replace('/<(h[1-6]|p|span|a|li|div|figcaption)[^>]*>\s*<\/\1>/i', '', $html);
+        // NOTE: excludes div (often CSS-styled containers like hero-bg) and section
+        $html = preg_replace('/<(h[1-6]|p|span|a|li|figcaption|cite)[^>]*>\s*<\/\1>/i', '', $html);
         // Second pass for nested empties (e.g. <a><span></span></a>)
-        $html = preg_replace('/<(h[1-6]|p|span|a|li|div|figcaption)[^>]*>\s*<\/\1>/i', '', $html);
-        // Remove empty sections (only whitespace/newlines inside)
-        $html = preg_replace('/<section[^>]*>\s*<\/section>/is', '', $html);
+        $html = preg_replace('/<(h[1-6]|p|span|a|li|figcaption|cite)[^>]*>\s*<\/\1>/i', '', $html);
 
         // Replace template SITE_CONFIG block with generated one
         $configScript = $this->buildSiteConfigScript($preset, $content);
