@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.0] — 2026-04-13
+
+### Fixed
+- **Bilder-Mapping komplett repariert (BUG 1)** — Scanner speichert Bilder als `images[].url`, Konfigurator las `hero_image.src`. Neuer Image-Index baut `imagesByRole` und `imagesByPage` Lookup-Maps. Hero-Image Fallback-Kette: hero_image → role:hero → grösstes Bild → Screenshot.
+- **About-Bild aus Scanner-Images** — About-Section bekommt Bilder mit `role:"about"` aus dem Image-Index.
+- **Subpage-Bilder per page_url zugeordnet** — Jede Unterseite bekommt das passende Bild aus `imagesByPage[url]`.
+- **Subpages leer (BUG 2)** — Sections als `type: "text"` statt `type: "about"` gesendet, damit `PAGE_CONTENT` befüllt wird.
+- **Leere HTML-Elemente (BUG 4)** — Nach Placeholder-Cleanup werden leere h1-h6, p, span, a, li, div, figcaption und leere sections entfernt.
+
+---
+
 ## [3.44.5] — 2026-04-13
 
 ### Fixed

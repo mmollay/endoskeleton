@@ -598,8 +598,45 @@
           : "";
     var description = heroSubtitle || seoDesc || "";
 
+    // --- Build image index from scanner's images[] array ---
+    var allImages = scanData.images || [];
+    var imagesByRole = {};
+    var imagesByPage = {};
+    for (var ii = 0; ii < allImages.length; ii++) {
+      var img = allImages[ii];
+      var imgUrl = img.url || img.src || "";
+      if (!imgUrl) continue;
+      var role = img.role || "other";
+      if (!imagesByRole[role]) imagesByRole[role] = [];
+      imagesByRole[role].push(img);
+      var pageUrl = (img.page_url || "").toLowerCase();
+      if (pageUrl) {
+        if (!imagesByPage[pageUrl]) imagesByPage[pageUrl] = [];
+        imagesByPage[pageUrl].push(img);
+      }
+    }
+
     // --- Hero image fallback chain ---
-    var heroImgSrc = heroImage.src || "";
+    var heroImgSrc = heroImage.src || heroImage.url || "";
+    if (!heroImgSrc && imagesByRole["hero"] && imagesByRole["hero"].length) {
+      heroImgSrc =
+        imagesByRole["hero"][0].url || imagesByRole["hero"][0].src || "";
+    }
+    if (!heroImgSrc) {
+      // Pick the largest non-logo image as hero
+      var bestImg = null;
+      var bestArea = 0;
+      for (var hi = 0; hi < allImages.length; hi++) {
+        var candidate = allImages[hi];
+        if (candidate.role === "logo") continue;
+        var area = (candidate.width || 0) * (candidate.height || 0);
+        if (area > bestArea) {
+          bestArea = area;
+          bestImg = candidate;
+        }
+      }
+      if (bestImg) heroImgSrc = bestImg.url || bestImg.src || "";
+    }
     if (!heroImgSrc) {
       // Try screenshots.desktop from scanner
       var screenshots = scanData.screenshots || {};
@@ -673,8 +710,18 @@
             tag: "Ueber uns",
             title: aboutTitle,
             text: aboutText.substring(0, 2000),
-            image: aboutPage.image || "",
-            image_alt: aboutPage.image_alt || "",
+            image:
+              aboutPage.image ||
+              (imagesByRole["about"] && imagesByRole["about"][0]
+                ? imagesByRole["about"][0].url ||
+                  imagesByRole["about"][0].src ||
+                  ""
+                : ""),
+            image_alt:
+              aboutPage.image_alt ||
+              (imagesByRole["about"] && imagesByRole["about"][0]
+                ? imagesByRole["about"][0].alt || ""
+                : ""),
             cta: "",
             cta_href: "#",
           },
@@ -724,17 +771,27 @@
       usedSlugs[slug] = true;
       var title = (sp.title || slug).split(/\s*[–|]\s*/)[0].trim();
       if (title.length > 50) title = title.substring(0, 50);
+      // Find matching image for this subpage from scanner images
+      var spImgs =
+        imagesByPage[url] || imagesByPage[url.replace("://www.", "://")] || [];
+      var spImg = null;
+      for (var si2 = 0; si2 < spImgs.length; si2++) {
+        if (spImgs[si2].role !== "logo") {
+          spImg = spImgs[si2];
+          break;
+        }
+      }
       pages.push({
         slug: slug,
         title: title,
         sections: [
           {
-            type: "about",
+            type: "text",
             tag: "",
             title: title,
             text: _cleanPageText(sp.text || "").substring(0, 2000),
-            image: "",
-            image_alt: "",
+            image: spImg ? spImg.url || spImg.src || "" : "",
+            image_alt: spImg ? spImg.alt || "" : "",
           },
         ],
       });
