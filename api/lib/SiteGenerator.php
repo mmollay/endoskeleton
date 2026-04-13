@@ -519,19 +519,9 @@ SCRIPT;
         // Second pass for nested empties (e.g. <a><span></span></a>)
         $html = preg_replace('/<(h[1-6]|p|span|a|li|figcaption|cite)[^>]*>\s*<\/\1>/i', '', $html);
 
-        // Remove entire sections that have no visible text content after cleanup
-        // Matches <!-- Comment --> + <section ...>...</section> or <div class="banner-strip ...">...</div>
-        $html = preg_replace_callback(
-            '/\s*<!-- [^>]+ -->\s*<(section|div)\b([^>]*)>(.*?)<\/\1>/is',
-            function ($m) {
-                $inner = $m[3];
-                // Strip all HTML tags to get visible text
-                $text = trim(strip_tags($inner));
-                // If no visible text remains, remove the entire section
-                return $text === '' ? '' : $m[0];
-            },
-            $html
-        );
+        // Remove known optional sections when they have no content
+        // Uses DOM-aware approach: find section by marker, check if it has visible text
+        $html = $this->removeEmptySections($html);
 
         // Replace template SITE_CONFIG block with generated one
         $configScript = $this->buildSiteConfigScript($preset, $content);
@@ -540,6 +530,73 @@ SCRIPT;
             $configScript,
             $html
         );
+
+        return $html;
+    }
+
+    /**
+     * Remove optional template sections that ended up empty after placeholder cleanup.
+     * Uses DOMDocument to properly handle nested HTML instead of fragile regex.
+     */
+    private function removeEmptySections(string $html): string
+    {
+        // Markers for optional sections in the index template
+        $optionalMarkers = [
+            '<!-- Stats / Banner Strip -->',
+            '<!-- Testimonial / Quote Section -->',
+            '<!-- CTA Section -->',
+            '<!-- Optional: Features / Cards Section -->',
+            '<!-- Optional: CTA Section -->',
+        ];
+
+        foreach ($optionalMarkers as $marker) {
+            $pos = strpos($html, $marker);
+            if ($pos === false) continue;
+
+            // Find the next top-level element after the comment
+            $afterMarker = substr($html, $pos + strlen($marker));
+            $afterMarker = ltrim($afterMarker, "\n\r ");
+
+            // Determine opening tag: <section or <div
+            if (preg_match('/^<(section|div)\b/', $afterMarker, $tagMatch)) {
+                $tag = $tagMatch[1];
+                // Count nested tags to find the matching closing tag
+                $depth = 0;
+                $len = strlen($afterMarker);
+                $i = 0;
+                $endPos = false;
+                while ($i < $len) {
+                    // Opening tag
+                    if (preg_match('/^<' . $tag . '\b/i', substr($afterMarker, $i))) {
+                        $depth++;
+                        $i++;
+                    // Closing tag
+                    } elseif (preg_match('/^<\/' . $tag . '\s*>/i', substr($afterMarker, $i), $cm)) {
+                        $depth--;
+                        if ($depth === 0) {
+                            $endPos = $i + strlen($cm[0]);
+                            break;
+                        }
+                        $i++;
+                    } else {
+                        $i++;
+                    }
+                }
+
+                if ($endPos !== false) {
+                    $sectionHtml = substr($afterMarker, 0, $endPos);
+                    $text = trim(strip_tags($sectionHtml));
+                    if ($text === '') {
+                        // Find start of line containing the marker
+                        $lineStart = strrpos(substr($html, 0, $pos), "\n");
+                        if ($lineStart === false) $lineStart = 0;
+                        $removeFrom = $lineStart;
+                        $removeTo = $pos + strlen($marker) + (strlen($afterMarker) - strlen(substr($afterMarker, $endPos)));
+                        $html = substr($html, 0, $removeFrom) . substr($html, $removeTo);
+                    }
+                }
+            }
+        }
 
         return $html;
     }
