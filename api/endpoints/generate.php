@@ -29,8 +29,14 @@ if ($presetName !== null && isset($presets[$presetName])) {
 }
 
 $overrides = $input["overrides"] ?? [];
+// Normalize override keys: JS uses different names than PHP internals
+$keyAliases = [
+    "button" => "buttons",
+    "softness" => "charakter",
+    "navlayout" => "navLayout",
+];
 foreach ($overrides as $k => $v) {
-    $resolved[$k] = $v;
+    $resolved[$keyAliases[$k] ?? $k] = $v;
 }
 
 if (empty($resolved)) {

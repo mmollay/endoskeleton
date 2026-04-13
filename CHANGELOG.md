@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.6] — 2026-04-13
+
+### Fixed
+- **Override-Key-Aliase für Robustheit** — `generate.php` normalisiert jetzt alternative Key-Namen (`button→buttons`, `softness→charakter`, `navlayout→navLayout`), damit auch externe API-Aufrufe mit leicht abweichenden Keys funktionieren.
+
+---
+
 ## [3.45.5] — 2026-04-13
 
 ### Fixed
