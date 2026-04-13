@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.43.3] — 2026-04-13
+
+### Changed
+- **Sidebar-Panel visuell abgehoben** — Hintergrund von `#fafafa` auf `#f1f5f9` (deutlicherer Kontrast zur weißen Preview), plus `border-left` und `box-shadow` nach links. Die Sidebar hebt sich jetzt klar als eigener Bereich vom Live-Preview ab.
+- **Demo-Section Cards weiß auf grauem Panel** — `.demo-section` jetzt `#ffffff` statt `#f8fafc` → weißer Karteneffekt auf dem dunkleren Sidebar-Hintergrund. Stärkerer Kontrast, schnellere visuelle Zuordnung.
+- **Action-Buttons-Bereich** — `border-top`-Linie entfernt. Stattdessen `margin-top: 8px` und eigener Hintergrund `#eef2f7` mit abgerundeter Oberkante (`border-radius: 10px 10px 0 0`). Visuell klar getrennt vom Sidebar-Content ohne harte Linie.
+
+---
+
 ## [3.43.2] — 2026-04-13
 
 ### Changed
