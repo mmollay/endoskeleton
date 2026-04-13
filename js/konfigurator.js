@@ -720,7 +720,25 @@
       })
       .then(function (data) {
         if (data.download_url) {
-          window.location.href = data.download_url;
+          // Fetch ZIP as blob to avoid Cloudflare race-condition (503 on fresh URLs)
+          return fetch(data.download_url)
+            .then(function (zipRes) {
+              if (!zipRes.ok)
+                throw new Error(
+                  "Download fehlgeschlagen (" + zipRes.status + ")",
+                );
+              return zipRes.blob();
+            })
+            .then(function (blob) {
+              var url = URL.createObjectURL(blob);
+              var a = document.createElement("a");
+              a.href = url;
+              a.download = (data.hash || "endoskeleton") + "-site.zip";
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            });
         } else {
           alert("Generierung erfolgreich, aber kein Download-Link erhalten.");
         }

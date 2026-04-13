@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.2] — 2026-04-13
+
+### Fixed
+- **ZIP-Download via Blob statt window.location** — Generate-Button lud ZIP per `window.location.href = download_url`, was zu 503-Fehlern führte (Cloudflare Race-Condition bei frisch generierten URLs). Jetzt: ZIP wird via `fetch()` als Blob geladen und per temporärem `<a download>` ausgelöst. Funktioniert sofort, keine Timing-Probleme.
+
+---
+
 ## [3.44.1] — 2026-04-13
 
 ### Changed
