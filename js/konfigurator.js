@@ -492,19 +492,20 @@
   function _cleanPageText(text) {
     if (!text) return "";
     var lines = text.split("\n");
-    var start = 0;
-    for (var i = 0; i < Math.min(lines.length, 15); i++) {
+    // Strip leading nav-like lines (short, all-caps, menu items)
+    var navPatterns =
+      /^(start|home|kontakt|leistung|produkt|referenz|ueber uns|about|service|impressum|datenschutz|agb|de|en|\|)$/i;
+    var cleaned = [];
+    for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
-      if (
-        line.length < 30 &&
-        (line === line.toUpperCase() || line.length < 3)
-      ) {
-        start = i + 1;
-      } else {
-        break;
+      if (!line) continue;
+      // Skip short nav-like fragments at the beginning
+      if (cleaned.length === 0 && line.length < 30) {
+        if (navPatterns.test(line) || line === line.toUpperCase()) continue;
       }
+      cleaned.push(line);
     }
-    return lines.slice(start).join("\n").trim().substring(0, 5000);
+    return cleaned.join("\n").trim().substring(0, 5000);
   }
 
   function _extractServiceItems(text) {
@@ -575,18 +576,66 @@
     var heroSubtitle = heroText.subtitle || "";
     var heroEyebrow = heroText.eyebrow || scanData.branch || "";
 
-    var description =
-      heroSubtitle ||
-      (seo.description && typeof seo.description === "string"
+    // SEO description as universal fallback text
+    var seoDesc =
+      seo.description && typeof seo.description === "string"
         ? seo.description
-        : seo.description && seo.description.text) ||
-      "";
+        : seo.description && seo.description.text
+          ? seo.description.text
+          : "";
+    var description = heroSubtitle || seoDesc || "";
 
+    // --- Hero image fallback chain ---
+    var heroImgSrc = heroImage.src || "";
+    if (!heroImgSrc) {
+      // Try screenshots.desktop from scanner
+      var screenshots = scanData.screenshots || {};
+      if (screenshots.desktop) heroImgSrc = screenshots.desktop;
+    }
+
+    // --- About fallback ---
     var aboutTitle = aboutPage.title || "Ueber uns";
     var aboutText = _cleanPageText(aboutPage.text || "");
+    if (!aboutText && seoDesc) {
+      aboutText = seoDesc;
+    }
+    if (!aboutText) {
+      aboutText =
+        company +
+        (scanData.branch ? " — " + scanData.branch + "." : ".") +
+        " Erfahren Sie mehr ueber unser Unternehmen und unsere Leistungen.";
+    }
+
+    // --- Services fallback ---
     var servicesTitle = servicesPage.title || "Unsere Leistungen";
-    var servicesText = _cleanPageText(servicesPage.text || "");
+    var servicesRaw = servicesPage.text || "";
+    var servicesText = _cleanPageText(servicesRaw);
+    // If services text is mostly nav garbage (very short cleaned vs raw), discard
+    if (
+      servicesRaw.length > 50 &&
+      servicesText.length < servicesRaw.length * 0.3
+    ) {
+      servicesText = "";
+    }
     var serviceItems = _extractServiceItems(servicesText);
+    // If no service items, try building from scan pages
+    if (serviceItems.length === 0) {
+      var scanPages = scanData.pages || [];
+      for (var si = 0; si < scanPages.length && serviceItems.length < 4; si++) {
+        var sp2 = scanPages[si];
+        var spUrl = (sp2.url || "").toLowerCase();
+        if (!spUrl || spUrl === scanData.start_url) continue;
+        var spTitle = (sp2.title || "").split(/\s*[–|]\s*/)[0].trim();
+        if (!spTitle || spTitle.length < 3) continue;
+        var spText = _cleanPageText(sp2.text || "").substring(0, 200);
+        if (spText.length < 20) spText = spTitle;
+        serviceItems.push({
+          title: spTitle.substring(0, 80),
+          text: spText,
+          icon_path: "",
+        });
+      }
+    }
 
     var primaryColor = _findPrimaryColor(scanData);
 
@@ -600,7 +649,7 @@
             eyebrow: heroEyebrow,
             headline: heroHeadline,
             subline: description || aboutText.substring(0, 200),
-            image: heroImage.src || "",
+            image: heroImgSrc,
             cta: "Jetzt starten",
             cta_href: "kontakt.html",
             cta2: "Mehr erfahren",

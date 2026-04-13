@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.3] — 2026-04-13
+
+### Fixed
+- **Leere generierte Seiten behoben** — `_buildContentFromScan()` hat bei fehlendem Scan-Daten leere Strings an den Generator übergeben. Jetzt mehrstufige Fallback-Ketten:
+  - **Hero-Bild:** `hero_image.src` → `screenshots.desktop` (Scanner-Screenshot als Fallback)
+  - **About-Text:** `selected.about.text` → SEO-Description → automatisch generierter Firmentext
+  - **Services:** Navigations-Müll wird erkannt und verworfen (wenn >70% des Originaltexts beim Cleaning verloren geht). Fallback: Service-Items werden aus den Scan-Seitentiteln aufgebaut.
+  - **Subtitle:** `hero_text.subtitle` → SEO-Description
+- **Nav-Fragmente in Services-Text** — `_cleanPageText()` filtert jetzt Navigations-Zeilen ("Start", "Home", "Kontakt", "DE", "|" etc.) aggressiv raus, statt nur Großbuchstaben-Zeilen zu überspringen.
+- **Broken Images in generierten HTML-Seiten** — `SiteGenerator.php` entfernt jetzt `<img src="">` Tags und leere `background-image: url('')` Styles nach der Generierung, statt broken-image-Icons anzuzeigen.
+
+---
+
 ## [3.44.2] — 2026-04-13
 
 ### Fixed

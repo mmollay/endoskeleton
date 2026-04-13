@@ -504,6 +504,10 @@ SCRIPT;
         $html = preg_replace("/\\{\\{[A-Z_]+\\}\\}/", "", $html);
         $html = preg_replace("/\\{\\{#\\w+\\}\\}.*?\\{\\{\\/\\w+\\}\\}/s", "", $html);
 
+        // Remove broken images (empty src) and empty background-image divs
+        $html = preg_replace('/<img[^>]*src\s*=\s*["\']["\'][^>]*\/?>/i', '', $html);
+        $html = preg_replace('/background-image:\s*url\([\'"]?[\'"]?\)\s*;?/', '', $html);
+
         // Replace template SITE_CONFIG block with generated one
         $configScript = $this->buildSiteConfigScript($preset, $content);
         $html = preg_replace(
