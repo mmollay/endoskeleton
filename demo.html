@@ -164,19 +164,21 @@
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-      background: #fafafa;
+      background: #f1f5f9;
       padding: 0.75rem 0.75rem;
       display: flex;
       flex-direction: column;
       gap: 0;
       scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #fafafa;
+      scrollbar-color: #cbd5e1 #f1f5f9;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 0.875rem;
       color: #334155;
+      border-left: 1px solid #e2e8f0;
+      box-shadow: -4px 0 12px rgba(15, 23, 42, 0.06);
     }
     .demo-sidebar-panel::-webkit-scrollbar { width: 8px; }
-    .demo-sidebar-panel::-webkit-scrollbar-track { background: #fafafa; }
+    .demo-sidebar-panel::-webkit-scrollbar-track { background: #f1f5f9; }
     .demo-sidebar-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
     .demo-title {
@@ -188,11 +190,14 @@
     .demo-title span { color: #3b82f6; font-weight: 500; font-size: 0.8rem; }
 
     .demo-section {
-      padding-bottom: 0.75rem;
-      margin-bottom: 0.75rem;
-      border-bottom: 1px solid #e2e8f0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.625rem 0.75rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
-    .demo-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .demo-section:last-child { margin-bottom: 0; }
 
     .demo-group { margin-bottom: 0.625rem; }
     .demo-group:last-child { margin-bottom: 0; }
@@ -406,19 +411,50 @@
     }
 
     /* ─── Visual Pickers (Stil-Tab) ─────────── */
+    /* Category tabs (shared by colors / fonts / buttons) */
+    .cat-tabs {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .cat-tab {
+      background: #f1f5f9;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+    }
+    .cat-tab:hover { color: #3b82f6; background: #eff6ff; }
+    .cat-tab.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .cat-panel { display: none; }
+    .cat-panel.active { display: grid; }
+
     .color-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 4px;
     }
+    .cat-panel.color-panel { grid-template-columns: repeat(9, 1fr); gap: 4px; }
+    .cat-panel.font-panel { grid-template-columns: 1fr 1fr; gap: 4px; }
+    .cat-panel.button-panel { grid-template-columns: 1fr 1fr; gap: 4px; }
     .color-swatch {
       width: 100%; aspect-ratio: 1;
       border-radius: 50%;
-      border: 2px solid #fff;
+      border: 1.5px solid #fff;
       cursor: pointer;
       transition: all 0.15s;
       position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      max-width: 28px;
+      max-height: 28px;
     }
     .color-swatch:hover { transform: scale(1.15); z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .color-swatch.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
@@ -777,7 +813,7 @@
 
       <!-- ══ Tab: Presets ══ -->
       <div class="sidebar-tab-panel active" id="tab-presets" style="overflow-y:auto;max-height:calc(100vh - 130px);padding-bottom:1rem;">
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+        <div class="demo-section">
           <div class="demo-group">
             <label>Vorlagen</label>
             <div class="preset-grid" id="builtin-preset-grid"></div>
@@ -917,35 +953,46 @@
         <div class="demo-section">
           <div class="demo-group">
             <label>Farbe</label>
-            <div class="color-grid" id="color-grid">
-              <!-- Rot/Warm -->
-              <div class="color-swatch" data-color="red" title="Rot" style="background:#dc2626"></div>
-              <div class="color-swatch" data-color="wine" title="Weinrot" style="background:#881337"></div>
-              <div class="color-swatch" data-color="coral" title="Coral" style="background:#f97316"></div>
-              <div class="color-swatch" data-color="orange" title="Orange" style="background:#f97316"></div>
-              <div class="color-swatch" data-color="gold" title="Gold" style="background:#b45309"></div>
-              <div class="color-swatch" data-color="brown" title="Braun" style="background:#78350f"></div>
-              <!-- Grün -->
-              <div class="color-swatch active" data-color="green" title="Grün" style="background:#2e6b2e"></div>
-              <div class="color-swatch" data-color="forest" title="Forest" style="background:#15803d"></div>
-              <div class="color-swatch" data-color="survival" title="Survival Green" style="background:#2d7a2d"></div>
-              <div class="color-swatch" data-color="olive" title="Olive" style="background:#4d7c0f"></div>
-              <div class="color-swatch" data-color="mint" title="Mint" style="background:#059669"></div>
-              <div class="color-swatch" data-color="teal" title="Teal" style="background:#0d9488"></div>
-              <div class="color-swatch" data-color="pink" title="Pink" style="background:#ec4899"></div>
-              <!-- Blau/Violett -->
-              <div class="color-swatch" data-color="blue" title="Blau" style="background:#2563eb"></div>
-              <div class="color-swatch" data-color="navy" title="Navy" style="background:#1e3a5f"></div>
-              <div class="color-swatch" data-color="violet" title="Violett" style="background:#7c3aed"></div>
-              <div class="color-swatch" data-color="lavender" title="Lavendel" style="background:#a78bfa"></div>
-              <div class="color-swatch" data-color="slate" title="Slate" style="background:#334155"></div>
-              <div class="color-swatch" data-color="gray" title="Grau" style="background:#64748b"></div>
-              <!-- Neutral + Neon -->
-              <div class="color-swatch" data-color="charcoal" title="Anthrazit" style="background:#1e1e1e"></div>
-              <div class="color-swatch" data-color="lime" title="Neon-Grün" style="background:#22c55e;box-shadow:0 0 6px #22c55e"></div>
-              <div class="color-swatch" data-color="cyan" title="Cyan" style="background:#06b6d4;box-shadow:0 0 6px #06b6d4"></div>
-              <div class="color-swatch" data-color="electric" title="Electric" style="background:#6366f1;box-shadow:0 0 6px #6366f1"></div>
-              <div class="color-swatch" data-color="neon-pink" title="Neon-Pink" style="background:#ec4899;box-shadow:0 0 6px #ec4899"></div>
+            <div class="cat-tabs" data-cat-group="color">
+              <button type="button" class="cat-tab" data-cat="warm">Warm</button>
+              <button type="button" class="cat-tab active" data-cat="gruen">Grün</button>
+              <button type="button" class="cat-tab" data-cat="blau">Blau</button>
+              <button type="button" class="cat-tab" data-cat="neutral">Neutral</button>
+              <button type="button" class="cat-tab" data-cat="neon">Neon</button>
+            </div>
+            <div class="cat-panel color-panel" data-cat="warm">
+              <div class="color-swatch" data-color="red" data-cat="warm" title="Rot" style="background:#dc2626"></div>
+              <div class="color-swatch" data-color="wine" data-cat="warm" title="Weinrot" style="background:#881337"></div>
+              <div class="color-swatch" data-color="coral" data-cat="warm" title="Coral" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="orange" data-cat="warm" title="Orange" style="background:#f97316"></div>
+              <div class="color-swatch" data-color="gold" data-cat="warm" title="Gold" style="background:#b45309"></div>
+              <div class="color-swatch" data-color="brown" data-cat="warm" title="Braun" style="background:#78350f"></div>
+              <div class="color-swatch" data-color="pink" data-cat="warm" title="Pink" style="background:#ec4899"></div>
+            </div>
+            <div class="cat-panel color-panel active" data-cat="gruen">
+              <div class="color-swatch active" data-color="green" data-cat="gruen" title="Grün" style="background:#2e6b2e"></div>
+              <div class="color-swatch" data-color="forest" data-cat="gruen" title="Forest" style="background:#15803d"></div>
+              <div class="color-swatch" data-color="survival" data-cat="gruen" title="Survival Green" style="background:#2d7a2d"></div>
+              <div class="color-swatch" data-color="olive" data-cat="gruen" title="Olive" style="background:#4d7c0f"></div>
+              <div class="color-swatch" data-color="mint" data-cat="gruen" title="Mint" style="background:#059669"></div>
+              <div class="color-swatch" data-color="teal" data-cat="gruen" title="Teal" style="background:#0d9488"></div>
+            </div>
+            <div class="cat-panel color-panel" data-cat="blau">
+              <div class="color-swatch" data-color="blue" data-cat="blau" title="Blau" style="background:#2563eb"></div>
+              <div class="color-swatch" data-color="navy" data-cat="blau" title="Navy" style="background:#1e3a5f"></div>
+              <div class="color-swatch" data-color="violet" data-cat="blau" title="Violett" style="background:#7c3aed"></div>
+              <div class="color-swatch" data-color="lavender" data-cat="blau" title="Lavendel" style="background:#a78bfa"></div>
+            </div>
+            <div class="cat-panel color-panel" data-cat="neutral">
+              <div class="color-swatch" data-color="slate" data-cat="neutral" title="Slate" style="background:#334155"></div>
+              <div class="color-swatch" data-color="gray" data-cat="neutral" title="Grau" style="background:#64748b"></div>
+              <div class="color-swatch" data-color="charcoal" data-cat="neutral" title="Anthrazit" style="background:#1e1e1e"></div>
+            </div>
+            <div class="cat-panel color-panel" data-cat="neon">
+              <div class="color-swatch" data-color="lime" data-cat="neon" title="Neon-Grün" style="background:#22c55e;box-shadow:0 0 6px #22c55e"></div>
+              <div class="color-swatch" data-color="cyan" data-cat="neon" title="Cyan" style="background:#06b6d4;box-shadow:0 0 6px #06b6d4"></div>
+              <div class="color-swatch" data-color="electric" data-cat="neon" title="Electric" style="background:#6366f1;box-shadow:0 0 6px #6366f1"></div>
+              <div class="color-swatch" data-color="neon-pink" data-cat="neon" title="Neon-Pink" style="background:#ec4899;box-shadow:0 0 6px #ec4899"></div>
             </div>
           </div>
         </div>
@@ -953,23 +1000,49 @@
         <div class="demo-section">
           <div class="demo-group">
             <label>Schrift</label>
-            <div class="font-grid">
-              <button class="font-card active" data-font="swiss-precision"><span class="font-preview" style="font-family:'Inter',sans-serif;font-weight:700;letter-spacing:-0.02em">Aa Swiss</span><span class="font-label">Inter</span></button>
-              <button class="font-card" data-font="modern-sans"><span class="font-preview" style="font-family:'DM Sans',sans-serif;font-weight:800">Aa Modern</span><span class="font-label">DM Sans</span></button>
-              <button class="font-card" data-font="brand-bold"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase">AA BRAND</span><span class="font-label">Oswald + Source</span></button>
-              <button class="font-card" data-font="classic-serif"><span class="font-preview" style="font-family:'Lora',serif;font-weight:600">Aa Classic</span><span class="font-label">Lora + Inter</span></button>
-              <button class="font-card" data-font="editorial-grand"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:700">Aa Editorial</span><span class="font-label">Playfair + Inter</span></button>
-              <button class="font-card" data-font="magazine"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:900;font-style:italic">Aa Magazine</span><span class="font-label">Playfair Contrast</span></button>
-              <button class="font-card" data-font="luxury-thin"><span class="font-preview" style="font-family:'Cormorant Garamond',serif;font-weight:300">Aa Luxury</span><span class="font-label">Cormorant + Montserrat</span></button>
-              <button class="font-card" data-font="display-serif"><span class="font-preview" style="font-family:'Fraunces',serif;font-weight:900">Aa Display</span><span class="font-label">Fraunces + Inter</span></button>
-              <button class="font-card" data-font="fashion"><span class="font-preview" style="font-family:'Bodoni Moda',serif;font-weight:700">Aa Fashion</span><span class="font-label">Bodoni Moda + Jost</span></button>
-              <button class="font-card" data-font="nordic"><span class="font-preview" style="font-family:'DM Serif Display',serif;font-weight:400">Aa Nordic</span><span class="font-label">DM Serif + IBM Plex</span></button>
-              <button class="font-card" data-font="softcraft"><span class="font-preview" style="font-family:'EB Garamond',serif;font-weight:600">Aa Craft</span><span class="font-label">Softcraft Serif</span></button>
-              <button class="font-card" data-font="rounded-friendly"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:600">Aa Playful</span><span class="font-label">Fredoka + Nunito</span></button>
-              <button class="font-card" data-font="cinematic"><span class="font-preview" style="font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:0.02em">AA CINEMA</span><span class="font-label">Bebas Neue</span></button>
-              <button class="font-card" data-font="geometric-black"><span class="font-preview" style="font-family:'Space Grotesk',sans-serif;font-weight:700">Aa Geo</span><span class="font-label">Geometric Black</span></button>
-              <button class="font-card" data-font="tech-display"><span class="font-preview" style="font-family:'Space Mono',monospace;font-weight:700">Aa Tech</span><span class="font-label">Tech Display</span></button>
-              <button class="font-card" data-font="mono-hacker"><span class="font-preview" style="font-family:'JetBrains Mono',monospace;font-weight:600">> Hacker</span><span class="font-label">JetBrains Mono</span></button>
+            <div class="cat-tabs" data-cat-group="font">
+              <button type="button" class="cat-tab active" data-cat="sans">Sans</button>
+              <button type="button" class="cat-tab" data-cat="serif">Serif</button>
+              <button type="button" class="cat-tab" data-cat="display">Display</button>
+              <button type="button" class="cat-tab" data-cat="verspielt">Verspielt</button>
+              <button type="button" class="cat-tab" data-cat="mono">Mono</button>
+            </div>
+            <div class="cat-panel font-panel active" data-cat="sans">
+              <button class="font-card active" data-font="swiss-precision" data-cat="sans"><span class="font-preview" style="font-family:'Inter',sans-serif;font-weight:700;letter-spacing:-0.02em">Aa Swiss</span><span class="font-label">Inter</span></button>
+              <button class="font-card" data-font="modern-sans" data-cat="sans"><span class="font-preview" style="font-family:'DM Sans',sans-serif;font-weight:800">Aa Modern</span><span class="font-label">DM Sans</span></button>
+              <button class="font-card" data-font="modern" data-cat="sans"><span class="font-preview" style="font-family:'Inter',sans-serif;font-weight:400">Aa Light</span><span class="font-label">Inter Light</span></button>
+              <button class="font-card" data-font="humanist" data-cat="sans"><span class="font-preview" style="font-family:'Nunito',sans-serif;font-weight:600">Aa Humanist</span><span class="font-label">Nunito</span></button>
+              <button class="font-card" data-font="system" data-cat="sans"><span class="font-preview" style="font-family:system-ui,-apple-system,sans-serif;font-weight:600">Aa System</span><span class="font-label">System UI</span></button>
+            </div>
+            <div class="cat-panel font-panel" data-cat="serif">
+              <button class="font-card" data-font="classic-serif" data-cat="serif"><span class="font-preview" style="font-family:'Lora',serif;font-weight:600">Aa Classic</span><span class="font-label">Lora + Inter</span></button>
+              <button class="font-card" data-font="editorial" data-cat="serif"><span class="font-preview" style="font-family:'Cormorant Garamond',serif;font-weight:600">Aa Editorial</span><span class="font-label">Cormorant + Lato</span></button>
+              <button class="font-card" data-font="editorial-grand" data-cat="serif"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:700">Aa Grand</span><span class="font-label">Playfair + Inter</span></button>
+              <button class="font-card" data-font="serif" data-cat="serif"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:600">Aa Serif</span><span class="font-label">Playfair + Source</span></button>
+              <button class="font-card" data-font="elegant" data-cat="serif"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:500">Aa Elegant</span><span class="font-label">Playfair + Lato</span></button>
+              <button class="font-card" data-font="softcraft" data-cat="serif"><span class="font-preview" style="font-family:'EB Garamond',serif;font-weight:600">Aa Craft</span><span class="font-label">EB Garamond</span></button>
+              <button class="font-card" data-font="nordic" data-cat="serif"><span class="font-preview" style="font-family:'DM Serif Display',serif;font-weight:400">Aa Nordic</span><span class="font-label">DM Serif + IBM</span></button>
+              <button class="font-card" data-font="display-serif" data-cat="serif"><span class="font-preview" style="font-family:'Fraunces',serif;font-weight:900">Aa Display</span><span class="font-label">Fraunces + Inter</span></button>
+            </div>
+            <div class="cat-panel font-panel" data-cat="display">
+              <button class="font-card" data-font="brand-bold" data-cat="display"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase">AA BRAND</span><span class="font-label">Oswald + Source</span></button>
+              <button class="font-card" data-font="cinematic" data-cat="display"><span class="font-preview" style="font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:0.02em">AA CINEMA</span><span class="font-label">Bebas Neue</span></button>
+              <button class="font-card" data-font="geometric-black" data-cat="display"><span class="font-preview" style="font-family:'Space Grotesk',sans-serif;font-weight:700">Aa Geo</span><span class="font-label">Space Grotesk</span></button>
+              <button class="font-card" data-font="tech-display" data-cat="display"><span class="font-preview" style="font-family:'Space Mono',monospace;font-weight:700">Aa Tech</span><span class="font-label">Space Mono</span></button>
+              <button class="font-card" data-font="contrast" data-cat="display"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:700;font-style:italic">Aa Contrast</span><span class="font-label">Playfair Italic</span></button>
+              <button class="font-card" data-font="magazine" data-cat="display"><span class="font-preview" style="font-family:'Playfair Display',serif;font-weight:900;font-style:italic">Aa Magazine</span><span class="font-label">Playfair Bold</span></button>
+              <button class="font-card" data-font="fashion" data-cat="display"><span class="font-preview" style="font-family:'Bodoni Moda',serif;font-weight:700">Aa Fashion</span><span class="font-label">Bodoni + Jost</span></button>
+              <button class="font-card" data-font="luxury-thin" data-cat="display"><span class="font-preview" style="font-family:'Cormorant Garamond',serif;font-weight:300">Aa Luxury</span><span class="font-label">Cormorant Thin</span></button>
+            </div>
+            <div class="cat-panel font-panel" data-cat="verspielt">
+              <button class="font-card" data-font="rounded" data-cat="verspielt"><span class="font-preview" style="font-family:'Nunito',sans-serif;font-weight:700">Aa Rounded</span><span class="font-label">Nunito</span></button>
+              <button class="font-card" data-font="rounded-friendly" data-cat="verspielt"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:600">Aa Friendly</span><span class="font-label">Fredoka + Nunito</span></button>
+              <button class="font-card" data-font="playful" data-cat="verspielt"><span class="font-preview" style="font-family:'Fredoka',cursive;font-weight:500">Aa Playful</span><span class="font-label">Fredoka Light</span></button>
+              <button class="font-card" data-font="survival" data-cat="verspielt"><span class="font-preview" style="font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase">AA SURVIVAL</span><span class="font-label">Oswald + Serif</span></button>
+            </div>
+            <div class="cat-panel font-panel" data-cat="mono">
+              <button class="font-card" data-font="mono" data-cat="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace;font-weight:500">Aa Mono</span><span class="font-label">JetBrains Mono</span></button>
+              <button class="font-card" data-font="mono-hacker" data-cat="mono"><span class="font-preview" style="font-family:'JetBrains Mono',monospace;font-weight:600">> Hacker</span><span class="font-label">Mono Hacker</span></button>
             </div>
           </div>
         </div>
@@ -977,26 +1050,51 @@
         <div class="demo-section">
           <div class="demo-group">
             <label>Buttons</label>
-            <div class="button-grid">
-              <button class="button-preview-card active" data-buttons="rect-solid"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;letter-spacing:0.1em;font-size:0.55rem">BTN</span><span class="btn-label">Rect Solid</span></button>
-              <button class="button-preview-card" data-buttons="rect-outline"><span class="btn-mini" style="background:transparent;border:1px solid #3b82f6;border-radius:0;color:#3b82f6;text-transform:uppercase;letter-spacing:0.1em;font-size:0.55rem">BTN</span><span class="btn-label">Rect Outline</span></button>
-              <button class="button-preview-card" data-buttons="pill-solid"><span class="btn-mini" style="background:#3b82f6;border-radius:999px;font-weight:600">Button</span><span class="btn-label">Pill Solid</span></button>
-              <button class="button-preview-card" data-buttons="pill-thin"><span class="btn-mini" style="background:transparent;border:1.5px solid rgba(0,0,0,0.3);border-radius:999px;color:#333;font-weight:500">Button</span><span class="btn-label">Pill Thin</span></button>
-              <button class="button-preview-card" data-buttons="soft-round"><span class="btn-mini" style="background:#3b82f6;border-radius:8px;font-weight:600">Button</span><span class="btn-label">Soft Round</span></button>
-              <button class="button-preview-card" data-buttons="ghost-tint"><span class="btn-mini" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;color:#3b82f6;font-weight:500">Button</span><span class="btn-label">Ghost Tint</span></button>
-              <button class="button-preview-card" data-buttons="brutalist"><span class="btn-mini" style="background:#3b82f6;border-radius:0;border:2px solid #000;box-shadow:3px 3px 0 #000;font-weight:700">Button</span><span class="btn-label">Brutalist</span></button>
-              <button class="button-preview-card" data-buttons="cta-arrow"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:600">Button →</span><span class="btn-label">CTA Arrow</span></button>
-              <button class="button-preview-card" data-buttons="tech-angle"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);text-transform:uppercase;letter-spacing:0.08em;font-size:0.55rem">BTN</span><span class="btn-label">Tech Angle</span></button>
-              <button class="button-preview-card" data-buttons="shadow-lift"><span class="btn-mini" style="background:#3b82f6;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-weight:700">Button</span><span class="btn-label">Shadow Lift</span></button>
-              <button class="button-preview-card" data-buttons="gradient-cta"><span class="btn-mini" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:8px;font-weight:700">Button</span><span class="btn-label">Gradient</span></button>
-              <button class="button-preview-card" data-buttons="chip"><span class="btn-mini" style="background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:4px;font-size:0.55rem;padding:0.15rem 0.45rem">Btn</span><span class="btn-label">Chip</span></button>
-              <button class="button-preview-card" data-buttons="heavy-bold"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;font-size:0.55rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
-              <button class="button-preview-card" data-buttons="minimal-link"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Button</span><span class="btn-label">Minimal Link</span></button>
+            <div class="cat-tabs" data-cat-group="buttons">
+              <button type="button" class="cat-tab active" data-cat="eckig">Eckig</button>
+              <button type="button" class="cat-tab" data-cat="rund">Rund</button>
+              <button type="button" class="cat-tab" data-cat="soft">Soft</button>
+              <button type="button" class="cat-tab" data-cat="outline">Outline</button>
+              <button type="button" class="cat-tab" data-cat="special">Special</button>
+            </div>
+            <div class="cat-panel button-panel active" data-cat="eckig">
+              <button class="button-preview-card active" data-buttons="rect-solid" data-cat="eckig"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;letter-spacing:0.08em">BTN</span><span class="btn-label">Rect Solid</span></button>
+              <button class="button-preview-card" data-buttons="rect-outline" data-cat="eckig"><span class="btn-mini" style="background:transparent;border:1px solid #3b82f6;border-radius:0;color:#3b82f6;text-transform:uppercase;letter-spacing:0.08em">BTN</span><span class="btn-label">Rect Outline</span></button>
+              <button class="button-preview-card" data-buttons="sharp" data-cat="eckig"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;font-weight:700;font-size:0.5rem">BTN</span><span class="btn-label">Sharp</span></button>
+              <button class="button-preview-card" data-buttons="bold" data-cat="eckig"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;box-shadow:2px 2px 0 #1d4ed8;font-size:0.5rem">BTN</span><span class="btn-label">Bold</span></button>
+              <button class="button-preview-card" data-buttons="heavy-bold" data-cat="eckig"><span class="btn-mini" style="background:#3b82f6;border-radius:4px;font-weight:900;text-transform:uppercase;font-size:0.5rem">BTN</span><span class="btn-label">Heavy Bold</span></button>
+            </div>
+            <div class="cat-panel button-panel" data-cat="rund">
+              <button class="button-preview-card" data-buttons="pill-solid" data-cat="rund"><span class="btn-mini" style="background:#3b82f6;border-radius:999px">Btn</span><span class="btn-label">Pill Solid</span></button>
+              <button class="button-preview-card" data-buttons="pill-thin" data-cat="rund"><span class="btn-mini" style="background:#3b82f6;border-radius:999px">Btn</span><span class="btn-label">Pill Thin</span></button>
+              <button class="button-preview-card" data-buttons="rounded" data-cat="rund"><span class="btn-mini" style="background:#3b82f6;border-radius:9999px;padding:0.18rem 0.65rem">Btn</span><span class="btn-label">Rounded</span></button>
+            </div>
+            <div class="cat-panel button-panel" data-cat="soft">
+              <button class="button-preview-card" data-buttons="soft-round" data-cat="soft"><span class="btn-mini" style="background:#3b82f6;border-radius:8px">Btn</span><span class="btn-label">Soft Round</span></button>
+              <button class="button-preview-card" data-buttons="soft" data-cat="soft"><span class="btn-mini" style="background:#3b82f6;border-radius:8px;box-shadow:0 2px 6px rgba(59,130,246,0.3)">Btn</span><span class="btn-label">Soft Shadow</span></button>
+            </div>
+            <div class="cat-panel button-panel" data-cat="outline">
+              <button class="button-preview-card" data-buttons="outline" data-cat="outline"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:2px solid #3b82f6 !important;border-radius:6px">Btn</span><span class="btn-label">Outline</span></button>
+              <button class="button-preview-card" data-buttons="outline-thin" data-cat="outline"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:1px solid #3b82f6 !important;border-radius:6px">Btn</span><span class="btn-label">Outline Thin</span></button>
+              <button class="button-preview-card" data-buttons="outline-elegant" data-cat="outline"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:1px solid rgba(59,130,246,0.3) !important;border-radius:4px">Btn</span><span class="btn-label">Outline Elegant</span></button>
+              <button class="button-preview-card" data-buttons="ghost" data-cat="outline"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:1px solid rgba(59,130,246,0.3) !important;border-radius:6px">Btn</span><span class="btn-label">Ghost</span></button>
+              <button class="button-preview-card" data-buttons="ghost-tint" data-cat="outline"><span class="btn-mini" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:6px;color:#3b82f6">Btn</span><span class="btn-label">Ghost Tint</span></button>
+            </div>
+            <div class="cat-panel button-panel" data-cat="special">
+              <button class="button-preview-card" data-buttons="shadow-lift" data-cat="special"><span class="btn-mini" style="background:#3b82f6;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.12)">Btn</span><span class="btn-label">Shadow Lift</span></button>
+              <button class="button-preview-card" data-buttons="gradient-cta" data-cat="special"><span class="btn-mini" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:8px">Btn</span><span class="btn-label">Gradient</span></button>
+              <button class="button-preview-card" data-buttons="brutalist" data-cat="special"><span class="btn-mini" style="background:#3b82f6;border-radius:0;border:2px solid #000;box-shadow:2px 2px 0 #000">Btn</span><span class="btn-label">Brutalist</span></button>
+              <button class="button-preview-card" data-buttons="tech" data-cat="special"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;font-weight:700;box-shadow:0 2px 12px rgba(59,130,246,0.4);font-size:0.5rem">TECH</span><span class="btn-label">Tech</span></button>
+              <button class="button-preview-card" data-buttons="tech-angle" data-cat="special"><span class="btn-mini" style="background:#3b82f6;clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);text-transform:uppercase;font-size:0.5rem">BTN</span><span class="btn-label">Tech Angle</span></button>
+              <button class="button-preview-card" data-buttons="tactical" data-cat="special"><span class="btn-mini" style="background:#3b82f6;border-radius:0;text-transform:uppercase;font-weight:500;font-size:0.5rem">TAC</span><span class="btn-label">Tactical</span></button>
+              <button class="button-preview-card" data-buttons="cta-arrow" data-cat="special"><span class="btn-mini" style="background:#3b82f6;border-radius:4px">Btn &rarr;</span><span class="btn-label">CTA Arrow</span></button>
+              <button class="button-preview-card" data-buttons="chip" data-cat="special"><span class="btn-mini" style="background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:4px;font-size:0.5rem">Btn</span><span class="btn-label">Chip</span></button>
+              <button class="button-preview-card" data-buttons="minimal-link" data-cat="special"><span class="btn-mini" style="background:transparent;border:none;color:#3b82f6;text-decoration:underline;font-weight:500;padding:0">Btn</span><span class="btn-label">Minimal Link</span></button>
             </div>
           </div>
         </div>
 
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+        <div class="demo-section">
           <div class="demo-group">
             <label>Dichte</label>
             <div class="visual-btn-row">
@@ -1051,7 +1149,7 @@
             </div>
           </div>
         </div>
-        <div class="demo-section" style="border-bottom:none;padding-bottom:0;">
+        <div class="demo-section">
           <button class="demo-btn" id="export-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#3b82f6;color:#fff;border-color:#3b82f6;font-weight:500;" onclick="exportConfig()">Config exportieren</button>
           <button class="demo-btn" id="endo-cmd-btn" style="width:100%;padding:0.625rem;font-size:0.8125rem;background:#22c55e;color:#fff;border-color:#22c55e;font-weight:500;margin-top:0.375rem;" onclick="copyEndoCommand()">🤖 /endo Befehl kopieren</button>
           <div id="export-toast">✓ In Zwischenablage kopiert</div>
@@ -2107,6 +2205,16 @@
       updateUrlState();
     }
 
+    function syncCatTabs() {
+      if (typeof activateCatTab !== 'function') return;
+      var activeColor = document.querySelector('.color-swatch.active[data-cat]');
+      if (activeColor) activateCatTab('color', activeColor.dataset.cat);
+      var activeFont = document.querySelector('.font-card.active[data-cat]');
+      if (activeFont) activateCatTab('font', activeFont.dataset.cat);
+      var activeBtn = document.querySelector('.button-preview-card.active[data-cat]');
+      if (activeBtn) activateCatTab('buttons', activeBtn.dataset.cat);
+    }
+
     function syncUIControls(p) {
       function setActiveByData(a, v) { document.querySelectorAll('['+a+']').forEach(function(b){ b.classList.toggle('active', b.getAttribute(a)===v); }); }
       setActiveByData('data-layout', p.layout); setActiveByData('data-hero', p.hero);
@@ -2123,6 +2231,7 @@
       /* Nav-Select bleibt ein <select> */
       var navSel = document.getElementById('nav-select');
       if (navSel) navSel.value = p.navBehavior;
+      syncCatTabs();
     }
 
     window.applyPreset = function applyPreset(name) {
@@ -2387,6 +2496,29 @@
     document.querySelectorAll('[data-lang]').forEach(function(btn) {
       btn.addEventListener('click', function() { setActive(this); applyLang(this.dataset.lang); });
     });
+    /* Category tab switcher (colors / fonts / buttons) */
+    function activateCatTab(group, cat) {
+      var tabs = document.querySelectorAll('.cat-tabs[data-cat-group="' + group + '"] .cat-tab');
+      tabs.forEach(function(t) {
+        t.classList.toggle('active', t.dataset.cat === cat);
+      });
+      var tabsEl = document.querySelector('.cat-tabs[data-cat-group="' + group + '"]');
+      if (!tabsEl) return;
+      var parent = tabsEl.parentElement;
+      var panels = parent.querySelectorAll(':scope > .cat-panel');
+      panels.forEach(function(p) {
+        p.classList.toggle('active', p.dataset.cat === cat);
+      });
+    }
+    document.querySelectorAll('.cat-tabs').forEach(function(tabs) {
+      var group = tabs.dataset.catGroup;
+      tabs.querySelectorAll('.cat-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activateCatTab(group, tab.dataset.cat);
+        });
+      });
+    });
+
     /* Visual picker event listeners */
     document.querySelectorAll('.color-swatch[data-color]').forEach(function(sw) {
       sw.addEventListener('click', function() {

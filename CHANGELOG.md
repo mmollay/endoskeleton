@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.0] — 2026-04-13
+
+### Fixed
+- **demo.html mit konfigurator.html synchronisiert** — `demo.html` hatte eine komplett veraltete Sidebar-Kopie (keine Tabs, nur 16 Fonts, nur 14 Buttons, altes flaches Layout). Jetzt identisch: Kategorien-Tabs, alle 27 Schriften, alle 24 Buttons, alle 24 Farben in 5 Tabs, Card-Style Sektionen, graues Sidebar-Panel (`#f1f5f9`), `syncCatTabs()` bei Preset-Wechsel. **Eine Wahrheit für beide Dateien.**
+
+---
+
 ## [3.43.3] — 2026-04-13
 
 ### Changed
