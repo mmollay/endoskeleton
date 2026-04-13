@@ -31,7 +31,7 @@ $list = [];
 foreach ($presets as $name => $config) {
     $list[$name] = [
         'parameters'  => $config,
-        'preview_url' => 'https://skeleton.ssi.at/demo.html#preset=' . $name,
+        'preview_url' => 'https://skeleton.ssi.at/konfigurator.html?fullscreen=1#preset=' . $name,
     ];
 }
 

@@ -273,7 +273,7 @@ final class RecommendEngine
                 "overrides"   => $overrides,
                 "confidence"  => $confidence,
                 "reasoning"   => implode(". ", array_unique($data["reasons"])) ?: "Standard-Empfehlung",
-                "preview_url" => "https://skeleton.ssi.at/demo.html#" . implode("&", $hashParts),
+                "preview_url" => "https://skeleton.ssi.at/konfigurator.html?fullscreen=1#" . implode("&", $hashParts),
             ];
         }
 

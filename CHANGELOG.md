@@ -4,6 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.1] — 2026-04-13
+
+### Changed
+- **demo.html abgeschafft** — `demo.html` (~2700 Zeilen) durch einen 15-Zeilen Redirect-Stub ersetzt. Leitet `demo.html#hash` automatisch auf `konfigurator.html?fullscreen=1#hash` um. Bestehende Bookmarks, API-Links und Google-Index funktionieren weiter.
+- **Fullscreen-Modus in konfigurator.html** — Neuer URL-Parameter `?fullscreen=1` versteckt Sidebar + Domain-Bar und zeigt nur die reine Live-Preview. **Eine Wahrheit** für den gesamten Sidebar-Code.
+- **"Ansicht vertiefen" Button** — öffnet jetzt `konfigurator.html?fullscreen=1` statt `demo.html`.
+- **API-URLs aktualisiert** — `CatalogReader.php`, `preview.php`, `presets.php`, `RecommendEngine.php`, `schema.php` zeigen auf `konfigurator.html?fullscreen=1` statt `demo.html`. CatalogReader parst PRESETS jetzt aus `konfigurator.html`.
+
+---
+
 ## [3.44.0] — 2026-04-13
 
 ### Fixed

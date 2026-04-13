@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.44.0'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.44.1'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.44.0">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.44.1">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -1666,9 +1666,9 @@
 </div><!-- /konfig-preview -->
 
   <script src="js/lucide.min.js"></script>
-  <script src="js/scanner-client.js?v=3.44.0"></script>
-  <script src="js/content-injector.js?v=3.44.0"></script>
-  <script src="js/konfigurator.js?v=3.44.0"></script>
+  <script src="js/scanner-client.js?v=3.44.1"></script>
+  <script src="js/content-injector.js?v=3.44.1"></script>
+  <script src="js/konfigurator.js?v=3.44.1"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
@@ -2920,6 +2920,16 @@
       })();
     renderCustomPresets();
     restoreUrlState();
+
+      /* ─── Fullscreen-Modus (?fullscreen=1 → Sidebar + Domain-Bar verstecken) ─── */
+      if (new URLSearchParams(location.search).has('fullscreen')) {
+        var sidebar = document.querySelector('.demo-sidebar-wrapper');
+        var domainBar = document.getElementById('konfig-domain-bar');
+        if (sidebar) sidebar.style.display = 'none';
+        if (domainBar) domainBar.style.display = 'none';
+        document.body.style.marginRight = '0';
+        document.body.classList.remove('konfig-has-bar');
+      }
 
       /* If no preset selected after restore, highlight Default */
       if (!document.querySelector('.preset-card.active')) {

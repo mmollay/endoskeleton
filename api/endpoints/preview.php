@@ -26,6 +26,6 @@ if (empty($hashParts)) {
     Response::error("Keine gueltigen Parameter gefunden", 400);
 }
 
-$url = "https://skeleton.ssi.at/demo.html#" . implode("&", $hashParts);
+$url = "https://skeleton.ssi.at/konfigurator.html?fullscreen=1#" . implode("&", $hashParts);
 header("Location: " . $url, true, 302);
 exit;

@@ -483,9 +483,9 @@
   }
 
   function _onDeepen() {
-    // Open full-screen preview: demo.html with current preset settings (no sidebar)
+    // Open full-screen preview: konfigurator.html?fullscreen=1 with current settings (no sidebar)
     var hash = window.location.hash;
-    var previewUrl = "demo.html" + hash;
+    var previewUrl = "konfigurator.html?fullscreen=1" + hash;
     window.open(previewUrl, "_blank");
   }
 

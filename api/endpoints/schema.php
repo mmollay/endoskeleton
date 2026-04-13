@@ -105,7 +105,7 @@ $schema = [
         "/preview" => [
             "get" => [
                 "summary" => "Live-Vorschau",
-                "description" => "Redirect zur demo.html mit den angegebenen Parametern.",
+                "description" => "Redirect zur Fullscreen-Vorschau (konfigurator.html?fullscreen=1) mit den angegebenen Parametern.",
                 "responses" => ["302" => ["description" => "Redirect zur Vorschau"]],
             ],
         ],

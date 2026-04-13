@@ -21,8 +21,8 @@ final class CatalogReader
 
     public function getPresets(): array
     {
-        // Parse PRESETS from demo.html <script> block
-        $demo = file_get_contents($this->root . '/demo.html');
+        // Parse PRESETS from konfigurator.html <script> block
+        $demo = file_get_contents($this->root . '/konfigurator.html');
         if (!preg_match('/var PRESETS\s*=\s*\{(.+?)\};\s*\n\s*var defaults/s', $demo, $m)) {
             return [];
         }
@@ -130,7 +130,7 @@ final class CatalogReader
             'name'        => $name,
             'parameters'  => $config,
             'css_urls'    => $cssUrls,
-            'preview_url' => 'https://skeleton.ssi.at/demo.html#preset=' . $name,
+            'preview_url' => 'https://skeleton.ssi.at/konfigurator.html?fullscreen=1#preset=' . $name,
         ];
     }
 }
