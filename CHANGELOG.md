@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.2] — 2026-04-13
+
+### Fixed
+- **Leere Sections komplett entfernt** — Stats/Banner, Testimonial und CTA-Sections werden jetzt automatisch entfernt wenn sie nach dem Placeholder-Cleanup keinen sichtbaren Text mehr enthalten. Verwendet `strip_tags()` um zu prüfen ob echte Inhalte vorhanden sind, statt leere HTML-Gerüste stehen zu lassen.
+
+---
+
 ## [3.45.1] — 2026-04-13
 
 ### Fixed

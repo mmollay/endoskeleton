@@ -519,6 +519,20 @@ SCRIPT;
         // Second pass for nested empties (e.g. <a><span></span></a>)
         $html = preg_replace('/<(h[1-6]|p|span|a|li|figcaption|cite)[^>]*>\s*<\/\1>/i', '', $html);
 
+        // Remove entire sections that have no visible text content after cleanup
+        // Matches <!-- Comment --> + <section ...>...</section> or <div class="banner-strip ...">...</div>
+        $html = preg_replace_callback(
+            '/\s*<!-- [^>]+ -->\s*<(section|div)\b([^>]*)>(.*?)<\/\1>/is',
+            function ($m) {
+                $inner = $m[3];
+                // Strip all HTML tags to get visible text
+                $text = trim(strip_tags($inner));
+                // If no visible text remains, remove the entire section
+                return $text === '' ? '' : $m[0];
+            },
+            $html
+        );
+
         // Replace template SITE_CONFIG block with generated one
         $configScript = $this->buildSiteConfigScript($preset, $content);
         $html = preg_replace(
