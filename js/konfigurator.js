@@ -492,17 +492,30 @@
   function _cleanPageText(text) {
     if (!text) return "";
     var lines = text.split("\n");
-    // Strip leading nav-like lines (short, all-caps, menu items)
-    var navPatterns =
-      /^(start|home|kontakt|leistung|produkt|referenz|ueber uns|about|service|impressum|datenschutz|agb|de|en|\|)$/i;
+    // Nav/UI patterns to remove everywhere
+    var junkLine =
+      /^(start|home|kontakt|leistung|produkt|referenz|ueber uns|über uns|about|service|impressum|datenschutz|agb|de|en|links|spenden|patenschaft|mehr|menü|menu|navigation|suche|search|anmelden|login|registrieren|cookie|verstanden|akzeptieren|learn more|zurück|weiter|schließen|\|)$/i;
+    var cookieLine =
+      /cookie|datenschutz.*akzept|privacy.*policy|we use cookies|diese webseite benutzt/i;
     var cleaned = [];
+    var seenContent = false;
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
       if (!line) continue;
-      // Skip short nav-like fragments at the beginning
-      if (cleaned.length === 0 && line.length < 30) {
-        if (navPatterns.test(line) || line === line.toUpperCase()) continue;
-      }
+      // Always skip cookie-banner lines
+      if (cookieLine.test(line)) continue;
+      // Skip nav-like short fragments (< 25 chars) that match patterns
+      if (line.length < 25 && junkLine.test(line)) continue;
+      // Skip ALL-CAPS short lines (nav headers, labels)
+      if (
+        line.length < 30 &&
+        line === line.toUpperCase() &&
+        !/[.!?]/.test(line)
+      )
+        continue;
+      // First real content line must be > 30 chars (skip stray labels)
+      if (!seenContent && line.length < 30) continue;
+      seenContent = true;
       cleaned.push(line);
     }
     return cleaned.join("\n").trim().substring(0, 5000);

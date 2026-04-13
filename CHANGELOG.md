@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.44.5] — 2026-04-13
+
+### Fixed
+- **Text-Cleaner komplett umgeschrieben** — `_cleanPageText()` filtert jetzt aggressiv Cookie-Banner ("Diese Webseite benutzt Cookies", "Verstanden!", "Learn more"), Navigation-Fragmente (Home, Kontakt, Links, Spenden, etc.) und ALL-CAPS-Kurzzeilen **überall** im Text, nicht nur am Anfang. Erste echte Content-Zeile muss >30 Zeichen haben. Verhindert dass generierte Seiten Cookie-Banner und Nav-Müll als About-Text oder Hero-Subtitle zeigen.
+
+---
+
 ## [3.44.4] — 2026-04-13
 
 ### Fixed
