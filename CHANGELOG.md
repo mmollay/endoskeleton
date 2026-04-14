@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.8] — 2026-04-14
+
+### Removed
+- **"Ansicht vertiefen" Button entfernt** — Öffnete nur einen nutzlosen Fullscreen-Preview ohne Funktionalität. "Website generieren" ist jetzt der einzige Action-Button.
+
+---
+
 ## [3.45.7] — 2026-04-14
 
 ### Added

@@ -29,7 +29,7 @@
     _el.scanProgress = document.getElementById("konfig-scan-progress");
     _el.scanDomain = document.getElementById("konfig-scan-domain");
     _el.historyList = document.getElementById("konfig-history-list");
-    _el.deepenBtn = document.getElementById("konfig-deepen-btn");
+    _el.deepenBtn = null;
     _el.generateBtn = document.getElementById("konfig-generate-btn");
     _el.presetRec = document.getElementById("konfig-preset-recommendation");
   }
@@ -489,13 +489,6 @@
       overrides: overrides,
       content: content,
     };
-  }
-
-  function _onDeepen() {
-    // Open full-screen preview: konfigurator.html?fullscreen=1 with current settings (no sidebar)
-    var hash = window.location.hash;
-    var previewUrl = "konfigurator.html?fullscreen=1" + hash;
-    window.open(previewUrl, "_blank");
   }
 
   function _cleanPageText(text) {
