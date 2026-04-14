@@ -196,6 +196,15 @@
 
     _switchState(STATES.PREVIEW);
 
+    // Show scanner result link in header
+    var scannerLink = document.getElementById("scanner-result-link");
+    if (scannerLink) {
+      scannerLink.href =
+        "https://scanner.ssi.at/api/v1/scans/" + encodeURIComponent(domain);
+      scannerLink.style.display = "inline-block";
+      scannerLink.title = "Scanner-Ergebnis für " + domain + " ansehen";
+    }
+
     var _rb = document.getElementById("btn-ki-refine");
     if (_rb) _rb.disabled = false;
 

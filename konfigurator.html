@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.45.6'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.45.7'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,7 +102,7 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.45.6">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.45.7">
   <style>
     /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
     body {
@@ -883,7 +883,10 @@
     <div class="demo-sidebar-panel">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">
         <div class="demo-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">SSI Endoskeleton <span id="endo-version"></span></div>
-        <button onclick="if(confirm('Zurücksetzen?')){location.hash='';location.reload();}" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">↺ Reset</button>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <a id="scanner-result-link" href="#" target="_blank" style="display:none;padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#3b82f6;font-size:11px;cursor:pointer;white-space:nowrap;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.background='#eff6ff';" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff';">Scanner-Ergebnis</a>
+          <button onclick="if(confirm('Zurücksetzen?')){location.hash='';location.reload();}" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">↺ Reset</button>
+        </div>
       </div>
       <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
 
@@ -1666,9 +1669,9 @@
 </div><!-- /konfig-preview -->
 
   <script src="js/lucide.min.js"></script>
-  <script src="js/scanner-client.js?v=3.45.6"></script>
-  <script src="js/content-injector.js?v=3.45.6"></script>
-  <script src="js/konfigurator.js?v=3.45.6"></script>
+  <script src="js/scanner-client.js?v=3.45.7"></script>
+  <script src="js/content-injector.js?v=3.45.7"></script>
+  <script src="js/konfigurator.js?v=3.45.7"></script>
 
   <!-- ═══ Config ═══ -->
   <script>

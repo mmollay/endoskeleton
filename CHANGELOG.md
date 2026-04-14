@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.45.7] — 2026-04-14
+
+### Added
+- **Scanner-Ergebnis Link im Header** — Nach dem Scannen einer Domain erscheint oben in der Sidebar ein "Scanner-Ergebnis" Link, der direkt zur Scanner-API-Ansicht führt (`scanner.ssi.at/api/v1/scans/{domain}`). Damit kann man sofort prüfen ob Bilder und Texte korrekt erfasst wurden.
+
+---
+
 ## [3.45.6] — 2026-04-13
 
 ### Fixed
