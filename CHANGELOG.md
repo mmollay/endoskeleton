@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.46.0] — 2026-04-14
+
+### Fixed
+- **Umlaute korrekt** — Fallback-Texte im Konfigurator nutzen jetzt echte Umlaute (Über uns, über, Leistungen) statt ASCII-Ersatz.
+
+---
+
 ## [3.45.8] — 2026-04-14
 
 ### Removed

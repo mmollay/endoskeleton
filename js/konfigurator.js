@@ -648,7 +648,7 @@
     }
 
     // --- About fallback ---
-    var aboutTitle = aboutPage.title || "Ueber uns";
+    var aboutTitle = aboutPage.title || "Über uns";
     var aboutText = _cleanPageText(aboutPage.text || "");
     if (!aboutText && seoDesc) {
       aboutText = seoDesc;
@@ -657,7 +657,7 @@
       aboutText =
         company +
         (scanData.branch ? " — " + scanData.branch + "." : ".") +
-        " Erfahren Sie mehr ueber unser Unternehmen und unsere Leistungen.";
+        " Erfahren Sie mehr über unser Unternehmen und unsere Leistungen.";
     }
 
     // --- Services fallback ---
@@ -711,7 +711,7 @@
           },
           {
             type: "about",
-            tag: "Ueber uns",
+            tag: "Über uns",
             title: aboutTitle,
             text: aboutText.substring(0, 2000),
             image:
