@@ -248,6 +248,7 @@ final class SiteGenerator
       address: "{$address}"
     },
     social: {{$socialJs}},
+    languages: ["de"],
     footer: {
       tagline: "{$tagline}",
       credit: true
@@ -528,6 +529,27 @@ SCRIPT;
                 }
             }
         }
+        // Append bank details to spenden/donate pages
+        $bank = $content["bank"] ?? null;
+        if ($bank && ($bank["iban"] ?? "")) {
+            if (preg_match('/spende|donat/i', $slug)) {
+                $bankHtml = '<div class="bank-details" style="margin-top:2rem;padding:1.5rem;background:var(--bg-muted,#f1f5f9);border-radius:var(--radius-md,12px);">';
+                $bankHtml .= '<h3 style="margin-bottom:0.75rem;">Spendenkonto</h3>';
+                if ($bank["bank"] ?? "") {
+                    $bankHtml .= '<p><strong>' . htmlspecialchars($bank["bank"]) . '</strong></p>';
+                }
+                $iban = $bank["iban"];
+                // Format IBAN with spaces: AT81 3305 5000 0002 6815
+                $ibanFormatted = implode(' ', str_split($iban, 4));
+                $bankHtml .= '<p>IBAN: <strong>' . $ibanFormatted . '</strong></p>';
+                if ($bank["bic"] ?? "") {
+                    $bankHtml .= '<p>BIC: ' . htmlspecialchars($bank["bic"]) . '</p>';
+                }
+                $bankHtml .= '</div>';
+                $pageContentParts[] = $bankHtml;
+            }
+        }
+
         $replacements["{{PAGE_CONTENT}}"] = implode("\n      ", $pageContentParts);
 
         // Subpage CTA (page-level fields)
@@ -550,6 +572,9 @@ SCRIPT;
         $html = preg_replace("/\\{\\{[A-Z_]+\\}\\}/", "", $html);
         $html = preg_replace("/\\{\\{#\\w+\\}\\}.*?\\{\\{\\/\\w+\\}\\}/s", "", $html);
 
+        // Remove opening hours block if empty
+        $html = preg_replace('#<div class="opening-hours-block">\s*<h3[^>]*>Öffnungszeiten</h3>\s*<div class="divider"></div>\s*<p>\s*</p>\s*</div>#su', '', $html);
+
         // Remove broken images (empty src) and empty background-image divs
         $html = preg_replace('/<img[^>]*src\s*=\s*["\']["\'][^>]*\/?>/i', '', $html);
         $html = preg_replace('/background-image:\s*url\([\'"]?[\'"]?\)\s*;?/', '', $html);
@@ -557,8 +582,7 @@ SCRIPT;
         // Remove empty image wrapper divs (rounded container with no img inside)
         $html = preg_replace('#<div class="rounded[^"]*">\s*</div>#s', '', $html);
 
-        // If grid-2 has only one non-empty child, switch to single-column
-        $html = preg_replace('#<div class="grid-2 align-center">\s*(<div class="section-text">.*?</div>)\s*</div>#s', '$1', $html);
+        // Note: grid-2 with only text (no image) still looks fine — CSS handles single-child gracefully
 
         // Remove empty content elements left after placeholder cleanup
         // NOTE: excludes div (often CSS-styled containers like hero-bg) and section
@@ -691,9 +715,9 @@ SCRIPT;
             $html = file_get_contents($htmlFile);
             foreach ($urlToFile as $url => $filename) {
                 if (strpos($html, $url) !== false) {
-                    // Copy image if not already copied
+                    // Copy and resize image if not already copied
                     if (!isset($copied[$filename])) {
-                        copy($scanImagesDir . "/" . $filename, $imgDir . "/" . $filename);
+                        $this->copyAndResize($scanImagesDir . "/" . $filename, $imgDir . "/" . $filename, 1200, 900);
                         $copied[$filename] = true;
                     }
                     $html = str_replace($url, "img/" . $filename, $html);
@@ -701,6 +725,68 @@ SCRIPT;
             }
             file_put_contents($htmlFile, $html);
         }
+    }
+
+    private function copyAndResize(string $src, string $dst, int $maxW, int $maxH): void
+    {
+        $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+
+        // Only resize JPEG/PNG, copy others as-is
+        if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
+            copy($src, $dst);
+            return;
+        }
+
+        $info = @getimagesize($src);
+        if (!$info) {
+            copy($src, $dst);
+            return;
+        }
+
+        [$w, $h] = $info;
+
+        // Already small enough? Just copy
+        if ($w <= $maxW && $h <= $maxH) {
+            copy($src, $dst);
+            return;
+        }
+
+        // Calculate new dimensions preserving aspect ratio
+        $ratio = min($maxW / $w, $maxH / $h);
+        $newW = (int)round($w * $ratio);
+        $newH = (int)round($h * $ratio);
+
+        // Load source
+        $srcImg = match ($info[2]) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
+            IMAGETYPE_PNG  => @imagecreatefrompng($src),
+            default        => null,
+        };
+
+        if (!$srcImg) {
+            copy($src, $dst);
+            return;
+        }
+
+        // Resize
+        $dstImg = imagecreatetruecolor($newW, $newH);
+
+        // Preserve PNG transparency
+        if ($info[2] === IMAGETYPE_PNG) {
+            imagealphablending($dstImg, false);
+            imagesavealpha($dstImg, true);
+        }
+
+        imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newW, $newH, $w, $h);
+
+        // Save
+        match ($info[2]) {
+            IMAGETYPE_JPEG => imagejpeg($dstImg, $dst, 85),
+            IMAGETYPE_PNG  => imagepng($dstImg, $dst, 6),
+        };
+
+        imagedestroy($srcImg);
+        imagedestroy($dstImg);
     }
 
     private function createZip(string $dir, string $hash): void

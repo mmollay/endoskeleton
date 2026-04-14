@@ -610,6 +610,27 @@
     return null;
   }
 
+  function _buildAddress(contact) {
+    // Build full address from scanner contact data
+    var parts = [];
+    if (contact.addresses && contact.addresses[0]) {
+      parts.push(contact.addresses[0]); // "Gartengasse 13"
+    }
+    if (contact.plz_ort && contact.plz_ort[0]) {
+      parts.push(contact.plz_ort[0].plz + " " + contact.plz_ort[0].ort);
+    } else if (
+      contact.plz &&
+      contact.plz[0] &&
+      contact.cities &&
+      contact.cities[0]
+    ) {
+      parts.push(contact.plz[0] + " " + contact.cities[0]);
+    } else if (contact.cities && contact.cities[0]) {
+      parts.push(contact.cities[0]);
+    }
+    return parts.join(", "); // "Gartengasse 13, 7020 Loipersbach"
+  }
+
   function _buildContentFromScan(scanData, presetName) {
     var sel = scanData.selected || {};
     var aboutPage = sel.about || {};
@@ -660,14 +681,57 @@
       }
     }
 
-    // --- Hero image fallback chain ---
-    var heroImgSrc = heroImage.src || heroImage.url || "";
+    // --- KI-basierte Bildauswahl (wenn ai_analysis.images vorhanden) ---
+    var aiImages =
+      (scanData.ai_analysis || scanData.ki_analysis || {}).images || [];
+    var imagesByBestUse = {};
+    for (var ai = 0; ai < aiImages.length; ai++) {
+      var aiImg = aiImages[ai];
+      var bestUse = aiImg.best_use || "skip";
+      if (!imagesByBestUse[bestUse]) imagesByBestUse[bestUse] = [];
+      imagesByBestUse[bestUse].push(aiImg);
+    }
+    // Sort each category by quality (highest first)
+    for (var key in imagesByBestUse) {
+      imagesByBestUse[key].sort(function (a, b) {
+        return (b.quality || 0) - (a.quality || 0);
+      });
+    }
+
+    // Helper: find URL of best KI-rated image for a use
+    function _kiBestImage(use) {
+      var list = imagesByBestUse[use];
+      if (!list || !list.length) return "";
+      // Match KI filename to scanner image URL
+      var file = list[0].file || "";
+      for (var si = 0; si < allImages.length; si++) {
+        if (
+          allImages[si].filename === file ||
+          (allImages[si].url || "").indexOf(file) >= 0
+        ) {
+          return allImages[si].url || allImages[si].src || "";
+        }
+      }
+      return list[0].url || "";
+    }
+
+    // --- Hero image: KI > hero_extractor > role > largest ---
+    var heroImgSrc = "";
+    // 1. KI-rated hero
+    if (imagesByBestUse["hero"] && imagesByBestUse["hero"].length) {
+      heroImgSrc = _kiBestImage("hero");
+    }
+    // 2. Hero extractor result
+    if (!heroImgSrc) {
+      heroImgSrc = heroImage.src || heroImage.url || "";
+    }
+    // 3. Role-tagged hero
     if (!heroImgSrc && imagesByRole["hero"] && imagesByRole["hero"].length) {
       heroImgSrc =
         imagesByRole["hero"][0].url || imagesByRole["hero"][0].src || "";
     }
+    // 4. Largest non-logo
     if (!heroImgSrc) {
-      // Pick the largest non-logo image as hero
       var bestImg = null;
       var bestArea = 0;
       for (var hi = 0; hi < allImages.length; hi++) {
@@ -681,8 +745,8 @@
       }
       if (bestImg) heroImgSrc = bestImg.url || bestImg.src || "";
     }
+    // 5. Screenshot fallback
     if (!heroImgSrc) {
-      // Try screenshots.desktop from scanner
       var screenshots = scanData.screenshots || {};
       if (screenshots.desktop) heroImgSrc = screenshots.desktop;
     }
@@ -775,17 +839,12 @@
             title: aboutTitle,
             text: aboutText.substring(0, 2000),
             image:
+              _kiBestImage("about") ||
               aboutPage.image ||
               (imagesByRole["about"] && imagesByRole["about"][0]
-                ? imagesByRole["about"][0].url ||
-                  imagesByRole["about"][0].src ||
-                  ""
+                ? imagesByRole["about"][0].url || ""
                 : ""),
-            image_alt:
-              aboutPage.image_alt ||
-              (imagesByRole["about"] && imagesByRole["about"][0]
-                ? imagesByRole["about"][0].alt || ""
-                : ""),
+            image_alt: "",
             cta: "",
             cta_href: "#",
           },
@@ -910,8 +969,15 @@
         name: company,
         email: (contact.emails || [])[0] || "",
         phone: (contact.phones || [])[0] || "",
-        address: (contact.cities || [])[0] || "",
+        address: _buildAddress(contact),
       },
+      bank: contact.iban
+        ? {
+            iban: (contact.iban || [])[0] || "",
+            bic: (contact.bic || [])[0] || "",
+            bank: contact.bank || "",
+          }
+        : null,
       footer: { tagline: description.substring(0, 100) },
       social_media: {},
       pages: pages,

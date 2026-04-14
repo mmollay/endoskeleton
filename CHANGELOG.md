@@ -4,6 +4,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.48.0] — 2026-04-15
+
+### Added
+- **KI-gesteuerte Bildauswahl** — Gemini bewertet jedes Bild (Qualität 1-10, beste Verwendung: hero/about/services/skip). Generator wählt automatisch die besten Bilder pro Bereich.
+- **Intelligente Bildverteilung** — Unbenutzte Bilder werden content-basiert auf Subpages verteilt. Jede Seite bekommt ein Bild.
+- **Bilder-Resize** — Eingebettete Bilder werden auf max 1200x900px resized (PHP GD). ZIP-Größe drastisch reduziert.
+- **Bankdaten auf Spenden-Seite** — IBAN/BIC werden als formatierter Block eingebaut wenn Scanner Bankverbindung findet.
+- **Vollständige Kontaktadresse** — Straße + PLZ + Ort ("Gartengasse 13, 7020 Loipersbach") statt nur Stadtname.
+
+### Fixed
+- **Bilder nicht abgeschnitten** — `object-fit: contain` statt `cover`. Hochformat-Bilder zeigen das komplette Motiv.
+- **Grid-Layout auf Subpages** — Text + Bild nebeneinander (grid-2) statt untereinander. Leerer Container wird entfernt wenn kein Bild.
+- **EN-Button entfernt** — `languages: ["de"]` in SITE_CONFIG für einsprachige Seiten.
+- **Öffnungszeiten ausgeblendet** — Block wird entfernt wenn keine Öffnungszeiten vorhanden.
+- **analyze.py Image-Bug** — "Is a directory" Fehler behoben. Bilder werden jetzt korrekt aus `images/`-Ordner geladen.
+
+---
+
 ## [3.47.0] — 2026-04-14
 
 ### Added
