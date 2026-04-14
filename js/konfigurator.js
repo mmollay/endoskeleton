@@ -200,7 +200,9 @@
     var scannerLink = document.getElementById("scanner-result-link");
     if (scannerLink) {
       scannerLink.href =
-        "https://scanner.ssi.at/api/v1/scans/" + encodeURIComponent(domain);
+        "https://scanner.ssi.at/api/v1/scans/" +
+        encodeURIComponent(domain) +
+        "?format=html";
       scannerLink.style.display = "inline-block";
       scannerLink.title = "Scanner-Ergebnis für " + domain + " ansehen";
     }
