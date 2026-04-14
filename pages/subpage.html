@@ -13,11 +13,14 @@
   <link rel="icon" href="img/logo.png" type="image/png">
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="layouts/{{LAYOUT}}.css">
+  <link rel="stylesheet" href="heroes/{{HERO}}.css">
   <link rel="stylesheet" href="buttons/{{BUTTONS}}.css">
   <link rel="stylesheet" href="softness/{{CHARAKTER}}.css">
   <link rel="stylesheet" href="spacing/{{SPACING}}.css">
   <link rel="stylesheet" href="animation/{{ANIMATION}}.css">
   <link rel="stylesheet" href="widths/{{WIDTH}}.css">
+  <link rel="stylesheet" href="fonts/{{FONT_MODULE}}.css">
+  <link rel="stylesheet" href="colors/{{COLOR_MODULE}}.css">
   <link rel="stylesheet" href="theme.css">
 </head>
 <body class="layout-{{LAYOUT}}" data-modules="{{MODULES}}">
@@ -36,7 +39,14 @@
   <!-- Main Content -->
   <section class="reveal">
     <div class="container">
-      {{PAGE_CONTENT}}
+      <div class="grid-2 align-center">
+        <div class="section-text">
+          {{PAGE_CONTENT}}
+        </div>
+        <div class="rounded overflow-hidden shadow-lg">
+          <img src="{{PAGE_IMAGE}}" alt="{{PAGE_IMAGE_ALT}}" style="width:100%;height:auto;display:block;" loading="lazy">
+        </div>
+      </div>
     </div>
   </section>
 

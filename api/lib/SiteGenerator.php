@@ -49,6 +49,9 @@ final class SiteGenerator
             }
         }
 
+        // Copy scanner images locally and rewrite URLs
+        $this->embedImages($dir, $content);
+
         $htaccess = "<IfModule mod_headers.c>\n  Header set Cache-Control \"no-cache\"\n</IfModule>";
         file_put_contents($dir . "/.htaccess", $htaccess);
 
@@ -153,6 +156,23 @@ final class SiteGenerator
         }
 
         file_put_contents($dir . "/theme.css", $css);
+    }
+
+    private function textToHtml(string $text): string
+    {
+        $text = trim($text);
+        if ($text === "") return "";
+        // Split on double newlines into paragraphs
+        $paragraphs = preg_split("/\n\s*\n/", $text);
+        $html = [];
+        foreach ($paragraphs as $p) {
+            $p = trim($p);
+            if ($p === "") continue;
+            // Convert single newlines to <br> within paragraphs
+            $p = nl2br(htmlspecialchars($p, ENT_QUOTES, 'UTF-8'));
+            $html[] = "<p>" . $p . "</p>";
+        }
+        return implode("\n", $html);
     }
 
     private function buildSiteConfigScript(array $preset, array $content): string
@@ -360,7 +380,7 @@ SCRIPT;
             if ($type === "about") {
                 $replacements["{{ABOUT_TAG}}"]       = $section["tag"] ?? "";
                 $replacements["{{ABOUT_TITLE}}"]     = $section["title"] ?? "";
-                $replacements["{{ABOUT_TEXT}}"]       = $section["text"] ?? "";
+                $replacements["{{ABOUT_TEXT}}"]       = $this->textToHtml($section["text"] ?? "");
                 $replacements["{{ABOUT_CTA}}"]       = $section["cta"] ?? "";
                 $replacements["{{ABOUT_LINK}}"]      = $section["cta_href"] ?? "#";
                 $replacements["{{ABOUT_IMAGE}}"]     = $section["image"] ?? "";
@@ -470,6 +490,27 @@ SCRIPT;
         $replacements["{{PAGE_TAG}}"]  = $page["hero_eyebrow"] ?? $page["tag"] ?? "";
         $replacements["{{PAGE_LEAD}}"] = $page["hero_subtitle"] ?? $page["lead"] ?? "";
 
+        // PAGE_IMAGE from section data
+        $replacements["{{PAGE_IMAGE}}"] = "";
+        $replacements["{{PAGE_IMAGE_ALT}}"] = "";
+        foreach ($sections as $sec) {
+            $img = $sec["image"] ?? "";
+            if ($img) {
+                $replacements["{{PAGE_IMAGE}}"] = $img;
+                $replacements["{{PAGE_IMAGE_ALT}}"] = $sec["image_alt"] ?? "";
+                break;
+            }
+        }
+
+        // Override PAGE_TITLE with section title if longer (refined titles)
+        foreach ($sections as $sec) {
+            $secTitle = $sec["title"] ?? "";
+            if ($secTitle && strlen($secTitle) > strlen($replacements["{{PAGE_TITLE}}"])) {
+                $replacements["{{PAGE_TITLE}}"] = $secTitle;
+                break;
+            }
+        }
+
         // PAGE_CONTENT: built from text sections
         $pageContentParts = [];
         foreach ($sections as $sec) {
@@ -512,6 +553,12 @@ SCRIPT;
         // Remove broken images (empty src) and empty background-image divs
         $html = preg_replace('/<img[^>]*src\s*=\s*["\']["\'][^>]*\/?>/i', '', $html);
         $html = preg_replace('/background-image:\s*url\([\'"]?[\'"]?\)\s*;?/', '', $html);
+
+        // Remove empty image wrapper divs (rounded container with no img inside)
+        $html = preg_replace('#<div class="rounded[^"]*">\s*</div>#s', '', $html);
+
+        // If grid-2 has only one non-empty child, switch to single-column
+        $html = preg_replace('#<div class="grid-2 align-center">\s*(<div class="section-text">.*?</div>)\s*</div>#s', '$1', $html);
 
         // Remove empty content elements left after placeholder cleanup
         // NOTE: excludes div (often CSS-styled containers like hero-bg) and section
@@ -593,6 +640,69 @@ SCRIPT;
         return $html;
     }
 
+    private function embedImages(string $dir, array $content): void
+    {
+        // Find domain from content to locate scanner images
+        $domain = $content["domain"] ?? "";
+        if (!$domain) {
+            // Try to extract from logo_url or first page image
+            foreach ($content["pages"] ?? [] as $p) {
+                foreach ($p["sections"] ?? [] as $s) {
+                    $img = $s["image"] ?? "";
+                    if ($img && preg_match('#https?://([^/]+)#', $img, $m)) {
+                        $domain = preg_replace('/^www\./', '', $m[1]);
+                        break 2;
+                    }
+                }
+            }
+        }
+        if (!$domain) return;
+
+        $scanImagesDir = "/home/pawbot/projects/scanner/api/data/scans/" . $domain . "/images";
+        if (!is_dir($scanImagesDir)) return;
+
+        // Create img/ directory in output
+        $imgDir = $dir . "/img";
+        if (!is_dir($imgDir)) mkdir($imgDir, 0755, true);
+
+        // Build URL → local filename mapping from scanner images
+        $scanJson = "/home/pawbot/projects/scanner/api/data/scans/" . $domain . "/scan.json";
+        if (!file_exists($scanJson)) return;
+        $scan = json_decode(file_get_contents($scanJson), true) ?? [];
+        $urlToFile = [];
+        foreach ($scan["images"] ?? [] as $img) {
+            $url = $img["url"] ?? "";
+            $filename = $img["filename"] ?? "";
+            if ($url && $filename && file_exists($scanImagesDir . "/" . $filename)) {
+                $urlToFile[$url] = $filename;
+            }
+        }
+        // Also map hero image
+        $heroSrc = $scan["hero_image"]["src"] ?? "";
+        if ($heroSrc && isset($urlToFile[$heroSrc])) {
+            // Already in map
+        }
+
+        if (empty($urlToFile)) return;
+
+        // Copy images and rewrite URLs in all HTML files
+        $copied = [];
+        foreach (glob($dir . "/*.html") as $htmlFile) {
+            $html = file_get_contents($htmlFile);
+            foreach ($urlToFile as $url => $filename) {
+                if (strpos($html, $url) !== false) {
+                    // Copy image if not already copied
+                    if (!isset($copied[$filename])) {
+                        copy($scanImagesDir . "/" . $filename, $imgDir . "/" . $filename);
+                        $copied[$filename] = true;
+                    }
+                    $html = str_replace($url, "img/" . $filename, $html);
+                }
+            }
+            file_put_contents($htmlFile, $html);
+        }
+    }
+
     private function createZip(string $dir, string $hash): void
     {
         $zipFile = $dir . "/site.zip";
@@ -624,7 +734,7 @@ SCRIPT;
         $dir = __DIR__ . "/../data/generated";
         if (!is_dir($dir)) return;
         foreach (glob($dir . "/*", GLOB_ONLYDIR) as $subdir) {
-            if (filemtime($subdir) < time() - 3600) {
+            if (filemtime($subdir) < time() - 86400) {
                 $files = new \RecursiveIteratorIterator(
                     new \RecursiveDirectoryIterator($subdir, \FilesystemIterator::SKIP_DOTS),
                     \RecursiveIteratorIterator::CHILD_FIRST

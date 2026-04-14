@@ -4,6 +4,34 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.47.0] — 2026-04-14
+
+### Added
+- **KI-Refinement automatisch beim Generieren** — Klick auf "Website generieren" ruft automatisch Gemini auf, das Hero-Texte, About, Services und alle Subpages professionell umschreibt. Kein manueller "KI optimieren"-Klick mehr nötig.
+- **Subpage-Texte KI-optimiert** — refine.py verarbeitet jetzt bis zu 8 Unterseiten mit eigenem Titel und Text. Vorher nur Hero/About/Services.
+- **Bilder lokal eingebettet** — Generierte Seiten enthalten die Bilder im `img/`-Ordner statt Hotlinking auf die Original-Website. ZIP enthält alles, Seite funktioniert offline.
+- **Subpage-Bilder** — Unterseiten-Template zeigt jetzt das passende Bild neben dem Text (grid-2 Layout).
+- **Preview im neuen Tab** — "Website generieren" öffnet die fertige Seite direkt im Browser. ZIP wird parallel heruntergeladen.
+
+### Fixed
+- **Nav-Labels vs. Seitentitel getrennt** — Navigation zeigt kurze Labels ("Förderungen"), Seitenüberschriften den vollen KI-Titel ("Förderungen & Finanzierung für Ihren Assistenzhund").
+- **About-Textgröße** — `section-text` statt `section-lead` für lange About-Texte, keine überdimensionierte Schrift mehr.
+- **Absätze im About-Text** — `textToHtml()` wandelt Newlines in echte `<p>`-Tags um statt alles in einen Block zu pressen.
+- **CSS-Module in allen Templates** — subpage.html, kontakt.html, impressum.html, datenschutz.html haben jetzt alle CSS-Links (fonts, colors, heroes). Vorher fehlten sie → falsche Farben/Schriften auf Unterseiten.
+- **Leere Bild-Container entfernt** — Seiten ohne Bilder zeigen kein broken-image-Icon mehr.
+- **Footer-/Nav-Müll in Texten** — "Powered by SSILogin", "Impressum - Kontakt - Datenschutz", spaced-out Titel ("N e u i g k e i t e n") werden jetzt gefiltert.
+- **Login/Admin/403-Seiten gefiltert** — Keine Login-Pages oder Error-Seiten mehr im Nav oder als Subpages.
+- **Broken Slugs** — Query-Strings (`?lp=center`) werden vor der Slug-Extraktion entfernt, kein "indexphplpcenter" mehr.
+- **Service-Cards** — Bevorzugt KI-refined Items, bessere Fallback-Extraktion bei Texten ohne Doppel-Newlines.
+- **Hero-Subtitle** — Zeigt echten Subtitle statt abgeschnittenen About-Text.
+- **Cleanup-TTL** — Generierte Seiten bleiben 24h statt 1h (Entwicklungsphase).
+
+### Changed
+- **`_cleanPageText()` erweitert** — Filtert Footer-Zeilen (beliebige Länge), Nav-Listen, spaced-out Zeilen, trailing Footer-Content.
+- **`_extractServiceItems()` verbessert** — Fallback auf Single-Newline-Split wenn keine Doppel-Newlines vorhanden.
+
+---
+
 ## [3.46.0] — 2026-04-14
 
 ### Fixed

@@ -498,16 +498,23 @@
     var lines = text.split("\n");
     // Nav/UI patterns to remove everywhere
     var junkLine =
-      /^(start|home|kontakt|leistung|produkt|referenz|ueber uns|über uns|about|service|impressum|datenschutz|agb|de|en|links|spenden|patenschaft|mehr|menü|menu|navigation|suche|search|anmelden|login|registrieren|cookie|verstanden|akzeptieren|learn more|zurück|weiter|schließen|\|)$/i;
+      /^(start|home|kontakt|leistung|produkt|referenz|ueber uns|über uns|about|service|impressum|datenschutz|agb|de|en|links|spenden|patenschaft|mehr|menü|menu|navigation|suche|search|anmelden|login|registrieren|cookie|verstanden|akzeptieren|learn more|zurück|weiter|schließen|n e u i g k e i t e n|neuigkeiten|begleithunde|servicehunde|blindenf|förderungen|\|)$/i;
     var cookieLine =
       /cookie|datenschutz.*akzept|privacy.*policy|we use cookies|diese webseite benutzt/i;
+    // Footer-like lines (any length)
+    var footerLine =
+      /^(impressum\s*[-–|]\s*kontakt|powered by|©|copyright|\(c\)|alle rechte|all rights|designed by|webdesign|login$)/i;
+    // Lines that are just a list of nav-like short words separated by dashes/pipes
+    var navListLine = /^([a-zäöüß\s]{2,20}\s*[-–|]\s*){2,}/i;
     var cleaned = [];
     var seenContent = false;
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].trim();
       if (!line) continue;
-      // Always skip cookie-banner lines
+      // Always skip cookie-banner and footer lines
       if (cookieLine.test(line)) continue;
+      if (footerLine.test(line)) continue;
+      if (navListLine.test(line)) continue;
       // Skip nav-like short fragments (< 25 chars) that match patterns
       if (line.length < 25 && junkLine.test(line)) continue;
       // Skip ALL-CAPS short lines (nav headers, labels)
@@ -517,24 +524,57 @@
         !/[.!?]/.test(line)
       )
         continue;
+      // Skip lines with spaced-out characters (e.g. "N e u i g k e i t e n")
+      if (/^([A-Za-zÄÖÜäöüß] ){3,}[A-Za-zÄÖÜäöüß]$/.test(line)) continue;
       // First real content line must be > 30 chars (skip stray labels)
       if (!seenContent && line.length < 30) continue;
       seenContent = true;
       cleaned.push(line);
+    }
+    // Remove trailing footer-like content (last few lines often have footer text)
+    while (cleaned.length > 0) {
+      var last = cleaned[cleaned.length - 1];
+      if (
+        last.length < 40 &&
+        /powered by|impressum|kontakt|datenschutz|disclaimer|login|©/i.test(
+          last,
+        )
+      ) {
+        cleaned.pop();
+      } else {
+        break;
+      }
     }
     return cleaned.join("\n").trim().substring(0, 5000);
   }
 
   function _extractServiceItems(text) {
     if (!text) return [];
+    // Try splitting on double newlines first
     var paragraphs = text.split(/\n\n+/).filter(function (p) {
       return p.trim().length > 20;
     });
+    // If only 1 paragraph, try splitting on single newlines (some sites have no double breaks)
+    if (paragraphs.length <= 1) {
+      var lines = text.split(/\n/).filter(function (l) {
+        return l.trim().length > 15;
+      });
+      if (lines.length >= 3) {
+        paragraphs = [];
+        for (var li = 0; li < lines.length; li += 2) {
+          var title = lines[li].trim();
+          var desc = lines[li + 1] ? lines[li + 1].trim() : title;
+          paragraphs.push(title + "\n" + desc);
+        }
+      }
+    }
     var items = [];
     for (var i = 0; i < Math.min(paragraphs.length, 6); i++) {
       var p = paragraphs[i].trim();
       var firstLine = p.split("\n")[0].trim();
       var rest = p.split("\n").slice(1).join(" ").trim();
+      // Skip items that look like footer/nav garbage
+      if (/powered by|impressum|login|©/i.test(firstLine)) continue;
       items.push({
         title: firstLine.substring(0, 80),
         text: (rest || firstLine).substring(0, 300),
@@ -671,8 +711,23 @@
     ) {
       servicesText = "";
     }
-    var serviceItems = _extractServiceItems(servicesText);
-    // If no service items, try building from scan pages
+    // Prefer KI-refined service items if available
+    var serviceItems = [];
+    if (
+      scanData._refinedServiceItems &&
+      scanData._refinedServiceItems.length > 0
+    ) {
+      serviceItems = scanData._refinedServiceItems.map(function (item) {
+        return {
+          title: item.title || "",
+          text: item.text || "",
+          icon_path: "",
+        };
+      });
+    } else {
+      serviceItems = _extractServiceItems(servicesText);
+    }
+    // If still no service items, try building from scan pages
     if (serviceItems.length === 0) {
       var scanPages = scanData.pages || [];
       for (var si = 0; si < scanPages.length && serviceItems.length < 4; si++) {
@@ -681,8 +736,13 @@
         if (!spUrl || spUrl === scanData.start_url) continue;
         var spTitle = (sp2.title || "").split(/\s*[–|]\s*/)[0].trim();
         if (!spTitle || spTitle.length < 3) continue;
+        if (/^(login|admin|403|404)$/i.test(spTitle)) continue;
+        if (/\/admin|\/login|\?/i.test(spUrl)) continue;
         var spText = _cleanPageText(sp2.text || "").substring(0, 200);
         if (spText.length < 20) spText = spTitle;
+        // Clean spaced-out titles
+        if (/^([A-Za-zÄÖÜäöüß] ){3,}/.test(spTitle))
+          spTitle = spTitle.replace(/ /g, "");
         serviceItems.push({
           title: spTitle.substring(0, 80),
           text: spText,
@@ -702,7 +762,7 @@
             type: "hero",
             eyebrow: heroEyebrow,
             headline: heroHeadline,
-            subline: description || aboutText.substring(0, 200),
+            subline: description || heroSubtitle || "",
             image: heroImgSrc,
             cta: "Jetzt starten",
             cta_href: "kontakt.html",
@@ -743,8 +803,28 @@
       { slug: "datenschutz", title: "Datenschutz", sections: [] },
     ];
 
-    // Add sub-pages from scan (exclude homepage, about, services, legal)
-    var skipUrls = ["kontakt", "impressum", "datenschutz", "agb", "disclaimer"];
+    // Add sub-pages from scan (exclude homepage, about, services, legal, admin)
+    var skipUrls = [
+      "kontakt",
+      "impressum",
+      "datenschutz",
+      "agb",
+      "disclaimer",
+      "login",
+      "admin",
+      "register",
+      "signup",
+      "signin",
+      "logout",
+      "wp-admin",
+      "wp-login",
+      "search",
+      "404",
+      "cart",
+      "checkout",
+    ];
+    var skipTitlePatterns =
+      /^(login|admin|403|404|error|forbidden|not found)$/i;
     var usedSlugs = {
       index: true,
       kontakt: true,
@@ -764,17 +844,30 @@
         continue;
       if (aboutPage.url && url === aboutPage.url.toLowerCase()) continue;
       if (servicesPage.url && url === servicesPage.url.toLowerCase()) continue;
-      var slug = url
+      // Skip admin/login/error URLs
+      if (/\/admin|\/login|\/wp-|\/search|\?/i.test(url)) continue;
+      // Extract slug from path (strip query strings BEFORE extracting filename)
+      var urlPath = url.split("?")[0].split("#")[0];
+      var slug = urlPath
         .split("/")
         .pop()
         .replace(/\.html?$/, "")
+        .replace(/\.php$/, "")
         .replace(/[^a-z0-9-]/g, "");
       if (!slug || skipUrls.indexOf(slug) >= 0) continue;
-      // Deduplicate slugs (www vs non-www, with/without .html)
+      // Deduplicate slugs
       if (usedSlugs[slug]) continue;
       usedSlugs[slug] = true;
       var title = (sp.title || slug).split(/\s*[–|]\s*/)[0].trim();
       if (title.length > 50) title = title.substring(0, 50);
+      // Skip pages with junk titles
+      if (skipTitlePatterns.test(title)) continue;
+      // Clean spaced-out titles ("N e u i g k e i t e n" → "Neuigkeiten")
+      if (/^([A-Za-zÄÖÜäöüß] ){3,}/.test(title)) {
+        title = title.replace(/ /g, "");
+      }
+      // Skip pages with very little content (< 20 words)
+      if ((sp.word_count || 0) < 20 && !sp.text) continue;
       // Find matching image for this subpage from scanner images
       var spImgs =
         imagesByPage[url] || imagesByPage[url.replace("://www.", "://")] || [];
@@ -785,15 +878,22 @@
           break;
         }
       }
+      // Use KI-refined text if available
+      var refinedSub =
+        scanData._refinedSubpages && scanData._refinedSubpages[slug];
+      var pageTitle = refinedSub ? refinedSub.title || title : title;
+      var subText = refinedSub
+        ? refinedSub.text
+        : _cleanPageText(sp.text || "").substring(0, 2000);
       pages.push({
         slug: slug,
-        title: title,
+        title: title, // Short original title for navigation
         sections: [
           {
             type: "text",
             tag: "",
-            title: title,
-            text: _cleanPageText(sp.text || "").substring(0, 2000),
+            title: pageTitle, // Long refined title for page heading
+            text: subText.substring(0, 2000),
             image: spImg ? spImg.url || spImg.src || "" : "",
             image_alt: spImg ? spImg.alt || "" : "",
           },
@@ -818,6 +918,24 @@
     };
   }
 
+  function _doGenerate(cached, preset) {
+    var domain = _currentDomain;
+    var content = _buildContentFromScan(cached, preset);
+    var state = typeof getState === "function" ? getState() : {};
+
+    var body = {
+      preset: preset,
+      overrides: state,
+      content: content,
+    };
+
+    return fetch("api/v1/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  }
+
   function _onGenerate() {
     var preset = _getSelectedPreset();
     var domain = _currentDomain;
@@ -830,24 +948,94 @@
 
     var btn = _el.generateBtn;
     var originalText = btn.textContent;
-    btn.textContent = "Generiere...";
     btn.disabled = true;
     btn.style.opacity = "0.6";
 
-    var content = _buildContentFromScan(cached, preset);
-    var state = typeof getState === "function" ? getState() : {};
+    // Step 1: Refine content with KI (if not already refined)
+    var refinePromise;
+    if (cached.refined) {
+      btn.textContent = "Generiere...";
+      refinePromise = Promise.resolve();
+    } else {
+      btn.textContent = "KI optimiert Texte...";
+      var trimmed = {
+        title: cached.title || "",
+        branch: cached.branch || "",
+        hero_text: cached.hero_text || {},
+        selected: cached.selected || {},
+        contact: cached.contact || {},
+        ai_analysis: cached.ai_analysis || cached.ki_analysis || {},
+        seo: cached.seo || {},
+        colors: cached.colors || [],
+        pages: (cached.pages || []).slice(0, 12).map(function (p) {
+          return {
+            url: p.url,
+            title: p.title,
+            text: (p.text || "").substring(0, 800),
+          };
+        }),
+      };
+      refinePromise = ScannerClient.refine(domain, trimmed, ["all"])
+        .then(function (result) {
+          if (result.status === "ok" && result.refined) {
+            var refined = result.refined;
+            if (refined.hero) {
+              if (!cached.hero_text) cached.hero_text = {};
+              if (refined.hero.headline)
+                cached.hero_text.headline = refined.hero.headline;
+              if (refined.hero.subtitle)
+                cached.hero_text.subtitle = refined.hero.subtitle;
+              if (refined.hero.eyebrow)
+                cached.hero_text.eyebrow = refined.hero.eyebrow;
+            }
+            if (refined.about) {
+              if (!cached.selected) cached.selected = {};
+              if (!cached.selected.about) cached.selected.about = {};
+              if (refined.about.title)
+                cached.selected.about.title = refined.about.title;
+              if (refined.about.text)
+                cached.selected.about.text = refined.about.text;
+            }
+            if (refined.services) {
+              if (!cached.selected) cached.selected = {};
+              if (!cached.selected.services) cached.selected.services = {};
+              if (refined.services.title)
+                cached.selected.services.title = refined.services.title;
+              if (refined.services.items) {
+                cached._refinedServiceItems = refined.services.items;
+              }
+              if (refined.services.lead) {
+                cached.selected.services.text = refined.services.lead;
+              }
+            }
+            // Merge refined subpages
+            if (refined.subpages && refined.subpages.length > 0) {
+              cached._refinedSubpages = {};
+              for (var spi = 0; spi < refined.subpages.length; spi++) {
+                var rsp = refined.subpages[spi];
+                if (rsp.slug) {
+                  cached._refinedSubpages[rsp.slug] = {
+                    title: rsp.title || "",
+                    text: rsp.text || "",
+                  };
+                }
+              }
+            }
+            cached.refined = true;
+          }
+          btn.textContent = "Generiere...";
+        })
+        .catch(function () {
+          // Refinement failed — generate with raw content
+          btn.textContent = "Generiere (ohne KI)...";
+        });
+    }
 
-    var body = {
-      preset: preset,
-      overrides: state,
-      content: content,
-    };
-
-    fetch("api/v1/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
+    // Step 2: Generate after refinement
+    refinePromise
+      .then(function () {
+        return _doGenerate(cached, preset);
+      })
       .then(function (res) {
         if (!res.ok) {
           return res.json().then(function (err) {
@@ -857,28 +1045,33 @@
         return res.json();
       })
       .then(function (data) {
+        // Open preview in new tab
+        if (data.preview_url) {
+          window.open(data.preview_url, "_blank");
+        }
+
+        // Download ZIP in background
         if (data.download_url) {
-          // Fetch ZIP as blob to avoid Cloudflare race-condition (503 on fresh URLs)
-          return fetch(data.download_url)
+          fetch(data.download_url)
             .then(function (zipRes) {
-              if (!zipRes.ok)
-                throw new Error(
-                  "Download fehlgeschlagen (" + zipRes.status + ")",
-                );
+              if (!zipRes.ok) return;
               return zipRes.blob();
             })
             .then(function (blob) {
+              if (!blob) return;
               var url = URL.createObjectURL(blob);
               var a = document.createElement("a");
               a.href = url;
-              a.download = (data.hash || "endoskeleton") + "-site.zip";
+              a.download = (domain || "website") + ".zip";
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
               URL.revokeObjectURL(url);
             });
-        } else {
-          alert("Generierung erfolgreich, aber kein Download-Link erhalten.");
+        }
+
+        if (!data.preview_url && !data.download_url) {
+          alert("Generierung erfolgreich, aber kein Link erhalten.");
         }
       })
       .catch(function (err) {
