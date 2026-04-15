@@ -4,6 +4,33 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.50.0] — 2026-04-15
+
+### Added
+- **Konfigurator Soft Warm Theme** — Komplettes UI-Redesign: cremefarbener Hintergrund, warme Brauntöne (#7c6a4f), abgerundete Karten statt kaltem Blau/Grau
+- **Welcome-Seite neu gestaltet** — Weiße Card mit SSI-Logo, Gradient-Hintergrund, Feature-Badges, warme Eingabefelder
+- **KI-Design Button** — Vollständige KI-Pipeline: Preset-Wahl + Text-Optimierung + Hero-Bild in einem Klick
+- **KI-Texte Button** — Separater Button nur für Text-Refinement
+- **Design-Varianten-Navigation** — 4 visuell diverse Varianten (dunkel/hell/warm/dynamisch) mit direkten Buttons zum Durchblättern
+- **Neu-Scannen Button** — Domain komplett frisch crawlen + Gemini neu analysieren lassen, mit Fortschrittsanzeige
+- **Hero-Wallpaper-Persistenz** — ContentInjector.inject() überschreibt das gewählte Hintergrundbild nicht mehr
+
+### Changed
+- Sidebar-Tab von 8px auf 20px verbreitert (leichter klickbar)
+- Buttons kompakter: kleineres Padding und Schrift
+- Domain-Bar in warmem Dunkelbraun statt Schwarzblau
+- Scanning-Screen hell mit Card-Design statt dunklem Vollbild
+- Preset-Recommendation Badge zeigt `design_reasoning` von Gemini
+- `?fullscreen=1` URL-Parameter wird automatisch entfernt statt Sidebar zu verstecken
+- Alle Cache-Bust Versionen auf 3.49.x aktualisiert
+
+### Fixed
+- Hero-Hintergrundbild verschwindet nicht mehr nach ContentInjector.inject (Wrapper-Pattern)
+- KI-Design/KI-Texte Buttons werden auch bei gecachten Domains enabled
+- Konfigurator.js wird korrekt aus js/ Unterordner geladen (nicht Root)
+
+---
+
 ## [3.49.0] — 2026-04-15
 
 ### Added

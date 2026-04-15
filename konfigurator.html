@@ -10,7 +10,7 @@
   <script>
     /* ─── FOUC-Prevention: Parse hash and build correct CSS URLs before browser fetches ─── */
     (function(){
-      window.ENDO_VERSION = '3.46.0'; var v = ENDO_VERSION + '-' + Date.now();
+      window.ENDO_VERSION = '3.49.3'; var v = ENDO_VERSION + '-' + Date.now();
       document.addEventListener('DOMContentLoaded', function() { var el = document.getElementById('endo-version'); if (el) el.textContent = 'v' + ENDO_VERSION; });
       /* ─── PRESETS: Config-driven templates (v5.0, zero hardcoded CSS) ─── */
       var PRESETS = {
@@ -102,11 +102,11 @@
       
     })();
   </script>
-  <link rel="stylesheet" href="css/konfigurator.css?v=3.46.0">
+  <link rel="stylesheet" href="css/konfigurator.css?v=3.49.3">
   <style>
-    /* ═══ Demo Sidebar v5.0 — Spacious, Modern, Clear ═══ */
+    /* ═══ Demo Sidebar v6.0 — Soft Warm Theme ═══ */
     body {
-      margin-right: 348px; /* 340px panel + 8px tab */
+      margin-right: 360px; /* 340px panel + 20px tab */
       transition: margin-right 0.25s ease;
       overflow-x: hidden;
     }
@@ -117,14 +117,14 @@
     /* Hero buttons: Each module controls its own style.
        Base hero contrast (0,2,0) handles dark backgrounds. */
     body.sidebar-collapsed {
-      margin-right: 24px;
+      margin-right: 20px;
     }
     .site-nav {
-      right: 348px !important;
+      right: 360px !important;
       transition: right 0.25s ease, background 0.3s, box-shadow 0.3s, transform 0.35s ease, color 0.3s !important;
     }
     body.sidebar-collapsed .site-nav {
-      right: 24px !important;
+      right: 20px !important;
     }
 
     .demo-sidebar-wrapper {
@@ -140,25 +140,25 @@
     .demo-sidebar-wrapper.collapsed { transform: translateX(340px); }
 
     .demo-sidebar-tab {
-      width: 8px;
-      background: transparent;
-      color: #64748b;
+      width: 20px;
+      background: #f5f0e6;
+      color: #a09080;
       border: none;
-      border-left: none;
+      border-left: 1px solid #e8dfd0;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      border-radius: 3px 0 0 3px;
-      box-shadow: -1px 0 4px rgba(0,0,0,0.04);
+      border-radius: 4px 0 0 4px;
+      box-shadow: -2px 0 6px rgba(60,45,25,0.06);
       transition: background 0.15s, color 0.15s;
       user-select: none;
     }
-    .demo-sidebar-tab:hover { background: #fff; color: #3b82f6; }
+    .demo-sidebar-tab:hover { background: #fefcf9; color: #7c6a4f; }
     .demo-sidebar-tab .tab-arrow {
       display: inline-block;
       transition: transform 0.25s ease;
@@ -172,38 +172,38 @@
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-      background: #f1f5f9;
+      background: #fefcf9;
       padding: 0.75rem 0.75rem;
       display: flex;
       flex-direction: column;
       gap: 0;
       scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #f1f5f9;
+      scrollbar-color: #d4c9b8 #fefcf9;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 0.875rem;
-      color: #334155;
-      border-left: 1px solid #e2e8f0;
-      box-shadow: -4px 0 12px rgba(15, 23, 42, 0.06);
+      color: #5c5040;
+      border-left: 1px solid #e8dfd0;
+      box-shadow: -4px 0 12px rgba(60, 45, 25, 0.06);
     }
     .demo-sidebar-panel::-webkit-scrollbar { width: 8px; }
-    .demo-sidebar-panel::-webkit-scrollbar-track { background: #f1f5f9; }
-    .demo-sidebar-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .demo-sidebar-panel::-webkit-scrollbar-track { background: #fefcf9; }
+    .demo-sidebar-panel::-webkit-scrollbar-thumb { background: #d4c9b8; border-radius: 4px; }
 
     .demo-title {
       font-weight: 700;
       font-size: 0.95rem;
-      color: #0f172a;
+      color: #3d3427;
       letter-spacing: -0.01em;
     }
-    .demo-title span { color: #3b82f6; font-weight: 500; font-size: 0.8rem; }
+    .demo-title span { color: #7c6a4f; font-weight: 500; font-size: 0.8rem; }
 
     .demo-section {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 0.625rem 0.75rem;
-      margin-bottom: 0.5rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      border: 1px solid #e8dfd0;
+      border-radius: 7px;
+      padding: 0.5rem 0.625rem;
+      margin-bottom: 0.375rem;
+      box-shadow: 0 1px 3px rgba(60, 45, 25, 0.04);
     }
     .demo-section:last-child { margin-bottom: 0; }
 
@@ -220,9 +220,9 @@
       gap: 5px;
       padding: 6px 8px;
       background: #fff;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d4c9b8;
       border-radius: 6px;
-      color: #334155;
+      color: #5c5040;
       font-size: 0.7rem;
       font-weight: 500;
       font-family: inherit;
@@ -231,25 +231,25 @@
       line-height: 1.2;
     }
     .util-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-      background: #eff6ff;
+      border-color: #7c6a4f;
+      color: #7c6a4f;
+      background: #faf6ef;
     }
     .util-btn i[data-lucide] {
       width: 13px;
       height: 13px;
     }
 
-    .demo-group { margin-bottom: 0.625rem; }
+    .demo-group { margin-bottom: 0.5rem; }
     .demo-group:last-child { margin-bottom: 0; }
 
     .demo-group label {
-      color: #64748b;
-      font-size: 0.625rem;
+      color: #a09080;
+      font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       display: block;
-      margin-bottom: 0.375rem;
+      margin-bottom: 0.25rem;
       font-weight: 600;
     }
 
@@ -257,19 +257,19 @@
 
     .demo-btn {
       background: #fff;
-      color: #475569;
-      border: 1px solid #e2e8f0;
-      font-size: 0.75rem;
+      color: #6b5d4d;
+      border: 1px solid #e8dfd0;
+      font-size: 0.7rem;
       font-family: inherit;
-      padding: 0.4rem 0.7rem;
-      border-radius: 6px;
+      padding: 0.3rem 0.55rem;
+      border-radius: 5px;
       cursor: pointer;
       transition: all 0.15s;
       white-space: nowrap;
       font-weight: 500;
     }
-    .demo-btn:hover { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
-    .demo-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; box-shadow: 0 1px 2px rgba(59,130,246,0.15); }
+    .demo-btn:hover { background: #faf6ef; color: #3d3427; border-color: #d4c9b8; }
+    .demo-btn.active { background: #7c6a4f; color: #fff; border-color: #7c6a4f; box-shadow: 0 1px 2px rgba(124,106,79,0.2); }
 
     /* ─── KONTRAST-SCHUTZ: Dunkle Button-Backgrounds erzwingen weissen Text ─── */
     /* Jeder .demo-btn mit inline background-style (dunkler als #f8fafc) MUSS weisen Text haben */
@@ -285,8 +285,8 @@
 
     .demo-select {
       background: #fff;
-      color: #334155;
-      border: 1px solid #e2e8f0;
+      color: #5c5040;
+      border: 1px solid #e8dfd0;
       font-size: 0.8125rem;
       font-family: inherit;
       padding: 0.45rem 0.65rem;
@@ -295,7 +295,7 @@
       outline: none;
       width: 100%;
     }
-    .demo-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .demo-select:focus { border-color: #7c6a4f; box-shadow: 0 0 0 3px rgba(124,106,79,0.1); }
 
     /* ─── Quick-Presets ──────────────────────── */
     .preset-grid {
@@ -306,28 +306,28 @@
     }
     .preset-card {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       border-radius: 8px;
       padding: 0;
       cursor: pointer;
       transition: all 0.15s;
       text-align: left;
       overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 2px rgba(60,45,25,0.03);
     }
-    .preset-card:hover { border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59,130,246,0.12); transform: translateY(-1px); }
-    .preset-card.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); background: #f0f7ff; }
-    .preset-card.active .preset-name::after { content: ' ✓'; color: #3b82f6; font-weight: 700; }
+    .preset-card:hover { border-color: #7c6a4f; box-shadow: 0 2px 8px rgba(124,106,79,0.12); transform: translateY(-1px); }
+    .preset-card.active { border-color: #7c6a4f; box-shadow: 0 0 0 3px rgba(124,106,79,0.15); background: #faf6ef; }
+    .preset-card.active .preset-name::after { content: ' ✓'; color: #7c6a4f; font-weight: 700; }
     .preset-card .preset-text { padding: 0.375rem 0.5rem; }
     .preset-card .preset-name {
       font-size: 0.75rem;
       font-weight: 600;
-      color: #0f172a;
+      color: #3d3427;
       display: block;
     }
     .preset-card .preset-desc {
       font-size: 0.5625rem;
-      color: #94a3b8;
+      color: #a09080;
       display: block;
       margin-top: 0.1rem;
       line-height: 1.25;
@@ -367,7 +367,7 @@
     /* ─── Custom Presets ─────────────────────── */
     .preset-section-label {
       font-size: 0.6875rem;
-      color: #64748b;
+      color: #a09080;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       margin: 1rem 0 0.5rem;
@@ -380,7 +380,7 @@
       right: 6px;
       background: none;
       border: none;
-      color: #94a3b8;
+      color: #a09080;
       font-size: 0.875rem;
       cursor: pointer;
       opacity: 0;
@@ -393,8 +393,8 @@
     #save-preset-btn {
       width: 100%;
       background: #fff;
-      color: #64748b;
-      border: 1px dashed #cbd5e1;
+      color: #a09080;
+      border: 1px dashed #d4c9b8;
       font-size: 0.8125rem;
       font-family: inherit;
       padding: 0.625rem;
@@ -404,20 +404,20 @@
       transition: all 0.15s;
       font-weight: 500;
     }
-    #save-preset-btn:hover { background: #f8fafc; color: #3b82f6; border-color: #3b82f6; }
+    #save-preset-btn:hover { background: #faf6ef; color: #7c6a4f; border-color: #7c6a4f; }
     #save-preset-form {
       display: none;
       margin-top: 0.625rem;
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       border-radius: 8px;
       padding: 0.75rem;
     }
     #save-preset-form input {
       width: 100%;
       background: #fff;
-      color: #0f172a;
-      border: 1px solid #e2e8f0;
+      color: #3d3427;
+      border: 1px solid #e8dfd0;
       font-size: 0.8125rem;
       font-family: inherit;
       padding: 0.5rem 0.625rem;
@@ -426,7 +426,7 @@
       outline: none;
       box-sizing: border-box;
     }
-    #save-preset-form input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    #save-preset-form input:focus { border-color: #7c6a4f; box-shadow: 0 0 0 3px rgba(124,106,79,0.1); }
     #save-preset-form .form-actions {
       display: flex;
       gap: 0.5rem;
@@ -438,17 +438,17 @@
       padding: 0.45rem;
       border-radius: 6px;
       cursor: pointer;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       font-weight: 500;
     }
     #save-preset-form .btn-save {
-      background: #3b82f6;
+      background: #7c6a4f;
       color: #fff;
-      border-color: #3b82f6;
+      border-color: #7c6a4f;
     }
     #save-preset-form .btn-cancel {
       background: #fff;
-      color: #64748b;
+      color: #a09080;
     }
 
     /* ─── Visual Pickers (Stil-Tab) ─────────── */
@@ -460,21 +460,21 @@
       flex-wrap: wrap;
     }
     .cat-tab {
-      background: #f1f5f9;
+      background: #f5f0e6;
       border: 1px solid transparent;
       border-radius: 4px;
       padding: 3px 8px;
       font-size: 0.62rem;
       font-weight: 600;
-      color: #64748b;
+      color: #a09080;
       cursor: pointer;
       font-family: inherit;
       transition: all 0.15s;
       line-height: 1.3;
       letter-spacing: 0.01em;
     }
-    .cat-tab:hover { color: #3b82f6; background: #eff6ff; }
-    .cat-tab.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .cat-tab:hover { color: #7c6a4f; background: #faf6ef; }
+    .cat-tab.active { background: #7c6a4f; color: #fff; border-color: #7c6a4f; }
     .cat-panel { display: none; }
     .cat-panel.active { display: grid; }
 
@@ -498,7 +498,7 @@
       max-height: 28px;
     }
     .color-swatch:hover { transform: scale(1.15); z-index: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .color-swatch.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
+    .color-swatch.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #7c6a4f; }
     .color-swatch::after {
       content: attr(title);
       position: absolute;
@@ -522,7 +522,7 @@
     .font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
     .font-card {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       border-radius: 5px;
       padding: 0.4rem 0.5rem;
       cursor: pointer;
@@ -533,11 +533,11 @@
       min-width: 0;
       overflow: hidden;
     }
-    .font-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(59,130,246,0.08); }
-    .font-card.active { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    .font-card:hover { border-color: #7c6a4f; box-shadow: 0 2px 4px rgba(124,106,79,0.08); }
+    .font-card.active { border-color: #7c6a4f; background: #faf6ef; box-shadow: 0 0 0 2px rgba(124,106,79,0.15); }
     .font-card .font-preview {
       font-size: 0.8rem;
-      color: #0f172a;
+      color: #3d3427;
       line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
@@ -545,7 +545,7 @@
     }
     .font-card .font-label {
       font-size: 0.55rem;
-      color: #94a3b8;
+      color: #a09080;
       font-family: 'Inter', sans-serif !important;
       white-space: nowrap;
       overflow: hidden;
@@ -559,7 +559,7 @@
     }
     .button-preview-card {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       border-radius: 5px;
       padding: 0.4rem 0.2rem;
       cursor: pointer;
@@ -568,8 +568,8 @@
       min-width: 0;
       overflow: hidden;
     }
-    .button-preview-card:hover { border-color: #3b82f6; box-shadow: 0 2px 4px rgba(59,130,246,0.08); }
-    .button-preview-card.active { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    .button-preview-card:hover { border-color: #7c6a4f; box-shadow: 0 2px 4px rgba(124,106,79,0.08); }
+    .button-preview-card.active { border-color: #7c6a4f; background: #faf6ef; box-shadow: 0 0 0 2px rgba(124,106,79,0.15); }
     .button-preview-card .btn-pair {
       display: flex;
       gap: 3px;
@@ -591,8 +591,8 @@
     }
     .button-preview-card .btn-mini-ghost {
       background: transparent !important;
-      color: #3b82f6 !important;
-      border: 1px solid rgba(59,130,246,0.4) !important;
+      color: #7c6a4f !important;
+      border: 1px solid rgba(124,106,79,0.4) !important;
       box-shadow: none !important;
       clip-path: none !important;
       text-decoration: none !important;
@@ -600,7 +600,7 @@
     .button-preview-card .btn-label {
       display: block;
       font-size: 0.6rem;
-      color: #64748b;
+      color: #a09080;
       margin-top: 4px;
       white-space: nowrap;
       overflow: hidden;
@@ -614,23 +614,23 @@
     }
     .charakter-card {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       padding: 0.5rem 0.25rem;
       cursor: pointer;
       transition: all 0.15s;
       text-align: center;
       border-radius: 6px;
     }
-    .charakter-card:hover { border-color: #3b82f6; }
-    .charakter-card.active { border-color: #3b82f6; background: #eff6ff; }
+    .charakter-card:hover { border-color: #7c6a4f; }
+    .charakter-card.active { border-color: #7c6a4f; background: #faf6ef; }
     .charakter-card .ck-shape {
       width: 26px; height: 18px;
       margin: 0 auto 4px;
-      background: #3b82f6;
+      background: #7c6a4f;
     }
     .charakter-card .ck-label {
       font-size: 0.625rem;
-      color: #64748b;
+      color: #a09080;
       font-weight: 500;
     }
 
@@ -641,19 +641,19 @@
     }
     .visual-btn {
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e8dfd0;
       border-radius: 6px;
       padding: 0.55rem 0.35rem;
       cursor: pointer;
       transition: all 0.15s;
       text-align: center;
       font-family: inherit;
-      color: #475569;
+      color: #6b5d4d;
       font-size: 0.75rem;
       font-weight: 500;
     }
-    .visual-btn:hover { border-color: #3b82f6; color: #0f172a; }
-    .visual-btn.active { border-color: #3b82f6; background: #eff6ff; color: #0f172a; }
+    .visual-btn:hover { border-color: #7c6a4f; color: #3d3427; }
+    .visual-btn.active { border-color: #7c6a4f; background: #faf6ef; color: #3d3427; }
     .visual-btn .vb-icon {
       display: block;
       font-size: 1rem;
@@ -664,27 +664,27 @@
     .sidebar-tabs {
       display: flex;
       gap: 2px;
-      margin-bottom: 1rem;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 3px;
+      margin-bottom: 0.625rem;
+      background: #f5f0e6;
+      border-radius: 6px;
+      padding: 2px;
     }
     .sidebar-tab-btn {
       flex: 1;
       background: transparent;
-      color: #64748b;
+      color: #a09080;
       border: none;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-family: inherit;
-      padding: 0.5rem 0.25rem;
-      border-radius: 6px;
+      padding: 0.4rem 0.25rem;
+      border-radius: 5px;
       cursor: pointer;
       transition: all 0.15s;
       font-weight: 600;
       white-space: nowrap;
     }
-    .sidebar-tab-btn:hover { color: #0f172a; }
-    .sidebar-tab-btn.active { background: #fff; color: #3b82f6; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 700; }
+    .sidebar-tab-btn:hover { color: #3d3427; }
+    .sidebar-tab-btn.active { background: #fff; color: #7c6a4f; box-shadow: 0 1px 3px rgba(60,45,25,0.1); font-weight: 700; }
     .sidebar-tab-panel { display: none; overflow-x: hidden; }
     .sidebar-tab-panel.active { display: block; }
 
@@ -847,30 +847,49 @@
 
 <!-- ═══ KONFIGURATOR: Welcome State ═══ -->
 <div id="konfig-welcome">
-    <img class="konfig-welcome-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232563eb'/%3E%3Ctext x='32' y='42' font-size='28' fill='white' text-anchor='middle' font-family='system-ui'%3ES%3C/text%3E%3C/svg%3E" alt="SSI">
-    <h1 class="konfig-welcome-title">Wie würde Ihre Website aussehen?</h1>
-    <p class="konfig-welcome-subtitle">Geben Sie Ihre Domain ein und sehen Sie Ihr neues Design in Sekunden.</p>
-    <div class="konfig-input-group">
-        <input type="text" id="konfig-domain-input" placeholder="z.B. blindenhund.at" autofocus>
-        <button id="konfig-domain-button">Anzeigen</button>
+    <div class="konfig-welcome-card">
+        <img class="konfig-welcome-logo" src="ssi-logo.png" alt="SSI">
+        <h1 class="konfig-welcome-title">Willkommen beim Website-Konfigurator</h1>
+        <p class="konfig-welcome-subtitle">Geben Sie eine Domain ein — wir scannen die bestehende Website und zeigen Ihnen, wie Ihr neues Design aussehen könnte.</p>
+        <div class="konfig-input-group">
+            <input type="text" id="konfig-domain-input" placeholder="z.B. meine-firma.at" autofocus>
+            <button id="konfig-domain-button">Scannen</button>
+        </div>
+        <div class="konfig-features">
+            <div class="konfig-feature">
+                <span class="konfig-feature-icon">&#x1F50D;</span>
+                <span>Automatische Analyse</span>
+            </div>
+            <div class="konfig-feature">
+                <span class="konfig-feature-icon">&#x1F3A8;</span>
+                <span>KI-optimiertes Design</span>
+            </div>
+            <div class="konfig-feature">
+                <span class="konfig-feature-icon">&#x26A1;</span>
+                <span>Fertig in Sekunden</span>
+            </div>
+        </div>
     </div>
     <div class="konfig-history">
-        <div class="konfig-history-label">Kürzlich gescannt:</div>
+        <div class="konfig-history-label">Kürzlich gescannt</div>
         <div id="konfig-history-list"></div>
     </div>
 </div>
 
 <!-- ═══ KONFIGURATOR: Scanning State ═══ -->
 <div id="konfig-scanning">
-    <div class="konfig-scan-spinner"></div>
-    <div class="konfig-scan-domain" id="konfig-scan-domain"></div>
-    <div id="konfig-scan-progress">Verbinde...</div>
+    <div class="konfig-scanning-card">
+        <div class="konfig-scan-spinner"></div>
+        <div class="konfig-scan-domain" id="konfig-scan-domain"></div>
+        <div id="konfig-scan-progress">Verbinde...</div>
+    </div>
 </div>
 
 <!-- ═══ KONFIGURATOR: Domain Bar ═══ -->
 <div id="konfig-domain-bar">
     <select id="konfig-domain-select"></select>
     <span id="konfig-domain-badge"></span>
+    <button id="konfig-rescan">Neu scannen</button>
     <button id="konfig-add-domain">+ Neue Domain</button>
 </div>
 
@@ -884,19 +903,31 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;">
         <div class="demo-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">SSI Endoskeleton <span id="endo-version"></span></div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <a id="scanner-result-link" href="#" target="_blank" style="display:none;padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#3b82f6;font-size:11px;cursor:pointer;white-space:nowrap;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.background='#eff6ff';" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff';">Scanner-Ergebnis</a>
-          <button onclick="if(confirm('Zurücksetzen?')){location.hash='';location.reload();}" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">↺ Reset</button>
+          <a id="scanner-result-link" href="#" target="_blank" style="display:none;padding:3px 8px;background:#fff;border:1px solid #e8dfd0;border-radius:4px;color:#7c6a4f;font-size:11px;cursor:pointer;white-space:nowrap;text-decoration:none;transition:all 0.15s;" onmouseover="this.style.borderColor='#7c6a4f';this.style.background='#faf6ef';" onmouseout="this.style.borderColor='#e8dfd0';this.style.background='#fff';">Scanner-Ergebnis</a>
+          <button onclick="if(confirm('Zurücksetzen?')){location.hash='';location.reload();}" style="padding:3px 8px;background:#fff;border:1px solid #e8dfd0;border-radius:4px;color:#a09080;font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='#e8dfd0';this.style.color='#a09080';">↺ Reset</button>
         </div>
       </div>
-      <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#b0b8c4;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#94a3b8;">—</span> mögliche Designs</div>
+      <div id="variation-counter" style="text-align:center;padding:0.15rem 0;font-size:0.6rem;color:#c4b8a8;margin-bottom:0.25rem;"><span id="variation-count" style="font-weight:500;color:#a09080;">—</span> mögliche Designs</div>
 
 
-      <!-- KI Refinement — always visible above tabs -->
-      <div style="padding:0 0.5rem 0.5rem;">
-        <button id="btn-ki-refine" class="btn btn-primary btn-sm" disabled style="width:100%;">
-          <i data-lucide="sparkles"></i> KI optimieren
-        </button>
-        <div id="ki-refine-status" style="font-size:0.65rem;color:#64748b;margin-top:4px;display:none;"></div>
+      <!-- KI Actions — always visible above tabs -->
+      <div style="padding:0 0.5rem 0.5rem;display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;gap:5px;">
+          <button id="btn-ki-design" disabled style="flex:1;padding:0.35rem 0.5rem;background:#7c6a4f;border:1px solid #7c6a4f;border-radius:5px;color:#fff;font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:4px;" title="KI wählt das optimale Design-Preset">
+            <i data-lucide="palette" style="width:13px;height:13px;"></i> KI-Design
+          </button>
+          <button id="btn-ki-refine" disabled style="flex:1;padding:0.35rem 0.5rem;background:#fff;border:1px solid #d4c9b8;border-radius:5px;color:#6b5d4d;font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:4px;" title="KI optimiert die Texte">
+            <i data-lucide="sparkles" style="width:13px;height:13px;"></i> KI-Texte
+          </button>
+        </div>
+        <!-- Variant navigation -->
+        <div id="ki-variant-bar" style="display:none;">
+          <div style="display:flex;gap:3px;align-items:center;">
+            <span style="font-size:0.6rem;color:#a09080;font-weight:600;white-space:nowrap;">Varianten:</span>
+            <div id="ki-variant-buttons" style="display:flex;gap:3px;flex:1;"></div>
+          </div>
+        </div>
+        <div id="ki-refine-status" style="font-size:0.6rem;color:#a09080;margin-top:2px;display:none;line-height:1.4;"></div>
       </div>
 
       <!-- Tab Navigation -->
@@ -952,20 +983,20 @@
 
             <!-- Bild-Controls: nur bei Fullscreen/Split/Banner -->
             <div id="hero-image-controls">
-              <label style="font-size:0.65rem;color:#64748b;margin-top:4px;display:block;">Bild-Intensität</label>
+              <label style="font-size:0.65rem;color:#a09080;margin-top:4px;display:block;">Bild-Intensität</label>
               <div class="demo-btn-row" style="margin-bottom:6px;">
                 <button class="demo-btn active" data-intensity="vivid" onclick="setHeroIntensity(this)">Satt</button>
                 <button class="demo-btn" data-intensity="veil" onclick="setHeroIntensity(this)">Zart (Schleier)</button>
               </div>
-              <label style="font-size:0.65rem;color:#64748b;display:block;">Hintergrundbild</label>
+              <label style="font-size:0.65rem;color:#a09080;display:block;">Hintergrundbild</label>
               <div class="wallpaper-grid" id="wallpaper-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
-                <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #3b82f6;background:#f1f5f9;cursor:pointer;font-size:0.55rem;color:#94a3b8;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
+                <button class="wallpaper-thumb active" data-wallpaper="none" onclick="setWallpaper(this)" style="width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #7c6a4f;background:#faf6ef;cursor:pointer;font-size:0.55rem;color:#a09080;display:flex;align-items:center;justify-content:center;" title="Kein Bild">—</button>
               </div>
             </div>
 
             <!-- Deko-Controls: nur bei Minimal/Playful -->
             <div id="hero-deko-controls" style="display:none;">
-              <label style="font-size:0.65rem;color:#64748b;margin-top:4px;display:block;">Dekoration</label>
+              <label style="font-size:0.65rem;color:#a09080;margin-top:4px;display:block;">Dekoration</label>
               <div class="demo-btn-row" style="flex-wrap:wrap;gap:4px;">
                 <button class="demo-btn active" data-deco="off" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Aus</button>
                 <button class="demo-btn" data-deco="waves" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Wellen</button>
@@ -976,15 +1007,15 @@
                 <button class="demo-btn" data-deco="minimal" onclick="setDecoration(this)" style="font-size:0.6rem;padding:4px 8px;">Minimal</button>
               </div>
               <div style="display:flex;gap:6px;margin-top:6px;">
-                <button onclick="regenerateDecoration()" style="flex:1;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:0.65rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#3b82f6';this.style.color='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">&#x1f504; Variation</button>
-                <label style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.65rem;color:#64748b;">
+                <button onclick="regenerateDecoration()" style="flex:1;padding:6px;background:#fff;border:1px solid #e8dfd0;border-radius:6px;color:#a09080;font-size:0.65rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#7c6a4f';this.style.color='#7c6a4f'" onmouseout="this.style.borderColor='#e8dfd0';this.style.color='#a09080'">&#x1f504; Variation</button>
+                <label style="flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #e8dfd0;border-radius:6px;cursor:pointer;font-size:0.65rem;color:#a09080;">
                   <input type="checkbox" id="deco-animate" onchange="toggleDecoAnimation(this.checked)" style="margin:0;width:14px;height:14px;"> Bewegen
                 </label>
               </div>
               <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
-                <label style="font-size:0.65rem;color:#94a3b8;white-space:nowrap;">Farbe:</label>
-                <input type="color" id="deco-color" value="#2e6b2e" onchange="setDecoColor(this.value)" style="width:28px;height:22px;border:1px solid #e2e8f0;border-radius:4px;padding:0;cursor:pointer;">
-                <button onclick="resetDecoColor()" style="padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;color:#94a3b8;font-size:0.6rem;cursor:pointer;">Auto</button>
+                <label style="font-size:0.65rem;color:#a09080;white-space:nowrap;">Farbe:</label>
+                <input type="color" id="deco-color" value="#2e6b2e" onchange="setDecoColor(this.value)" style="width:28px;height:22px;border:1px solid #e8dfd0;border-radius:4px;padding:0;cursor:pointer;">
+                <button onclick="resetDecoColor()" style="padding:3px 8px;background:#fff;border:1px solid #e8dfd0;border-radius:4px;color:#a09080;font-size:0.6rem;cursor:pointer;">Auto</button>
               </div>
             </div>
           </div>
@@ -1189,8 +1220,8 @@
               <button class="button-preview-card" data-buttons="minimal-link" data-cat="special"><span class="btn-pair"><span class="btn-mini" style="background:transparent;color:#3b82f6;border:none;text-decoration:underline;padding:0.18rem 0.1rem">Btn</span><span class="btn-mini" style="background:transparent;color:#888;border:none;text-decoration:underline;padding:0.18rem 0.1rem">Btn</span></span><span class="btn-label">Minimal Link</span></button>
             </div>
             <div class="control-group" style="margin-top:8px;">
-              <label class="control-label" style="font-size:0.65rem;color:#64748b;margin-bottom:4px;display:block;">Button-Icon</label>
-              <select id="btn-icon-select" style="width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:0.75rem;font-family:inherit;background:#fff;cursor:pointer;">
+              <label class="control-label" style="font-size:0.65rem;color:#a09080;margin-bottom:4px;display:block;">Button-Icon</label>
+              <select id="btn-icon-select" style="width:100%;padding:6px 8px;border:1px solid #e8dfd0;border-radius:5px;font-size:0.75rem;font-family:inherit;background:#fff;cursor:pointer;">
                 <option value="">Kein Icon</option>
                 <option value="arrow-right">Arrow Right →</option>
                 <option value="chevron-right">Chevron Right ›</option>
@@ -1277,7 +1308,7 @@
             <button class="util-btn" id="endo-cmd-btn" onclick="copyEndoCommand()" title="/endo DOMAIN.at Befehl in Zwischenablage kopieren"><i data-lucide="terminal"></i><span>/endo</span></button>
           </div>
           <div id="export-toast">✓ In Zwischenablage kopiert</div>
-          <pre id="config-export" style="display:none;margin-top:0.5rem;padding:0.5rem;background:#1e293b;border-radius:4px;font-size:0.6rem;color:#94a3b8;max-height:12rem;overflow:auto;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent)" title="Klick zum Kopieren"></pre>
+          <pre id="config-export" style="display:none;margin-top:0.5rem;padding:0.5rem;background:#3d3427;border-radius:4px;font-size:0.6rem;color:#c4b8a8;max-height:12rem;overflow:auto;white-space:pre-wrap;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent)" title="Klick zum Kopieren"></pre>
         </div>
       </div>
 
@@ -1668,9 +1699,9 @@
 </div><!-- /konfig-preview -->
 
   <script src="js/lucide.min.js"></script>
-  <script src="js/scanner-client.js?v=3.46.0"></script>
-  <script src="js/content-injector.js?v=3.46.0"></script>
-  <script src="js/konfigurator.js?v=3.46.0"></script>
+  <script src="js/scanner-client.js?v=3.49.3"></script>
+  <script src="js/content-injector.js?v=3.49.3"></script>
+  <script src="js/konfigurator.js?v=3.49.7"></script>
 
   <!-- ═══ Config ═══ -->
   <script>
@@ -1972,12 +2003,12 @@
             startup:   ["photo-1519389950473-47ba0277781c","photo-1553877522-43269d4ea984","photo-1460925895917-afdab827c52f"]
     };
 
-    function getRandomPresetImage(presetKey) {
+    window.getRandomPresetImage = function getRandomPresetImage(presetKey) {
       /* Deterministisch: immer erstes Bild (QA-stability) */
       var pool = IMAGE_POOL[presetKey];
       if (!pool || !pool.length) return null;
       return pool[0];
-    }
+    };
 
     window.currentHeroImageId = null;
 
@@ -2035,13 +2066,13 @@
       document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
         var isMatch = b.dataset.wallpaper === imageId;
         b.classList.toggle('active', isMatch);
-        b.style.borderColor = isMatch ? '#3b82f6' : '#e2e8f0';
+        b.style.borderColor = isMatch ? '#7c6a4f' : '#e8dfd0';
       });
       /* If no match found (image not in picker), deselect all */
       var anyMatch = document.querySelector('.wallpaper-thumb.active');
       if (!anyMatch) {
         var noneBtn = document.querySelector('.wallpaper-thumb[data-wallpaper="none"]');
-        if (noneBtn) { noneBtn.classList.add('active'); noneBtn.style.borderColor = '#3b82f6'; }
+        if (noneBtn) { noneBtn.classList.add('active'); noneBtn.style.borderColor = '#7c6a4f'; }
       }
     }
 
@@ -2175,7 +2206,7 @@
         btn.dataset.wallpaper = wp.id;
         btn.title = wp.label;
         btn.onclick = function() { setWallpaper(this); };
-        btn.style.cssText = 'width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #e2e8f0;cursor:pointer;background-size:cover;background-position:center;background-image:url(https://images.unsplash.com/' + wp.id + '?w=120&q=40);transition:border-color 0.2s;';
+        btn.style.cssText = 'width:100%;aspect-ratio:16/10;border-radius:4px;border:2px solid #e8dfd0;cursor:pointer;background-size:cover;background-position:center;background-image:url(https://images.unsplash.com/' + wp.id + '?w=120&q=40);transition:border-color 0.2s;';
         grid.appendChild(btn);
       });
     }
@@ -2183,10 +2214,10 @@
     window.setWallpaper = function setWallpaper(btn) {
       document.querySelectorAll('.wallpaper-thumb').forEach(function(b) {
         b.classList.remove('active');
-        b.style.borderColor = '#e2e8f0';
+        b.style.borderColor = '#e8dfd0';
       });
       btn.classList.add('active');
-      btn.style.borderColor = '#3b82f6';
+      btn.style.borderColor = '#7c6a4f';
       var wpId = btn.dataset.wallpaper;
       if (wpId === 'none') {
         window.currentHeroImageId = null;
@@ -2227,7 +2258,7 @@
       ['fullscreen', 'split', 'playful', 'minimal', 'banner'].forEach(function(hero) {
         var keys = groups[hero];
         if (!keys || keys.length === 0) return;
-        html += '<div class="preset-group-label" style="grid-column:1/-1;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:12px 0 4px;padding:0 2px;">' + heroLabels[hero] + '</div>';
+        html += '<div class="preset-group-label" style="grid-column:1/-1;font-size:11px;font-weight:600;color:#a09080;text-transform:uppercase;letter-spacing:0.08em;margin:12px 0 4px;padding:0 2px;">' + heroLabels[hero] + '</div>';
         keys.forEach(function(key) {
           var meta = PRESET_META[key];
           var config = PRESETS[key];
@@ -2923,14 +2954,10 @@
     renderCustomPresets();
     restoreUrlState();
 
-      /* ─── Fullscreen-Modus (?fullscreen=1 → Sidebar + Domain-Bar verstecken) ─── */
+      /* ─── Fullscreen-Parameter entfernen falls vorhanden ─── */
       if (new URLSearchParams(location.search).has('fullscreen')) {
-        var sidebar = document.querySelector('.demo-sidebar-wrapper');
-        var domainBar = document.getElementById('konfig-domain-bar');
-        if (sidebar) sidebar.style.display = 'none';
-        if (domainBar) domainBar.style.display = 'none';
-        document.body.style.marginRight = '0';
-        document.body.classList.remove('konfig-has-bar');
+        var cleanUrl = location.pathname + location.hash;
+        history.replaceState(null, '', cleanUrl);
       }
 
       /* If no preset selected after restore, highlight Default */

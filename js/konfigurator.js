@@ -65,6 +65,84 @@
 
     var _refineBtn = document.getElementById("btn-ki-refine");
     if (_refineBtn) _refineBtn.addEventListener("click", _onRefine);
+
+    var _designBtn = document.getElementById("btn-ki-design");
+    if (_designBtn) _designBtn.addEventListener("click", _onKiDesign);
+
+    var _rescanBtn = document.getElementById("konfig-rescan");
+    if (_rescanBtn) _rescanBtn.addEventListener("click", _onRescan);
+  }
+
+  // --- Rescan ----------------------------------------------------------------
+
+  function _onRescan() {
+    var domain = _currentDomain;
+    if (!domain) return;
+
+    // Clear ALL local caches
+    delete _scanCache[domain];
+    _kiDesignDomain = null;
+    _kiDesignIndex = -1;
+    _kiDesignAlternatives = [];
+    window.currentHeroImageId = null;
+
+    // Hide variant bar + status
+    var varBar = document.getElementById("ki-variant-bar");
+    if (varBar) varBar.style.display = "none";
+    var statusEl = document.getElementById("ki-refine-status");
+    if (statusEl) statusEl.style.display = "none";
+
+    // Show scanning state immediately
+    ContentInjector.reset();
+    _switchState(STATES.SCANNING);
+    if (_el.scanDomain) _el.scanDomain.textContent = domain;
+
+    // Trigger server-side rescan via API
+    fetch(
+      "https://scanner.ssi.at/api/v1/scans/" +
+        encodeURIComponent(domain) +
+        "/rescan?start=1",
+      { mode: "no-cors" },
+    ).catch(function () {
+      /* expected — redirect response */
+    });
+
+    // Poll for fresh data (skip cache — wait for new scan to complete)
+    var pollCount = 0;
+    var maxPolls = 120; // 10 min max
+    var pollInterval = setInterval(function () {
+      pollCount++;
+      if (pollCount > maxPolls) {
+        clearInterval(pollInterval);
+        _switchState(STATES.WELCOME);
+        alert("Scan hat zu lange gedauert. Bitte erneut versuchen.");
+        return;
+      }
+
+      // Update progress text
+      if (pollCount < 10) {
+        _el.scanProgress &&
+          (_el.scanProgress.textContent = "Crawle Website...");
+      } else if (pollCount < 30) {
+        _el.scanProgress &&
+          (_el.scanProgress.textContent = "KI analysiert Bilder...");
+      } else {
+        _el.scanProgress &&
+          (_el.scanProgress.textContent = "Finalisiere Analyse...");
+      }
+
+      // Check if new scan is ready
+      ScannerClient.checkCache(domain).then(function (data) {
+        if (!data || !data.domain) return;
+        // Check if this is fresh data (has ki_analysis from the new scan)
+        var hasKi = data.ki_analysis && data.ki_analysis.analysis;
+        if (!hasKi && pollCount < 20) return; // Wait for KI analysis
+
+        clearInterval(pollInterval);
+        _scanCache[domain] = data;
+        _transitionToPreview(data);
+      });
+    }, 5000);
   }
 
   // --- State machine ----------------------------------------------------------
@@ -209,6 +287,8 @@
 
     var _rb = document.getElementById("btn-ki-refine");
     if (_rb) _rb.disabled = false;
+    var _db = document.getElementById("btn-ki-design");
+    if (_db) _db.disabled = false;
 
     _updateDomainSelect(domain);
     _updateBadge(scanData);
@@ -289,6 +369,10 @@
       _highlightRecommendedPreset(_scanCache[domain]);
       _updateBadge(_scanCache[domain]);
       _updateHashDomain(domain);
+      var _rb2 = document.getElementById("btn-ki-refine");
+      if (_rb2) _rb2.disabled = false;
+      var _db2 = document.getElementById("btn-ki-design");
+      if (_db2) _db2.disabled = false;
       return;
     }
 
@@ -1150,6 +1234,345 @@
       });
   }
 
+  // --- KI Design Selection (full pipeline with variant navigation) ------------
+
+  var _kiDesignAlternatives = [];
+  var _kiDesignIndex = -1;
+  var _kiDesignDomain = null;
+
+  var THEME_CATEGORY = {
+    tech: "dark",
+    cinematic: "dark",
+    portfolio: "dark",
+    creative: "dark",
+    corporate: "light",
+    medical: "light",
+    architekt: "light",
+    kanzlei: "light",
+    minimal: "light",
+    elegant: "warm",
+    gastro: "warm",
+    softcraft: "warm",
+    boutique: "warm",
+    startup: "vibrant",
+    outdoor: "vibrant",
+    survival: "vibrant",
+    natur: "pastel",
+    wellness: "pastel",
+    kinder: "pastel",
+    playful: "pastel",
+    kreativ: "pastel",
+    editorial: "editorial",
+    default: "light",
+  };
+
+  var CAT_COLORS = {
+    dark: "#1e1e1e",
+    light: "#3b82f6",
+    warm: "#b45309",
+    vibrant: "#6366f1",
+    pastel: "#10b981",
+    editorial: "#881337",
+  };
+
+  var CAT_LABELS = {
+    dark: "dunkel & modern",
+    light: "hell & professionell",
+    warm: "warm & einladend",
+    vibrant: "dynamisch & energetisch",
+    pastel: "sanft & freundlich",
+    editorial: "klassisch & redaktionell",
+  };
+
+  // Build diverse alternatives — one from each visual category
+  function _buildAlternatives(scanData) {
+    var ki =
+      scanData.ki_analysis && scanData.ki_analysis.analysis
+        ? scanData.ki_analysis.analysis
+        : {};
+    var primary = ki.recommended_preset || _resolvePreset(scanData);
+    var primaryCat = THEME_CATEGORY[primary] || "light";
+
+    var CATEGORY_PICKS = {
+      dark: ["tech", "cinematic", "portfolio"],
+      light: ["corporate", "minimal", "architekt"],
+      warm: ["elegant", "gastro", "softcraft"],
+      vibrant: ["startup", "outdoor", "creative"],
+      pastel: ["wellness", "natur", "playful"],
+      editorial: ["editorial", "boutique", "kanzlei"],
+    };
+
+    var alts = [primary];
+    var usedCats = {};
+    usedCats[primaryCat] = true;
+
+    var catOrder = ["light", "warm", "vibrant", "pastel", "dark", "editorial"];
+    for (var c = 0; c < catOrder.length && alts.length < 4; c++) {
+      var cat = catOrder[c];
+      if (usedCats[cat]) continue;
+      var picks = CATEGORY_PICKS[cat];
+      for (var p = 0; p < picks.length; p++) {
+        if (alts.indexOf(picks[p]) === -1) {
+          alts.push(picks[p]);
+          usedCats[cat] = true;
+          break;
+        }
+      }
+    }
+    return alts;
+  }
+
+  function _applyKiPreset(presetName, cached) {
+    // Apply preset
+    if (typeof window.applyPreset === "function") {
+      window.applyPreset(presetName);
+    }
+
+    // Apply overrides if this is the primary KI recommendation
+    if (_lastPresetOverrides && _kiDesignIndex === 0) {
+      var overrideMap = {
+        color: typeof switchColor === "function" ? switchColor : null,
+        charakter:
+          typeof switchCharakter === "function" ? switchCharakter : null,
+        theme: typeof switchTheme === "function" ? switchTheme : null,
+      };
+      for (var prop in _lastPresetOverrides) {
+        var val = _lastPresetOverrides[prop];
+        if (val && overrideMap[prop]) {
+          overrideMap[prop](val);
+        }
+      }
+    }
+
+    // Highlight card
+    var cards = document.querySelectorAll(".preset-card");
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].classList.remove("recommended");
+    }
+    var matched = document.querySelector(
+      '.preset-card[data-preset="' + presetName + '"]',
+    );
+    if (matched) {
+      matched.classList.add("recommended");
+    }
+
+    // Re-inject content then force hero wallpaper (inject overwrites hero-bg)
+    ContentInjector.inject(cached);
+    _forceHeroWallpaper(presetName);
+  }
+
+  function _forceHeroWallpaper(presetName) {
+    var imgId = null;
+    if (typeof window.getRandomPresetImage === "function") {
+      imgId = window.getRandomPresetImage(presetName);
+    }
+    if (!imgId) return;
+    var url = "https://images.unsplash.com/" + imgId + "?w=1600&q=80";
+    // Set synchronously on all hero-bg elements (skip preloader)
+    var bgs = document.querySelectorAll(".hero-bg");
+    for (var i = 0; i < bgs.length; i++) {
+      bgs[i].style.backgroundImage = "url(" + url + ")";
+    }
+    window.currentHeroImageId = imgId;
+  }
+
+  function _renderVariantBar() {
+    var bar = document.getElementById("ki-variant-bar");
+    var container = document.getElementById("ki-variant-buttons");
+    if (!bar || !container) return;
+    bar.style.display = "";
+    while (container.firstChild) container.removeChild(container.firstChild);
+    for (var i = 0; i < _kiDesignAlternatives.length; i++) {
+      var name = _kiDesignAlternatives[i];
+      var cat = THEME_CATEGORY[name] || "light";
+      var dotColor = CAT_COLORS[cat] || "#7c6a4f";
+      var isActive = i === _kiDesignIndex;
+      var btn = document.createElement("button");
+      btn.setAttribute("data-variant-idx", String(i));
+      btn.style.cssText =
+        "flex:1;padding:4px 2px;border-radius:4px;font-size:0.6rem;font-weight:600;" +
+        "font-family:inherit;cursor:pointer;transition:all 0.15s;display:flex;" +
+        "align-items:center;justify-content:center;gap:3px;line-height:1;" +
+        (isActive
+          ? "background:#7c6a4f;color:#fff;border:1px solid #7c6a4f;"
+          : "background:#fff;color:#6b5d4d;border:1px solid #d4c9b8;");
+      var dot = document.createElement("span");
+      dot.style.cssText =
+        "width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;background:" +
+        (isActive ? "#fff" : dotColor);
+      btn.appendChild(dot);
+      btn.appendChild(
+        document.createTextNode(name.charAt(0).toUpperCase() + name.slice(1)),
+      );
+      btn.onclick = (function (idx) {
+        return function () {
+          _selectVariant(idx);
+        };
+      })(i);
+      container.appendChild(btn);
+    }
+  }
+
+  function _selectVariant(idx) {
+    var domain = _currentDomain;
+    var cached = domain ? _scanCache[domain] : null;
+    if (!cached || idx < 0 || idx >= _kiDesignAlternatives.length) return;
+    _kiDesignIndex = idx;
+    var presetName = _kiDesignAlternatives[idx];
+    _applyKiPreset(presetName, cached);
+    _renderVariantBar();
+    var statusEl = document.getElementById("ki-refine-status");
+    if (statusEl) {
+      var ki =
+        cached.ki_analysis && cached.ki_analysis.analysis
+          ? cached.ki_analysis.analysis
+          : {};
+      var label = presetName.charAt(0).toUpperCase() + presetName.slice(1);
+      var cat = THEME_CATEGORY[presetName] || "";
+      var reason =
+        idx === 0 ? ki.design_reasoning || "" : CAT_LABELS[cat] || "";
+      statusEl.textContent = label + (reason ? " — " + reason : "");
+      statusEl.style.display = "block";
+    }
+  }
+
+  function _onKiDesign() {
+    var domain = _currentDomain;
+    var cached = domain ? _scanCache[domain] : null;
+    if (!cached) return;
+
+    var btn = document.getElementById("btn-ki-design");
+    var statusEl = document.getElementById("ki-refine-status");
+    var ki =
+      cached.ki_analysis && cached.ki_analysis.analysis
+        ? cached.ki_analysis.analysis
+        : {};
+
+    // Build alternatives on first click or domain change
+    if (_kiDesignDomain !== domain) {
+      _kiDesignAlternatives = _buildAlternatives(cached);
+      _kiDesignIndex = -1;
+      _kiDesignDomain = domain;
+    }
+
+    // If variants already shown, cycle to next
+    if (_kiDesignIndex >= 0) {
+      _kiDesignIndex = (_kiDesignIndex + 1) % _kiDesignAlternatives.length;
+      _selectVariant(_kiDesignIndex);
+      return;
+    }
+
+    // First click: apply KI preset + show variant bar + refine texts
+    _kiDesignIndex = 0;
+    var presetName = _kiDesignAlternatives[0];
+    var label = presetName.charAt(0).toUpperCase() + presetName.slice(1);
+
+    _applyKiPreset(presetName, cached);
+    _renderVariantBar();
+
+    // If already refined, just show result
+    if (cached.refined) {
+      var reason0 = ki.design_reasoning || "";
+      if (statusEl) {
+        statusEl.textContent = label + (reason0 ? " — " + reason0 : "");
+        statusEl.style.display = "block";
+      }
+      return;
+    }
+
+    // Refine texts on first activation
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = "0.6";
+    }
+    if (statusEl) {
+      statusEl.textContent = label + " — Optimiere Design & Texte...";
+      statusEl.style.display = "block";
+    }
+
+    var trimmed = {
+      title: cached.title || "",
+      branch: cached.branch || ki.branch || "",
+      hero_text: cached.hero_text || {},
+      selected: cached.selected || {},
+      contact: cached.contact || {},
+      ai_analysis: cached.ai_analysis || cached.ki_analysis || {},
+      seo: cached.seo || {},
+      colors: cached.colors || [],
+      pages: (cached.pages || []).slice(0, 12).map(function (p) {
+        return {
+          url: p.url,
+          title: p.title,
+          text: (p.text || "").substring(0, 800),
+        };
+      }),
+    };
+
+    ScannerClient.refine(domain, trimmed, ["all"])
+      .then(function (result) {
+        if (result.status === "ok" && result.refined) {
+          var refined = result.refined;
+          if (refined.hero) {
+            if (!cached.hero_text) cached.hero_text = {};
+            if (refined.hero.headline)
+              cached.hero_text.headline = refined.hero.headline;
+            if (refined.hero.subtitle)
+              cached.hero_text.subtitle = refined.hero.subtitle;
+            if (refined.hero.eyebrow)
+              cached.hero_text.eyebrow = refined.hero.eyebrow;
+          }
+          if (refined.about) {
+            if (!cached.selected) cached.selected = {};
+            if (!cached.selected.about) cached.selected.about = {};
+            if (refined.about.title)
+              cached.selected.about.title = refined.about.title;
+            if (refined.about.text)
+              cached.selected.about.text = refined.about.text;
+          }
+          if (refined.services) {
+            if (!cached.selected) cached.selected = {};
+            if (!cached.selected.services) cached.selected.services = {};
+            if (refined.services.title)
+              cached.selected.services.title = refined.services.title;
+            if (refined.services.items)
+              cached._refinedServiceItems = refined.services.items;
+            if (refined.services.lead)
+              cached.selected.services.text = refined.services.lead;
+          }
+          if (refined.subpages && refined.subpages.length > 0) {
+            cached._refinedSubpages = {};
+            for (var spi = 0; spi < refined.subpages.length; spi++) {
+              var rsp = refined.subpages[spi];
+              if (rsp.slug) {
+                cached._refinedSubpages[rsp.slug] = {
+                  title: rsp.title || "",
+                  text: rsp.text || "",
+                };
+              }
+            }
+          }
+          cached.refined = true;
+        }
+        ContentInjector.inject(cached);
+        _forceHeroWallpaper(presetName);
+        var reason1 = ki.design_reasoning || "";
+        if (statusEl) {
+          statusEl.textContent = label + (reason1 ? " — " + reason1 : "");
+        }
+      })
+      .catch(function () {
+        if (statusEl) {
+          statusEl.textContent = label + " (Texte nicht optimiert)";
+        }
+      })
+      .finally(function () {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = "";
+        }
+      });
+  }
+
   // --- KI Refinement -----------------------------------------------------------
 
   function _onRefine() {
@@ -1169,7 +1592,7 @@
     btn.disabled = true;
     statusEl.style.display = "block";
     statusEl.style.color = "#64748b";
-    statusEl.textContent = "KI analysiert und optimiert...";
+    statusEl.textContent = "KI optimiert Texte...";
 
     // Nur relevante Felder senden (nicht alle Seitentexte — verhindert Timeout)
     var trimmed = {
@@ -1727,6 +2150,23 @@
     _cacheElements();
     _bindEvents();
     _renderHistory();
+
+    // Wrap ContentInjector.inject — always re-apply hero wallpaper after injection
+    var _origInject = ContentInjector.inject;
+    ContentInjector.inject = function (data) {
+      _origInject.call(ContentInjector, data);
+      // Re-apply current wallpaper (inject overwrites hero-bg backgroundImage)
+      if (window.currentHeroImageId) {
+        var wUrl =
+          "https://images.unsplash.com/" +
+          window.currentHeroImageId +
+          "?w=1600&q=80";
+        var hbgs = document.querySelectorAll(".hero-bg");
+        for (var hi = 0; hi < hbgs.length; hi++) {
+          hbgs[hi].style.backgroundImage = "url(" + wUrl + ")";
+        }
+      }
+    };
 
     // Hook into applyPreset — re-inject scan content after every preset switch
     var origApplyPreset = window.applyPreset;
