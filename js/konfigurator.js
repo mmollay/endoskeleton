@@ -1496,18 +1496,33 @@
   // --- Preset recommendation ---------------------------------------------------
 
   /**
-   * Map KI analysis (branch + mood) to the best preset name.
-   * Uses branch keywords and design_mood to find the optimal match.
+   * Map KI analysis to the best preset name.
+   * Priority: 1) Gemini recommended_preset, 2) branch keywords, 3) mood, 4) default.
+   * Also stores preset_overrides for fine-tuning in _lastPresetOverrides.
    */
+  var _lastPresetOverrides = null;
+
   function _resolvePreset(scanData) {
     var ki =
       scanData.ki_analysis && scanData.ki_analysis.analysis
         ? scanData.ki_analysis.analysis
         : {};
+
+    // Priority 1: Gemini direct recommendation
+    if (
+      ki.recommended_preset &&
+      window.PRESETS &&
+      window.PRESETS[ki.recommended_preset]
+    ) {
+      _lastPresetOverrides = ki.preset_overrides || null;
+      return ki.recommended_preset;
+    }
+
+    // Priority 2: Branch keyword matching (fallback for old analysis data)
     var branch = (ki.branch || scanData.branch || "").toLowerCase();
     var mood = (ki.design_mood || "").toLowerCase();
+    _lastPresetOverrides = null;
 
-    // Branch keyword → preset mapping
     var BRANCH_PRESETS = {
       gastro: "gastro",
       restaurant: "gastro",
@@ -1574,9 +1589,11 @@
       boutique: "boutique",
       schmuck: "boutique",
       luxus: "elegant",
+      hund: "natur",
+      tier: "natur",
+      ausbildung: "corporate",
     };
 
-    // Mood → preset fallback
     var MOOD_PRESETS = {
       modern: "corporate",
       minimalistisch: "minimal",
@@ -1593,23 +1610,23 @@
       dynamisch: "startup",
       clean: "minimal",
       bold: "creative",
+      serioes: "corporate",
+      edel: "elegant",
+      lebendig: "playful",
     };
 
-    // Try branch keywords first
     for (var keyword in BRANCH_PRESETS) {
       if (branch.indexOf(keyword) !== -1) {
         return BRANCH_PRESETS[keyword];
       }
     }
 
-    // Try mood
     for (var m in MOOD_PRESETS) {
       if (mood.indexOf(m) !== -1) {
         return MOOD_PRESETS[m];
       }
     }
 
-    // Default
     return "corporate";
   }
 
@@ -1627,6 +1644,22 @@
       window.applyPreset(presetName);
     }
 
+    // Apply KI overrides on top of preset (e.g. different color or theme)
+    if (_lastPresetOverrides) {
+      var overrideMap = {
+        color: typeof switchColor === "function" ? switchColor : null,
+        charakter:
+          typeof switchCharakter === "function" ? switchCharakter : null,
+        theme: typeof switchTheme === "function" ? switchTheme : null,
+      };
+      for (var prop in _lastPresetOverrides) {
+        var val = _lastPresetOverrides[prop];
+        if (val && overrideMap[prop]) {
+          overrideMap[prop](val);
+        }
+      }
+    }
+
     // Highlight the card
     var matched = document.querySelector(
       '.preset-card[data-preset="' + presetName + '"]',
@@ -1635,25 +1668,22 @@
       matched.classList.add("recommended");
     }
 
-    // Show recommendation badge
+    // Show recommendation badge with design reasoning
     if (_el.presetRec) {
       var ki =
         scanData.ki_analysis && scanData.ki_analysis.analysis
           ? scanData.ki_analysis.analysis
           : {};
-      var reason = ki.branch || scanData.branch || "";
-      if (reason && reason.indexOf("Unbekannt") === -1) {
-        _el.presetRec.textContent =
-          "Empfohlen für " +
-          reason +
-          ": " +
-          presetName.charAt(0).toUpperCase() +
-          presetName.slice(1);
+      var label = presetName.charAt(0).toUpperCase() + presetName.slice(1);
+      var reason = ki.design_reasoning || "";
+      var branch = ki.branch || scanData.branch || "";
+
+      if (reason) {
+        _el.presetRec.textContent = label + " — " + reason;
+      } else if (branch && branch.indexOf("Unbekannt") === -1) {
+        _el.presetRec.textContent = "Empfohlen für " + branch + ": " + label;
       } else {
-        _el.presetRec.textContent =
-          "Empfohlen: " +
-          presetName.charAt(0).toUpperCase() +
-          presetName.slice(1);
+        _el.presetRec.textContent = "Empfohlen: " + label;
       }
       _el.presetRec.style.display = "";
     }

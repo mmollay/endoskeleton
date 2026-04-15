@@ -4,6 +4,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.49.0] — 2026-04-15
+
+### Added
+- **KI-gesteuerte Design-Wahl** — Gemini wählt das optimale Design-Preset aus 23 verfügbaren basierend auf Branche, Zielgruppe und Textstimmung. Ersetzt das starre Keyword-Matching.
+- **Preset-Overrides** — Gemini kann einzelne Properties (Farbe, Charakter, Theme) fein-tunen wenn das Basis-Preset fast, aber nicht perfekt passt.
+- **Design-Begründung** — `design_reasoning` erklärt warum ein bestimmtes Preset gewählt wurde. Wird im Konfigurator als Badge angezeigt.
+
+### Changed
+- `_resolvePreset()` priorisiert jetzt `ki.recommended_preset` (Gemini-Empfehlung) vor dem alten Branch-Keyword-Matching (Fallback für alte Analysen).
+- `_highlightRecommendedPreset()` wendet Overrides (switchColor/switchCharakter/switchTheme) nach Preset-Anwendung an.
+- `TEXT_ANALYSIS_PROMPT` in analyze.py enthält jetzt die vollständige Preset-Liste mit Beschreibungen für Gemini.
+
+---
+
 ## [3.48.0] — 2026-04-15
 
 ### Added
