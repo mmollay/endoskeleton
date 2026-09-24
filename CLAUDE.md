@@ -1,4 +1,4 @@
-# Endoskeleton v3.15.0
+# Endoskeleton v3.50.1
 
 Modulares Website-Template-System für alle generierten SSI-Websites.
 Repo: github.com/mmollay/endoskeleton
@@ -7,8 +7,8 @@ Demo: skeleton.ssi.at
 ## Regeln
 
 1. **Nur allgemeingültige Änderungen** — was ALLE Websites betrifft gehört hierher, website-spezifisches NICHT
-2. **Nach jeder Änderung**: VERSION bumpen, CHANGELOG.md updaten, shared.js Version updaten, demo.html Version updaten
-3. **Committen + Pushen**: `git add -A && git commit -m 'feat/fix: vX.Y.Z — Beschreibung' && git push origin main`
+2. **Nach jeder Änderung**: VERSION bumpen, CHANGELOG.md updaten (die Version steht nur in `VERSION`)
+3. **Committen + Pushen**: `git add -A && git commit -m 'feat/fix: vX.Y.Z — Beschreibung' && git push origin main` — **Git nie als root ausführen** (sonst gehört `.git` root und pawbot kann nicht mehr committen)
 4. **Testen**: skeleton.ssi.at im Browser prüfen (oder curl)
 5. **Keine Breaking Changes** an bestehenden Preset-Namen — bestehende Websites nutzen diese!
 
@@ -28,7 +28,8 @@ animation/NAME.css      → none, subtle, dynamic
 widths/NAME.css         → compact, default, wide, full
 shared.js               → Demo-Controller + Nav-Behavior
 pages/SEITE.html        → Template-Seiten (index, kontakt, impressum, datenschutz, subpage)
-demo.html               → Live-Preview aller Kombinationen
+demo.html               → nur noch Weiterleitung auf konfigurator.html
+konfigurator.html       → Live-Preview aller Kombinationen (Sidebar-Konfigurator)
 config.json             → Standard-Konfiguration
 ```
 
@@ -42,7 +43,7 @@ SSI-Core pipeline.sh liest aus diesem Verzeichnis:
 ## Preset hinzufügen (Checkliste)
 
 1. CSS-Datei in der richtigen Kategorie erstellen (z.B. colors/magenta.css)
-2. demo.html: Option im Dropdown hinzufügen
+2. konfigurator.html: Option im Dropdown hinzufügen
 3. shared.js: Falls neue Kategorie → Logik erweitern
 4. config.json: Default-Werte anpassen falls nötig
 5. CHANGELOG.md updaten

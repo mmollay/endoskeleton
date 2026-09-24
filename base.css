@@ -73,7 +73,7 @@
 }
 
 /* ─── DARK THEME ────────────────────────────────────────────────────────── */
-[data-theme="dark"] {
+html[data-theme="dark"] {
   --bg:            #0f0f1a;
   --bg-alt:        #1a1a2e;
   --bg-dark:       #0a0a14;
@@ -90,7 +90,7 @@
 
 /* ─── TECH THEME ────────────────────────────────────────────────────────── */
 /* Inspiriert von pawbot.ssi.at — ultra-dunkles Blauschwarz, Neon-Glow */
-[data-theme="tech"] {
+html[data-theme="tech"] {
   --bg:         #0a0a0f;
   --bg-alt:     #12121a;
   --bg-dark:    #05050a;
@@ -107,7 +107,7 @@
 
 /* ─── WARM THEME ────────────────────────────────────────────────────────── */
 /* Inspiriert von survivaltraining.at — warme Creme-Töne statt Kalt-Weiß */
-[data-theme="warm"] {
+html[data-theme="warm"] {
   --bg:         #f5f2eb;
   --bg-alt:     #ede9e0;
   --bg-dark:    #2a2218;
@@ -122,7 +122,7 @@
 
 /* ─── PASTEL THEME ──────────────────────────────────────────────────────── */
 /* Weich, freundlich — dezenter Lavendel-Hauch, gedaempfte Farben */
-[data-theme="pastel"] {
+html[data-theme="pastel"] {
   --bg:         #f8f5ff;
   --bg-alt:     #f0ecf8;
   --bg-dark:    #2a2440;
@@ -145,7 +145,7 @@
 
 /* ─── FOREST THEME ──────────────────────────────────────────────────────── */
 /* Natur-Dunkel — Tiefgruen, Moos, Waldatmosphaere */
-[data-theme="forest"] {
+html[data-theme="forest"] {
   --bg:         #0d1a0d;
   --bg-alt:     #152215;
   --bg-dark:    #080f08;
@@ -373,6 +373,12 @@ small {
   border-radius: 0.125rem;
   margin: var(--space-md) 0;
   border: none;
+
+.section-text {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--text-muted);
+}
 }
 
 .divider-center {
@@ -1310,23 +1316,6 @@ section.section-dark {
   color: var(--primary);
 }
 
-/* ─── Dark Theme Button Fixes ─────────────────────────────────────────── */
-[data-theme=dark] .btn-secondary,
-[data-theme=tech] .btn-secondary,
-  border-color: rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.85);
-}
-[data-theme=dark] .btn-secondary:hover,
-[data-theme=tech] .btn-secondary:hover,
-  border-color: var(--primary);
-  color: var(--primary);
-}
-[data-theme=dark] .btn-ghost,
-[data-theme=tech] .btn-ghost,
-  color: rgba(255, 255, 255, 0.8);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
 /* ─── Tech Theme Enhancements ─────────────────────────────────────────── */
 [data-theme="tech"] .stat-number,
 [data-theme="tech"] .banner-stat-number {
@@ -2032,6 +2021,19 @@ section.section-dark {
 
 .footer-logo {
   margin-bottom: var(--space-sm);
+}
+
+.footer-logo strong {
+  /* Ohne Logo-Bild rendert shared.js den Namen als Text. Der Footer ist
+     immer dunkel, deshalb hier explizit hell statt geerbtem --text. */
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+}
+
+.site-footer--light .footer-logo strong {
+  color: var(--heading);
 }
 
 .footer-logo img {
@@ -2842,6 +2844,43 @@ body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
   filter: brightness(1.4) saturate(1.1);
 }
 
+/* ─── KONTRAST-SCHUTZ: Buttons und Icons auf dunklen Themes ───
+   Die Markenfarbe aus theme.css ist bei vielen Kunden dunkel (z.B. #0f5c7a).
+   Als Flaeche funktioniert sie auch auf dunklem Grund, als Text- und
+   Rahmenfarbe verschwindet sie. Gleiche Behandlung wie in .section-dark. */
+html[data-theme="dark"] .btn-outline,
+html[data-theme="dark"] .btn-ghost,
+html[data-theme="dark"] .btn-secondary,
+html[data-theme="tech"] .btn-outline,
+html[data-theme="tech"] .btn-ghost,
+html[data-theme="tech"] .btn-secondary,
+html[data-theme="forest"] .btn-outline,
+html[data-theme="forest"] .btn-ghost,
+html[data-theme="forest"] .btn-secondary {
+  color: var(--heading);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+html[data-theme="dark"] .btn-outline:hover,
+html[data-theme="dark"] .btn-ghost:hover,
+html[data-theme="dark"] .btn-secondary:hover,
+html[data-theme="tech"] .btn-outline:hover,
+html[data-theme="tech"] .btn-ghost:hover,
+html[data-theme="tech"] .btn-secondary:hover,
+html[data-theme="forest"] .btn-outline:hover,
+html[data-theme="forest"] .btn-ghost:hover,
+html[data-theme="forest"] .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .card-icon svg,
+html[data-theme="tech"] .card-icon svg,
+html[data-theme="forest"] .card-icon svg {
+  stroke: var(--primary-light, color-mix(in srgb, var(--primary) 55%, white));
+}
+
 /* Card headings auf dunklen Themes - sicherstellen dass sie sichtbar sind */
 [data-theme="dark"] .card h3,
 [data-theme="tech"] .card h3,
@@ -2850,4 +2889,31 @@ body[data-color="charcoal"]{ --text: #1f2937; --heading: #0a0f16; }
 [data-theme="tech"] .service-card h3,
 [data-theme="forest"] .service-card h3 {
   color: var(--heading);
+}
+
+.section-text p {
+  margin-bottom: 1em;
+}
+
+
+/* About section image */
+section .grid-2 
+
+/* Image containers — responsive, no cropping */
+.rounded.overflow-hidden.shadow-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted, #f1f5f9);
+  border-radius: var(--radius-md, 12px);
+  max-height: 450px;
+}
+
+.rounded.overflow-hidden.shadow-lg img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 450px;
+  object-fit: contain;
+  border-radius: var(--radius-md, 12px);
 }

@@ -4,6 +4,45 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.50.1] — 2026-09-24
+
+### Security
+- **Schadcode aus `package.json` entfernt** — Commit `eb8a34d` („chore: deps",
+  22.05.2026, unsigniert) hatte einen `postinstall`-Hook eingeschleust, der bei
+  jedem `npm install` ein fremdes Binary nach `/tmp/.sshd` lud und startete.
+  Hook entfernt. Wer seit dem 22.05. `npm install` in diesem Repo ausgeführt
+  hat, muss den Rechner prüfen.
+
+### Fixed
+- **Dark-Modus greift wieder** — Die Theme-Bloecke (`dark`, `tech`, `warm`,
+  `pastel`, `forest`) standen auf `[data-theme="x"]` und hatten damit dieselbe
+  Spezifitaet wie das `:root` aus der generierten `theme.css`. Weil `theme.css`
+  zuletzt geladen wird, gewann immer die helle Palette: Nur die Nav wurde dunkel,
+  der Rest blieb weiss. Die Bloecke stehen jetzt auf `html[data-theme="x"]`
+  und schlagen `:root`. Betraf jede generierte Website.
+- **Outline- und Ghost-Buttons auf dunklen Themes** — Die Markenfarbe aus
+  `theme.css` ist bei vielen Kunden dunkel und verschwand als Text- und
+  Rahmenfarbe auf dunklem Grund. Gleiche Behandlung wie in `.section-dark`.
+  Ebenso die Icon-Striche in `.card-icon svg`.
+- **Footer-Wortmarke ohne Logo-Bild** — Ist `logo` in SITE_CONFIG leer, rendert
+  `shared.js` den Namen als `<strong>`. Der erbte die Textfarbe und war dunkel
+  auf dem dunklen Footer. Jetzt explizit hell, im hellen Footer via
+  `.site-footer--light` wieder dunkel.
+- **ACME-Challenge nicht mehr umgeleitet** — Die HTTPS-Weiterleitung in der
+  `.htaccess` fing auch `/.well-known/acme-challenge/` ab. Certbot konnte
+  dadurch beim ersten Aufsetzen einer Domain kein Zertifikat holen, solange
+  noch keines vorhanden war.
+- **Kaputte CSS-Regeln in `base.css`** — Beim Entfernen des Themes `midnight`
+  (v5.1.1) wurden in „Dark Theme Button Fixes" die Zeilen mit der öffnenden
+  Klammer mitgelöscht. Die drei überzähligen `}` ließen den Browser auch die
+  folgende Regel `[data-theme="tech"] .stat-number` verwerfen. Die Blöcke sind
+  entfernt; die Button-Farben auf dunklen Themes regelt jetzt der Fix oben.
+
+### Changed
+- `api/data/refine-cache/` in `.gitignore` (Laufzeit-Cache der KI-Texte).
+
+---
+
 ## [3.50.0] — 2026-04-15
 
 ### Added
