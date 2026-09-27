@@ -24,6 +24,29 @@ $ist = array_map(static fn ($f) => basename($f, '.json'), glob("$w/lp/musterbuch
 sort($ist);
 
 $tests = [
+    'Musterbuch in Kunden-Optik: fremdes Profil ohne die Beispielbilder' => static function () use ($w, $soll): void {
+        $p = H::profilKopie();
+        file_put_contents("$p/profil.css", str_replace(['--primary: #1d5c8c;', '--card-bg: #fbfcfe;'], ['--primary: #7a1d5c;', '--card-bg: #ffffff;'], (string) file_get_contents("$p/profil.css")));
+        foreach (glob("$p/bilder/*.webp") ?: [] as $f) { unlink($f); }
+        file_put_contents("$p/bilder/bilder.json", '[]');
+        $ziel = T::tmp() . '/_musterbuch';
+        $repoVorher = hash_file('sha256', "$w/musterbuch/hero--schlicht/index.html");
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($ziel) . ' 2>&1', $aus, $rc);
+        T::eq($rc, 0, 'gebaut: ' . implode(' ', $aus));
+        $dirs = array_map('basename', glob("$ziel/*", GLOB_ONLYDIR) ?: []);
+        sort($dirs);
+        T::eq($dirs, $soll, 'alle Seiten');
+        T::contains((string) @file_get_contents("$ziel/hero--bild-rechts/es/lp.css"), '--primary: #7a1d5c;', 'mit den Farben des Kundenprofils');
+        T::ok(is_file("$ziel/hero--bild-rechts/es/bilder/beispiel-vortrag.webp"), 'neutrale Beispielbilder mitgebracht');
+        T::eq(hash_file('sha256', "$w/musterbuch/hero--schlicht/index.html"), $repoVorher, 'Repo-Musterbuch unberührt');
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($ziel) . ' 2>&1', $aus, $rc);
+        T::eq($rc, 0, 'ein früheres Musterbuch darf ersetzt werden');
+        $fremd = T::tmp() . '/webseite';
+        mkdir($fremd);
+        file_put_contents("$fremd/index.html", 'Kundenseite');
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($fremd) . ' 2>&1', $aus, $rc);
+        T::ok($rc === 2 && file_get_contents("$fremd/index.html") === 'Kundenseite', 'ein fremder Ordner wird nie gelöscht');
+    },
     'je Variante genau eine Fixture' => static fn () => T::eq($ist, $soll, 'Fixtures = Varianten des Katalogs'),
     'Übersicht und Sperren des Musterbuchs' => static function () use ($w, $soll): void {
         $index = (string) @file_get_contents("$w/musterbuch/index.html");
