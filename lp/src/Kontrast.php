@@ -32,8 +32,9 @@ final class Kontrast
     {
         $befunde = [];
         foreach ($paare as [$vorn, $hinten, $gross]) {
-            $a = self::hex($tokens[$vorn] ?? '');
-            $b = self::hex($tokens[$hinten] ?? '');
+            // Ein Paar darf eine feste Farbe nennen (#…), z. B. die weiße Schrift des Sprunglinks aus base.css.
+            $a = self::hex(str_starts_with($vorn, '#') ? $vorn : ($tokens[$vorn] ?? ''));
+            $b = self::hex(str_starts_with($hinten, '#') ? $hinten : ($tokens[$hinten] ?? ''));
             if ($a === null || $b === null) {
                 $fehlt = $a === null ? $vorn : $hinten;
                 $befunde[] = Befund::sperrend($pfad, "Farbe $fehlt fehlt im Profil oder ist keine Hex-Farbe", "$wo: Im Kundenprofil fehlt eine Farbe ($fehlt).");

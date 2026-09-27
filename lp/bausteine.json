@@ -171,7 +171,7 @@
         "danke":      { "typ": "zeile", "label": "Dankestext", "max": 200, "pflicht": true }
       },
       "regeln": { "hoechstens": 1 },
-      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--error", "--card-bg", false], ["--text-on-primary", "--primary", false], ["--heading", "--bg-alt", true]],
+      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--error", "--card-bg", false], ["--text-on-primary", "--primary", false], ["--heading", "--bg-alt", true], ["--text", "--lp-akzent", false]],
       "beispiel": {
         "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt kostenlos anmelden",
         "felder": ["vorname", "email"], "knopf_text": "Ich bin dabei", "liste": "beispiel-abend",
