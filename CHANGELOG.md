@@ -11,6 +11,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
   KI und Uhr; Aussehen nur aus dem Kundenprofil. Prüfungen vor der Freigabe (`lp/pruefen.php`), Musterbuch, Skill.
 - **Tests** `php tests/run.php` (ohne Abhängigkeiten) und `node ci/browser.js`.
 
+### Neue Klassen
+- Rahmen: `lp-seite`, `lp-kopf`, `lp-kopf-innen`, `lp-logo`, `lp-inhalt`, `lp-block`, `lp-block-innen`, `lp-titel`, `lp-knopf`, `lp-fuss`, `lp-fuss-innen`, `lp-fuss-firma`, `lp-fuss-links`, `lp-rechtsseite`
+- Kopfbereich (`hero`): `lp-hero`, `lp-hero--bild-rechts`, `lp-hero--bild-hinten`, `lp-hero--schlicht`, `lp-hero-text`, `lp-hero-dachzeile`, `lp-hero-titel`, `lp-hero-bild`
+- Termin (`termin`): `lp-termin`, `lp-termin--karte`, `lp-termin--band`, `lp-termin-liste`, `lp-termin-eintrag`, `lp-termin-zeit`, `lp-termin-ort`, `lp-termin-leer`
+- Themen (`themen`): `lp-themen`, `lp-themen--haken`, `lp-themen--zwei-spalten`, `lp-themen-liste`, `lp-themen-punkt`
+- Video (`video`): `lp-video`, `lp-video--breit`, `lp-video--mit-text`, `lp-video-rahmen`, `lp-video-start`, `lp-video-bild`, `lp-video-link`, `lp-video-text`
+- Erfahrungen (`erfahrungen`): `lp-erfahrungen`, `lp-erfahrungen--karten`, `lp-erfahrungen--einzeln`, `lp-erfahrungen-liste`, `lp-erfahrung`, `lp-erfahrung-text`, `lp-erfahrung-name`, `lp-erfahrung-quelle`
+- Häufige Fragen (`faq`): `lp-faq`, `lp-faq--standard`, `lp-faq-liste`, `lp-faq-frage`, `lp-faq-antwort`
+- Anmeldung (`anmeldung`): `lp-anmeldung`, `lp-anmeldung--karte`, `lp-anmeldung--breit`, `lp-formular`, `lp-feld`, `lp-feld-fehler`, `lp-einwilligung`, `lp-anmeldung-hinweis`, `lp-anmeldung-danke`
+- Abschluss (`abschluss`): `lp-abschluss`, `lp-abschluss--akzent`, `lp-abschluss--schlicht`, `lp-abschluss-text`
+
 ### Changed
 - Versionsangaben vereinheitlicht: VERSION, Konfigurator (`ENDO_VERSION`, `?v=`) und package.json nennen 3.51.0
   (vorher 3.50.1 / 3.49.3 / 4.6.7).

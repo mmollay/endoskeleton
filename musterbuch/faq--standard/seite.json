@@ -1,0 +1,36 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Häufige Fragen – standard",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Häufige Fragen\" in der Variante „standard\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Häufige Fragen – standard",
+            "text": "Baustein „faq\" in der Variante „standard\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "faq",
+            "variante": "standard",
+            "titel": "Häufige Fragen",
+            "fragen": [
+                {
+                    "frage": "Kostet die Teilnahme etwas?",
+                    "antwort": "Nein, die Teilnahme ist kostenlos."
+                },
+                {
+                    "frage": "Brauche ich ein Programm?",
+                    "antwort": "Nein. Du bekommst einen Link und nimmst im Browser teil.\n\nWer möchte, kann auch die App verwenden."
+                },
+                {
+                    "frage": "Gibt es eine Aufzeichnung?",
+                    "antwort": "Nein, der Abend findet nur live statt."
+                }
+            ]
+        }
+    ]
+}

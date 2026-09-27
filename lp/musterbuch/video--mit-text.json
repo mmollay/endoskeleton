@@ -1,0 +1,28 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Video – mit-text",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Video\" in der Variante „mit-text\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Video – mit-text",
+            "text": "Baustein „video\" in der Variante „mit-text\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "video",
+            "variante": "mit-text",
+            "titel": "Kurz erklärt: Worum geht es?",
+            "anbieter": "youtube",
+            "kennung": "AbCdEfGhIjk",
+            "vorschau": {
+                "datei": "bestand/beispiel-video.webp"
+            },
+            "text": "In drei Minuten erklärt: worum es an diesem Abend geht und für wen er gedacht ist.\n\nDas Video startet erst, wenn du auf das Bild klickst."
+        }
+    ]
+}

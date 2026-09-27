@@ -1,0 +1,37 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Kopfbereich – schlicht",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Kopfbereich\" in der Variante „schlicht\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "dachzeile": "Kostenloser Online-Abend",
+            "titel": "Gesund durch den Winter",
+            "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
+            "bild": {
+                "datei": "bestand/beispiel-vortrag.webp"
+            },
+            "knopf": {
+                "text": "Kostenlos anmelden",
+                "ziel": "#anmeldung"
+            },
+            "anker": "start"
+        },
+        {
+            "typ": "anmeldung",
+            "variante": "karte",
+            "anker": "anmeldung",
+            "titel": "Jetzt kostenlos anmelden",
+            "felder": [
+                "vorname",
+                "email"
+            ],
+            "knopf_text": "Ich bin dabei",
+            "liste": "beispiel-abend",
+            "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail."
+        }
+    ]
+}

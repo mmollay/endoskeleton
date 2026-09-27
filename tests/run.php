@@ -81,7 +81,7 @@ foreach ($files as $file) {
     $name = basename($file, '.test.php');
     if ($filter !== '' && $name !== $filter) { continue; }
     try {
-        $tests = require $file;
+        $tests = (static fn (string $datei): array => require $datei)($file);   // eigener Gültigkeitsbereich je Testdatei
     } catch (\Throwable $e) {
         T::$failures[] = "$name — Testdatei nicht ladbar: " . get_class($e) . ': ' . $e->getMessage();
         continue;

@@ -1,0 +1,31 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Anmeldung – karte",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Anmeldung\" in der Variante „karte\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Anmeldung – karte",
+            "text": "Baustein „anmeldung\" in der Variante „karte\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "anmeldung",
+            "variante": "karte",
+            "anker": "anmeldung",
+            "titel": "Jetzt kostenlos anmelden",
+            "felder": [
+                "vorname",
+                "email"
+            ],
+            "knopf_text": "Ich bin dabei",
+            "liste": "beispiel-abend",
+            "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail.",
+            "text": "Trag dich ein – den Zugangslink bekommst du per E-Mail."
+        }
+    ]
+}

@@ -1,0 +1,31 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Themen – haken",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Themen\" in der Variante „haken\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Themen – haken",
+            "text": "Baustein „themen\" in der Variante „haken\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "themen",
+            "variante": "haken",
+            "titel": "Darum geht es",
+            "punkte": [
+                "Wie das Immunsystem arbeitet",
+                "Was Schlaf damit zu tun hat",
+                "Drei einfache Gewohnheiten",
+                "Bewegung im Alltag",
+                "Essen, das guttut",
+                "Fragen aus dem Publikum"
+            ],
+            "text": "Ein kurzer Einstieg in das, was dich erwartet."
+        }
+    ]
+}

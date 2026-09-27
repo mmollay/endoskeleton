@@ -598,3 +598,18 @@ section.lp-abschluss--akzent {
 .lp-abschluss .lp-knopf {
   justify-self: center;
 }
+
+/* ─── WENIGER BEWEGUNG ──────────────────────────────────────────────────── */
+/* base.css setzt die Dauer nur über „*" — .btn (transition: … 0.2s) ist spezifischer und gewinnt dort. */
+@media (prefers-reduced-motion: reduce) {
+  .lp-seite *,
+  .lp-seite *::before,
+  .lp-seite *::after {
+    transition: none;
+    animation: none;
+  }
+
+  .lp-seite .btn:hover {
+    transform: none;
+  }
+}

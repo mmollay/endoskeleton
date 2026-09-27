@@ -1,0 +1,35 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Termin – karte",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Termin\" in der Variante „karte\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Termin – karte",
+            "text": "Baustein „termin\" in der Variante „karte\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "termin",
+            "variante": "karte",
+            "titel": "Nächster Termin",
+            "art": "online",
+            "termine": [
+                {
+                    "beginn": "2099-10-06T19:00",
+                    "dauer_min": 60
+                },
+                {
+                    "beginn": "2099-12-01T18:30",
+                    "dauer_min": 90
+                }
+            ],
+            "ort": "Online über Zoom – den Link bekommst du per E-Mail",
+            "wenn_leer": "Der nächste Termin steht bald fest."
+        }
+    ]
+}
