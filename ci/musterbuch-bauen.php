@@ -29,8 +29,10 @@ $w = dirname(__DIR__);
 $args = array_slice($argv, 1);
 $profil = Cli::option($args, '--profil') ?? "$w/lp/musterbuch/_testprofil";
 $ziel = Cli::option($args, '--ziel') ?? "$w/musterbuch";
-if ($args !== [] || !is_dir($profil) || (is_dir($ziel) && realpath($ziel) !== realpath("$w/musterbuch") && !is_file("$ziel/index.html") && (scandir($ziel) ?: []) !== ['.', '..'])) {
-    fwrite(STDERR, "Aufruf: php ci/musterbuch-bauen.php [--profil <ordner>] [--ziel <ordner>] — Ziel muss leer oder ein Musterbuch sein\n");
+// Das Ziel wird vollständig ersetzt — deshalb nur einen leeren Ordner oder ein früheres Musterbuch (Markierung).
+$frueher = is_file("$ziel/.musterbuch") || realpath($ziel) === realpath("$w/musterbuch");
+if ($args !== [] || !is_dir($profil) || (file_exists($ziel) && !$frueher && (!is_dir($ziel) || (scandir($ziel) ?: []) !== ['.', '..']))) {
+    fwrite(STDERR, "Aufruf: php ci/musterbuch-bauen.php [--profil <ordner>] [--ziel <ordner>] — das Ziel muss leer oder ein Musterbuch sein\n");
     exit(2);
 }
 $version = trim((string) file_get_contents("$w/VERSION"));
@@ -48,6 +50,17 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
         exit(1);
     }
     unlink("$o/profil/VERSION");
+    if (realpath($profil) !== realpath("$w/lp/musterbuch/_testprofil")) {
+        // Kunden-Optik: die Fixtures verwenden die neutralen Beispielbilder — die kommen mit (nur Vorschau).
+        $bilder = json_decode((string) @file_get_contents("$o/profil/bilder/bilder.json"), true) ?: [];
+        foreach (json_decode((string) file_get_contents("$w/lp/musterbuch/_testprofil/bilder/bilder.json"), true) as $b) {
+            if (!in_array($b['datei'], array_column($bilder, 'datei'), true)) {
+                $bilder[] = $b;
+                Dateien::kopieren("$w/lp/musterbuch/_testprofil/bilder/{$b['datei']}", "$o/profil/bilder/{$b['datei']}");
+            }
+        }
+        Dateien::schreiben("$o/profil/bilder/bilder.json", json_encode($bilder, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n");
+    }
     $e = Bauer::bauen($o);
     if (Befund::sperrt($e->befunde)) {
         fwrite(STDERR, "$name: " . implode(' | ', array_map(static fn ($b) => $b->technik, $e->befunde)) . "\n");
@@ -58,6 +71,7 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
     $liste[] = sprintf('<li><a href="%s/">%s – %s</a> <span>(seit %s, geändert %s)</span></li>', $name, Text::e($b['name']), Text::e($variante), $b['seit'], $b['geaendert']);
 }
 Sammelordner::schreiben($ziel);
+Dateien::schreiben("$ziel/.musterbuch", "Musterbuch, gebaut von ci/musterbuch-bauen.php — wird beim nächsten Bau ersetzt.\n");
 $css = substr(hash_file('sha256', "$ziel/hero--schlicht/es/lp.css"), 0, 10);
 Dateien::schreiben("$ziel/index.html", <<<HTML
 <!DOCTYPE html>
