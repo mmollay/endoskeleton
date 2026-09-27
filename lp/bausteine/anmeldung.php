@@ -1,7 +1,7 @@
 <?php
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
- * Anmeldung: Felder mit Label, autocomplete und Fehlertext; Einwilligung aus dem Profil, nie vorangehakt; Honigtopf;
+ * Anmeldung: Felder mit Label, autocomplete und Fehlertext (als Beschreibung erst nach dem Absenden, lp.js); Einwilligung aus dem Profil, nie vorangehakt; Honigtopf;
  * Liste und Kurzprüfsumme des Einwilligungstexts als versteckte Felder. Ohne Formularziel sichtbar gesperrt
  * (Livegang gesperrt, bis die Anbindung steht). @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
@@ -21,7 +21,7 @@ $felder = [
 
 <?= $k->absaetze($b['text'] ?? '') ?>
 
-<form class="lp-formular" method="post"<?= $ziel !== '' ? ' action="' . $k->e($ziel) . '"' : '' ?> novalidate>
+<form class="lp-formular" method="post"<?= $ziel !== '' ? ' action="' . $k->e($ziel) . '"' : '' ?>>
 <?php if ($ziel === ''): ?>
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>
 <?php endif ?>
@@ -29,14 +29,14 @@ $felder = [
 <?php foreach ($felder as $name => [$label, $typ, $auto, $pflicht, $fehler]): if (!in_array($name, $b['felder'], true)) { continue; } $id = "lp-f-$name"; ?>
 <div class="lp-feld">
 <label for="<?= $id ?>"><?= $k->e($label) ?></label>
-<input id="<?= $id ?>" name="<?= $name ?>" type="<?= $typ ?>" autocomplete="<?= $auto ?>"<?= $pflicht ? ' required aria-describedby="' . $id . '-fehler"' : '' ?>>
+<input id="<?= $id ?>" name="<?= $name ?>" type="<?= $typ ?>" autocomplete="<?= $auto ?>"<?= $pflicht ? ' required' : '' ?>>
 <?php if ($pflicht): ?>
 <p class="lp-feld-fehler" id="<?= $id ?>-fehler" hidden><?= $k->e($fehler) ?></p>
 <?php endif ?>
 </div>
 <?php endforeach ?>
 <div class="lp-feld lp-einwilligung">
-<input id="lp-f-einwilligung" name="einwilligung" type="checkbox" value="ja" required aria-describedby="lp-f-einwilligung-fehler">
+<input id="lp-f-einwilligung" name="einwilligung" type="checkbox" value="ja" required>
 <label for="lp-f-einwilligung"><?= $k->e($p['einwilligung']) ?> Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</label>
 <p class="lp-feld-fehler" id="lp-f-einwilligung-fehler" hidden><?= $k->e($k->du('Bitte bestätige die Einwilligung.', 'Bitte bestätigen Sie die Einwilligung.')) ?></p>
 </div>

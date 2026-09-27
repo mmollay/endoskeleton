@@ -19,11 +19,11 @@ Cli::lauf($argv, 'php lp/neu.php <sammelordner> <slug> <vorlage>   (Vorlagen: ' 
         [$sammel, $slug, $vorlage] = $a;
         $sammel = Cli::ordner($sammel);
         if (!preg_match('/^[a-z0-9][a-z0-9-]{1,40}$/', $slug) || in_array($slug, ['profil', 'es', 'img'], true)) {
-            throw new InvalidArgumentException("ungültiger Name „{$slug}\" — nur a-z, 0-9 und -, 2 bis 41 Zeichen");
+            throw new InvalidArgumentException("ungültiger Name „{$slug}“ — nur a-z, 0-9 und -, 2 bis 41 Zeichen");
         }
         $quelle = __DIR__ . "/vorlagen/$vorlage.json";
         if (!preg_match('/^[a-z0-9-]+$/', $vorlage) || !is_file($quelle)) {
-            throw new InvalidArgumentException("Vorlage „{$vorlage}\" gibt es nicht");
+            throw new InvalidArgumentException("Vorlage „{$vorlage}“ gibt es nicht");
         }
         $ziel = "$sammel/$slug";
         if (file_exists($ziel)) {

@@ -16,7 +16,7 @@ const path = require('path');
 
 const MUSTERBUCH = path.join(__dirname, '..', 'musterbuch');
 const BILDER = path.join(__dirname, 'bilder');
-const BREITEN = [360, 390, 1280];
+const BREITEN = [320, 360, 390, 1280];
 const TYPEN = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
 
 let bestanden = 0;
@@ -25,7 +25,7 @@ const pruefe = (bedingung, was) => { if (bedingung) { bestanden++; } else { fehl
 
 /** Öffnet eine Musterbuch-Seite; fremd sammelt alle Anfragen außerhalb von lp.test. */
 async function oeffnen(browser, name, breite, optionen = {}) {
-  const kontext = await browser.newContext({ viewport: { width: breite, height: 900 }, reducedMotion: optionen.reducedMotion || 'no-preference' });
+  const kontext = await browser.newContext({ viewport: { width: breite, height: 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
   const page = await kontext.newPage();
   const fremd = [];
   await page.route('**/*', (r) => {
@@ -90,7 +90,7 @@ function kontrastImBrowser() {
       pruefe(fremd.length === 0, `${name || 'Übersicht'} @${breite}: Fremdanfragen ${fremd.join(', ')}`);
       const schwach = await page.evaluate(kontrastImBrowser);
       pruefe(schwach.length === 0, `${name || 'Übersicht'} @${breite}: zu wenig Kontrast: ${schwach.join(' | ')}`);
-      if (name && breite !== 360) { await page.screenshot({ path: path.join(BILDER, `${name}-${breite}.png`), fullPage: true }); }
+      if (name && (breite === 390 || breite === 1280)) { await page.screenshot({ path: path.join(BILDER, `${name}-${breite}.png`), fullPage: true }); }
       await kontext.close();
     }
   }
@@ -119,8 +119,11 @@ function kontrastImBrowser() {
     pruefe(!besucht.some((b) => b.name === 'website'), 'Honigtopf wird nie fokussiert');
 
     // Formular leer absenden → Fehler am ersten Feld, Fokus dort
+    const vorher = await page.evaluate(() => document.getElementById('lp-f-vorname').hasAttribute('aria-describedby'));
+    pruefe(!vorher, 'vor dem Absenden keine Fehlerbeschreibung am Feld');
     await page.click('.lp-formular button[type="submit"]');
-    const leer = await page.evaluate(() => ({ fokus: document.activeElement.id, ungueltig: [...document.querySelectorAll('[aria-invalid="true"]')].map((e) => e.name), fehlerSichtbar: !document.getElementById('lp-f-vorname-fehler').hidden }));
+    const leer = await page.evaluate(() => ({ fokus: document.activeElement.id, ungueltig: [...document.querySelectorAll('[aria-invalid="true"]')].map((e) => e.name), fehlerSichtbar: !document.getElementById('lp-f-vorname-fehler').hidden, beschrieben: document.getElementById('lp-f-vorname').getAttribute('aria-describedby') }));
+    pruefe(leer.beschrieben === 'lp-f-vorname-fehler', `Fehlertext als Beschreibung verknüpft (${leer.beschrieben})`);
     pruefe(leer.fokus === 'lp-f-vorname', `Fokus auf dem ersten Fehlerfeld (${leer.fokus})`);
     pruefe(['vorname', 'email', 'einwilligung'].every((n) => leer.ungueltig.includes(n)), `aria-invalid an allen Pflichtfeldern (${leer.ungueltig})`);
     pruefe(leer.fehlerSichtbar, 'Fehlertext sichtbar');
@@ -133,6 +136,17 @@ function kontrastImBrowser() {
     await page.evaluate(() => document.querySelector('.lp-formular').addEventListener('submit', (e) => e.preventDefault()));
     await page.click('.lp-formular button[type="submit"]');
     pruefe(await page.evaluate(() => document.querySelectorAll('[aria-invalid="true"]').length) === 0, 'vollständig ausgefüllt: keine Fehler');
+    pruefe(await page.evaluate(() => !document.getElementById('lp-f-vorname').hasAttribute('aria-describedby')), 'nach der Korrektur keine Fehlerbeschreibung mehr');
+    await kontext.close();
+  }
+
+  // Ohne JavaScript: der Browser prüft die Pflichtfelder selbst, leeres Absenden schickt nichts ab
+  {
+    const { page, fremd, kontext } = await oeffnen(browser, 'anmeldung--karte', 1280, { ohneJs: true });
+    await page.click('.lp-formular button[type="submit"]');
+    await page.waitForTimeout(300);
+    pruefe(fremd.length === 0 && page.url() === 'http://lp.test/anmeldung--karte/', `ohne JavaScript nichts abgeschickt (${fremd.join(', ')})`);
+    pruefe(await page.evaluate(() => document.getElementById('lp-f-vorname').matches(':invalid')), 'ohne JavaScript meldet der Browser das Pflichtfeld');
     await kontext.close();
   }
 
@@ -178,7 +192,7 @@ function kontrastImBrowser() {
   {
     const { page, kontext } = await oeffnen(browser, 'abschluss--akzent', 1280, { reducedMotion: 'reduce' });
     const dauer = await page.evaluate(() => getComputedStyle(document.querySelector('.lp-knopf')).transitionDuration.split(',').map((s) => parseFloat(s) * (s.includes('ms') ? 0.001 : 1)));
-    pruefe(dauer.every((d) => d <= 0.001), `keine Übergänge bei „weniger Bewegung" (${dauer})`);
+    pruefe(dauer.every((d) => d <= 0.001), `keine Übergänge bei „weniger Bewegung“ (${dauer})`);
     await kontext.close();
   }
 

@@ -40,11 +40,9 @@ final class Skill
             . "- Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `\"dekorativ\": true`).\n"
             . "- Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.\n\n## Abschnitte\n";
         foreach ($k->bausteine as $typ => $e) {
-            $felder = [];
-            foreach ($e['felder'] as $name => $f) {
-                $felder[] = "`$name` ({$f['label']}" . (isset($f['max']) && in_array($f['typ'], ['zeile', 'absatz'], true) ? ", ≤ {$f['max']} Zeichen" : '') . ')';
-            }
-            $s .= "\n- **{$e['name']}** (`$typ`, Varianten " . implode(', ', $e['varianten']) . '): ' . implode(', ', $felder) . "\n";
+            $s .= "\n### {$e['name']} (`$typ`)\n\nVarianten: " . implode(', ', array_map(static fn ($v) => "`$v`", $e['varianten']))
+                . (($r = self::regeln($e['regeln'])) !== '' ? " · $r" : '') . "\n\n" . self::tabelle($e['felder'], $e['varianten'])
+                . "\n```json\n" . json_encode($e['beispiel'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n```\n";
         }
         return $s;
     }
@@ -83,7 +81,7 @@ final class Skill
             'kennung' => '`' . $f['muster'] . '`',
             'bild' => '`{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}`',
             'bilddatei' => '`bestand/…` oder `img/…`',
-            'knopf' => '`{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}`',
+            'knopf' => ($f['nur_anker'] ?? false) ? '`{"text": ≤ 40 Zeichen, "ziel": "#anker"}` (nur Sprungmarken der Seite)' : '`{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}`',
             'liste' => "{$f['min']}–{$f['max']} Einträge" . (is_string($f['eintrag']['typ'] ?? null) ? ' (' . self::grenzen($f['eintrag']) . ')' : ''),
             'janein' => '`true` / `false`',
         };

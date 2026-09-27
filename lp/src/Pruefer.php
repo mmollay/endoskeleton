@@ -34,7 +34,9 @@ final class Pruefer
         $p = new self($seite, Profil::laden("$seite/profil"), json_decode((string) file_get_contents("$seite/seite.json"), true));
         $p->befunde = $bau->befunde;
         $p->nachbau($bau->dateien);
+        $p->ordner($bau->dateien);
         $p->texte();
+        $p->bildrechte();
         $p->rechtstexte();
         foreach (self::SEITEN as $datei) {
             $p->html($datei);
@@ -42,11 +44,8 @@ final class Pruefer
         $p->css();
         $p->termine($heute ?? (new \DateTimeImmutable('now', new \DateTimeZone(Text::ZONE)))->format('Y-m-d\TH:i'));
         $p->formular();
-        if (($p->plan['meta']['vorschaubild'] ?? '') === '') {
-            $p->hinweis('meta.vorschaubild', 'kein eigenes Vorschaubild', 'Seiteneinstellungen: Es gibt kein eigenes Vorschaubild für das Teilen in sozialen Netzwerken.');
-        }
         if (($p->profil->daten['vorschlag'] ?? false) === true) {
-            $p->hinweis('profil.vorschlag', 'Profil ist als vorschlag markiert', 'Kundenprofil: Farben und Schriften sind noch ein Vorschlag und nicht vom Kunden bestätigt.');
+            $p->hinweis('profil.vorschlag', 'Profil ist als vorschlag markiert', 'Kundenprofil: Farben und Schriften sind noch ein Vorschlag und noch nicht bestätigt.');
         }
         return $p->befunde;
     }
@@ -72,6 +71,71 @@ final class Pruefer
             $this->sperrend('', 'gebaute Dateien passen nicht zu seite.json: ' . implode(', ', $abweichend),
                 'Die Seite ist nicht auf dem Stand ihres Bauplans oder wurde von Hand verändert — bitte neu bauen.');
         }
+    }
+
+    /**
+     * Im Seitenordner liegt nur, was dorthin gehört: Bauplan, Marke, Profilkopie, das Gebaute, Git und die Dateien des
+     * Livegangs; in img/ nur Bilder, auf die der Bauplan verweist. Alles andere würde mit ausgeliefert.
+     */
+    private function ordner(array $dateien): void
+    {
+        $erlaubt = ['seite.json', 'ENDOSKELETON', 'profil', 'es', 'img', '.git', '.gitignore', 'VERSION', 'CHANGELOG.md'];
+        foreach (array_diff(scandir($this->seite) ?: [], ['.', '..']) as $e) {
+            if (!in_array($e, $erlaubt, true) && !isset($dateien[$e])) {
+                $this->sperrend($e, "$e gehört nicht in den Seitenordner (würde ausgeliefert)", 'Im Ordner der Seite liegt eine fremde Datei — bitte entfernen.');
+            }
+        }
+        if (!is_dir("$this->seite/img")) {
+            return;
+        }
+        $genutzt = [];
+        $plan = $this->plan;
+        array_walk_recursive($plan, static function ($w) use (&$genutzt): void {
+            if (is_string($w) && str_starts_with($w, 'img/')) {
+                $genutzt[$w] = true;
+            }
+        });
+        foreach (array_diff(scandir("$this->seite/img") ?: [], ['.', '..']) as $e) {
+            if (!isset($genutzt["img/$e"])) {
+                $this->sperrend("img/$e", "img/$e wird im Bauplan nicht verwendet", 'Im Bilderordner der Seite liegt eine Datei, die die Seite nicht verwendet — bitte entfernen.');
+            }
+        }
+    }
+
+    /** Verwendete Bilder aus dem Bestand: ohne Freigabe sperrend, mit eingebranntem Text zum Gegenlesen. */
+    private function bildrechte(): void
+    {
+        $bilder = [];
+        if (is_string($this->plan['meta']['vorschaubild'] ?? null)) {
+            $bilder['meta.vorschaubild'] = $this->plan['meta']['vorschaubild'];
+        }
+        foreach ($this->plan['bausteine'] as $i => $b) {
+            foreach (['bild', 'vorschau'] as $f) {
+                if (is_string($b[$f]['datei'] ?? null)) {
+                    $bilder["bausteine.$i.$f"] = $b[$f]['datei'];
+                }
+            }
+        }
+        foreach ($bilder as $pfad => $datei) {
+            if (!str_starts_with($datei, 'bestand/')) {
+                continue;
+            }
+            $eintrag = $this->profil->bild(substr($datei, 8)) ?? [];
+            if (($eintrag['freigegeben'] ?? false) !== true) {
+                $this->sperrend($pfad, "$datei ist im Bildbestand nicht freigegeben", $this->wo($pfad) . ': Für dieses Bild fehlt noch die Freigabe (Bildrechte).');
+            }
+            if (($eintrag['eingebrannter_text'] ?? false) === true) {
+                $this->hinweis($pfad, "$datei hat eingebrannten Text", $this->wo($pfad) . ': Im Bild steht Text — bitte gegenlesen (keine Heil- oder Wirkversprechen).');
+            }
+        }
+    }
+
+    /** Für den Vergleich mit der Sperrliste: ohne **, weiche Trennzeichen und Nullbreitenzeichen, Leerraum zusammengefasst. */
+    private static function normal(string $text): string
+    {
+        $t = str_replace('**', '', $text);
+        $t = (string) preg_replace('/[\x{00AD}\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u', '', $t);
+        return trim((string) preg_replace('/\s+/u', ' ', $t));
     }
 
     /** Sperrliste, Grenzwörter, Platzhalter und ASCII-Umlaute in allen Textfeldern des Bauplans und in genutzten Alt-Texten. */
@@ -102,21 +166,22 @@ final class Pruefer
         $grenz = array_filter((array) ($this->profil->daten['grenzwoerter'] ?? []), 'is_string');
         foreach ($felder as $pfad => $text) {
             $wo = $this->wo($pfad);
+            $vergleich = self::normal($text);
             foreach ($sperr as $w) {
-                if ($w !== '' && mb_stripos($text, $w) !== false) {
-                    $this->sperrend($pfad, "Sperrliste: „{$w}\"", "$wo: „{$w}\" darf auf der Seite nicht stehen (Sperrliste des Kunden).");
+                if (self::normal($w) !== '' && mb_stripos($vergleich, self::normal($w)) !== false) {
+                    $this->sperrend($pfad, "Sperrliste: „{$w}“", "$wo: „{$w}“ darf auf der Seite nicht stehen (Sperrliste).");
                 }
             }
             foreach ($grenz as $w) {
-                if ($w !== '' && mb_stripos($text, $w) !== false) {
-                    $this->hinweis($pfad, "Grenzwort: „{$w}\"", "$wo: „{$w}\" bitte gegenlesen — keine Heil- oder Wirkversprechen.");
+                if (self::normal($w) !== '' && mb_stripos($vergleich, self::normal($w)) !== false) {
+                    $this->hinweis($pfad, "Grenzwort: „{$w}“", "$wo: „{$w}“ bitte gegenlesen — keine Heil- oder Wirkversprechen.");
                 }
             }
             if (preg_match(self::PLATZHALTER, $text) || (trim($text) !== '' && preg_match('/^[\s.…]+$/u', $text))) {
                 $this->sperrend($pfad, 'Platzhalter im Text', "$wo: Hier steht noch ein Platzhalter statt echtem Text.");
             }
             if (preg_match(self::ASCII, $text, $m)) {
-                $this->hinweis($pfad, "ASCII-Umlaut? „{$m[0]}\"", "$wo: „{$m[0]}\" — bitte mit echten Umlauten schreiben (ä, ö, ü, ß).");
+                $this->hinweis($pfad, "ASCII-Umlaut? „{$m[0]}“", "$wo: „{$m[0]}“ — bitte mit echten Umlauten schreiben (ä, ö, ü, ß).");
             }
         }
     }
@@ -125,7 +190,7 @@ final class Pruefer
     {
         foreach (['impressum' => 'Das Impressum', 'datenschutz' => 'Die Datenschutzerklärung'] as $name => $label) {
             if (Rechtstext::platzhalter($this->profil->rechtstext($name))) {
-                $this->sperrend("profil.rechtliches.$name", "rechtliches/$name.txt enthält Platzhalter", "$label ist noch ein Platzhalter — der Text des Kunden fehlt.");
+                $this->sperrend("profil.rechtliches.$name", "rechtliches/$name.txt enthält Platzhalter", "$label ist noch ein Platzhalter — der endgültige Text fehlt noch.");
             }
         }
     }
@@ -145,11 +210,19 @@ final class Pruefer
         if ($x->query('//h1')->length !== 1) {
             $this->sperrend($datei, "$datei: genau eine H1 erwartet, " . $x->query('//h1')->length . ' gefunden', 'Die Seite braucht genau eine Hauptüberschrift.');
         }
-        if (preg_match('/<[^>]+\sstyle\s*=|<style\b/i', $html)) {
+        if ($x->query('//@style|//style')->length > 0) {
             $this->sperrend($datei, "$datei: style-Attribut oder <style>", 'Die Seite enthält Gestaltung außerhalb des Profils.');
         }
-        if (preg_match('/<[^>]+\son[a-z]+\s*=/i', $html)) {
+        if ($x->query('//@*[starts-with(translate(name(), "ON", "on"), "on")]')->length > 0) {
             $this->sperrend($datei, "$datei: on*-Attribut", 'Die Seite enthält eingebettete Skripte.');
+        }
+        $vorige = 0;
+        foreach ($x->query('//h1|//h2|//h3|//h4|//h5|//h6') as $h) {
+            $stufe = (int) substr($h->nodeName, 1);
+            if ($stufe > $vorige + 1) {
+                $this->hinweis($datei, "$datei: Überschrift springt von H$vorige auf H$stufe („" . trim($h->textContent) . '“)', 'Eine Überschrift überspringt eine Ebene — für Screenreader bitte ohne Sprung gliedern.');
+            }
+            $vorige = $stufe;
         }
         foreach ($x->query('//script') as $s) {
             $src = $s->getAttribute('src');
@@ -162,7 +235,11 @@ final class Pruefer
         }
         $ids = [];
         foreach ($x->query('//*[@id]') as $e) {
-            $ids[$e->getAttribute('id')] = true;
+            $id = $e->getAttribute('id');
+            if (isset($ids[$id])) {
+                $this->sperrend($datei, "$datei: id „{$id}“ doppelt", 'Eine Sprungmarke kommt doppelt vor — Links und Formularbeschriftungen gehen dann ins Leere.');
+            }
+            $ids[$id] = true;
         }
         $hosts = array_merge($this->profil->hosts(), ['www.youtube.com']);
         foreach ($x->query('//a[@href]') as $a) {
@@ -203,11 +280,11 @@ final class Pruefer
             }
         }
         $pfad = "$this->seite/" . strtok($src, '?');
-        if (str_contains($src, '//') || str_contains($src, '..') || !is_file($pfad)) {
+        if (str_contains($src, '//') || str_contains($src, '/../') || str_starts_with($src, '../') || !is_file($pfad)) {
             return;   // Fremdquelle oder fehlend: melden Quellenprüfung bzw. Nachbau-Vergleich
         }
         $logo = 'es/' . $this->profil->daten['logo']['datei'];
-        if ($src !== $logo && !str_ends_with(strtolower($src), '.webp')) {
+        if ($src !== $logo && (@getimagesize($pfad)[2] ?? null) !== IMAGETYPE_WEBP) {
             $this->sperrend($datei, "$datei: $src ist kein WebP", 'Ein Bild ist nicht im platzsparenden WebP-Format.');
         }
         if (filesize($pfad) > self::MAX_BILD) {
@@ -271,7 +348,7 @@ final class Pruefer
         }
     }
 
-    /** „Abschnitt 2 „Themen", Eintrag 3" aus einem technischen Pfad. */
+    /** „Abschnitt 2 „Themen“, Eintrag 3“ aus einem technischen Pfad. */
     private function wo(string $pfad): string
     {
         $t = explode('.', $pfad);
@@ -280,7 +357,7 @@ final class Pruefer
         }
         $typ = (string) ($this->plan['bausteine'][(int) $t[1]]['typ'] ?? '');
         $name = Katalog::laden()->baustein($typ)['name'] ?? $typ;
-        $wo = 'Abschnitt ' . ((int) $t[1] + 1) . " „{$name}\"";
+        $wo = 'Abschnitt ' . ((int) $t[1] + 1) . " „{$name}“";
         return isset($t[3]) && ctype_digit($t[3]) ? "$wo, Eintrag " . ((int) $t[3] + 1) : $wo;
     }
 

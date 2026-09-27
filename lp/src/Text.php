@@ -41,7 +41,7 @@ final class Text
         return (bool) preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $z) && self::zeit($z)?->format('Y-m-d\TH:i') === $z;
     }
 
-    /** „Dienstag, 6. Oktober 2026, 19:00 Uhr" — in Österreich „Jänner". */
+    /** „Dienstag, 6. Oktober 2026, 19:00 Uhr“ — in Österreich „Jänner“. */
     public static function datum(string $z, string $sprache): string
     {
         $d = self::zeit($z) ?? throw new \InvalidArgumentException("ungültiger Zeitpunkt: $z");

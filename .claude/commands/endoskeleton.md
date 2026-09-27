@@ -10,7 +10,7 @@ und Vorlage des Panel-Abgleichs — dort wird **nie** direkt gearbeitet.
    `sudo -iu pawbot git -C /home/pawbot/projects/endoskeleton worktree add ../endoskeleton-arbeit -b <zweig>`
    Bearbeiten und Browsertests gehen bequemer im Klon auf server6 (`/home/pawbot/projects/endoskeleton-klon` mit
    Arbeitskopie `../endoskeleton-arbeit`); `scripts/arbeit-nach-server7.sh` überträgt den Zweig und testet dort.
-2. **Test zuerst**: `php tests/run.php` (ohne Abhängigkeiten) — der neue Test muss gegen den alten Stand rot sein.
+2. **Test zuerst**: `php tests/run.php` (ohne Abhängigkeiten; auf server6 **`php8.2`**, dort ist `php` 8.5 ohne mbstring) — der neue Test muss gegen den alten Stand rot sein.
    Danach Gegenprobe: `php8.2 /home/pawbot/projects/panel/scripts/gegenprobe.php --in <arbeitskopie> tests/run.php <datei> <suchen> <ersetzen>`
    (nur BESTANDEN zählt).
 3. **Browsertests**: `ES_PLAYWRIGHT=/home/pawbot/projects/panel/node_modules/playwright node ci/browser.js`.

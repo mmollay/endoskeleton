@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Häufige Fragen – standard",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Häufige Fragen\" in der Variante „standard\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Häufige Fragen“ in der Variante „standard“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Häufige Fragen – standard",
-            "text": "Baustein „faq\" in der Variante „standard\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „faq“ in der Variante „standard“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "faq",

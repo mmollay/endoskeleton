@@ -2,14 +2,14 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Kopfbereich – schlicht",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Kopfbereich\" in der Variante „schlicht\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Kopfbereich“ in der Variante „schlicht“."
     },
     "bausteine": [
         {
             "typ": "hero",
             "variante": "schlicht",
             "dachzeile": "Kostenloser Online-Abend",
-            "titel": "Gesund durch den Winter",
+            "titel": "Gesundheitsvorsorgeuntersuchungen verständlich erklärt",
             "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
             "bild": {
                 "datei": "bestand/beispiel-vortrag.webp"

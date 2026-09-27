@@ -44,6 +44,15 @@ foreach ($soll as $name) {
             T::ok(@file_get_contents("$w/musterbuch/$name/$pfad") === $inhalt, "musterbuch/$name/$pfad aktuell (sonst: php ci/musterbuch-bauen.php)");
         }
         T::eq(@file_get_contents("$w/musterbuch/$name/seite.json"), file_get_contents("$w/lp/musterbuch/$name.json"), 'Bauplan kopiert');
+        $ist = [];
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$w/musterbuch/$name", FilesystemIterator::SKIP_DOTS)) as $f) {
+            $r = substr($f->getPathname(), strlen("$w/musterbuch/$name") + 1);
+            if (!str_starts_with($r, 'profil/')) { $ist[] = $r; }
+        }
+        $soll = array_merge(array_keys($e->dateien), ['seite.json', 'ENDOSKELETON']);
+        sort($ist); sort($soll);
+        T::eq($ist, $soll, 'keine veralteten Dateien');
+        T::ok(!file_exists("$w/musterbuch/$name/profil/VERSION"), 'keine VERSION-Datei unter dem DocumentRoot (die Haupt-.htaccess sperrt sie mit „denied“ → fail2ban)');
         T::eq(H::texte(H::sperrend(Pruefer::pruefen("$w/musterbuch/$name", '2026-09-27T12:00'))), '', 'Prüfer ohne sperrende Befunde');
     };
 }

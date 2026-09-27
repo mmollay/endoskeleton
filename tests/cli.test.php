@@ -28,7 +28,7 @@ return [
         T::eq($rc, 1, 'sperrend = 1');
         $z = $zeilen($out);
         T::ok($z !== [] && array_keys($z[0]) === ['art', 'pfad', 'technik', 'kunde'], 'JSON-Lines mit art, pfad, technik, kunde');
-        T::eq($z[0]['kunde'] ?? '', 'Abschnitt 1 „Kopfbereich": „Titel" ist leer.', 'Kundentext mit echten Umlauten');
+        T::eq($z[0]['kunde'] ?? '', 'Abschnitt 1 „Kopfbereich“: „Titel“ ist leer.', 'Kundentext mit echten Umlauten');
         [$rc, , $err] = $php('bauen.php', [H::ordner(H::seite(), '3.50.0')]);
         T::eq($rc, 2, 'falsche Marke = 2');
         T::contains($err, 'ENDOSKELETON', 'Meldung auf stderr');
@@ -36,6 +36,8 @@ return [
         T::eq($rc, 2, 'ohne Argument = 2');
         [$rc] = $php('bauen.php', ['/gibt/es/nicht']);
         T::eq($rc, 2, 'fehlender Ordner = 2');
+        [$rc] = $php('bauen.php', [H::ordner(H::seite()), '--ziel', '/tmp/x']);
+        T::eq($rc, 2, 'unbekanntes Argument = 2');
     },
     'pruefen: --heute stellt die Uhr' => static function () use ($php, $zeilen): void {
         $o = H::ordner(H::seite([Endo\Lp\Katalog::laden()->baustein('termin')['beispiel']]));
@@ -47,6 +49,8 @@ return [
         T::ok(in_array('alle Termine vergangen', array_column($zeilen($out), 'technik'), true), 'Befund ausgegeben');
         [$rc] = $php('pruefen.php', [$o, '--heute', 'morgen']);
         T::eq($rc, 2, 'ungültige Uhrzeit: 2');
+        [$rc] = $php('pruefen.php', ['--heute', '2026-09-27T12:00']);
+        T::eq($rc, 2, 'ohne Ordner: 2 (nicht still der aktuelle Ordner)');
     },
     'neu: legt an, verweigert Vorhandenes und ungültige Namen' => static function () use ($php): void {
         $basis = T::tmp();          // ein Ausbruch mit ../ landet so noch im Temp-Ordner des Tests
@@ -60,7 +64,7 @@ return [
         T::eq($rc, 2, 'vorhanden: 2');
         foreach (['../raus', 'Gross', 'a', 'profil', 'x y'] as $slug) {
             [$rc] = $php('neu.php', [$sammel, $slug, 'zoom-vortrag']);
-            T::eq($rc, 2, "ungültiger Name „{$slug}\": 2");
+            T::eq($rc, 2, "ungültiger Name „{$slug}“: 2");
         }
         [$rc] = $php('neu.php', [$sammel, 'andere', '../../VERSION']);
         T::eq($rc, 2, 'Vorlage außerhalb: 2');

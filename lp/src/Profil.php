@@ -104,13 +104,13 @@ final class Profil
             $f[] = Befund::sperrend("profil.$pfad", $technik, self::WO . ": $kunde");
         };
         foreach (array_diff(array_keys($d), self::SCHLUESSEL) as $s) {
-            $fehler((string) $s, "unbekannter Schlüssel $s in profil.json", "Die Angabe „{$s}\" ist unbekannt.");
+            $fehler((string) $s, "unbekannter Schlüssel $s in profil.json", "Die Angabe „{$s}“ ist unbekannt.");
         }
         if (($d['format'] ?? null) !== 1) {
             $fehler('format', 'format muss 1 sein', 'Das Profilformat wird nicht unterstützt.');
         }
-        if (!self::text($d['name'] ?? null)) {
-            $fehler('name', 'name fehlt', 'Der Profilname fehlt.');
+        if (!is_string($d['name'] ?? null) || !preg_match('/^[\p{L}0-9][\p{L}0-9 ._-]{0,59}$/u', $d['name'])) {
+            $fehler('name', 'name fehlt oder enthält Sonderzeichen (nur Buchstaben, Ziffern, Leerzeichen, . _ -)', 'Der Profilname fehlt oder enthält Sonderzeichen.');
         }
         if (!is_string($d['version'] ?? null) || !preg_match('/^\d+\.\d+\.\d+$/', $d['version'])) {
             $fehler('version', 'version muss X.Y.Z sein', 'Die Profilversion fehlt oder hat die falsche Form.');
@@ -119,14 +119,14 @@ final class Profil
             $fehler('sprache', 'sprache muss de-AT oder de-DE sein', 'Die Sprache fehlt.');
         }
         if (!in_array($d['anrede'] ?? null, ['du', 'Sie'], true)) {
-            $fehler('anrede', 'anrede muss du oder Sie sein', 'Die Anrede muss „du" oder „Sie" sein.');
+            $fehler('anrede', 'anrede muss du oder Sie sein', 'Die Anrede muss „du“ oder „Sie“ sein.');
         }
         if (isset($d['vorschlag']) && !is_bool($d['vorschlag'])) {
-            $fehler('vorschlag', 'vorschlag muss true/false sein', 'Die Kennzeichnung „Vorschlag" hat die falsche Form.');
+            $fehler('vorschlag', 'vorschlag muss true/false sein', 'Die Kennzeichnung „Vorschlag“ hat die falsche Form.');
         }
         $firma = is_array($d['firma'] ?? null) ? $d['firma'] : [];
         foreach (array_diff(array_keys($firma), self::FIRMA) as $s) {
-            $fehler("firma.$s", "unbekannter Schlüssel firma.$s", "Die Firmenangabe „{$s}\" ist unbekannt.");
+            $fehler("firma.$s", "unbekannter Schlüssel firma.$s", "Die Firmenangabe „{$s}“ ist unbekannt.");
         }
         foreach (['name' => 'Firmenname', 'strasse' => 'Straße', 'plz_ort' => 'PLZ und Ort', 'email' => 'E-Mail-Adresse'] as $s => $label) {
             if (!self::text($firma[$s] ?? null)) {
@@ -139,6 +139,14 @@ final class Profil
         $logo = is_array($d['logo'] ?? null) ? $d['logo'] : [];
         if (!is_string($logo['datei'] ?? null) || !preg_match('/^logo\.(svg|png|webp)$/', $logo['datei']) || !is_file("$this->ordner/{$logo['datei']}")) {
             $fehler('logo.datei', 'logo.datei muss logo.svg|png|webp sein und existieren', 'Das Logo fehlt.');
+        } elseif (str_ends_with($logo['datei'], '.svg')) {
+            // Ein SVG wird auch direkt aufgerufen (es/logo.svg) — dann liefe ein Skript darin auf der Seiten-Domain.
+            $svg = (string) file_get_contents("$this->ordner/{$logo['datei']}");
+            if (preg_match('/<script|<foreignObject|<!ENTITY|<\?xml-stylesheet|\son[a-z]+\s*=|(xlink:)?href\s*=\s*["\'](?!#)/i', $svg)) {
+                $fehler('logo.datei', 'logo.svg enthält Skript, Ereignis-Attribut, fremden Verweis oder Entität', 'Das Logo enthält unzulässige Bestandteile.');
+            }
+        } elseif (!in_array(@getimagesize("$this->ordner/{$logo['datei']}")[2] ?? null, [IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
+            $fehler('logo.datei', 'logo.datei ist kein lesbares PNG/WebP', 'Das Logo ist beschädigt.');
         }
         if (!self::text($logo['alt'] ?? null)) {
             $fehler('logo.alt', 'logo.alt fehlt', 'Der Alternativtext zum Logo fehlt.');
@@ -152,8 +160,8 @@ final class Profil
             $fehler('einwilligung', 'einwilligung muss 20–600 Zeichen haben', 'Der Einwilligungstext für das Formular fehlt oder ist zu lang.');
         }
         $ziel = $d['formularziel'] ?? null;
-        if (!is_string($ziel) || ($ziel !== '' && (!str_starts_with($ziel, 'https://') || filter_var($ziel, FILTER_VALIDATE_URL) === false))) {
-            $fehler('formularziel', 'formularziel muss leer oder eine https-Adresse sein', 'Das Formularziel muss leer oder eine sichere Adresse (https) sein.');
+        if (!is_string($ziel) || ($ziel !== '' && !Text::https($ziel, $this->hosts()))) {
+            $fehler('formularziel', 'formularziel muss leer oder https auf einen Host aus link_hosts sein (ohne Benutzer, ohne Port)', 'Das Formularziel muss leer oder eine sichere Adresse (https) auf einer freigegebenen Website sein.');
         }
         if (!is_array($d['link_hosts'] ?? null) || !array_is_list($d['link_hosts'])) {
             $fehler('link_hosts', 'link_hosts muss eine Liste sein', 'Die Liste erlaubter Link-Adressen fehlt.');
@@ -179,6 +187,16 @@ final class Profil
         $fehler = static function (string $technik, string $kunde) use (&$f): void {
             $f[] = Befund::sperrend('profil.css', $technik, self::WO . ": $kunde");
         };
+        // Streng, damit nichts an den Prüfungen vorbei in den Browser kommt: kein Backslash (Escapes wie u\72l),
+        // keine Kommentarzeichen in Texten (sonst verstecken sie Regeln vor der Kommentar-Entfernung).
+        if (str_contains($this->css, '\\')) {
+            $fehler('Backslash im CSS (Escape) nicht erlaubt', 'Die Profilgestaltung enthält unzulässige Zeichen.');
+            return $f;
+        }
+        if (preg_match('/(["\'])[^"\']*(\/\*|\*\/)[^"\']*\1/', $this->css)) {
+            $fehler('Kommentarzeichen innerhalb eines Textes nicht erlaubt', 'Die Profilgestaltung enthält unzulässige Zeichen.');
+            return $f;
+        }
         $css = self::ohneKommentare($this->css);
         if (stripos($css, '@import') !== false) {
             $fehler('@import ist nicht erlaubt', 'Die Profilgestaltung darf keine fremden Dateien laden.');
@@ -188,11 +206,13 @@ final class Profil
         if ($rest !== '') {
             $fehler('nur :root und @font-face erlaubt, gefunden: ' . mb_substr($rest, 0, 60), 'Die Profilgestaltung enthält mehr als Farben und Schriften.');
         }
-        preg_match_all('/url\(\s*([\'"]?)([^\'")]*)\1\s*\)/i', $css, $urls);
+        // Jedes url( muss genau url(schrift/<name>.woff2) sein, wahlweise in Anführungszeichen.
+        $gueltig = preg_match_all('/url\(\s*([\'"]?)(schrift\/[a-z0-9_-]+(\.[a-z0-9_-]+)*\.woff2)\1\s*\)/i', $css, $urls);
+        if (substr_count(strtolower($css), 'url(') !== $gueltig) {
+            $fehler('url() nicht erlaubt — nur url(schrift/<name>.woff2)', 'Schriften müssen im Profil liegen (keine fremden Adressen).');
+        }
         foreach ($urls[2] as $u) {
-            if (!preg_match('#^schrift/[a-z0-9._-]+\.woff2$#', $u)) {
-                $fehler("url($u) nicht erlaubt — nur schrift/*.woff2", 'Schriften müssen im Profil liegen (keine fremden Adressen).');
-            } elseif (!is_file("$this->ordner/$u")) {
+            if (!is_file("$this->ordner/$u")) {
                 $fehler("Schriftdatei $u fehlt", 'Eine Schriftdatei fehlt.');
             }
         }
@@ -211,11 +231,13 @@ final class Profil
     {
         $f = [];
         foreach ($this->bilder as $datei => $b) {
-            if (!preg_match('/^[a-z0-9][a-z0-9._-]*\.webp$/', $datei) || !is_file("$this->ordner/bilder/$datei")) {
-                $f[] = Befund::sperrend("profil.bilder.$datei", "Bild $datei fehlt oder ist kein WebP mit einfachem Namen", self::WO . ": Das Bild „{$datei}\" fehlt.");
+            if (!preg_match('/^[a-z0-9][a-z0-9_-]*(\.[a-z0-9_-]+)*\.webp$/', $datei) || !is_file("$this->ordner/bilder/$datei")) {
+                $f[] = Befund::sperrend("profil.bilder.$datei", "Bild $datei fehlt oder ist kein WebP mit einfachem Namen", self::WO . ": Das Bild „{$datei}“ fehlt.");
+            } elseif ((@getimagesize("$this->ordner/bilder/$datei")[2] ?? null) !== IMAGETYPE_WEBP) {
+                $f[] = Befund::sperrend("profil.bilder.$datei", "Bild $datei ist kein lesbares WebP", self::WO . ": Das Bild „{$datei}“ ist beschädigt.");
             }
             if (!self::text($b['alt'] ?? null)) {
-                $f[] = Befund::sperrend("profil.bilder.$datei.alt", "Alt-Text zu $datei fehlt", self::WO . ": Zum Bild „{$datei}\" fehlt die Beschreibung (Alternativtext).");
+                $f[] = Befund::sperrend("profil.bilder.$datei.alt", "Alt-Text zu $datei fehlt", self::WO . ": Zum Bild „{$datei}“ fehlt die Beschreibung (Alternativtext).");
             }
         }
         return $f;
@@ -226,8 +248,8 @@ final class Profil
     {
         $f = [];
         foreach (self::RECHTSTEXTE as $name => $label) {
-            if (!is_file("$this->ordner/rechtliches/$name.txt")) {
-                $f[] = Befund::sperrend("profil.rechtliches.$name", "rechtliches/$name.txt fehlt", self::WO . ": $label fehlt.");
+            if (!is_file("$this->ordner/rechtliches/$name.txt") || trim((string) file_get_contents("$this->ordner/rechtliches/$name.txt")) === '') {
+                $f[] = Befund::sperrend("profil.rechtliches.$name", "rechtliches/$name.txt fehlt oder ist leer", self::WO . ": $label fehlt.");
             }
         }
         return $f;

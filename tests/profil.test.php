@@ -53,8 +53,39 @@ return [
         T::eq(count(H::sperrend($mitJson(static function ($j) { $j['formularziel'] = 'http://beispiel.invalid/x'; return $j; }))), 1, 'Formularziel ohne https');
         T::eq(count(H::sperrend($mitJson(static function ($j) { $j['logo']['datei'] = 'logo.gif'; return $j; }))), 1, 'Logo fehlt');
         T::eq(count(H::sperrend($mitJson(static function ($j) { $j['version'] = '1.0'; return $j; }))), 1, 'Version');
-        T::eq(count(H::sperrend($mitJson(static function ($j) { $j['link_hosts'] = ['https://www.example.com']; return $j; }))), 1, 'Host mit Schema');
+        T::ok(in_array('profil.link_hosts.0', array_map(static fn ($b) => $b->pfad, H::sperrend($mitJson(static function ($j) { $j['link_hosts'] = ['https://www.example.com']; return $j; }))), true), 'Host mit Schema');
         T::eq(count(H::sperrend($mitJson(static fn ($j) => $j + ['unbekannt' => 1]))), 1, 'unbekannter Schlüssel');
+    },
+    'CSS lässt sich nicht über Escape, Kommentare oder den Namen erweitern' => static function () use ($mitCss, $mitJson, $testCss): void {
+        $b = H::sperrend($mitCss($testCss . "\n@font-face { font-family: X; src: u\\72l(\"https://evil.example.com/f.woff2\"); }\n"));
+        T::ok($b !== [], 'Escape (Backslash) im CSS');
+        $b = H::sperrend($mitCss(":root { --lp-kommentar: \"/*\"; }\nbody { background-image: url(https://evil.example.com/p.png); }\n:root { --lp-kommentar-ende: \"*/\"; }\n" . $testCss));
+        T::ok($b !== [], 'Kommentarzeichen in einem Text');
+        $b = H::sperrend($mitCss($testCss . "\n@font-face { font-family: X; src: url(\"https://evil.example.com/a)b.woff2\"); }\n"));
+        T::ok($b !== [], 'Klammer in der Adresse');
+        $b = H::sperrend($mitJson(static fn ($j) => ['name' => 'x */ @import "https://evil.example.com/a.css"; /*'] + $j));
+        T::ok($b !== [], 'Sonderzeichen im Profilnamen');
+    },
+    'Formularziel nur https auf erlaubtem Host' => static function () use ($mitJson): void {
+        foreach (['https://sammler.evil.example.com/x', 'https://user:pw@beispiel.invalid/x', 'https://beispiel.invalid:8443/x'] as $ziel) {
+            T::eq(count(H::sperrend($mitJson(static fn ($j) => ['formularziel' => $ziel] + $j))), 1, "abgelehnt: $ziel");
+        }
+    },
+    'SVG-Logo ohne Skript und fremde Verweise' => static function (): void {
+        foreach (['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>', '<svg xmlns="http://www.w3.org/2000/svg" onload="x"></svg>',
+                  '<svg xmlns="http://www.w3.org/2000/svg"><image href="https://evil.example.com/a.png"/></svg>'] as $svg) {
+            $d = H::profilKopie();
+            file_put_contents("$d/logo.svg", $svg);
+            T::eq(count(H::sperrend(Profil::laden($d)->pruefen())), 1, 'SVG abgelehnt: ' . substr($svg, 42, 30));
+        }
+    },
+    'leerer Rechtstext und kaputtes Bild' => static function (): void {
+        $d = H::profilKopie();
+        file_put_contents("$d/rechtliches/impressum.txt", "  \n");
+        T::eq(count(H::sperrend(Profil::laden($d)->pruefen())), 1, 'leeres Impressum');
+        $d = H::profilKopie();
+        file_put_contents("$d/bilder/beispiel-video.webp", 'kaputt');
+        T::eq(count(H::sperrend(Profil::laden($d)->pruefen())), 1, 'kaputtes Bestandsbild');
     },
     'Bilder: Datei und Alt-Text' => static function (): void {
         $d = H::profilKopie();
@@ -85,6 +116,19 @@ return [
         foreach (['profil.json', 'profil.css', 'logo.svg', 'rechtliches/impressum.txt', 'rechtliches/datenschutz.txt', 'bilder/bilder.json', 'bilder/beispiel-vortrag.webp'] as $f) {
             T::ok(is_file("$seite/profil/$f"), "kopiert: $f");
         }
+    },
+    'Profil übernehmen: nie aus der Seite selbst, bei Fehlern bleibt die alte Kopie' => static function (): void {
+        $seite = T::tmp() . '/seite';
+        mkdir($seite);
+        ProfilKopie::uebernehmen($seite, H::testprofil());
+        try { ProfilKopie::uebernehmen($seite, "$seite/profil"); T::ok(false, 'Ausnahme erwartet'); } catch (\RuntimeException $e) { T::ok(true, 'Profil aus der Seite abgelehnt'); }
+        T::ok(is_file("$seite/profil/profil.json"), 'alte Kopie unversehrt');
+        $d = H::profilKopie();
+        unlink("$d/bilder/beispiel-video.webp");
+        symlink(H::testprofil() . '/bilder/beispiel-video.webp', "$d/bilder/beispiel-video.webp");
+        try { ProfilKopie::uebernehmen($seite, $d); T::ok(false, 'Verweis im Profil: Ausnahme erwartet'); } catch (\RuntimeException $e) { T::ok(true, 'Verweis abgelehnt'); }
+        T::ok(is_file("$seite/profil/profil.css") && is_file("$seite/profil/bilder/beispiel-video.webp"), 'alte Kopie nach dem Fehler vollständig');
+        T::eq(glob("$seite/.profil-*") ?: [], [], 'kein Zwischenordner zurückgelassen');
     },
     'ungültiges Profil wird nicht übernommen' => static function (): void {
         $d = H::profilKopie();

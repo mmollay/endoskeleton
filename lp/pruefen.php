@@ -16,5 +16,8 @@ Cli::lauf($argv, 'php lp/pruefen.php <seitenordner> [--heute JJJJ-MM-TTTHH:MM]',
     if ($heute !== null && !Text::zeitpunktGueltig($heute)) {
         throw new InvalidArgumentException("--heute: kein Zeitpunkt JJJJ-MM-TTTHH:MM: $heute");
     }
-    return Pruefer::pruefen(Cli::ordner($a[0] ?? ''), $heute);
-});
+    if (count($a) !== 1) {
+        throw new InvalidArgumentException('genau ein Seitenordner erwartet');
+    }
+    return Pruefer::pruefen(Cli::ordner($a[0]), $heute);
+}, 3);

@@ -1,5 +1,5 @@
 <?php
-/** Bestehende Websites (Lohr, werkstatt-test) nutzen base.css, shared.js und die Presets — die bleiben exakt wie in 3.50.1. */
+/** Bestehende Websites nutzen base.css, shared.js und die Presets — die bleiben exakt wie in 3.50.1. */
 
 declare(strict_types=1);
 

@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Termin – band",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Termin\" in der Variante „band\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Termin“ in der Variante „band“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Termin – band",
-            "text": "Baustein „termin\" in der Variante „band\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „termin“ in der Variante „band“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "termin",

@@ -100,10 +100,12 @@ return [
     'faq: details/summary und FAQPage, </script> bricht nichts' => static function () use ($bau, $b, $jsonLd): void {
         $f = $b('faq');
         $f['fragen'][] = ['frage' => 'Was passiert mit </script><script>alert(1)</script>?', 'antwort' => 'Nichts </script> passiert.'];
+        $f['fragen'][] = ['frage' => 'Und fett?', 'antwort' => 'Das ist **wichtig**.'];
         [$h, $x] = $bau(H::seite([$f]));
-        T::eq($x->query('//details[contains(@class,"lp-faq-frage")]/summary')->length, 2, 'zwei Fragen');
+        T::eq($x->query('//details[contains(@class,"lp-faq-frage")]/summary')->length, 3, 'drei Fragen');
         $faq = array_values(array_filter($jsonLd($x), static fn ($j) => ($j['@type'] ?? '') === 'FAQPage'))[0] ?? [];
-        T::eq(count($faq['mainEntity'] ?? []), 2, 'FAQPage mit zwei Fragen');
+        T::eq(count($faq['mainEntity'] ?? []), 3, 'FAQPage mit drei Fragen');
+        T::eq($faq['mainEntity'][2]['acceptedAnswer']['text'] ?? '', 'Das ist wichtig.', 'JSON-LD ohne Sternchen');
         T::eq($faq['mainEntity'][1]['acceptedAnswer']['text'] ?? '', 'Nichts </script> passiert.', 'Antwort unverändert im JSON-LD');
         T::eq(substr_count($h, '<script'), substr_count($h, '</script>'), 'jedes Skript sauber geschlossen');
         T::notContains($h, '<script>alert', 'kein eingeschleustes Skript');
@@ -132,8 +134,10 @@ return [
         $text = json_decode((string) file_get_contents(H::testprofil() . '/profil.json'), true)['einwilligung'];
         T::eq($x->query('//input[@type="hidden" and @name="einwilligung_kurz" and @value="' . substr(hash('sha256', $text), 0, 12) . '"]')->length, 1, 'Kurzprüfsumme des Einwilligungstexts');
         foreach ($x->query('//input[@required]') as $in) {
-            T::eq($x->query('//*[@id="' . $in->getAttribute('aria-describedby') . '" and @hidden]')->length, 1, $in->getAttribute('name') . ': Fehlertext vorbereitet');
+            T::eq($x->query('//*[@id="' . $in->getAttribute('id') . '-fehler" and @hidden]')->length, 1, $in->getAttribute('name') . ': Fehlertext vorbereitet');
+            T::ok(!$in->hasAttribute('aria-describedby'), $in->getAttribute('name') . ': Fehlertext erst nach dem Absenden als Beschreibung (lp.js)');
         }
+        T::ok(!$form?->hasAttribute('novalidate'), 'ohne JavaScript prüft der Browser selbst (novalidate setzt erst lp.js)');
         T::eq($x->query('//fieldset[@disabled]')->length, 0, 'mit Ziel nicht gesperrt');
         T::notContains($h, 'wird gerade eingerichtet', 'kein Hinweis');
     },

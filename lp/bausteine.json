@@ -17,9 +17,15 @@
       "lp-fuss-links": "3.51.0", "lp-rechtsseite": "3.51.0"
     },
     "farbpaare": [
-      ["--text", "--bg", false], ["--heading", "--bg", true], ["--text-muted", "--bg", false],
-      ["--primary", "--bg", false], ["--text-on-primary", "--primary", false],
-      ["--focus", "--bg", true], ["#ffffff", "--focus", false]
+      ["--text", "--bg", false], ["--text", "--bg-alt", false], ["--text", "--card-bg", false], ["--text", "--lp-akzent", false],
+      ["--heading", "--bg", false], ["--heading", "--bg-alt", false], ["--heading", "--card-bg", false], ["--heading", "--lp-akzent", false],
+      ["--primary", "--bg", false], ["--primary", "--bg-alt", false], ["--primary", "--card-bg", false], ["--primary", "--lp-akzent", false],
+      ["--primary-dark", "--bg", false], ["--primary-dark", "--bg-alt", false], ["--primary-dark", "--card-bg", false], ["--primary-dark", "--lp-akzent", false],
+      ["--text-muted", "--bg", false], ["--text-muted", "--bg-alt", false], ["--text-muted", "--card-bg", false],
+      ["--text-on-primary", "--primary", false], ["--text-on-primary", "--primary-dark", false],
+      ["--error", "--card-bg", false],
+      ["--focus", "--bg", true], ["--focus", "--bg-alt", true], ["--focus", "--card-bg", true], ["--focus", "--lp-akzent", true],
+      ["#ffffff", "--focus", false]
     ]
   },
   "bausteine": {
@@ -38,7 +44,6 @@
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "zuerst": true, "genau_einmal": true },
-      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--primary", "--bg", false]],
       "beispiel": {
         "typ": "hero", "variante": "bild-rechts", "dachzeile": "Kostenloser Online-Abend",
         "titel": "Gesund durch den Winter", "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
@@ -63,7 +68,6 @@
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "hoechstens": 2 },
-      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--heading", "--lp-akzent", true], ["--text", "--lp-akzent", false]],
       "beispiel": {
         "typ": "termin", "variante": "karte", "titel": "Nächster Termin", "art": "online",
         "termine": [{ "beginn": "2099-10-06T19:00", "dauer_min": 60 }],
@@ -84,7 +88,6 @@
                     "eintrag": { "typ": "zeile", "label": "Punkt", "max": 120, "pflicht": true } }
       },
       "regeln": {},
-      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--primary", "--bg", true]],
       "beispiel": {
         "typ": "themen", "variante": "haken", "titel": "Darum geht es",
         "punkte": ["Wie das Immunsystem arbeitet", "Was Schlaf damit zu tun hat", "Drei einfache Gewohnheiten"]
@@ -105,7 +108,6 @@
         "vorschau": { "typ": "bild", "label": "Vorschaubild", "pflicht": true }
       },
       "regeln": {},
-      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--text-on-primary", "--primary", false]],
       "beispiel": {
         "typ": "video", "variante": "breit", "titel": "Kurz erklärt: Worum geht es?", "anbieter": "youtube", "kennung": "AbCdEfGhIjk",
         "vorschau": { "datei": "bestand/beispiel-video.webp" }
@@ -128,7 +130,6 @@
                                     "quelle": { "typ": "url", "label": "Quelle", "pflicht": true } } }
       },
       "regeln": {},
-      "farbpaare": [["--heading", "--bg-alt", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--primary", "--card-bg", false]],
       "beispiel": {
         "typ": "erfahrungen", "variante": "karten", "titel": "Das sagen Teilnehmer",
         "eintraege": [{ "text": "Sehr verständlich erklärt, ich habe viel mitgenommen.", "name": "Anna B.", "ort": "Graz",
@@ -148,7 +149,6 @@
                                  "antwort": { "typ": "absatz", "label": "Antwort", "max": 800, "pflicht": true } } }
       },
       "regeln": { "hoechstens": 1 },
-      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--heading", "--card-bg", false], ["--text", "--card-bg", false]],
       "beispiel": {
         "typ": "faq", "titel": "Häufige Fragen",
         "fragen": [{ "frage": "Kostet die Teilnahme etwas?", "antwort": "Nein, die Teilnahme ist kostenlos." }]
@@ -171,7 +171,6 @@
         "danke":      { "typ": "zeile", "label": "Dankestext", "max": 200, "pflicht": true }
       },
       "regeln": { "hoechstens": 1 },
-      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--error", "--card-bg", false], ["--text-on-primary", "--primary", false], ["--heading", "--bg-alt", true], ["--text", "--lp-akzent", false]],
       "beispiel": {
         "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt kostenlos anmelden",
         "felder": ["vorname", "email"], "knopf_text": "Ich bin dabei", "liste": "beispiel-abend",
@@ -187,10 +186,9 @@
       "felder": {
         "titel": { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
         "text":  { "typ": "absatz", "label": "Text", "max": 300 },
-        "knopf": { "typ": "knopf", "label": "Knopf", "pflicht": true }
+        "knopf": { "typ": "knopf", "label": "Knopf", "pflicht": true, "nur_anker": true }
       },
       "regeln": {},
-      "farbpaare": [["--heading", "--lp-akzent", true], ["--text", "--lp-akzent", false], ["--heading", "--bg", true], ["--text", "--bg", false]],
       "beispiel": {
         "typ": "abschluss", "variante": "akzent", "titel": "Sei dabei", "knopf": { "text": "Platz sichern", "ziel": "#anmeldung" }
       }

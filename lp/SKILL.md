@@ -12,6 +12,9 @@ Firma, Rechtstexte und Einwilligung kommen **nur** aus dem Profil — im Bauplan
 
 ## Ablauf
 
+`php` steht für PHP ab 8.2 mit mbstring: auf server7 `php` (8.3), auf server6 **`php8.2`** (dort ist `php` 8.5 ohne
+mbstring).
+
 ```bash
 php lp/neu.php <sammelordner> <slug> zoom-vortrag          # Ordner, Bauplan aus der Vorlage, Marke, git init
 php lp/profil-uebernehmen.php <seite> <sammelordner>/_profil  # Profil in die Seite kopieren (nur so ändert es sich)
@@ -24,6 +27,8 @@ php lp/sammelordner.php <sammelordner>                     # .htaccess des Samme
 Befunde kommen als JSON-Lines `{art, pfad, technik, kunde}`: `sperrend` verhindert Bau bzw. Freigabe, `hinweis` ist
 zum Gegenlesen. `kunde` nennt den Abschnitt mit Nummer und Namen und ist für den Kunden geschrieben.
 
+Im Profil optional: `--lp-logo-hoehe` (Höhe des Logos im Kopf, Vorgabe `3rem`).
+
 Bestehende Seiten baut immer der Stand ihrer Marke:
 `/home/pawbot/projects/endoskeleton-versionen/<Marke aus ENDOSKELETON>/lp/bauen.php`.
 
@@ -35,7 +40,11 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Links nur in Knöpfen (`knopf.ziel`) und Quellen (`url`): `#anker` auf der Seite oder `https://` auf einen Host aus
   `link_hosts` des Profils.
 - Bilder: `bestand/<datei>` aus `profil/bilder/` (Alt-Text aus `bilder.json`) oder `img/<datei>` im Seitenordner
-  (dann `alt` Pflicht, leer nur mit `"dekorativ": true`). WebP, höchstens 400 KB.
+  (dann `alt` Pflicht, leer nur mit `"dekorativ": true`). WebP, höchstens 400 KB. Bestandsbilder brauchen in
+  `bilder.json` `"freigegeben": true`; im Seitenordner liegen nur Bilder, die der Bauplan verwendet.
+- Sprungmarken (`anker`): `inhalt` und alles mit `lp-` sind vergeben. Der Abschluss-Knopf führt nur auf eine
+  Sprungmarke der Seite.
+- `meta.vorschaubild` wird ab Teil 4 (feste Adresse) als `og:image` ausgegeben; bis dahin nur geprüft.
 - Termine als `JJJJ-MM-TTTHH:MM` (Wiener Zeit). Gebaut werden alle; vergangene blendet `lp.js` aus. Sind alle vorbei,
   sperrt die Prüfung.
 - Ohne `formularziel` im Profil ist das Anmeldeformular sichtbar gesperrt und die Freigabe gesperrt.
@@ -262,7 +271,7 @@ Varianten: `akzent`, `schlicht` · seit 3.51.0, geändert 3.51.0
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
-| `knopf` | knopf | ja | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
+| `knopf` | knopf | ja | `{"text": ≤ 40 Zeichen, "ziel": "#anker"}` (nur Sprungmarken der Seite) |
 
 ```json
 {

@@ -18,7 +18,7 @@ return [
     'die acht Bausteine von 3.51.0' => static fn () => T::eq(array_keys($k->bausteine), ['hero', 'termin', 'themen', 'video', 'erfahrungen', 'faq', 'anmeldung', 'abschluss'], 'Typen'),
     'jeder Eintrag vollständig' => static function () use ($k, $version, $typen): void {
         foreach ($k->bausteine as $typ => $e) {
-            foreach (['name', 'seit', 'geaendert', 'klassen', 'varianten', 'felder', 'regeln', 'farbpaare', 'beispiel'] as $s) {
+            foreach (['name', 'seit', 'geaendert', 'klassen', 'varianten', 'felder', 'regeln', 'beispiel'] as $s) {
                 T::ok(array_key_exists($s, $e), "$typ: Schlüssel $s");
             }
             T::ok(version_compare($e['seit'], $version, '<=') && version_compare($e['geaendert'], $version, '<='), "$typ: seit/geändert ≤ VERSION");
@@ -31,8 +31,14 @@ return [
                 if ($s === 'typ') { T::ok(in_array($w, $typen, true), "$typ: Feldtyp $w bekannt"); }
             });
             foreach ($e['felder'] as $name => $f) { T::ok(isset($f['label']) && $f['label'] !== '', "$typ.$name: label"); }
-            foreach ($e['farbpaare'] as $paar) { T::ok(count($paar) === 3 && is_bool($paar[2]), "$typ: Farbpaar mit groß/klein"); }
         }
+    },
+    'Kontrast-Matrix: jede Schriftfarbe auf jeder Fläche' => static function () use ($k): void {
+        $paare = array_map(static fn ($p) => "$p[0] auf $p[1]", $k->rahmen['farbpaare']);
+        foreach (['--text', '--heading', '--primary', '--primary-dark'] as $schrift) {
+            foreach (['--bg', '--bg-alt', '--card-bg', '--lp-akzent'] as $flaeche) { T::ok(in_array("$schrift auf $flaeche", $paare, true), "$schrift auf $flaeche geprüft"); }
+        }
+        foreach ($k->rahmen['farbpaare'] as $p) { T::ok($p[2] === false || $p[0] === '--focus', "$p[0] auf $p[1]: nur der Fokusrahmen darf mit 3:1 auskommen"); }
     },
     'jedes Beispiel ist ein gültiger Baustein' => static function () use ($k): void {
         $p = Profil::laden(H::testprofil());

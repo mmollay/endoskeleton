@@ -32,7 +32,7 @@ body.lp-seite {
 }
 
 .lp-logo img {
-  height: 3rem;
+  height: var(--lp-logo-hoehe, 3rem);   /* optional im Profil, z. B. für ein hohes Logo */
   width: auto;
 }
 
@@ -50,8 +50,22 @@ section.lp-block {
   gap: var(--space-lg);
 }
 
-.lp-block-innen > * {
+.lp-block-innen > *,
+.lp-hero-text > * {
   min-width: 0;
+}
+
+/* Lange zusammengesetzte Wörter („Nahrungsergänzungsmittel") dürfen umbrechen statt die Seite zu verbreitern. */
+.lp-block h1,
+.lp-block h2,
+.lp-block h3,
+.lp-block p,
+.lp-block li,
+.lp-block summary,
+.lp-block label,
+.lp-block figcaption {
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .lp-block p,
@@ -496,8 +510,10 @@ section.lp-anmeldung {
   border: 0;
 }
 
-.lp-anmeldung--breit .lp-formular fieldset {
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+@media (min-width: 40rem) {
+  .lp-anmeldung--breit .lp-formular fieldset {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .lp-anmeldung--breit .lp-einwilligung,

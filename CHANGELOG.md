@@ -9,7 +9,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 ### Added
 - **Landingpage-Baukasten `lp/`** — Seiten aus festen Bausteinen (`seite.json`), gebaut von `lp/bauen.php` ohne Netz,
   KI und Uhr; Aussehen nur aus dem Kundenprofil. Prüfungen vor der Freigabe (`lp/pruefen.php`), Musterbuch, Skill.
-- **Tests** `php tests/run.php` (ohne Abhängigkeiten) und `node ci/browser.js`.
+- **Tests** `php tests/run.php` (ohne Abhängigkeiten) und `node ci/browser.js` (Scheinadresse `lp.test`, 320–1280 px).
+- **Versionsmarke** `ENDOSKELETON` je Landingpage und `<meta name="generator" content="SSI Endoskeleton 3.51.0">`;
+  `scripts/version-ablegen.sh` legt getaggte Stände schreibgeschützt nach `endoskeleton-versionen/<X.Y.Z>/` —
+  bestehende Seiten bauen immer mit dem Stand ihrer Marke.
+- Befehl `/endoskeleton` (`.claude/commands/endoskeleton.md`) neu: Arbeitskopie, Test zuerst, Gegenprobe, VERSION zuletzt.
+- Optionales Profil-Token `--lp-logo-hoehe` (Höhe des Logos im Kopf, Vorgabe `3rem`).
+
+### Bewusste Abweichungen vom Entwurf (27.09.2026)
+- Golddateien sind das gebaute Musterbuch (`musterbuch/`), keine eigenen `tests/gold/`.
+- Kontrast als Matrix im Rahmen (jede Schriftfarbe auf jeder Fläche, Knopfschrift auch auf der Hover-Farbe,
+  Fokusrahmen auf jeder Fläche) statt Farbpaaren je Baustein — die Paare je Baustein ließen genutzte Kombinationen aus.
+- `--lp-akzent` ist eine helle Fläche, nie Schriftfarbe.
+- `bauen.php` baut immer an Ort und Stelle (kein `--ziel`); der Prüfer vergleicht den Bau im Speicher.
+- `meta.vorschaubild` wird geprüft, aber erst ab Teil 4 (feste Adresse) als `og:image` ausgegeben.
+- Das Formularziel muss auf einem Host aus `link_hosts` liegen.
+
+### Fixed (nur Landingpages)
+- base.css schaltet bei „weniger Bewegung“ die Übergänge der Knöpfe nicht ab (die `*`-Regel verliert gegen `.btn`);
+  `lp.css` gleicht das für Landingpages aus. Bestehende Websites bleiben unverändert (Test `bestand`).
 
 ### Neue Klassen
 - Rahmen: `lp-seite`, `lp-kopf`, `lp-kopf-innen`, `lp-logo`, `lp-inhalt`, `lp-block`, `lp-block-innen`, `lp-titel`, `lp-knopf`, `lp-fuss`, `lp-fuss-innen`, `lp-fuss-firma`, `lp-fuss-links`, `lp-rechtsseite`

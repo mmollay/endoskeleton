@@ -17,7 +17,7 @@ final class Bauer
         $version = trim((string) file_get_contents("$endo/VERSION"));
         $marke = is_file("$seite/ENDOSKELETON") ? trim((string) file_get_contents("$seite/ENDOSKELETON")) : '';
         if (!preg_match('/^\d+\.\d+\.\d+$/', $marke) || $marke !== $version) {
-            throw new BauFehler("ENDOSKELETON der Seite ist „{$marke}\", dieser Stand ist $version — mit /home/pawbot/projects/endoskeleton-versionen/<Marke>/lp/bauen.php bauen");
+            throw new BauFehler("ENDOSKELETON der Seite ist „{$marke}“, dieser Stand ist $version — mit /home/pawbot/projects/endoskeleton-versionen/<Marke>/lp/bauen.php bauen");
         }
         if (!is_dir("$seite/profil")) {
             throw new BauFehler("$seite/profil fehlt — zuerst lp/profil-uebernehmen.php ausführen");
@@ -38,7 +38,7 @@ final class Bauer
         if (Befund::sperrt($befunde)) {
             return new Ergebnis($befunde);
         }
-        $befunde = array_merge($befunde, self::kontrast($katalog, $profil, $plan['bausteine']));
+        $befunde = array_merge($befunde, self::kontrast($katalog, $profil));
         if (Befund::sperrt($befunde)) {
             return new Ergebnis($befunde);
         }
@@ -56,7 +56,9 @@ final class Bauer
         $dateien['es/' . $logo] = (string) file_get_contents("$seite/profil/$logo");
         if (is_dir("$seite/profil/schrift")) {
             foreach (Dateien::eintraege("$seite/profil/schrift") as $s) {
-                $dateien["es/schrift/$s"] = (string) file_get_contents("$seite/profil/schrift/$s");
+                if (str_ends_with($s, '.woff2') && is_file("$seite/profil/schrift/$s") && !is_link("$seite/profil/schrift/$s")) {
+                    $dateien["es/schrift/$s"] = (string) file_get_contents("$seite/profil/schrift/$s");
+                }
             }
         }
         foreach ($k->kopien as $ziel => $quelle) {
@@ -96,30 +98,21 @@ final class Bauer
     }
 
     /**
-     * Farbpaare des Rahmens und jedes genutzten Bausteins gegen die Profilfarben.
+     * Kontrast als Matrix: jede Schriftfarbe auf jeder Fläche, Knopfschrift auch auf der Hover-Farbe, Fokusrahmen
+     * auf jeder Fläche (lp/bausteine.json „rahmen.farbpaare“). Text 4,5:1, Fokusrahmen 3:1 — auch für kleine,
+     * fette Schrift gilt 4,5:1 (Beschriftungen, Termindatum auf dem Handy, **fett** im Fließtext).
      * @return list<Befund>
      */
-    public static function kontrast(Katalog $katalog, Profil $profil, array $bausteine): array
+    public static function kontrast(Katalog $katalog, Profil $profil): array
     {
-        $tokens = $profil->tokens;
-        $befunde = Kontrast::pruefe($tokens, $katalog->rahmen['farbpaare'], 'profil.css', 'Seitenrahmen');
-        $gesehen = [];
-        foreach ($bausteine as $i => $b) {
-            $e = $katalog->baustein($b['typ']);
-            if (isset($gesehen[$b['typ']])) {
-                continue;
-            }
-            $gesehen[$b['typ']] = true;
-            $befunde = array_merge($befunde, Kontrast::pruefe($tokens, $e['farbpaare'], "bausteine.$i", 'Abschnitt ' . ($i + 1) . " „{$e['name']}\""));
-        }
-        return $befunde;
+        return Kontrast::pruefe($profil->tokens, $katalog->rahmen['farbpaare'], 'profil.css', 'Kundenprofil');
     }
 
     private static function css(string $endo, string $version, Profil $profil): string
     {
         $p = (string) Kontrast::hex($profil->tokens['--primary']);
         $rgb = implode(', ', array_map('hexdec', str_split(substr($p, 1), 2)));
-        return "/* SSI Endoskeleton $version — Landingpage: base.css + Profil „{$profil->daten['name']}\" {$profil->daten['version']} + lp.css */\n"
+        return "/* SSI Endoskeleton $version — Landingpage: base.css + Profil + lp.css */\n"
             . file_get_contents("$endo/base.css") . "\n"
             . $profil->css . "\n"
             . ":root {\n  --primary-rgb: $rgb;\n}\n\n"

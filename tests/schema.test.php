@@ -17,7 +17,7 @@ $pruefe = static fn (mixed $seite, ?string $ordner = null): array => Schema::pru
 $einer = static function (mixed $seite, string $teil, string $was, ?string $ordner = null) use ($pruefe): void {
     $befunde = $pruefe($seite, $ordner);
     $s = H::sperrend($befunde);
-    T::ok(count($s) === 1 && (str_contains($s[0]->pfad, $teil) || str_contains($s[0]->technik, $teil)), "$was — erwartet genau einen Befund mit „{$teil}\", bekommen:\n" . H::texte($befunde));
+    T::ok(count($s) === 1 && (str_contains($s[0]->pfad, $teil) || str_contains($s[0]->technik, $teil)), "$was — erwartet genau einen Befund mit „{$teil}“, bekommen:\n" . H::texte($befunde));
 };
 $alle = ['termin', 'themen', 'video', 'erfahrungen', 'faq', 'abschluss'];
 
@@ -67,7 +67,7 @@ return [
         $s = H::sperrend($pruefe(H::seite([$b('themen'), $b('video'), $b('termin'), $e])));
         T::eq(count($s), 1, 'ein Befund');
         T::eq($s[0]->pfad ?? '', 'bausteine.4.eintraege.0.text', 'Pfad');
-        T::eq($s[0]->kunde ?? '', 'Abschnitt 5 „Erfahrungen", Eintrag 1: „Text" ist 301 Zeichen lang, erlaubt sind 300.', 'Kundentext');
+        T::eq($s[0]->kunde ?? '', 'Abschnitt 5 „Erfahrungen“, Eintrag 1: „Text“ ist 301 Zeichen lang, erlaubt sind 300.', 'Kundentext');
     },
     'Formen der Felder' => static function () use ($einer, $b): void {
         $t = $b('termin'); $t['titel'] = 42;
@@ -101,7 +101,9 @@ return [
         $a = $b('abschluss'); $a['knopf']['ziel'] = 'javascript:alert(1)';
         $einer(H::seite([$a]), 'bausteine.1.knopf.ziel', 'javascript im Knopf');
         $a['knopf']['ziel'] = 'https://www.example.com/shop';
-        T::eq(H::texte($pruefe(H::seite([$a]))), '', 'Knopf auf erlaubten Host');
+        $einer(H::seite([$a]), 'bausteine.1.knopf.ziel', 'Abschluss-Knopf nur auf einen Anker der Seite');
+        $s = H::seite(); $s['bausteine'][0]['knopf']['ziel'] = 'https://www.example.com/shop';
+        T::eq(H::texte($pruefe($s)), '', 'Knopf im Kopfbereich darf auf einen erlaubten Host');
     },
     'Regeln: zuerst, genau einmal, höchstens' => static function () use ($einer, $pruefe, $b): void {
         $s = H::seite([$b('termin')]); $s['bausteine'] = [$s['bausteine'][1], $s['bausteine'][0], $s['bausteine'][2]];
@@ -118,6 +120,10 @@ return [
         $einer(H::seite([$t]), 'anmeldung', 'Anker doppelt');
         $t = $b('termin'); $t['anker'] = 'Termin 1';
         $einer(H::seite([$t]), 'bausteine.1.anker', 'ungültiger Anker');
+        foreach (['inhalt', 'lp-f-email', 'lp-a1-titel'] as $vergeben) {
+            $t = $b('termin'); $t['anker'] = $vergeben;
+            $einer(H::seite([$t]), 'bausteine.1.anker', "vergebene Sprungmarke $vergeben");
+        }
     },
     'Bilder aus Bestand und Seitenordner' => static function () use ($einer, $pruefe): void {
         $s = H::seite(); $s['bausteine'][0]['bild'] = ['datei' => 'bestand/fehlt.webp'];
@@ -137,6 +143,14 @@ return [
         $einer($s, 'bausteine.0.bild', 'Pfad aus dem Ordner hinaus', $ordner);
         $s['bausteine'][0]['bild'] = ['datei' => 'img/../img/eigenes.webp', 'alt' => 'x'];
         $einer($s, 'bausteine.0.bild', 'Pfad mit .. innerhalb von img/', $ordner);
+        file_put_contents("$ordner/img/kein-bild.webp", 'nur Text');
+        $s['bausteine'][0]['bild'] = ['datei' => 'img/kein-bild.webp', 'alt' => 'x'];
+        $einer($s, 'bausteine.0.bild', 'Datei ist kein Bild', $ordner);
+        copy(H::testprofil() . '/bilder/beispiel-video.webp', "$ordner/img/foto..webp");
+        $s['bausteine'][0]['bild'] = ['datei' => 'img/foto..webp', 'alt' => 'x'];
+        $einer($s, 'bausteine.0.bild', 'zwei Punkte im Namen', $ordner);
+        $s['bausteine'][0]['bild'] = ['datei' => 'bestand/beispiel-vortrag.webp', 'alt' => ''];
+        $einer($s, 'bausteine.0.bild.alt', 'leerer Alt-Text beim Bestandsbild ohne dekorativ', $ordner);
         $s['bausteine'][0]['bild'] = ['datei' => 'bestand/beispiel-vortrag.webp', 'breite' => 3];
         $einer($s, 'bausteine.0.bild.breite', 'unbekannter Schlüssel im Bild', $ordner);
     },

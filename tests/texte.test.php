@@ -20,8 +20,8 @@ return [
         });
         T::ok(count($texte) > 80, 'Texte gefunden: ' . count($texte));
         foreach ($texte as $t) {
-            T::ok(!preg_match(Pruefer::ASCII, $t, $m), "ASCII-Umlaut „" . ($m[0] ?? '') . "\" in „{$t}\"");
-            T::ok(!preg_match('/lorem ipsum|\{\{|\bTODO\b/i', $t), "Platzhalter in „{$t}\"");
+            T::ok(!preg_match(Pruefer::ASCII, $t, $m), "ASCII-Umlaut „" . ($m[0] ?? '') . "“ in „{$t}“");
+            T::ok(!preg_match('/lorem ipsum|\{\{|\bTODO\b/i', $t), "Platzhalter in „{$t}“");
         }
     },
     'sichtbarer Text der gebauten Seite ohne ASCII-Umlaute' => static function (): void {
@@ -30,7 +30,7 @@ return [
         Bauer::bauen($o);
         foreach (['index.html', 'impressum.html', 'datenschutz.html'] as $f) {
             $text = html_entity_decode(strip_tags((string) preg_replace('#<(script|style)\b.*?</\1>#s', '', (string) file_get_contents("$o/$f"))), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            T::ok(!preg_match(Pruefer::ASCII, $text, $m), "$f: ASCII-Umlaut „" . ($m[0] ?? '') . '"');
+            T::ok(!preg_match(Pruefer::ASCII, $text, $m), "$f: ASCII-Umlaut „" . ($m[0] ?? '') . '“');
             T::ok((bool) preg_match('/[äöüßÄÖÜ]/u', $text), "$f: echte Umlaute");
         }
     },
