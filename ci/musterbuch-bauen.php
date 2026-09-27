@@ -38,6 +38,8 @@ if ($args !== [] || !is_dir($profil) || (file_exists($ziel) && !$frueher && (!is
 $version = trim((string) file_get_contents("$w/VERSION"));
 $k = Katalog::laden();
 Dateien::loeschen($ziel);
+// Markierung zuerst: auch ein abgebrochener Bau bleibt als Musterbuch erkennbar und darf ersetzt werden.
+Dateien::schreiben("$ziel/.musterbuch", "Musterbuch, gebaut von ci/musterbuch-bauen.php — wird beim nächsten Bau ersetzt.\n");
 $liste = [];
 foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
     $name = basename($fixture, '.json');
@@ -76,7 +78,6 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
     $liste[] = sprintf('<li><a href="%s/">%s – %s</a> <span>(seit %s, geändert %s)</span></li>', $name, Text::e($b['name']), Text::e($variante), $b['seit'], $b['geaendert']);
 }
 Sammelordner::schreiben($ziel);
-Dateien::schreiben("$ziel/.musterbuch", "Musterbuch, gebaut von ci/musterbuch-bauen.php — wird beim nächsten Bau ersetzt.\n");
 $css = substr(hash_file('sha256', "$ziel/hero--schlicht/es/lp.css"), 0, 10);
 Dateien::schreiben("$ziel/index.html", <<<HTML
 <!DOCTYPE html>
