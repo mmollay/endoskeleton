@@ -24,7 +24,7 @@
     {
       "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt kostenlos anmelden",
       "felder": ["vorname", "email"], "knopf_text": "Ich bin dabei", "liste": "{{name-der-liste}}",
-      "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail, die wir dir gerade geschickt haben."
+      "danke": "Danke! Bitte bestätige deine Anmeldung mit dem Link in unserer E-Mail."
     },
     {
       "typ": "abschluss", "variante": "akzent", "titel": "Sei dabei",
