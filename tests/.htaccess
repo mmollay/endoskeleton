@@ -1,0 +1,2 @@
+# Tests sind keine Webseite: alles 404 (nie „Require all denied" — fail2ban auf server7).
+RedirectMatch 404 ".*"
