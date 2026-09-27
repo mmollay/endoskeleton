@@ -4,7 +4,8 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  * Anmeldung: Felder mit Label, autocomplete und Fehlertext (als Beschreibung erst nach dem Absenden, lp.js); Einwilligung aus dem Profil, nie vorangehakt; Honigtopf;
  * Liste und Kurzprüfsumme des Einwilligungstexts als versteckte Felder. Ohne Formularziel sichtbar gesperrt
  * (Livegang gesperrt, bis die Anbindung steht). Rückmeldungen der Weiterleitung (?anmeldung=ok|bereits|fehler)
- * liegen versteckt bereit; lp.js zeigt und fokussiert die passende. @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ * liegen versteckt bereit; lp.js zeigt und fokussiert die passende. Ohne JavaScript bleibt es beim Formular, ein
+ * <noscript>-Hinweis erklärt den Ablauf per E-Mail. @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
@@ -50,6 +51,9 @@ $felder = [
 <input type="hidden" name="einwilligung_kurz" value="<?= substr(hash('sha256', (string) $p['einwilligung']), 0, 12) ?>">
 <button type="submit" class="btn btn-primary lp-knopf"><?= $k->e($b['knopf_text']) ?></button>
 </fieldset>
+<?php if ($ziel !== ''): ?>
+<noscript><p class="lp-anmeldung-hinweis"><?= $k->e($k->du('Nach dem Absenden bekommst du eine E-Mail von uns. Kommt keine an, schau bitte im Spam-Ordner nach und versuche es sonst noch einmal.', 'Nach dem Absenden bekommen Sie eine E-Mail von uns. Kommt keine an, sehen Sie bitte im Spam-Ordner nach und versuchen Sie es sonst noch einmal.')) ?></p></noscript>
+<?php endif ?>
 <p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><?= $k->e($b['danke']) ?></p>
 <p class="lp-anmeldung-bereits" role="status" tabindex="-1" hidden><?= $k->e($k->du('Du bist bereits angemeldet. Unsere E-Mail findest du in deinem Postfach – schau bitte auch im Spam-Ordner nach.', 'Sie sind bereits angemeldet. Unsere E-Mail finden Sie in Ihrem Postfach – sehen Sie bitte auch im Spam-Ordner nach.')) ?></p>
 </form>

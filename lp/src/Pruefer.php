@@ -337,6 +337,13 @@ final class Pruefer
             $this->sperrend('profil.formularziel', 'formularziel leer — Anmeldung nicht angebunden (Teil 5)',
                 'Das Anmeldeformular ist noch nicht angebunden — die Seite kann noch nicht veröffentlicht werden.');
         }
+        // Die Weiterleitung springt immer auf #anmeldung zurück; ohne diese Sprungmarke landet man am Seitenanfang.
+        foreach ($this->plan['bausteine'] as $i => $b) {
+            if (($b['typ'] ?? null) === 'anmeldung' && ($b['anker'] ?? null) !== 'anmeldung') {
+                $this->sperrend("bausteine.$i.anker", 'Anmeldung ohne anker "anmeldung" — der Rücksprung ?anmeldung=…#anmeldung ginge an den Seitenanfang',
+                    $this->wo("bausteine.$i") . ': Die Sprungmarke muss „anmeldung“ heißen, damit man nach dem Absenden wieder beim Formular landet.');
+            }
+        }
         $html = (string) @file_get_contents("$this->seite/index.html");
         if (!preg_match('/<input[^>]*name="einwilligung"[^>]*>/', $html, $m) || !str_contains($m[0], ' required')) {
             $this->sperrend('index.html', 'Einwilligung fehlt im Formular', 'Im Anmeldeformular fehlt die Einwilligung.');

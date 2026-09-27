@@ -52,6 +52,14 @@ return [
     'ohne Formularziel ist der Livegang gesperrt' => static function () use ($pruefe, $hat, $profilMit): void {
         $hat($pruefe(H::seite(), $profilMit(static fn ($j) => ['formularziel' => ''] + $j)), 'sperrend', 'formularziel', 'Anmeldung nicht angebunden');
     },
+    'Anmeldung ohne Sprungmarke „anmeldung“ sperrt (Rücksprung der Weiterleitung geht auf #anmeldung)' => static function () use ($pruefe, $hat): void {
+        $s = H::seite();
+        $n = count($s['bausteine']) - 1;
+        unset($s['bausteine'][0]['knopf'], $s['bausteine'][$n]['anker']);
+        $hat($pruefe($s), 'sperrend', "bausteine.$n.anker", 'Anmeldung ohne Sprungmarke');
+        $s['bausteine'][$n]['anker'] = 'mitmachen';
+        $hat($pruefe($s), 'sperrend', "bausteine.$n.anker", 'Anmeldung mit anderer Sprungmarke');
+    },
     'Termine: alle vergangen sperrt, einzelne und baldige sind Hinweise' => static function () use ($pruefe, $hat, $b): void {
         $t = $b('termin');
         $t['termine'] = [['beginn' => '2026-09-01T19:00', 'dauer_min' => 60], ['beginn' => '2026-10-06T19:00', 'dauer_min' => 60]];

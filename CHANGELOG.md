@@ -18,7 +18,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - **Rückmeldung nach dem Absenden:** Die Anmeldung trägt drei versteckte Meldungen (`role="status"`): Dank aus dem
   Bauplan, „bereits angemeldet“ und „Fehler“ (du/Sie aus dem Profil). Die Weiterleitungsstelle leitet mit
   `?anmeldung=ok|bereits|fehler#anmeldung` zurück; `lp.js` zeigt und fokussiert die passende Meldung und blendet bei
-  `ok` und `bereits` die Felder aus. Unbekannte Werte bleiben ohne Wirkung.
+  `ok` und `bereits` die Felder aus. Unbekannte Werte bleiben ohne Wirkung. Ins Bild kommt die Meldung durch den
+  Fokus, nicht durch die Sprungmarke: Die nimmt `lp.js` vorher aus der Adresse (Browsertest bei 390×300 px). Ohne
+  JavaScript springt der Browser nur zum Formular; ein `<noscript>`-Hinweis verweist auf die E-Mail. Die Prüfung
+  sperrt eine Anmeldung ohne `"anker": "anmeldung"`.
 
 ### Bewusste Abweichungen vom Entwurf (27.09.2026)
 - Golddateien sind das gebaute Musterbuch (`musterbuch/`), keine eigenen `tests/gold/`.
