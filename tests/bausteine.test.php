@@ -147,6 +147,26 @@ return [
         T::eq($x->query('//form[@action]')->length, 0, 'kein Ziel');
         T::contains((string) $x->query('//*[contains(@class,"lp-anmeldung-hinweis")]')->item(0)?->textContent, 'wird gerade eingerichtet', 'Hinweis sichtbar');
     },
+    'anmeldung: Rückmeldungen nach dem Absenden (?anmeldung=ok|bereits|fehler) vorbereitet, versteckt, du/Sie' => static function () use ($bau, $profilMit): void {
+        [$h, $x] = $bau(H::seite());
+        $meldung = static fn (string $klasse) => $x->query("//form[contains(@class,\"lp-formular\")]/p[contains(concat(' ', @class, ' '), ' $klasse ')]");
+        foreach (['lp-anmeldung-danke', 'lp-anmeldung-bereits', 'lp-anmeldung-fehler'] as $klasse) {
+            T::eq($meldung($klasse)->length, 1, "$klasse: genau einmal im Formular");
+            $p = $meldung($klasse)->item(0);
+            T::ok($p !== null && $p->hasAttribute('hidden'), "$klasse: ohne Rückmeldung versteckt");
+            T::eq($p?->getAttribute('role'), 'status', "$klasse: role=status");
+            T::eq($p?->getAttribute('tabindex'), '-1', "$klasse: fokussierbar für lp.js, aber kein Tab-Halt");
+        }
+        T::eq(trim((string) $meldung('lp-anmeldung-danke')->item(0)?->textContent), 'Danke! Bitte bestätige deine Anmeldung in der E-Mail.', 'ok: Dankestext aus dem Bauplan');
+        T::contains((string) $meldung('lp-anmeldung-bereits')->item(0)?->textContent, 'Du bist bereits angemeldet.', 'bereits: du');
+        T::contains((string) $meldung('lp-anmeldung-fehler')->item(0)?->textContent, 'Bitte prüfe deine Angaben und versuche es noch einmal.', 'fehler: du');
+        T::eq($x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-fehler")]/following-sibling::fieldset')->length, 1, 'fehler: Meldung steht vor den Feldern');
+        [$h] = $bau(H::seite(), $profilMit(static fn ($j) => ['anrede' => 'Sie'] + $j));
+        T::contains($h, 'Sie sind bereits angemeldet.', 'bereits: Sie');
+        T::contains($h, 'Bitte prüfen Sie Ihre Angaben und versuchen Sie es noch einmal.', 'fehler: Sie');
+        T::notContains($h, 'Du bist bereits', 'bereits: kein du');
+        T::notContains($h, 'Bitte prüfe deine', 'fehler: kein du');
+    },
     'Anrede aus dem Profil' => static function () use ($bau, $profilMit): void {
         [$h] = $bau(H::seite());
         T::contains($h, 'Bitte gib deine E-Mail-Adresse ein.', 'du');

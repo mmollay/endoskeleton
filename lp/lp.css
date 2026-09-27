@@ -593,9 +593,22 @@ section.lp-anmeldung {
   cursor: not-allowed;
 }
 
-.lp-anmeldung-danke {
+/* Rückmeldungen nach dem Absenden (?anmeldung=…, lp.js): umrandete Kästchen auf der Karte (--card-bg) — --heading
+   und --error auf --card-bg prüft die Kontrast-Matrix. Der Rahmen gibt auch dem Fokusrahmen einen sauberen Sitz. */
+.lp-formular .lp-anmeldung-danke,
+.lp-formular .lp-anmeldung-bereits,
+.lp-formular .lp-anmeldung-fehler {
+  margin: 0;                 /* Abstände setzt das Raster; „.lp-block p + p“ träfe sonst die zweite Meldung */
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
   font-weight: 600;
   color: var(--heading);
+}
+
+.lp-formular .lp-anmeldung-fehler {
+  border-color: var(--error);
+  color: var(--error);
 }
 
 /* ─── ABSCHLUSS ─────────────────────────────────────────────────────────── */

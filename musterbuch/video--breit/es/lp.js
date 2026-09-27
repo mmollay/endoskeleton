@@ -1,4 +1,4 @@
-/* SSI Endoskeleton — Landingpage-Baukasten: Video erst nach Klick, vergangene Termine ausblenden, Formularprüfung. */
+/* SSI Endoskeleton — Landingpage-Baukasten: Video erst nach Klick, vergangene Termine ausblenden, Formular und Rückmeldung. */
 (function () {
   'use strict';
 
@@ -28,9 +28,23 @@
     }
   });
 
+  // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|bereits|fehler#anmeldung): Meldung zeigen und fokussieren, bei
+  // ok und bereits ohne Felder; andere Werte wirken nicht. Beides verschwindet aus der Adresse — sonst nimmt Chrome beim
+  // Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte Adresse zeigte die Meldung statt des Formulars.
+  var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-bereits', fehler: '.lp-anmeldung-fehler' };
+  var adresse = new URL(location.href), zustand = adresse.searchParams.get('anmeldung');
+
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
   // Ohne JavaScript prüft der Browser selbst (required); mit JavaScript übernehmen die eigenen Meldungen.
   document.querySelectorAll('form.lp-formular').forEach(function (form) {
+    var meldung = Object.prototype.hasOwnProperty.call(meldungen, zustand) && form.querySelector(meldungen[zustand]);
+    if (meldung) {
+      meldung.hidden = false;
+      if (zustand !== 'fehler') { form.querySelector('fieldset').hidden = true; }
+      adresse.searchParams.delete('anmeldung'); adresse.hash = '';
+      try { history.replaceState(history.state, '', adresse.href); } catch (e) { /* ohne Verlauf nur ohne Fokus */ }
+      meldung.focus();
+    }
     form.noValidate = true;
     form.addEventListener('submit', function (ereignis) {
       var erstes = null;

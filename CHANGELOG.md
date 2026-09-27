@@ -15,6 +15,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
   bestehende Seiten bauen immer mit dem Stand ihrer Marke.
 - Befehl `/endoskeleton` (`.claude/commands/endoskeleton.md`) neu: Arbeitskopie, Test zuerst, Gegenprobe, VERSION zuletzt.
 - Optionales Profil-Token `--lp-logo-hoehe` (Höhe des Logos im Kopf, Vorgabe `3rem`).
+- **Rückmeldung nach dem Absenden:** Die Anmeldung trägt drei versteckte Meldungen (`role="status"`): Dank aus dem
+  Bauplan, „bereits angemeldet“ und „Fehler“ (du/Sie aus dem Profil). Die Weiterleitungsstelle leitet mit
+  `?anmeldung=ok|bereits|fehler#anmeldung` zurück; `lp.js` zeigt und fokussiert die passende Meldung und blendet bei
+  `ok` und `bereits` die Felder aus. Unbekannte Werte bleiben ohne Wirkung.
 
 ### Bewusste Abweichungen vom Entwurf (27.09.2026)
 - Golddateien sind das gebaute Musterbuch (`musterbuch/`), keine eigenen `tests/gold/`.
@@ -37,7 +41,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - Video (`video`): `lp-video`, `lp-video--breit`, `lp-video--mit-text`, `lp-video-rahmen`, `lp-video-start`, `lp-video-bild`, `lp-video-link`, `lp-video-text`
 - Erfahrungen (`erfahrungen`): `lp-erfahrungen`, `lp-erfahrungen--karten`, `lp-erfahrungen--einzeln`, `lp-erfahrungen-liste`, `lp-erfahrung`, `lp-erfahrung-text`, `lp-erfahrung-name`, `lp-erfahrung-quelle`
 - Häufige Fragen (`faq`): `lp-faq`, `lp-faq--standard`, `lp-faq-liste`, `lp-faq-frage`, `lp-faq-antwort`
-- Anmeldung (`anmeldung`): `lp-anmeldung`, `lp-anmeldung--karte`, `lp-anmeldung--breit`, `lp-formular`, `lp-feld`, `lp-feld-fehler`, `lp-einwilligung`, `lp-anmeldung-hinweis`, `lp-anmeldung-danke`
+- Anmeldung (`anmeldung`): `lp-anmeldung`, `lp-anmeldung--karte`, `lp-anmeldung--breit`, `lp-formular`, `lp-feld`, `lp-feld-fehler`, `lp-einwilligung`, `lp-anmeldung-hinweis`, `lp-anmeldung-danke`, `lp-anmeldung-bereits`, `lp-anmeldung-fehler`
 - Abschluss (`abschluss`): `lp-abschluss`, `lp-abschluss--akzent`, `lp-abschluss--schlicht`, `lp-abschluss-text`
 
 ### Changed
