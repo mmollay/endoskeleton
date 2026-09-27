@@ -10,8 +10,8 @@ return [
         T::eq(round(Kontrast::verhaeltnis('#000000', '#ffffff'), 2), 21.0, 'Schwarz auf Weiß');
         T::eq(round(Kontrast::verhaeltnis('#fff', '#000'), 2), 21.0, 'Kurzform und Reihenfolge egal');
         T::eq(round(Kontrast::verhaeltnis('#777777', '#ffffff'), 2), 4.48, '#777 auf Weiß');
-        T::eq(round(Kontrast::verhaeltnis('#76ad23', '#ffffff'), 2), 2.7, 'Hellgrün auf Weiß');
-        T::eq(round(Kontrast::verhaeltnis('#4d7a12', '#ffffff'), 2), 5.11, 'Dunkelgrün auf Weiß');
+        T::eq(round(Kontrast::verhaeltnis('#949494', '#ffffff'), 2), 3.03, 'Hellgrau auf Weiß');
+        T::eq(round(Kontrast::verhaeltnis('#3b7d3b', '#ffffff'), 2), 5.02, 'Grün auf Weiß');
     },
     'Hex normalisieren' => static function (): void {
         T::eq(Kontrast::hex('#ABC'), '#aabbcc', 'Kurzform');
@@ -20,7 +20,7 @@ return [
         T::eq(Kontrast::hex('#abcd'), null, 'vierstellig ist kein Hex');
     },
     'Farbpaare eines Profils prüfen' => static function (): void {
-        $tokens = ['--text' => '#777777', '--bg' => '#ffffff', '--heading' => '#777777', '--primary' => '#4d7a12'];
+        $tokens = ['--text' => '#777777', '--bg' => '#ffffff', '--heading' => '#777777', '--primary' => '#3b7d3b'];
         $b = Kontrast::pruefe($tokens, [['--text', '--bg', false], ['--heading', '--bg', true], ['--primary', '--bg', false]], 'bausteine.hero', 'Abschnitt „Kopfbereich"');
         T::eq(count($b), 1, 'nur der Fließtext fällt durch (große Schrift reicht 3:1)');
         T::eq($b[0]->art ?? '', 'sperrend', 'sperrend');
