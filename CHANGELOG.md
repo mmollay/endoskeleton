@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.51.0] — 2026-09-27
+
+### Added
+- **Landingpage-Baukasten `lp/`** — Seiten aus festen Bausteinen (`seite.json`), gebaut von `lp/bauen.php` ohne Netz,
+  KI und Uhr; Aussehen nur aus dem Kundenprofil. Prüfungen vor der Freigabe (`lp/pruefen.php`), Musterbuch, Skill.
+- **Tests** `php tests/run.php` (ohne Abhängigkeiten) und `node ci/browser.js`.
+
+### Changed
+- Versionsangaben vereinheitlicht: VERSION, Konfigurator (`ENDO_VERSION`, `?v=`) und package.json nennen 3.51.0
+  (vorher 3.50.1 / 3.49.3 / 4.6.7).
+
 ## [3.50.1] — 2026-09-24
 
 ### Security
