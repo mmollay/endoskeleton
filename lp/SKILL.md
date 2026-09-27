@@ -48,10 +48,13 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Termine als `JJJJ-MM-TTTHH:MM` (Wiener Zeit). Gebaut werden alle; vergangene blendet `lp.js` aus. Sind alle vorbei,
   sperrt die Prüfung.
 - Ohne `formularziel` im Profil ist das Anmeldeformular sichtbar gesperrt und die Freigabe gesperrt.
-- Das Formularziel antwortet immer mit 303 zurück auf die Seite: `?anmeldung=ok|bereits|fehler#anmeldung`. `lp.js`
-  zeigt dann den Dankestext (`danke`), „bereits angemeldet“ oder „Fehler“ (Texte fest, du/Sie aus dem Profil) und
-  fokussiert ihn — das bringt ihn ins Bild, die Sprungmarke nimmt `lp.js` aus der Adresse. Ohne JavaScript gibt es auf
-  der Seite keine Rückmeldung: Der Browser springt nur zum Formular, ein `<noscript>`-Hinweis verweist auf die E-Mail.
+- Das Formularziel antwortet immer mit 303 zurück auf die Seite: `?anmeldung=ok|fehler#anmeldung`. `lp.js` zeigt
+  dann den Dankestext (`danke`, ein ganzer Satz) mit dem festen Zusatzsatz „Falls du schon angemeldet warst, bekommst
+  du keine neue E-Mail.“ oder „Fehler“ (Texte fest, du/Sie aus dem Profil) und fokussiert ihn — das bringt ihn ins
+  Bild, die Sprungmarke nimmt `lp.js` aus der Adresse. Ohne JavaScript gibt es auf der Seite keine Rückmeldung: Der
+  Browser springt nur zum Formular, ein `<noscript>`-Hinweis verweist auf die E-Mail.
+- Datenschutz: Die Seite verrät nie, ob eine Adresse schon auf der Liste steht — keine Meldung „bereits angemeldet“.
+  Ein `?anmeldung=bereits` (älterer Stand der Weiterleitungsstelle) zeigt `lp.js` genau wie `ok`.
 - Die Anmeldung trägt immer `"anker": "anmeldung"` (Ziel des Rücksprungs); sonst sperrt die Prüfung.
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
