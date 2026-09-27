@@ -60,6 +60,11 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
             }
         }
         Dateien::schreiben("$o/profil/bilder/bilder.json", json_encode($bilder, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n");
+        // … ebenso die Beispiel-Adressen, auf die die Fixtures verlinken
+        $pj = json_decode((string) file_get_contents("$o/profil/profil.json"), true);
+        $test = json_decode((string) file_get_contents("$w/lp/musterbuch/_testprofil/profil.json"), true);
+        $pj['link_hosts'] = array_values(array_unique(array_merge($pj['link_hosts'], $test['link_hosts'])));
+        Dateien::schreiben("$o/profil/profil.json", json_encode($pj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n");
     }
     $e = Bauer::bauen($o);
     if (Befund::sperrt($e->befunde)) {

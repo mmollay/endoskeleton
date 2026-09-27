@@ -29,6 +29,9 @@ $tests = [
         file_put_contents("$p/profil.css", str_replace(['--primary: #1d5c8c;', '--card-bg: #fbfcfe;'], ['--primary: #7a1d5c;', '--card-bg: #ffffff;'], (string) file_get_contents("$p/profil.css")));
         foreach (glob("$p/bilder/*.webp") ?: [] as $f) { unlink($f); }
         file_put_contents("$p/bilder/bilder.json", '[]');
+        $pj = json_decode((string) file_get_contents("$p/profil.json"), true);
+        $pj['link_hosts'] = ['beispiel.invalid'];   // Kunde ohne die Beispiel-Hosts der Fixtures
+        file_put_contents("$p/profil.json", json_encode($pj, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         $ziel = T::tmp() . '/_musterbuch';
         $repoVorher = hash_file('sha256', "$w/musterbuch/hero--schlicht/index.html");
         exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($ziel) . ' 2>&1', $aus, $rc);
