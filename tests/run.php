@@ -80,7 +80,12 @@ sort($files);
 foreach ($files as $file) {
     $name = basename($file, '.test.php');
     if ($filter !== '' && $name !== $filter) { continue; }
-    $tests = require $file;
+    try {
+        $tests = require $file;
+    } catch (\Throwable $e) {
+        T::$failures[] = "$name — Testdatei nicht ladbar: " . get_class($e) . ': ' . $e->getMessage();
+        continue;
+    }
     foreach ($tests as $label => $fn) {
         T::$current = "$name/$label";
         try {

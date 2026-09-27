@@ -1,0 +1,199 @@
+{
+  "version": "3.51.0",
+  "seite": {
+    "felder": {
+      "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
+      "beschreibung": { "typ": "zeile", "label": "Beschreibung für Suchmaschinen", "max": 160, "pflicht": true },
+      "vorschaubild": { "typ": "bilddatei", "label": "Vorschaubild" },
+      "indexieren":   { "typ": "janein", "label": "In Suchmaschinen zeigen" }
+    }
+  },
+  "rahmen": {
+    "name": "Rahmen",
+    "klassen": {
+      "lp-seite": "3.51.0", "lp-kopf": "3.51.0", "lp-kopf-innen": "3.51.0", "lp-logo": "3.51.0",
+      "lp-inhalt": "3.51.0", "lp-block": "3.51.0", "lp-block-innen": "3.51.0", "lp-titel": "3.51.0",
+      "lp-knopf": "3.51.0", "lp-fuss": "3.51.0", "lp-fuss-innen": "3.51.0", "lp-fuss-firma": "3.51.0",
+      "lp-fuss-links": "3.51.0", "lp-rechtsseite": "3.51.0"
+    },
+    "farbpaare": [
+      ["--text", "--bg", false], ["--heading", "--bg", true], ["--text-muted", "--bg", false],
+      ["--primary", "--bg", false], ["--text-on-primary", "--primary", false],
+      ["--focus", "--bg", true], ["#ffffff", "--focus", false]
+    ]
+  },
+  "bausteine": {
+    "hero": {
+      "name": "Kopfbereich", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-hero": "3.51.0", "lp-hero--bild-rechts": "3.51.0", "lp-hero--bild-hinten": "3.51.0", "lp-hero--schlicht": "3.51.0",
+        "lp-hero-text": "3.51.0", "lp-hero-dachzeile": "3.51.0", "lp-hero-titel": "3.51.0", "lp-hero-bild": "3.51.0"
+      },
+      "varianten": ["bild-rechts", "bild-hinten", "schlicht"],
+      "felder": {
+        "dachzeile": { "typ": "zeile", "label": "Dachzeile", "max": 60 },
+        "titel":     { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+        "text":      { "typ": "absatz", "label": "Text", "max": 400 },
+        "bild":      { "typ": "bild", "label": "Bild", "pflicht_bei": ["bild-rechts", "bild-hinten"] },
+        "knopf":     { "typ": "knopf", "label": "Knopf" }
+      },
+      "regeln": { "zuerst": true, "genau_einmal": true },
+      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--primary", "--bg", false]],
+      "beispiel": {
+        "typ": "hero", "variante": "bild-rechts", "dachzeile": "Kostenloser Online-Abend",
+        "titel": "Gesund durch den Winter", "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
+        "bild": { "datei": "bestand/beispiel-vortrag.webp" }, "knopf": { "text": "Kostenlos anmelden", "ziel": "#anmeldung" }
+      }
+    },
+    "termin": {
+      "name": "Termin", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-termin": "3.51.0", "lp-termin--karte": "3.51.0", "lp-termin--band": "3.51.0", "lp-termin-liste": "3.51.0",
+        "lp-termin-eintrag": "3.51.0", "lp-termin-zeit": "3.51.0", "lp-termin-ort": "3.51.0", "lp-termin-leer": "3.51.0"
+      },
+      "varianten": ["karte", "band"],
+      "felder": {
+        "titel":     { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "art":       { "typ": "auswahl", "label": "Art", "werte": ["online", "vor_ort"] },
+        "termine":   { "typ": "liste", "label": "Termine", "min": 1, "max": 6, "pflicht": true,
+                       "eintrag": { "beginn": { "typ": "zeitpunkt", "label": "Beginn", "pflicht": true },
+                                    "dauer_min": { "typ": "zahl", "label": "Dauer in Minuten", "min": 15, "max": 600 } } },
+        "ort":       { "typ": "zeile", "label": "Ort", "max": 120, "pflicht": true },
+        "wenn_leer": { "typ": "zeile", "label": "Text ohne Termin", "max": 120, "pflicht": true },
+        "knopf":     { "typ": "knopf", "label": "Knopf" }
+      },
+      "regeln": { "hoechstens": 2 },
+      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--heading", "--lp-akzent", true], ["--text", "--lp-akzent", false]],
+      "beispiel": {
+        "typ": "termin", "variante": "karte", "titel": "Nächster Termin", "art": "online",
+        "termine": [{ "beginn": "2099-10-06T19:00", "dauer_min": 60 }],
+        "ort": "Online über Zoom – den Link bekommst du per E-Mail", "wenn_leer": "Der nächste Termin steht bald fest."
+      }
+    },
+    "themen": {
+      "name": "Themen", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-themen": "3.51.0", "lp-themen--haken": "3.51.0", "lp-themen--zwei-spalten": "3.51.0",
+        "lp-themen-liste": "3.51.0", "lp-themen-punkt": "3.51.0"
+      },
+      "varianten": ["haken", "zwei-spalten"],
+      "felder": {
+        "titel":  { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":   { "typ": "absatz", "label": "Text", "max": 300 },
+        "punkte": { "typ": "liste", "label": "Punkte", "min": 2, "max": 12, "pflicht": true,
+                    "eintrag": { "typ": "zeile", "label": "Punkt", "max": 120, "pflicht": true } }
+      },
+      "regeln": {},
+      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--primary", "--bg", true]],
+      "beispiel": {
+        "typ": "themen", "variante": "haken", "titel": "Darum geht es",
+        "punkte": ["Wie das Immunsystem arbeitet", "Was Schlaf damit zu tun hat", "Drei einfache Gewohnheiten"]
+      }
+    },
+    "video": {
+      "name": "Video", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-video": "3.51.0", "lp-video--breit": "3.51.0", "lp-video--mit-text": "3.51.0", "lp-video-rahmen": "3.51.0",
+        "lp-video-start": "3.51.0", "lp-video-bild": "3.51.0", "lp-video-link": "3.51.0", "lp-video-text": "3.51.0"
+      },
+      "varianten": ["breit", "mit-text"],
+      "felder": {
+        "titel":    { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+        "text":     { "typ": "absatz", "label": "Text", "max": 400, "pflicht_bei": ["mit-text"] },
+        "anbieter": { "typ": "auswahl", "label": "Anbieter", "werte": ["youtube"], "pflicht": true },
+        "kennung":  { "typ": "kennung", "label": "Video-Kennung", "muster": "^[A-Za-z0-9_-]{11}$", "pflicht": true },
+        "vorschau": { "typ": "bild", "label": "Vorschaubild", "pflicht": true }
+      },
+      "regeln": {},
+      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--text-on-primary", "--primary", false]],
+      "beispiel": {
+        "typ": "video", "variante": "breit", "titel": "Kurz erklärt: Worum geht es?", "anbieter": "youtube", "kennung": "AbCdEfGhIjk",
+        "vorschau": { "datei": "bestand/beispiel-video.webp" }
+      }
+    },
+    "erfahrungen": {
+      "name": "Erfahrungen", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-erfahrungen": "3.51.0", "lp-erfahrungen--karten": "3.51.0", "lp-erfahrungen--einzeln": "3.51.0",
+        "lp-erfahrungen-liste": "3.51.0", "lp-erfahrung": "3.51.0", "lp-erfahrung-text": "3.51.0",
+        "lp-erfahrung-name": "3.51.0", "lp-erfahrung-quelle": "3.51.0"
+      },
+      "varianten": ["karten", "einzeln"],
+      "felder": {
+        "titel":    { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "eintraege": { "typ": "liste", "label": "Einträge", "min": 1, "max": 6, "pflicht": true,
+                       "eintrag": { "text": { "typ": "absatz", "label": "Text", "max": 300, "pflicht": true },
+                                    "name": { "typ": "zeile", "label": "Name", "max": 60, "pflicht": true },
+                                    "ort": { "typ": "zeile", "label": "Ort", "max": 60 },
+                                    "quelle": { "typ": "url", "label": "Quelle", "pflicht": true } } }
+      },
+      "regeln": {},
+      "farbpaare": [["--heading", "--bg-alt", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--primary", "--card-bg", false]],
+      "beispiel": {
+        "typ": "erfahrungen", "variante": "karten", "titel": "Das sagen Teilnehmer",
+        "eintraege": [{ "text": "Sehr verständlich erklärt, ich habe viel mitgenommen.", "name": "Anna B.", "ort": "Graz",
+                        "quelle": "https://www.example.com/erfahrungen/1" }]
+      }
+    },
+    "faq": {
+      "name": "Häufige Fragen", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-faq": "3.51.0", "lp-faq--standard": "3.51.0", "lp-faq-liste": "3.51.0", "lp-faq-frage": "3.51.0", "lp-faq-antwort": "3.51.0"
+      },
+      "varianten": ["standard"],
+      "felder": {
+        "titel":  { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "fragen": { "typ": "liste", "label": "Fragen", "min": 1, "max": 15, "pflicht": true,
+                    "eintrag": { "frage": { "typ": "zeile", "label": "Frage", "max": 150, "pflicht": true },
+                                 "antwort": { "typ": "absatz", "label": "Antwort", "max": 800, "pflicht": true } } }
+      },
+      "regeln": { "hoechstens": 1 },
+      "farbpaare": [["--heading", "--bg", true], ["--text", "--bg", false], ["--heading", "--card-bg", false], ["--text", "--card-bg", false]],
+      "beispiel": {
+        "typ": "faq", "titel": "Häufige Fragen",
+        "fragen": [{ "frage": "Kostet die Teilnahme etwas?", "antwort": "Nein, die Teilnahme ist kostenlos." }]
+      }
+    },
+    "anmeldung": {
+      "name": "Anmeldung", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-anmeldung": "3.51.0", "lp-anmeldung--karte": "3.51.0", "lp-anmeldung--breit": "3.51.0", "lp-formular": "3.51.0",
+        "lp-feld": "3.51.0", "lp-feld-fehler": "3.51.0", "lp-einwilligung": "3.51.0", "lp-anmeldung-hinweis": "3.51.0",
+        "lp-anmeldung-danke": "3.51.0"
+      },
+      "varianten": ["karte", "breit"],
+      "felder": {
+        "titel":      { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":       { "typ": "absatz", "label": "Text", "max": 400 },
+        "felder":     { "typ": "auswahl", "label": "Formularfelder", "mehrfach": true, "werte": ["vorname", "nachname", "email", "telefon"], "enthaelt": ["email"], "pflicht": true },
+        "knopf_text": { "typ": "zeile", "label": "Text auf dem Knopf", "max": 40, "pflicht": true },
+        "liste":      { "typ": "kennung", "label": "Verteilerliste", "muster": "^[a-z0-9][a-z0-9-]{1,59}$", "pflicht": true },
+        "danke":      { "typ": "zeile", "label": "Dankestext", "max": 200, "pflicht": true }
+      },
+      "regeln": { "hoechstens": 1 },
+      "farbpaare": [["--heading", "--card-bg", true], ["--text", "--card-bg", false], ["--text-muted", "--card-bg", false], ["--error", "--card-bg", false], ["--text-on-primary", "--primary", false], ["--heading", "--bg-alt", true]],
+      "beispiel": {
+        "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt kostenlos anmelden",
+        "felder": ["vorname", "email"], "knopf_text": "Ich bin dabei", "liste": "beispiel-abend",
+        "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail."
+      }
+    },
+    "abschluss": {
+      "name": "Abschluss", "seit": "3.51.0", "geaendert": "3.51.0",
+      "klassen": {
+        "lp-abschluss": "3.51.0", "lp-abschluss--akzent": "3.51.0", "lp-abschluss--schlicht": "3.51.0", "lp-abschluss-text": "3.51.0"
+      },
+      "varianten": ["akzent", "schlicht"],
+      "felder": {
+        "titel": { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+        "text":  { "typ": "absatz", "label": "Text", "max": 300 },
+        "knopf": { "typ": "knopf", "label": "Knopf", "pflicht": true }
+      },
+      "regeln": {},
+      "farbpaare": [["--heading", "--lp-akzent", true], ["--text", "--lp-akzent", false], ["--heading", "--bg", true], ["--text", "--bg", false]],
+      "beispiel": {
+        "typ": "abschluss", "variante": "akzent", "titel": "Sei dabei", "knopf": { "text": "Platz sichern", "ziel": "#anmeldung" }
+      }
+    }
+  }
+}
