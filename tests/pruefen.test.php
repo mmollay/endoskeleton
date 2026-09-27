@@ -21,12 +21,20 @@ $pruefe = static function (array $seite, ?string $profil = null, string $heute =
     if ($danach) { $danach($o); }
     return Pruefer::pruefen($o, $heute);
 };
-/** Gibt es einen Befund der Art $art, dessen Technik-Text $teil enthält? */
+/** Gibt es einen Befund der Art $art, dessen Technik-Text oder Pfad $teil enthält? Der Nachbau-Befund zählt nicht mit. */
 $hat = static function (array $befunde, string $art, string $teil, string $was): void {
     foreach ($befunde as $x) {
+        if (str_starts_with($x->technik, 'gebaute Dateien passen nicht')) { continue; }
         if ($x->art === $art && (str_contains($x->technik, $teil) || str_contains($x->pfad, $teil))) { T::ok(true, $was); return; }
     }
-    T::ok(false, "$was — erwartet $art mit „{$teil}\", bekommen:\n" . H::texte($befunde));
+    T::ok(false, "$was — erwartet $art mit „{$teil}“, bekommen:\n" . H::texte($befunde));
+};
+/** Meldet der Nachbau-Vergleich die Datei $datei? */
+$nachbau = static function (array $befunde, string $datei, string $was): void {
+    foreach ($befunde as $x) {
+        if ($x->art === 'sperrend' && str_starts_with($x->technik, 'gebaute Dateien passen nicht') && str_contains($x->technik, $datei)) { T::ok(true, $was); return; }
+    }
+    T::ok(false, "$was — Nachbau-Befund zu $datei fehlt:\n" . H::texte($befunde));
 };
 $profilMit = static function (callable $aendern, ?callable $dateien = null): string {
     $p = H::profilKopie();
@@ -88,10 +96,10 @@ return [
     'Profil als Vorschlag ist ein Hinweis' => static function () use ($pruefe, $hat, $profilMit): void {
         $hat($pruefe(H::seite(), $profilMit(static fn ($j) => ['vorschlag' => true] + $j)), 'hinweis', 'vorschlag', 'Vorschlag');
     },
-    'von Hand geänderte Dateien fallen auf (Nachbau-Vergleich)' => static function () use ($pruefe, $hat): void {
-        $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/index.html", str_replace('Gesund durch den Winter</h1>', 'Anders</h1>', (string) file_get_contents("$o/index.html")))), 'sperrend', 'index.html', 'geänderte index.html');
-        $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/es/extra.js", 'x')), 'sperrend', 'es/extra.js', 'zusätzliche Datei in es/');
-        $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => unlink("$o/robots.txt")), 'sperrend', 'robots.txt', 'fehlende Datei');
+    'von Hand geänderte Dateien fallen auf (Nachbau-Vergleich)' => static function () use ($pruefe, $nachbau): void {
+        $nachbau($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/index.html", str_replace('Gesund durch den Winter</h1>', 'Anders</h1>', (string) file_get_contents("$o/index.html")))), 'index.html', 'geänderte index.html');
+        $nachbau($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/es/extra.js", 'x')), 'es/extra.js', 'zusätzliche Datei in es/');
+        $nachbau($pruefe(H::seite(), null, HEUTE, static fn ($o) => unlink("$o/robots.txt")), 'robots.txt', 'fehlende Datei');
     },
     'HTML-Regeln auch an von Hand geänderten Seiten' => static function () use ($pruefe, $hat): void {
         $einbau = static fn (string $html) => static fn ($o) => file_put_contents("$o/index.html", str_replace('</main>', $html . '</main>', (string) file_get_contents("$o/index.html")));
@@ -106,6 +114,44 @@ return [
         $hat($pruefe(H::seite(), null, HEUTE, $einbau('<link rel="preconnect" href="https://fonts.example.com">')), 'sperrend', 'fonts.example.com', 'preconnect');
         $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/es/lp.css", "@import url(https://fonts.example.com/x.css);\n", FILE_APPEND)), 'sperrend', 'lp.css', 'fremder Import im CSS');
         $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/index.html", str_replace('type="checkbox" value="ja"', 'type="checkbox" value="ja" checked', (string) file_get_contents("$o/index.html")))), 'sperrend', 'vorangehakt', 'vorangehakte Einwilligung');
+        $hat($pruefe(H::seite(), null, HEUTE, $einbau('<style>p { color: red; }</style>')), 'sperrend', 'style', '<style>-Element');
+        $hat($pruefe(H::seite(), null, HEUTE, $einbau('<p onclick="x">x</p>')), 'sperrend', 'on*-Attribut', 'on-Attribut');
+        $hat($pruefe(H::seite(), null, HEUTE, $einbau('<img src="es/logo.svg" srcset="https://cdn.example.com/a.webp 2x" alt="" width="1" height="1">')), 'sperrend', 'cdn.example.com', 'fremde Quelle im srcset');
+        $hat($pruefe(H::seite(), null, HEUTE, $einbau('<p id="inhalt">x</p>')), 'sperrend', 'doppelt', 'doppelte id');
+        $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/es/lp.css", "body { background: url(https://cdn.example.com/p.png); }\n", FILE_APPEND)), 'sperrend', 'fremde Dateien', 'url() mit Adresse im CSS');
+        $ohne = static fn (string $muster) => static fn ($o) => file_put_contents("$o/index.html", (string) preg_replace($muster, '', (string) file_get_contents("$o/index.html")));
+        $hat($pruefe(H::seite(), null, HEUTE, $ohne('#<div class="form-hp".*?</div>\n#s')), 'sperrend', 'Honigtopf', 'Honigtopf fehlt');
+        $hat($pruefe(H::seite(), null, HEUTE, $ohne('#<input id="lp-f-einwilligung"[^>]*>#')), 'sperrend', 'Einwilligung fehlt', 'Einwilligung fehlt');
+    },
+    'keine Fehlalarme bei „online =“ oder „style =“ im Text' => static function () use ($pruefe): void {
+        T::eq(H::texte(H::sperrend($pruefe(H::seite([], ['beschreibung' => 'Teilnahme online = kostenlos. Dein neuer style = gesund.'])))), '', 'nur Text, kein Attribut');
+    },
+    'Sperrliste lässt sich nicht mit Auszeichnung oder Leerraum umgehen' => static function () use ($pruefe, $hat, $b): void {
+        foreach (['Ich bin jetzt **garantiert** geheilt.', "Ich bin garantiert\ngeheilt.", 'Ich bin garantiert  geheilt.', "Ich bin garan\u{00AD}tiert geheilt.", "Ich bin garantiert\u{200B} geheilt."] as $text) {
+            $e = $b('erfahrungen');
+            $e['eintraege'][0]['text'] = $text;
+            $hat($pruefe(H::seite([$e])), 'sperrend', 'Sperrliste', 'Sperrwort trotz ' . json_encode($text, JSON_UNESCAPED_UNICODE));
+        }
+    },
+    'nur Gebautes und Verwendetes liegt im Seitenordner' => static function () use ($pruefe, $hat): void {
+        $hat($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/aktion.html", '<script>alert(1)</script>')), 'sperrend', 'aktion.html', 'fremde Datei oben');
+        $hat($pruefe(H::seite(), null, HEUTE, static function ($o): void { mkdir("$o/img"); copy(H::testprofil() . '/bilder/beispiel-video.webp', "$o/img/unbenutzt.webp"); }), 'sperrend', 'img/unbenutzt.webp', 'unbenutztes Bild in img/');
+        T::eq(H::texte(H::sperrend($pruefe(H::seite(), null, HEUTE, static fn ($o) => file_put_contents("$o/VERSION", "1.0.0\n")))), '', 'VERSION und CHANGELOG des Livegangs sind erlaubt');
+    },
+    'Bildrechte: nicht freigegebene Bilder sperren, eingebrannter Text ist ein Hinweis' => static function () use ($pruefe, $hat, $profilMit): void {
+        $mit = static fn (array $aenderung) => $profilMit(static fn ($j) => $j, static function ($d) use ($aenderung): void {
+            $bilder = json_decode((string) file_get_contents("$d/bilder/bilder.json"), true);
+            $bilder[0] = $aenderung + $bilder[0];
+            file_put_contents("$d/bilder/bilder.json", json_encode($bilder, JSON_UNESCAPED_UNICODE));
+        });
+        $hat($pruefe(H::seite(), $mit(['freigegeben' => false])), 'sperrend', 'freigegeben', 'Bild nicht freigegeben');
+        $befunde = $pruefe(H::seite(), $mit(['eingebrannter_text' => true]));
+        $hat($befunde, 'hinweis', 'eingebrannt', 'eingebrannter Text');
+        T::eq(H::texte(H::sperrend($befunde)), '', 'eingebrannter Text sperrt nicht');
+    },
+    'Überschriftensprung in einem Rechtstext ist ein Hinweis' => static function () use ($pruefe, $hat, $profilMit): void {
+        $p = $profilMit(static fn ($j) => $j, static fn ($d) => file_put_contents("$d/rechtliches/datenschutz.txt", "### Gleich Ebene drei\n\nText.\n"));
+        $hat($pruefe(H::seite(), $p), 'hinweis', 'Überschrift', 'Sprung von H1 zu H3');
     },
     'Bilder: Größe und Format' => static function () use ($pruefe, $hat): void {
         $o = H::ordner(H::seite());
@@ -122,13 +168,19 @@ return [
         $befunde = Pruefer::pruefen($o, HEUTE);
         $hat($befunde, 'sperrend', 'WebP', 'kein WebP');
         $hat($befunde, 'sperrend', '400 KB', 'zu groß');
+        $o2 = H::ordner(H::seite());
+        mkdir("$o2/img");
+        imagepng(imagecreatetruecolor(60, 40), "$o2/img/verkleidet.webp");
+        $s['bausteine'][0]['bild'] = ['datei' => 'img/verkleidet.webp', 'alt' => 'Testbild'];
+        file_put_contents("$o2/seite.json", json_encode($s, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        Bauer::bauen($o2);
+        $hat(Pruefer::pruefen($o2, HEUTE), 'sperrend', 'WebP', 'PNG mit Endung .webp wird am Inhalt erkannt');
     },
     'ASCII-Umlaute und fehlendes Vorschaubild sind Hinweise' => static function () use ($pruefe, $hat, $b): void {
         $t = $b('themen');
         $t['punkte'][0] = 'Was fuer ein Thema';
         $befunde = $pruefe(H::seite([$t]));
         $hat($befunde, 'hinweis', 'bausteine.1.punkte.0', 'ASCII-Umlaut');
-        $hat($befunde, 'hinweis', 'meta.vorschaubild', 'kein Vorschaubild');
         T::eq(H::texte(H::sperrend($befunde)), '', 'nur Hinweise');
     },
     'ungebaute Seite: Befunde des Baus' => static function () use ($hat): void {

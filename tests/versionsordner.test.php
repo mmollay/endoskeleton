@@ -33,6 +33,7 @@ return [
         T::eq($ablegen('9.9')[0], 2, 'ungültige Nummer verweigert');
         T::eq($ablegen('9.9.8')[0], 2, 'VERSION im Tag passt nicht zur Nummer');
         T::ok(!file_exists("$versionen/9.9.8"), 'dabei nichts liegen gelassen');
+        T::eq(glob("$versionen/.ablegen-*") ?: [], [], 'kein Zwischenordner zurückgelassen');
         $o = H::ordner(H::seite(), '9.9.9');
         [$rc, $aus] = $sh(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$versionen/9.9.9/lp/bauen.php") . ' ' . escapeshellarg($o));
         T::eq($rc, 0, 'Seite mit Marke 9.9.9 baut mit dem abgelegten Stand: ' . $aus);

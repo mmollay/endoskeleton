@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Video – mit-text",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Video\" in der Variante „mit-text\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Video“ in der Variante „mit-text“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Video – mit-text",
-            "text": "Baustein „video\" in der Variante „mit-text\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „video“ in der Variante „mit-text“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "video",

@@ -28,6 +28,9 @@ final class Dateien
         if (is_link($von)) {
             throw new \RuntimeException("Verweis wird nicht kopiert: $von");
         }
+        if (!file_exists($von)) {
+            throw new \RuntimeException("Quelle fehlt: $von");
+        }
         if (is_file($von)) {
             self::ordner(dirname($nach));
             if (!copy($von, $nach)) {
@@ -41,9 +44,13 @@ final class Dateien
         }
     }
 
+    /** Schreibt eine Datei; ein Verweis an dieser Stelle wird ersetzt, nie durchschrieben. */
     public static function schreiben(string $datei, string $inhalt): void
     {
         self::ordner(dirname($datei));
+        if (is_link($datei)) {
+            unlink($datei);
+        }
         if (file_put_contents($datei, $inhalt) === false) {
             throw new \RuntimeException("Schreiben fehlgeschlagen: $datei");
         }

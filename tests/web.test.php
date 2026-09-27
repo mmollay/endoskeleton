@@ -1,7 +1,7 @@
 <?php
 /**
  * Was der Webserver sehen könnte: Der Endoskeleton-Hauptordner ist DocumentRoot von skeleton.ssi.at (mod_php).
- * Jedes PHP-Skript unter lp/, ci/, tests/ hat die CLI-Wache; lp/, tests/, ci/ antworten mit 404 — nie „denied".
+ * Jedes PHP-Skript unter lp/, ci/, tests/ hat die CLI-Wache; lp/, tests/, ci/ antworten mit 404 — nie „denied“.
  */
 
 declare(strict_types=1);

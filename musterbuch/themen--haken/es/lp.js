@@ -29,7 +29,9 @@
   });
 
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
+  // Ohne JavaScript prüft der Browser selbst (required); mit JavaScript übernehmen die eigenen Meldungen.
   document.querySelectorAll('form.lp-formular').forEach(function (form) {
+    form.noValidate = true;
     form.addEventListener('submit', function (ereignis) {
       var erstes = null;
       form.querySelectorAll('[required]').forEach(function (feld) {
@@ -37,6 +39,7 @@
         feld.setAttribute('aria-invalid', ok ? 'false' : 'true');
         var fehler = document.getElementById(feld.id + '-fehler');
         if (fehler) { fehler.hidden = ok; }
+        if (ok) { feld.removeAttribute('aria-describedby'); } else if (fehler) { feld.setAttribute('aria-describedby', fehler.id); }
         if (!ok && !erstes) { erstes = feld; }
       });
       if (erstes) { ereignis.preventDefault(); erstes.focus(); }

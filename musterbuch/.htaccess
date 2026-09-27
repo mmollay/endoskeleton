@@ -1,5 +1,5 @@
 # Erzeugt von lp/sammelordner.php (SSI Endoskeleton) — wird bei Bedarf neu geschrieben, nicht von Hand ändern.
-# Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied" (fail2ban zählt jedes „client denied").
+# Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied“ (fail2ban zählt jedes „client denied“).
 ErrorDocument 404 default
 Options -Indexes
 <IfModule mod_expires.c>

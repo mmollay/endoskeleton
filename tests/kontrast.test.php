@@ -21,7 +21,7 @@ return [
     },
     'Farbpaare eines Profils prüfen' => static function (): void {
         $tokens = ['--text' => '#777777', '--bg' => '#ffffff', '--heading' => '#777777', '--primary' => '#3b7d3b'];
-        $b = Kontrast::pruefe($tokens, [['--text', '--bg', false], ['--heading', '--bg', true], ['--primary', '--bg', false]], 'bausteine.hero', 'Abschnitt „Kopfbereich"');
+        $b = Kontrast::pruefe($tokens, [['--text', '--bg', false], ['--heading', '--bg', true], ['--primary', '--bg', false]], 'bausteine.hero', 'Abschnitt „Kopfbereich“');
         T::eq(count($b), 1, 'nur der Fließtext fällt durch (große Schrift reicht 3:1)');
         T::eq($b[0]->art ?? '', 'sperrend', 'sperrend');
         T::contains($b[0]->technik ?? '', '--text auf --bg', 'Technik nennt das Paar');

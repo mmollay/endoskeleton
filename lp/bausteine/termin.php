@@ -2,7 +2,7 @@
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
  * Termin: alle Termine werden gebaut (deterministisch); lp.js blendet vergangene zur Laufzeit aus und zeigt dann
- * „wenn_leer". Je Termin ein JSON-LD Event. @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ * „wenn_leer“. Je Termin ein JSON-LD Event. @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
 $online = ($b['art'] ?? 'online') === 'online';
 $firma = (string) $k->profil->daten['firma']['name'];

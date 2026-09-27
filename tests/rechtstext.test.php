@@ -1,5 +1,5 @@
 <?php
-/** Format „rechtstext" für Impressum und Datenschutz (lp/src/Rechtstext.php). */
+/** Format „rechtstext“ für Impressum und Datenschutz (lp/src/Rechtstext.php). */
 
 declare(strict_types=1);
 

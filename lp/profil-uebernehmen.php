@@ -1,5 +1,5 @@
 <?php
-/** „Profil übernehmen": kopiert das Kundenprofil in den Ordner einer Landingpage (profil/). */
+/** „Profil übernehmen“: kopiert das Kundenprofil in den Ordner einer Landingpage (profil/). */
 
 declare(strict_types=1);
 

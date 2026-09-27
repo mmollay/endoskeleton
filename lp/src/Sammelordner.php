@@ -1,7 +1,7 @@
 <?php
 /**
  * Sammelordner eines Kunden (lp.<kundendomain>/) und das Musterbuch: .htaccess ohne Cache, nicht indexieren,
- * Baupläne, Profile und Marken als 404. Nie „Require all denied": fail2ban auf server7 sperrt bei „client denied"
+ * Baupläne, Profile und Marken als 404. Nie „Require all denied“: fail2ban auf server7 sperrt bei „client denied“
  * die aufrufende Adresse für eine Stunde.
  */
 
@@ -13,7 +13,7 @@ final class Sammelordner
 {
     public const HTACCESS = <<<'TXT'
     # Erzeugt von lp/sammelordner.php (SSI Endoskeleton) — wird bei Bedarf neu geschrieben, nicht von Hand ändern.
-    # Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied" (fail2ban zählt jedes „client denied").
+    # Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied“ (fail2ban zählt jedes „client denied“).
     ErrorDocument 404 default
     Options -Indexes
     <IfModule mod_expires.c>

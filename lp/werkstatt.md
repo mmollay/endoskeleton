@@ -13,18 +13,215 @@ _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand
 
 ## Abschnitte
 
-- **Kopfbereich** (`hero`, Varianten bild-rechts, bild-hinten, schlicht): `dachzeile` (Dachzeile, ≤ 60 Zeichen), `titel` (Titel, ≤ 80 Zeichen), `text` (Text, ≤ 400 Zeichen), `bild` (Bild), `knopf` (Knopf)
+### Kopfbereich (`hero`)
 
-- **Termin** (`termin`, Varianten karte, band): `titel` (Titel, ≤ 60 Zeichen), `art` (Art), `termine` (Termine), `ort` (Ort, ≤ 120 Zeichen), `wenn_leer` (Text ohne Termin, ≤ 120 Zeichen), `knopf` (Knopf)
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · genau einmal, als erster Abschnitt
 
-- **Themen** (`themen`, Varianten haken, zwei-spalten): `titel` (Titel, ≤ 60 Zeichen), `text` (Text, ≤ 300 Zeichen), `punkte` (Punkte)
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `dachzeile` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
-- **Video** (`video`, Varianten breit, mit-text): `titel` (Titel, ≤ 80 Zeichen), `text` (Text, ≤ 400 Zeichen), `anbieter` (Anbieter), `kennung` (Video-Kennung), `vorschau` (Vorschaubild)
+```json
+{
+    "typ": "hero",
+    "variante": "bild-rechts",
+    "dachzeile": "Kostenloser Online-Abend",
+    "titel": "Gesund durch den Winter",
+    "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
+    "bild": {
+        "datei": "bestand/beispiel-vortrag.webp"
+    },
+    "knopf": {
+        "text": "Kostenlos anmelden",
+        "ziel": "#anmeldung"
+    }
+}
+```
 
-- **Erfahrungen** (`erfahrungen`, Varianten karten, einzeln): `titel` (Titel, ≤ 60 Zeichen), `eintraege` (Einträge)
+### Termin (`termin`)
 
-- **Häufige Fragen** (`faq`, Varianten standard): `titel` (Titel, ≤ 60 Zeichen), `fragen` (Fragen)
+Varianten: `karte`, `band` · höchstens 2-mal
 
-- **Anmeldung** (`anmeldung`, Varianten karte, breit): `titel` (Titel, ≤ 60 Zeichen), `text` (Text, ≤ 400 Zeichen), `felder` (Formularfelder), `knopf_text` (Text auf dem Knopf, ≤ 40 Zeichen), `liste` (Verteilerliste), `danke` (Dankestext, ≤ 200 Zeichen)
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `art` | auswahl | – | eines von `online`, `vor_ort` |
+| `termine` | liste | ja | 1–6 Einträge |
+| `termine[].beginn` | zeitpunkt | ja | `JJJJ-MM-TTTHH:MM`, Wiener Zeit |
+| `termine[].dauer_min` | zahl | – | 15–600 |
+| `ort` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
+| `wenn_leer` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
+| `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
-- **Abschluss** (`abschluss`, Varianten akzent, schlicht): `titel` (Titel, ≤ 80 Zeichen), `text` (Text, ≤ 300 Zeichen), `knopf` (Knopf)
+```json
+{
+    "typ": "termin",
+    "variante": "karte",
+    "titel": "Nächster Termin",
+    "art": "online",
+    "termine": [
+        {
+            "beginn": "2099-10-06T19:00",
+            "dauer_min": 60
+        }
+    ],
+    "ort": "Online über Zoom – den Link bekommst du per E-Mail",
+    "wenn_leer": "Der nächste Termin steht bald fest."
+}
+```
+
+### Themen (`themen`)
+
+Varianten: `haken`, `zwei-spalten`
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `punkte` | liste | ja | 2–12 Einträge (eine Zeile, ≤ 120 Zeichen) |
+
+```json
+{
+    "typ": "themen",
+    "variante": "haken",
+    "titel": "Darum geht es",
+    "punkte": [
+        "Wie das Immunsystem arbeitet",
+        "Was Schlaf damit zu tun hat",
+        "Drei einfache Gewohnheiten"
+    ]
+}
+```
+
+### Video (`video`)
+
+Varianten: `breit`, `mit-text`
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | bei mit-text | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `anbieter` | auswahl | ja | eines von `youtube` |
+| `kennung` | kennung | ja | `^[A-Za-z0-9_-]{11}$` |
+| `vorschau` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "video",
+    "variante": "breit",
+    "titel": "Kurz erklärt: Worum geht es?",
+    "anbieter": "youtube",
+    "kennung": "AbCdEfGhIjk",
+    "vorschau": {
+        "datei": "bestand/beispiel-video.webp"
+    }
+}
+```
+
+### Erfahrungen (`erfahrungen`)
+
+Varianten: `karten`, `einzeln`
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `eintraege` | liste | ja | 1–6 Einträge |
+| `eintraege[].text` | absatz | ja | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `eintraege[].name` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `eintraege[].ort` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `eintraege[].quelle` | url | ja | `https://` auf erlaubte Hosts des Profils |
+
+```json
+{
+    "typ": "erfahrungen",
+    "variante": "karten",
+    "titel": "Das sagen Teilnehmer",
+    "eintraege": [
+        {
+            "text": "Sehr verständlich erklärt, ich habe viel mitgenommen.",
+            "name": "Anna B.",
+            "ort": "Graz",
+            "quelle": "https://www.example.com/erfahrungen/1"
+        }
+    ]
+}
+```
+
+### Häufige Fragen (`faq`)
+
+Varianten: `standard` · höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `fragen` | liste | ja | 1–15 Einträge |
+| `fragen[].frage` | zeile | ja | eine Zeile, ≤ 150 Zeichen |
+| `fragen[].antwort` | absatz | ja | ≤ 800 Zeichen, Leerzeile = Absatz, `**fett**` |
+
+```json
+{
+    "typ": "faq",
+    "titel": "Häufige Fragen",
+    "fragen": [
+        {
+            "frage": "Kostet die Teilnahme etwas?",
+            "antwort": "Nein, die Teilnahme ist kostenlos."
+        }
+    ]
+}
+```
+
+### Anmeldung (`anmeldung`)
+
+Varianten: `karte`, `breit` · höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `felder` | auswahl | ja | Liste aus `vorname`, `nachname`, `email`, `telefon`, muss `email` enthalten |
+| `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
+| `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
+| `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+
+```json
+{
+    "typ": "anmeldung",
+    "variante": "karte",
+    "anker": "anmeldung",
+    "titel": "Jetzt kostenlos anmelden",
+    "felder": [
+        "vorname",
+        "email"
+    ],
+    "knopf_text": "Ich bin dabei",
+    "liste": "beispiel-abend",
+    "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail."
+}
+```
+
+### Abschluss (`abschluss`)
+
+Varianten: `akzent`, `schlicht`
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `knopf` | knopf | ja | `{"text": ≤ 40 Zeichen, "ziel": "#anker"}` (nur Sprungmarken der Seite) |
+
+```json
+{
+    "typ": "abschluss",
+    "variante": "akzent",
+    "titel": "Sei dabei",
+    "knopf": {
+        "text": "Platz sichern",
+        "ziel": "#anmeldung"
+    }
+}
+```

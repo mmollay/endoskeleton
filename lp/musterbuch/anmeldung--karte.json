@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Anmeldung – karte",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Anmeldung\" in der Variante „karte\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Anmeldung“ in der Variante „karte“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Anmeldung – karte",
-            "text": "Baustein „anmeldung\" in der Variante „karte\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „anmeldung“ in der Variante „karte“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "anmeldung",

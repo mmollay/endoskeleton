@@ -20,7 +20,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 </div>
 </div>
 <?= $k->jsonLd(['@type' => 'FAQPage', 'mainEntity' => array_map(static fn (array $f): array => [
-    '@type' => 'Question', 'name' => $f['frage'], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['antwort']],
+    '@type' => 'Question', 'name' => $f['frage'], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => str_replace('**', '', $f['antwort'])],
 ], $b['fragen'])]) ?>
 
 </section>

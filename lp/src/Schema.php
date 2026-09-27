@@ -14,6 +14,9 @@ final class Schema
     private const BILD = ['datei', 'alt', 'dekorativ'];
     private const KNOPF = ['text', 'ziel'];
     private const ANKER = '/^[a-z][a-z0-9-]{0,39}$/';
+    /** Vom Rahmen vergebene ids: der Hauptinhalt und alles mit lp- (Überschriften, Formularfelder). */
+    private const ANKER_VERGEBEN = '/^(inhalt$|lp-)/';
+    private const BILDNAME = '[a-z0-9][a-z0-9_-]*(\.[a-z0-9_-]+)*';
 
     /** @var list<Befund> */
     private array $befunde = [];
@@ -39,7 +42,7 @@ final class Schema
             return;
         }
         foreach (array_diff(array_keys($seite), self::OBEN) as $s) {
-            $this->fehler((string) $s, "unbekannter Schlüssel $s", "Die Angabe „{$s}\" ist unbekannt.");
+            $this->fehler((string) $s, "unbekannter Schlüssel $s", "Die Angabe „{$s}“ ist unbekannt.");
         }
         if (($seite['format'] ?? null) !== 1) {
             $this->fehler('format', 'format muss 1 sein', 'Der Bauplan hat ein unbekanntes Format.');
@@ -70,7 +73,7 @@ final class Schema
                 $this->fehler("$pfad.typ", 'unbekannter Baustein ' . json_encode($typ, JSON_UNESCAPED_UNICODE), "Abschnitt $nr: Diesen Bausteintyp gibt es nicht.");
                 continue;
             }
-            $wo = "Abschnitt $nr „{$e['name']}\"";
+            $wo = "Abschnitt $nr „{$e['name']}“";
             $zahl[$typ] = ($zahl[$typ] ?? 0) + 1;
             $variante = $b['variante'] ?? $e['varianten'][0];
             if (!is_string($variante) || !in_array($variante, $e['varianten'], true)) {
@@ -87,7 +90,7 @@ final class Schema
             $this->objekt($rest, $felder, $pfad, $wo, $variante);
             if (isset($b['anker']) && is_string($b['anker'])) {
                 if (isset($anker[$b['anker']])) {
-                    $this->fehler("$pfad.anker", "Anker {$b['anker']} doppelt", "$wo: Die Sprungmarke „{$b['anker']}\" gibt es schon.");
+                    $this->fehler("$pfad.anker", "Anker {$b['anker']} doppelt", "$wo: Die Sprungmarke „{$b['anker']}“ gibt es schon.");
                 }
                 $anker[$b['anker']] = true;
             }
@@ -95,11 +98,11 @@ final class Schema
         foreach ($this->k->bausteine as $typ => $e) {
             $n = $zahl[$typ] ?? 0;
             if (($e['regeln']['genau_einmal'] ?? false) && $n !== 1) {
-                $this->fehler('bausteine', "$typ genau einmal erwartet, $n gefunden", "Die Seite braucht genau einen Abschnitt „{$e['name']}\" (gefunden: $n).");
+                $this->fehler('bausteine', "$typ genau einmal erwartet, $n gefunden", "Die Seite braucht genau einen Abschnitt „{$e['name']}“ (gefunden: $n).");
             }
             $max = $e['regeln']['hoechstens'] ?? null;
             if ($max !== null && $n > $max) {
-                $this->fehler('bausteine', "$typ höchstens $max, $n gefunden", "Den Abschnitt „{$e['name']}\" darf es höchstens {$max}-mal geben (gefunden: $n).");
+                $this->fehler('bausteine', "$typ höchstens $max, $n gefunden", "Den Abschnitt „{$e['name']}“ darf es höchstens {$max}-mal geben (gefunden: $n).");
             }
         }
         foreach ($this->ziele as [$ziel, $pfad, $wo]) {
@@ -113,13 +116,13 @@ final class Schema
     private function objekt(array $werte, array $felder, string $pfad, string $wo, ?string $variante): void
     {
         foreach (array_diff(array_keys($werte), array_keys($felder)) as $s) {
-            $this->fehler("$pfad.$s", "unbekanntes Feld $s", "$wo: Das Feld „{$s}\" gibt es hier nicht.");
+            $this->fehler("$pfad.$s", "unbekanntes Feld $s", "$wo: Das Feld „{$s}“ gibt es hier nicht.");
         }
         foreach ($felder as $name => $def) {
             $pflicht = ($def['pflicht'] ?? false) || ($variante !== null && in_array($variante, $def['pflicht_bei'] ?? [], true));
             if (!array_key_exists($name, $werte)) {
                 if ($pflicht) {
-                    $this->fehler("$pfad.$name", "Pflichtfeld $name fehlt", "$wo: „{$def['label']}\" fehlt.");
+                    $this->fehler("$pfad.$name", "Pflichtfeld $name fehlt", "$wo: „{$def['label']}“ fehlt.");
                 }
                 continue;
             }
@@ -129,7 +132,7 @@ final class Schema
 
     private function feld(mixed $w, array $def, string $pfad, string $wo, bool $pflicht): void
     {
-        $label = "„{$def['label']}\"";
+        $label = "„{$def['label']}“";
         $form = fn (string $erwartet) => $this->fehler($pfad, "$pfad: erwartet $erwartet, bekommen " . get_debug_type($w), "$wo: $label hat die falsche Form (erwartet: $erwartet).");
         switch ($def['typ']) {
             case 'zeile':
@@ -176,10 +179,10 @@ final class Schema
                         $this->fehler($pfad, "$pfad: Wert doppelt", "$wo: In $label steht ein Wert doppelt.");
                     }
                     foreach (array_diff($w, $def['werte']) as $x) {
-                        $this->fehler($pfad, "$pfad: unbekannter Wert $x", "$wo: „{$x}\" ist in $label nicht möglich (möglich: " . implode(', ', $def['werte']) . ').');
+                        $this->fehler($pfad, "$pfad: unbekannter Wert $x", "$wo: „{$x}“ ist in $label nicht möglich (möglich: " . implode(', ', $def['werte']) . ').');
                     }
                     foreach (array_diff($def['enthaelt'] ?? [], $w) as $x) {
-                        $this->fehler($pfad, "$pfad: $x fehlt", "$wo: $label muss „{$x}\" enthalten.");
+                        $this->fehler($pfad, "$pfad: $x fehlt", "$wo: $label muss „{$x}“ enthalten.");
                     }
                 } elseif (!is_string($w) || !in_array($w, $def['werte'], true)) {
                     $this->fehler($pfad, "$pfad: Wert nicht in " . implode('|', $def['werte']), "$wo: $label muss eines davon sein: " . implode(', ', $def['werte']) . '.');
@@ -193,6 +196,8 @@ final class Schema
             case 'anker':
                 if (!is_string($w) || !preg_match(self::ANKER, $w)) {
                     $this->fehler($pfad, "$pfad: Anker [a-z][a-z0-9-]*", "$wo: $label darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten.");
+                } elseif (preg_match(self::ANKER_VERGEBEN, $w)) {
+                    $this->fehler($pfad, "$pfad: Anker „{$w}“ ist vergeben (inhalt, lp-…)", "$wo: Die Sprungmarke „{$w}“ ist schon vergeben — bitte einen anderen Namen wählen.");
                 }
                 return;
             case 'kennung':
@@ -213,7 +218,7 @@ final class Schema
                     return;
                 }
                 foreach (array_diff(array_keys($w), self::BILD) as $s) {
-                    $this->fehler("$pfad.$s", "unbekannter Schlüssel $s im Bild", "$wo: Beim Bild ist „{$s}\" unbekannt.");
+                    $this->fehler("$pfad.$s", "unbekannter Schlüssel $s im Bild", "$wo: Beim Bild ist „{$s}“ unbekannt.");
                 }
                 if (!is_string($w['datei'] ?? null)) {
                     $this->fehler("$pfad.datei", "$pfad.datei fehlt", "$wo: Beim Bild fehlt die Datei.");
@@ -221,13 +226,15 @@ final class Schema
                 }
                 $dekorativ = $w['dekorativ'] ?? false;
                 if (!is_bool($dekorativ)) {
-                    $this->fehler("$pfad.dekorativ", "$pfad.dekorativ muss true/false sein", "$wo: Beim Bild hat „dekorativ\" die falsche Form.");
+                    $this->fehler("$pfad.dekorativ", "$pfad.dekorativ muss true/false sein", "$wo: Beim Bild hat „dekorativ“ die falsche Form.");
                 }
                 if (isset($w['alt']) && (!is_string($w['alt']) || mb_strlen($w['alt']) > 200)) {
                     $this->fehler("$pfad.alt", "$pfad.alt muss Text ≤ 200 sein", "$wo: Die Bildbeschreibung ist zu lang oder hat die falsche Form.");
                 }
-                if ($this->bilddatei($w['datei'], $pfad, $wo, $label) === 'img' && $dekorativ !== true && trim((string) ($w['alt'] ?? '')) === '') {
-                    $this->fehler("$pfad.alt", "$pfad.alt fehlt (eigenes Bild ohne dekorativ)", "$wo: Zum Bild fehlt die Beschreibung für Menschen, die es nicht sehen (Alternativtext).");
+                $art = $this->bilddatei($w['datei'], $pfad, $wo, $label);
+                $ohneAlt = trim((string) ($w['alt'] ?? '')) === '';
+                if ($art !== null && $dekorativ !== true && $ohneAlt && ($art === 'img' || array_key_exists('alt', $w))) {
+                    $this->fehler("$pfad.alt", "$pfad.alt fehlt oder ist leer (ohne dekorativ)", "$wo: Zum Bild fehlt die Beschreibung für Menschen, die es nicht sehen (Alternativtext).");
                 }
                 return;
             case 'knopf':
@@ -240,6 +247,8 @@ final class Schema
                 $ziel = $w['ziel'] ?? null;
                 if (is_string($ziel) && str_starts_with($ziel, '#') && preg_match(self::ANKER, substr($ziel, 1))) {
                     $this->ziele[] = [substr($ziel, 1), "$pfad.ziel", $wo];
+                } elseif (is_string($ziel) && ($def['nur_anker'] ?? false)) {
+                    $this->fehler("$pfad.ziel", "$pfad.ziel: nur #anker erlaubt", "$wo: Der Knopf muss zu einer Stelle auf dieser Seite führen (z. B. zur Anmeldung).");
                 } elseif (is_string($ziel) && !Text::https($ziel, $this->p->hosts())) {
                     $this->fehler("$pfad.ziel", "$pfad.ziel: #anker oder https auf erlaubte Hosts", "$wo: Der Knopf muss zu einer Stelle der Seite oder zu einer freigegebenen Website (https) führen.");
                 }
@@ -272,14 +281,18 @@ final class Schema
     /** Prüft bestand/<datei> bzw. img/<datei>; gibt 'bestand', 'img' oder null (Fehler) zurück. */
     private function bilddatei(string $datei, string $pfad, string $wo, string $label): ?string
     {
-        if (preg_match('#^bestand/([a-z0-9][a-z0-9._-]*)$#', $datei, $m) && $this->p->bild($m[1]) !== null) {
-            return 'bestand';
+        if (preg_match('#^bestand/(' . self::BILDNAME . ')$#', $datei, $m) && $this->p->bild($m[1]) !== null) {
+            return 'bestand';   // Form und Inhalt prüft das Profil
         }
-        if (preg_match('#^img/([a-z0-9][a-z0-9._-]*\.(webp|jpg|jpeg|png))$#', $datei, $m) && is_file("$this->ordner/img/$m[1]")) {
+        if (preg_match('#^img/(' . self::BILDNAME . '\.(webp|jpg|jpeg|png))$#', $datei, $m) && is_file("$this->ordner/img/$m[1]")) {
+            if (!in_array(@getimagesize("$this->ordner/img/$m[1]")[2] ?? null, [IMAGETYPE_WEBP, IMAGETYPE_PNG, IMAGETYPE_JPEG], true)) {
+                $this->fehler($pfad, "$pfad: $datei ist kein lesbares Bild (WebP, PNG, JPEG)", "$wo: Die Datei „{$datei}“ ist kein Bild oder beschädigt.");
+                return null;
+            }
             return 'img';
         }
         $this->fehler($pfad, "$pfad: Bild $datei nicht gefunden (bestand/<name> aus dem Profil oder img/<name> im Seitenordner)",
-            "$wo: Das Bild „{$datei}\" gibt es nicht.");
+            "$wo: Das Bild „{$datei}“ gibt es nicht.");
         return null;
     }
 

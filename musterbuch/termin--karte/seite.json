@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Termin – karte",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Termin\" in der Variante „karte\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Termin“ in der Variante „karte“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Termin – karte",
-            "text": "Baustein „termin\" in der Variante „karte\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „termin“ in der Variante „karte“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "termin",

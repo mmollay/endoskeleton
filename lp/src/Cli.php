@@ -11,10 +11,10 @@ namespace Endo\Lp;
 final class Cli
 {
     /** @param callable(list<string>): list<Befund> $fn  bekommt die Argumente ohne Skriptnamen */
-    public static function lauf(array $argv, string $aufruf, int $mindestens, callable $fn): never
+    public static function lauf(array $argv, string $aufruf, int $mindestens, callable $fn, ?int $hoechstens = null): never
     {
         $args = array_slice($argv, 1);
-        if (count($args) < $mindestens || in_array($args[0] ?? '', ['-h', '--help'], true)) {
+        if (count($args) < $mindestens || count($args) > ($hoechstens ?? $mindestens) || in_array($args[0] ?? '', ['-h', '--help'], true)) {
             fwrite(STDERR, "Aufruf: $aufruf\n");
             exit(2);
         }
@@ -44,6 +44,7 @@ final class Cli
 
     public static function ordner(string $pfad): string
     {
-        return realpath($pfad) ?: throw new \InvalidArgumentException("Ordner nicht gefunden: $pfad");
+        $echt = $pfad === '' ? false : realpath($pfad);
+        return ($echt !== false && is_dir($echt)) ? $echt : throw new \InvalidArgumentException("Ordner nicht gefunden: „{$pfad}“");
     }
 }

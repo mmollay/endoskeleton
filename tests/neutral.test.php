@@ -27,7 +27,7 @@ return [
     'Hosts nur aus Positivliste und reservierten Domains' => static function () use ($dateien, $reserviert, $w): void {
         T::ok(count($dateien) > 50, 'Dateien geprüft: ' . count($dateien));
         foreach ($dateien as $f) {
-            preg_match_all('#https?://([a-z0-9.-]+)#i', (string) file_get_contents($f), $m);
+            preg_match_all('#https?://(?:[^/@\s"\']*@)?([a-z0-9.-]+)#i', (string) file_get_contents($f), $m);
             foreach (array_unique(array_map('strtolower', $m[1])) as $h) { T::ok($reserviert($h), 'fremder Host ' . $h . ' in ' . substr($f, strlen($w) + 1)); }
         }
     },

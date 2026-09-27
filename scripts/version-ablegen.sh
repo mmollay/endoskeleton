@@ -11,8 +11,12 @@ cd "$(dirname "$0")/.."
 git rev-parse -q --verify "refs/tags/v$version" >/dev/null || { echo "Tag v$version fehlt — erst taggen." >&2; exit 2; }
 ziel="${ENDO_VERSIONEN:-/home/pawbot/projects/endoskeleton-versionen}/$version"
 [[ ! -e "$ziel" ]] || { echo "$ziel gibt es schon — Versionsordner werden nie überschrieben." >&2; exit 2; }
-mkdir -p "$ziel"
-git archive "v$version" lp VERSION base.css | tar -x -C "$ziel"
-[[ "$(cat "$ziel/VERSION")" == "$version" ]] || { chmod -R u+w "$ziel"; rm -r "$ziel"; echo "VERSION im Tag passt nicht zu $version." >&2; exit 2; }
-chmod -R a-w "$ziel"
+# Erst in einen Zwischenordner, dann umbenennen: scheitert etwas, bleibt nichts Halbes liegen.
+zwischen="$(dirname "$ziel")/.ablegen-$version-$$"
+trap 'if [[ -e "$zwischen" ]]; then chmod -R u+w "$zwischen"; find "$zwischen" -delete; fi' EXIT
+mkdir -p "$zwischen"
+git archive "v$version" lp VERSION base.css | tar -x -C "$zwischen"
+[[ "$(cat "$zwischen/VERSION")" == "$version" ]] || { echo "VERSION im Tag passt nicht zu $version." >&2; exit 2; }
+chmod -R a-w "$zwischen"
+mv "$zwischen" "$ziel"
 echo "abgelegt: $ziel"

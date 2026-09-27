@@ -1,7 +1,7 @@
 <?php
 /**
- * Format „rechtstext" für Impressum und Datenschutz: ## und ### als Überschriften (die H1 setzt der Rahmen),
- * Absätze, Listen mit „- ", **fett**, Links [Text](https://…) nur auf erlaubte Hosts oder mailto:.
+ * Format „rechtstext“ für Impressum und Datenschutz: ## und ### als Überschriften (die H1 setzt der Rahmen),
+ * Absätze, Listen mit „- “, **fett**, Links [Text](https://…) nur auf erlaubte Hosts oder mailto:.
  * Alles andere wird maskiert.
  */
 

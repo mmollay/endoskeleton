@@ -56,7 +56,7 @@ return [
             $vorige = 0;
             foreach ($x->query('//h1|//h2|//h3|//h4|//h5|//h6') as $h) {
                 $stufe = (int) substr($h->nodeName, 1);
-                T::ok($stufe <= $vorige + 1, "$f: kein Sprung vor {$h->nodeName} „" . trim($h->textContent) . '"');
+                T::ok($stufe <= $vorige + 1, "$f: kein Sprung vor {$h->nodeName} „" . trim($h->textContent) . '“');
                 $vorige = $stufe;
             }
         }
@@ -113,7 +113,7 @@ return [
         T::ok(!preg_match('/\b(rgba?|hsla?)\(\s*[\d.]/i', $css, $m), 'kein rgb()/hsl() mit Zahlen ' . ($m[0] ?? ''));
         T::ok(!preg_match('/:\s*[^;]*\b(white|black|red|green|blue|gr[ae]y|silver|orange|yellow|purple)\b/i', $css, $m), 'keine Farbnamen ' . ($m[0] ?? ''));
     },
-    'robots.txt und noindex folgen „indexieren"' => static function () use ($gebaut): void {
+    'robots.txt und noindex folgen „indexieren“' => static function () use ($gebaut): void {
         $o = $gebaut(H::seite());
         T::eq((string) file_get_contents("$o/robots.txt"), "User-agent: *\nDisallow: /\n", 'gesperrt ohne indexieren');
         T::contains((string) file_get_contents("$o/index.html"), '<meta name="robots" content="noindex, nofollow">', 'noindex');
@@ -131,7 +131,7 @@ return [
     'falsche oder fehlende Versionsmarke verweigert den Bau' => static function (): void {
         foreach (['3.50.0', "3.51.0; rm -rf /", ''] as $marke) {
             $o = H::ordner(H::seite(), $marke);
-            try { Bauer::bauen($o); T::ok(false, "BauFehler erwartet für Marke „{$marke}\""); } catch (BauFehler $e) { T::contains($e->getMessage(), 'ENDOSKELETON', 'Meldung nennt die Marke'); }
+            try { Bauer::bauen($o); T::ok(false, "BauFehler erwartet für Marke „{$marke}“"); } catch (BauFehler $e) { T::contains($e->getMessage(), 'ENDOSKELETON', 'Meldung nennt die Marke'); }
             T::ok(!is_file("$o/index.html"), 'nichts gebaut');
         }
     },
@@ -150,6 +150,34 @@ return [
         $o = H::ordner($s);
         T::ok(H::sperrend(Bauer::bauen($o)->befunde) !== [], 'Schema-Befund');
         T::ok(!is_dir("$o/es"), 'nichts gebaut');
+    },
+    'Kontrast: jede Schriftfarbe auf jeder Fläche' => static function (): void {
+        $p = H::profilKopie();
+        // Akzentfläche so dunkel, dass nur --primary darauf zu schwach ist
+        file_put_contents("$p/profil.css", str_replace('--lp-akzent: #e3eef7;', '--lp-akzent: #6f9fc8;', (string) file_get_contents("$p/profil.css")));
+        $b = H::sperrend(Bauer::bauen(H::ordner(H::seite(), null, $p))->befunde);
+        T::ok(array_filter($b, static fn ($x) => str_starts_with($x->technik, 'Kontrast --primary auf --lp-akzent ')) !== [], 'Primärfarbe auf Akzentfläche: ' . H::texte($b));
+        $p = H::profilKopie();
+        file_put_contents("$p/profil.css", str_replace('--primary-dark: #144566;', '--primary-dark: #7fa6c9;', (string) file_get_contents("$p/profil.css")));
+        $b = H::sperrend(Bauer::bauen(H::ordner(H::seite(), null, $p))->befunde);
+        T::ok(count(array_filter($b, static fn ($x) => str_contains($x->technik, 'auf --primary-dark'))) === 1, 'Knopfschrift auf der Hover-Farbe: ' . H::texte($b));
+    },
+    'schreibt nicht durch Verweise, übernimmt nur woff2-Schriften' => static function (): void {
+        $o = H::ordner(H::seite());
+        $fremd = T::tmp() . '/fremd.txt';
+        file_put_contents($fremd, 'unverändert');
+        symlink($fremd, "$o/robots.txt");
+        mkdir("$o/profil/schrift");
+        file_put_contents("$o/profil/schrift/notiz.txt", 'x');
+        symlink($fremd, "$o/profil/schrift/geheim.woff2");
+        Bauer::bauen($o);
+        T::eq((string) file_get_contents($fremd), 'unverändert', 'Ziel des Verweises unverändert');
+        T::ok(is_file("$o/robots.txt") && !is_link("$o/robots.txt"), 'robots.txt ist eine eigene Datei');
+        T::ok(!file_exists("$o/es/schrift/notiz.txt") && !file_exists("$o/es/schrift/geheim.woff2"), 'nur echte woff2-Dateien');
+    },
+    'CSS-Bündel ohne Profilnamen' => static function () use ($gebaut): void {
+        $o = $gebaut(H::seite());
+        T::notContains(substr((string) file_get_contents("$o/es/lp.css"), 0, 300), 'Testprofil', 'Name steht nicht im CSS');
     },
     'Profil mit zu schwachem Kontrast baut nicht' => static function (): void {
         $p = H::profilKopie();

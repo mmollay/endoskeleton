@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Erfahrungen – karten",
-        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Erfahrungen\" in der Variante „karten\"."
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Erfahrungen“ in der Variante „karten“."
     },
     "bausteine": [
         {
@@ -11,7 +11,7 @@
             "anker": "start",
             "dachzeile": "Musterbuch",
             "titel": "Erfahrungen – karten",
-            "text": "Baustein „erfahrungen\" in der Variante „karten\" (seit 3.51.0, geändert 3.51.0)."
+            "text": "Baustein „erfahrungen“ in der Variante „karten“ (seit 3.51.0, geändert 3.51.0)."
         },
         {
             "typ": "erfahrungen",
