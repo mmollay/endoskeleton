@@ -3001,17 +3001,22 @@ section.lp-block {
   min-width: 0;
 }
 
-/* Lange zusammengesetzte Wörter („Nahrungsergänzungsmittel") dürfen umbrechen statt die Seite zu verbreitern. */
+/* Lange zusammengesetzte Wörter („Nahrungsergänzungsmittel“) dürfen umbrechen statt die Seite zu verbreitern;
+   Silbentrennung nur in Überschriften, im Fließtext bricht ein Wort nur, wenn es sonst nicht passt. */
 .lp-block h1,
 .lp-block h2,
-.lp-block h3,
+.lp-block h3 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* „anywhere“ statt „break-word“: zählt auch für die Mindestbreite von Raster- und Listenelementen */
 .lp-block p,
 .lp-block li,
 .lp-block summary,
 .lp-block label,
 .lp-block figcaption {
-  overflow-wrap: break-word;
-  hyphens: auto;
+  overflow-wrap: anywhere;
 }
 
 .lp-block p,
