@@ -1,0 +1,17 @@
+## Angaben nach § 5 E-Commerce-Gesetz
+
+Beispiel Akademie GmbH
+Musterweg 1
+1010 Wien, Österreich
+
+### Kontakt
+
+- E-Mail: [office@beispiel.invalid](mailto:office@beispiel.invalid)
+- Telefon: +43 1 0000000
+
+### Unternehmensdaten
+
+UID-Nummer: ATU00000000
+Firmenbuchnummer: FN 000000a
+
+Dieses Impressum gehört zum neutralen Testprofil der Landingpage-Fabrik und beschreibt kein echtes Unternehmen.
