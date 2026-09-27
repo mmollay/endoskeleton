@@ -184,11 +184,15 @@ function kontrastImBrowser(nur) {
   // Nur 300 px hoch, damit das Formular unter der ersten Bildschirmhöhe liegt: Ins Bild bringt die Meldung allein der
   // Fokus (focus() scrollt) — die Sprungmarke #anmeldung nimmt lp.js vor dem Sprung aus der Adresse. „Weniger
   // Bewegung“, weil base.css sonst weich scrollt und die Lage beim Laden noch nicht feststeht.
+  // Datenschutz (27.09.2026): Nach außen gibt es nur ok | fehler. Ein „bereits“ (älterer Stand der Weiterleitungsstelle)
+  // zeigt genau dieselbe Seite wie „ok“ — sonst ließe sich an einer fremden Adresse die Anmeldung ablesen.
   {
-    const MELDUNGEN = ['lp-anmeldung-danke', 'lp-anmeldung-bereits', 'lp-anmeldung-fehler'];
-    const faelle = [['ok', 'lp-anmeldung-danke', false], ['bereits', 'lp-anmeldung-bereits', false], ['fehler', 'lp-anmeldung-fehler', true],
+    const MELDUNGEN = ['lp-anmeldung-danke', 'lp-anmeldung-fehler'];
+    const ZUSATZ = 'Falls du schon angemeldet warst, bekommst du keine neue E-Mail.';
+    const faelle = [['ok', 'lp-anmeldung-danke', false], ['bereits', 'lp-anmeldung-danke', false], ['fehler', 'lp-anmeldung-fehler', true],
       ['unsinn', null, true], ['constructor', null, true], [null, null, true]];
     for (const seite of ['anmeldung--karte', 'anmeldung--breit']) {
+      const seitentext = {};
       for (const [zustand, klasse, felder] of faelle) {
         const suche = zustand === null ? '' : `?anmeldung=${zustand}#anmeldung`;
         const { page, kontext } = await oeffnen(browser, seite, 390, { suche, hoehe: 300, reducedMotion: 'reduce' });
@@ -203,9 +207,17 @@ function kontrastImBrowser(nur) {
             felder: fs.getClientRects().length > 0,
             adresse: location.search + location.hash,
             durchgelaufen: document.querySelector('.lp-formular').noValidate,   // lp.js ist nicht abgebrochen
+            meldung: m ? m.innerText : '',
+            text: document.body.innerText,                                    // alles, was man sieht
+            bereits: document.querySelector('.lp-anmeldung-bereits') !== null,
           };
         }, MELDUNGEN);
         const fall = `${seite}${suche || ' ohne Parameter'}`;
+        seitentext[zustand] = ist.text;
+        pruefe(!ist.bereits, `${fall}: keine eigene Meldung „bereits angemeldet“ im Dokument`);
+        if (klasse === 'lp-anmeldung-danke') {
+          pruefe(ist.meldung.includes(ZUSATZ), `${fall}: Dankesmeldung mit Zusatzsatz („${ist.meldung}“)`);
+        }
         pruefe(JSON.stringify(ist.sichtbar) === JSON.stringify(klasse ? [klasse] : []), `${fall}: sichtbare Meldung ${ist.sichtbar.join(', ') || 'keine'} (erwartet ${klasse || 'keine'})`);
         pruefe(ist.fokus === (klasse || 'body'), `${fall}: Fokus auf ${ist.fokus} (erwartet ${klasse || 'body'})`);
         pruefe(ist.felder === felder, `${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'} (erwartet ${felder ? 'sichtbar' : 'ausgeblendet'})`);
@@ -222,6 +234,7 @@ function kontrastImBrowser(nur) {
         }
         await kontext.close();
       }
+      pruefe(seitentext.ok === seitentext.bereits && seitentext.ok.includes(ZUSATZ), `${seite}: ok und bereits im sichtbaren Text nicht unterscheidbar`);
     }
   }
 

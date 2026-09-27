@@ -147,25 +147,30 @@ return [
         T::eq($x->query('//form[@action]')->length, 0, 'kein Ziel');
         T::contains((string) $x->query('//*[contains(@class,"lp-anmeldung-hinweis")]')->item(0)?->textContent, 'wird gerade eingerichtet', 'Hinweis sichtbar');
     },
-    'anmeldung: Rückmeldungen nach dem Absenden (?anmeldung=ok|bereits|fehler) vorbereitet, versteckt, du/Sie' => static function () use ($bau, $profilMit): void {
+    'anmeldung: Rückmeldungen nach dem Absenden (?anmeldung=ok|fehler) vorbereitet, versteckt, du/Sie' => static function () use ($bau, $profilMit): void {
         [$h, $x] = $bau(H::seite());
-        $meldung = static fn (string $klasse) => $x->query("//form[contains(@class,\"lp-formular\")]/p[contains(concat(' ', @class, ' '), ' $klasse ')]");
-        foreach (['lp-anmeldung-danke', 'lp-anmeldung-bereits', 'lp-anmeldung-fehler'] as $klasse) {
-            T::eq($meldung($klasse)->length, 1, "$klasse: genau einmal im Formular");
-            $p = $meldung($klasse)->item(0);
+        $meldung = static fn (DOMXPath $x, string $klasse) => $x->query("//form[contains(@class,\"lp-formular\")]/p[contains(concat(' ', @class, ' '), ' $klasse ')]");
+        $text = static fn (DOMXPath $x, string $klasse): string => trim((string) preg_replace('/\s+/u', ' ', (string) $meldung($x, $klasse)->item(0)?->textContent));
+        foreach (['lp-anmeldung-danke', 'lp-anmeldung-fehler'] as $klasse) {
+            T::eq($meldung($x, $klasse)->length, 1, "$klasse: genau einmal im Formular");
+            $p = $meldung($x, $klasse)->item(0);
             T::ok($p !== null && $p->hasAttribute('hidden'), "$klasse: ohne Rückmeldung versteckt");
             T::eq($p?->getAttribute('role'), 'status', "$klasse: role=status");
             T::eq($p?->getAttribute('tabindex'), '-1', "$klasse: fokussierbar für lp.js, aber kein Tab-Halt");
         }
-        T::eq(trim((string) $meldung('lp-anmeldung-danke')->item(0)?->textContent), 'Danke! Bitte bestätige deine Anmeldung in der E-Mail.', 'ok: Dankestext aus dem Bauplan');
-        T::contains((string) $meldung('lp-anmeldung-bereits')->item(0)?->textContent, 'Du bist bereits angemeldet.', 'bereits: du');
-        T::contains((string) $meldung('lp-anmeldung-fehler')->item(0)?->textContent, 'Bitte prüfe deine Angaben und versuche es noch einmal.', 'fehler: du');
+        T::eq($text($x, 'lp-anmeldung-danke'), 'Danke! Bitte bestätige deine Anmeldung in der E-Mail. Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'ok: Dankestext aus dem Bauplan, danach der feste Zusatzsatz (du)');
+        T::contains($text($x, 'lp-anmeldung-fehler'), 'Bitte prüfe deine Angaben und versuche es noch einmal.', 'fehler: du');
         T::eq($x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-fehler")]/following-sibling::fieldset')->length, 1, 'fehler: Meldung steht vor den Feldern');
-        [$h] = $bau(H::seite(), $profilMit(static fn ($j) => ['anrede' => 'Sie'] + $j));
-        T::contains($h, 'Sie sind bereits angemeldet.', 'bereits: Sie');
+        // Datenschutz (Entscheidung 27.09.2026): Die Seite verrät nicht, ob eine Adresse schon auf der Liste steht —
+        // keine eigene Meldung dafür; die Dankesmeldung deckt beide Fälle ab.
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-bereits")]')->length, 0, 'keine eigene Meldung „bereits angemeldet“');
+        T::notContains($h, 'bereits angemeldet', 'kein Text „bereits angemeldet“');
+        [$h, $x] = $bau(H::seite(), $profilMit(static fn ($j) => ['anrede' => 'Sie'] + $j));
+        T::eq($text($x, 'lp-anmeldung-danke'), 'Danke! Bitte bestätige deine Anmeldung in der E-Mail. Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.', 'ok: Zusatzsatz (Sie)');
         T::contains($h, 'Bitte prüfen Sie Ihre Angaben und versuchen Sie es noch einmal.', 'fehler: Sie');
-        T::notContains($h, 'Du bist bereits', 'bereits: kein du');
+        T::notContains($h, 'Falls du schon', 'ok: kein du');
         T::notContains($h, 'Bitte prüfe deine', 'fehler: kein du');
+        T::notContains($h, 'bereits angemeldet', 'Sie: kein Text „bereits angemeldet“');
     },
     'anmeldung ohne JavaScript: Hinweis im <noscript> erklärt den Ablauf, du/Sie; ohne Formularziel keiner' => static function () use ($bau, $profilMit): void {
         [$h, $x] = $bau(H::seite());
