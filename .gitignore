@@ -48,3 +48,6 @@ api/data/generated/*
 api/data/rate-limits/*.json
 .superpowers/
 api/data/refine-cache/
+
+# Bildschirmfotos der Browsertests
+ci/bilder/

@@ -1,0 +1,15 @@
+# Erzeugt von lp/sammelordner.php (SSI Endoskeleton) — wird bei Bedarf neu geschrieben, nicht von Hand ändern.
+# Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied" (fail2ban zählt jedes „client denied").
+ErrorDocument 404 default
+Options -Indexes
+<IfModule mod_expires.c>
+ExpiresActive Off
+</IfModule>
+<IfModule mod_headers.c>
+Header always set Cache-Control "no-store"
+Header always set X-Robots-Tag "noindex"
+</IfModule>
+RedirectMatch 404 "(?i)\.(json|md|php)$"
+RedirectMatch 404 "(?i)/_profil(/|$)"
+RedirectMatch 404 "(?i)/profil(/|$)"
+RedirectMatch 404 "(?i)/ENDOSKELETON$"

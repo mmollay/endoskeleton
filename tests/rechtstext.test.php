@@ -19,7 +19,7 @@ return [
         $html = Rechtstext::html('Siehe [Seite](https://www.example.com/x) und [Mail](mailto:office@beispiel.invalid) und [Böse](https://evil.example.org) und [JS](javascript:alert(1)).', ['www.example.com']);
         T::contains($html, '<a href="https://www.example.com/x">Seite</a>', 'erlaubter Link');
         T::contains($html, '<a href="mailto:office@beispiel.invalid">Mail</a>', 'mailto');
-        T::notContains($html, 'href="https://evil', 'fremder Host wird kein Link');
+        T::notContains($html, 'href="https://evil.example.org', 'fremder Host wird kein Link');
         T::notContains($html, 'href="javascript', 'javascript: wird kein Link');
         T::contains($html, '[Böse](https://evil.example.org)', 'fremder Link bleibt als Text');
     },

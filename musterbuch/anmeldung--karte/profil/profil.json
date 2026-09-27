@@ -1,0 +1,24 @@
+{
+  "format": 1,
+  "name": "Testprofil",
+  "version": "1.0.0",
+  "sprache": "de-AT",
+  "anrede": "du",
+  "vorschlag": false,
+  "firma": {
+    "name": "Beispiel Akademie GmbH",
+    "strasse": "Musterweg 1",
+    "plz_ort": "1010 Wien",
+    "land": "Österreich",
+    "email": "office@beispiel.invalid",
+    "telefon": "+43 1 0000000",
+    "uid": "ATU00000000",
+    "firmenbuch": "FN 000000a"
+  },
+  "logo": { "datei": "logo.svg", "alt": "Beispiel Akademie", "breite": 180, "hoehe": 48 },
+  "einwilligung": "Ja, ich möchte die Zugangsdaten und Neuigkeiten der Beispiel Akademie per E-Mail bekommen. Diese Einwilligung kann ich jederzeit widerrufen.",
+  "formularziel": "https://beispiel.invalid/anmelden",
+  "link_hosts": ["www.example.com", "beispiel.invalid"],
+  "sperrliste": ["garantiert geheilt"],
+  "grenzwoerter": ["heilt"]
+}

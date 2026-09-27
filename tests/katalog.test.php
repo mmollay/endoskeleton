@@ -42,4 +42,28 @@ return [
             T::eq(H::texte(Schema::pruefen(H::seite($mitte), $k, $p, T::tmp())), '', "$typ: Beispiel gültig");
         }
     },
+    'jede Klasse kommt im Musterbuch vor, jede lp-Klasse steht im Katalog' => static function () use ($k): void {
+        $w = H::wurzel();
+        $css = (string) file_get_contents("$w/lp/lp.css");
+        preg_match_all('/\.(lp-[a-z0-9-]+)/', $css, $m);
+        $html = '';
+        // gebaute Seiten + Vorlagen (Klassen, die nur unter Bedingungen erscheinen, z. B. ohne Formularziel)
+        foreach (array_merge(glob("$w/musterbuch/*/*.html") ?: [], glob("$w/lp/bausteine/*.php") ?: []) as $f) { $html .= (string) file_get_contents($f); }
+        preg_match_all('/class="([^"]*)"/', $html, $c);
+        $genutzt = array_unique(array_filter(explode(' ', implode(' ', $c[1])), static fn ($x) => str_starts_with($x, 'lp-')));
+        $klassen = $k->klassen();
+        foreach (array_unique(array_merge($m[1], $genutzt)) as $x) { T::ok(isset($klassen[$x]), "Klasse $x steht im Katalog"); }
+        foreach (array_keys($klassen) as $x) {
+            T::ok(in_array($x, $genutzt, true), "Klasse $x kommt im Musterbuch oder einer Vorlage vor");
+        }
+    },
+    'neue Klassen stehen im CHANGELOG ihrer Version' => static function () use ($k, $version): void {
+        $log = (string) file_get_contents(H::wurzel() . '/CHANGELOG.md');
+        $start = strpos($log, "## [$version]");
+        $ende = strpos($log, "\n## [", $start + 5);
+        $abschnitt = substr($log, (int) $start, $ende === false ? null : $ende - $start);
+        foreach ($k->klassen() as $x => $seit) {
+            if ($seit === $version) { T::contains($abschnitt, "`$x`", "CHANGELOG $version nennt $x"); }
+        }
+    },
 ];

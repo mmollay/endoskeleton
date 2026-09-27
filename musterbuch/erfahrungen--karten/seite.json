@@ -1,0 +1,41 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Erfahrungen – karten",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Erfahrungen\" in der Variante „karten\"."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Erfahrungen – karten",
+            "text": "Baustein „erfahrungen\" in der Variante „karten\" (seit 3.51.0, geändert 3.51.0)."
+        },
+        {
+            "typ": "erfahrungen",
+            "variante": "karten",
+            "titel": "Das sagen Teilnehmer",
+            "eintraege": [
+                {
+                    "text": "Sehr verständlich erklärt, ich habe viel mitgenommen.",
+                    "name": "Anna B.",
+                    "ort": "Graz",
+                    "quelle": "https://www.example.com/erfahrungen/1"
+                },
+                {
+                    "text": "Endlich jemand, der sich Zeit für Fragen nimmt.",
+                    "name": "Peter K.",
+                    "ort": "Linz",
+                    "quelle": "https://www.example.com/erfahrungen/2"
+                },
+                {
+                    "text": "Kurzweilig und praktisch – genau richtig nach der Arbeit.",
+                    "name": "Sabine M.",
+                    "quelle": "https://www.example.com/erfahrungen/3"
+                }
+            ]
+        }
+    ]
+}
