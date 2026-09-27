@@ -1,0 +1,600 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton — Landingpage-Baukasten (lp) 3.51.0
+   Nur lp-*-Klassen und Tokens aus base.css/profil.css, keine festen Farben.
+   Hintergründe immer als section.lp-block…: base.css färbt sonst jede zweite
+   <section> (section:nth-of-type(even)).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── RAHMEN ────────────────────────────────────────────────────────────── */
+body.lp-seite {
+  padding-top: 0;            /* base.css reserviert Platz für eine feste Navigation — die gibt es hier nicht */
+}
+
+.lp-seite [hidden] {
+  display: none;             /* stärker als Klassen mit display, damit „hidden" immer gilt */
+}
+
+.lp-kopf {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-kopf-innen {
+  display: flex;
+  align-items: center;
+  min-height: 4.5rem;
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+}
+
+.lp-logo {
+  display: inline-flex;
+}
+
+.lp-logo img {
+  height: 3rem;
+  width: auto;
+}
+
+section.lp-block {
+  padding: var(--space-3xl) 0;
+  background: var(--bg);
+}
+
+.lp-block[id] {
+  scroll-margin-top: var(--space-md);
+}
+
+.lp-block-innen {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.lp-block-innen > * {
+  min-width: 0;
+}
+
+.lp-block p,
+.lp-block ul,
+.lp-block h2,
+.lp-block h1 {
+  margin-bottom: 0;
+}
+
+.lp-block p + p {
+  margin-top: var(--space-md);
+}
+
+.lp-block p a,
+.lp-block label a,
+.lp-fuss a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.lp-titel {
+  max-width: 40rem;
+}
+
+.lp-knopf {
+  justify-self: start;
+}
+
+.lp-fuss {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: var(--space-xl) 0;
+  font-size: var(--fs-sm);
+}
+
+.lp-fuss-innen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-md) var(--space-xl);
+}
+
+.lp-fuss-firma {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.lp-fuss-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.lp-fuss a {
+  color: var(--primary);
+}
+
+.lp-rechtsseite .lp-block-innen {
+  display: block;
+  max-width: 48rem;
+}
+
+.lp-rechtsseite h2 {
+  font-size: var(--fs-xl);
+  margin: var(--space-xl) 0 var(--space-sm);
+}
+
+.lp-rechtsseite h3 {
+  font-size: var(--fs-lg);
+  margin: var(--space-lg) 0 var(--space-sm);
+}
+
+.lp-rechtsseite ul {
+  margin-top: var(--space-sm);
+}
+
+/* ─── KOPFBEREICH ───────────────────────────────────────────────────────── */
+.lp-hero .lp-block-innen {
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.lp-hero-text {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 38rem;
+}
+
+.lp-hero-dachzeile {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.lp-hero-titel {
+  font-size: var(--fs-hero);
+  line-height: 1.1;
+}
+
+.lp-hero-text p:not(.lp-hero-dachzeile) {
+  font-size: var(--fs-md);
+}
+
+.lp-hero-text .lp-knopf {
+  margin-top: var(--space-sm);
+}
+
+.lp-hero-bild {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+@media (min-width: 60rem) {
+  .lp-hero--bild-rechts .lp-block-innen {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+
+section.lp-hero--bild-hinten {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-3xl) 0;
+}
+
+.lp-hero--bild-hinten .lp-block-innen {
+  min-height: 26rem;
+}
+
+.lp-hero--bild-hinten .lp-hero-bild {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.lp-hero--bild-hinten .lp-hero-text {
+  position: relative;
+  z-index: 1;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.lp-hero--schlicht .lp-hero-text {
+  max-width: 46rem;
+}
+
+/* ─── TERMIN ────────────────────────────────────────────────────────────── */
+.lp-termin-liste {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.lp-termin-eintrag {
+  margin: 0;
+  color: var(--text);
+}
+
+.lp-termin-zeit {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.lp-termin--karte .lp-termin-liste {
+  max-width: 46rem;
+}
+
+.lp-termin--karte .lp-termin-eintrag {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 0.35rem solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+section.lp-termin--band {
+  background: var(--lp-akzent);
+}
+
+.lp-termin--band .lp-termin-liste {
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+/* ─── THEMEN ────────────────────────────────────────────────────────────── */
+.lp-themen-liste {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+  max-width: 46rem;
+}
+
+.lp-themen-punkt {
+  position: relative;
+  margin: 0;
+  padding-left: 2rem;
+}
+
+.lp-themen-punkt::before {
+  content: "";
+  position: absolute;
+  left: 0.4rem;
+  top: 0.35em;
+  width: 0.45rem;
+  height: 0.85rem;
+  border: solid var(--primary);
+  border-width: 0 0.2rem 0.2rem 0;
+  transform: rotate(45deg);
+}
+
+@media (min-width: 48rem) {
+  .lp-themen--zwei-spalten .lp-themen-liste {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-2xl);
+    max-width: none;
+  }
+}
+
+/* ─── VIDEO ─────────────────────────────────────────────────────────────── */
+.lp-video-rahmen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--heading);
+}
+
+.lp-video-start {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.lp-video-bild {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lp-video-start::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4.5rem;
+  height: 4.5rem;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.lp-video-start::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-35%, -50%);
+  border-style: solid;
+  border-width: 0.8rem 0 0.8rem 1.3rem;
+  border-color: transparent transparent transparent var(--text-on-primary);
+}
+
+.lp-video-start:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: -0.1875rem;
+}
+
+.lp-video-rahmen iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lp-video-link {
+  font-size: var(--fs-sm);
+}
+
+@media (min-width: 60rem) {
+  .lp-video--mit-text .lp-block-innen {
+    grid-template-columns: 1fr 1.3fr;
+    align-items: center;
+  }
+
+  .lp-video--mit-text .lp-titel,
+  .lp-video--mit-text .lp-video-link {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ─── ERFAHRUNGEN ───────────────────────────────────────────────────────── */
+section.lp-erfahrungen {
+  background: var(--bg-alt);
+}
+
+.lp-erfahrungen-liste {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.lp-erfahrungen-liste > li {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .lp-erfahrungen--karten .lp-erfahrungen-liste {
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+}
+
+.lp-erfahrung {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.lp-erfahrung-text {
+  margin: 0;
+}
+
+.lp-erfahrung-text p {
+  font-size: var(--fs-md);
+}
+
+.lp-erfahrung-name {
+  margin-top: auto;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.lp-erfahrung-quelle {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.lp-erfahrungen--einzeln .lp-erfahrungen-liste {
+  max-width: 46rem;
+}
+
+.lp-erfahrungen--einzeln .lp-erfahrung-text p {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+}
+
+/* ─── HÄUFIGE FRAGEN ────────────────────────────────────────────────────── */
+.lp-faq-liste {
+  display: grid;
+  gap: var(--space-sm);
+  max-width: 50rem;
+}
+
+.lp-faq-frage {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.lp-faq-frage > summary {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  font-weight: 600;
+  color: var(--heading);
+  cursor: pointer;
+  list-style: none;
+}
+
+.lp-faq-frage > summary::-webkit-details-marker {
+  display: none;
+}
+
+.lp-faq-frage > summary::after {
+  content: "+";
+  font-size: var(--fs-lg);
+  line-height: 1;
+  color: var(--primary);
+}
+
+.lp-faq-frage[open] > summary::after {
+  content: "–";
+}
+
+.lp-faq-antwort {
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+
+/* ─── ANMELDUNG ─────────────────────────────────────────────────────────── */
+section.lp-anmeldung {
+  background: var(--bg-alt);
+}
+
+.lp-anmeldung--karte .lp-formular {
+  max-width: 38rem;
+}
+
+.lp-anmeldung--breit .lp-formular {
+  max-width: 60rem;
+}
+
+.lp-formular {
+  display: grid;
+  gap: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.lp-formular fieldset {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lp-anmeldung--breit .lp-formular fieldset {
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.lp-anmeldung--breit .lp-einwilligung,
+.lp-anmeldung--breit .lp-formular .lp-knopf {
+  grid-column: 1 / -1;
+}
+
+.lp-feld {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.lp-feld label {
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.lp-feld input:not([type="checkbox"]) {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.lp-feld input[aria-invalid="true"] {
+  border: 2px solid var(--error);
+}
+
+.lp-feld-fehler {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--error);
+}
+
+.lp-einwilligung {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-sm);
+}
+
+.lp-einwilligung input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.3rem;
+  accent-color: var(--primary);
+}
+
+.lp-einwilligung label {
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.lp-einwilligung .lp-feld-fehler {
+  grid-column: 2;
+}
+
+.lp-anmeldung-hinweis {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--lp-akzent);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.lp-formular fieldset:disabled input,
+.lp-formular fieldset:disabled .lp-knopf {
+  cursor: not-allowed;
+}
+
+.lp-anmeldung-danke {
+  font-weight: 600;
+  color: var(--heading);
+}
+
+/* ─── ABSCHLUSS ─────────────────────────────────────────────────────────── */
+section.lp-abschluss--akzent {
+  background: var(--lp-akzent);
+}
+
+.lp-abschluss .lp-block-innen {
+  justify-items: center;
+  text-align: center;
+}
+
+.lp-abschluss .lp-titel {
+  max-width: 44rem;
+}
+
+.lp-abschluss-text {
+  max-width: 40rem;
+}
+
+.lp-abschluss .lp-knopf {
+  justify-self: center;
+}
