@@ -44,6 +44,11 @@ $tests = [
         T::eq(hash_file('sha256', "$w/musterbuch/hero--schlicht/index.html"), $repoVorher, 'Repo-Musterbuch unberührt');
         exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($ziel) . ' 2>&1', $aus, $rc);
         T::eq($rc, 0, 'ein früheres Musterbuch darf ersetzt werden');
+        $kaputt = T::tmp() . '/kaputt';
+        $pk = H::profilKopie();
+        file_put_contents("$pk/profil.css", str_replace('--text: #2b3440;', '--text: #b0b8c0;', (string) file_get_contents("$pk/profil.css")));
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($pk) . ' --ziel ' . escapeshellarg($kaputt) . ' 2>&1', $aus, $rc);
+        T::ok($rc === 1 && is_file("$kaputt/.musterbuch"), 'auch ein abgebrochener Bau hinterlässt die Markierung (sonst ließe sich der Rest nie ersetzen)');
         $fremd = T::tmp() . '/webseite';
         mkdir($fremd);
         file_put_contents("$fremd/index.html", 'Kundenseite');
