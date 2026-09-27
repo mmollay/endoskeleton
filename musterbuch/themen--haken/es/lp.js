@@ -30,7 +30,8 @@
 
   // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|bereits|fehler#anmeldung): Meldung zeigen und fokussieren, bei
   // ok und bereits ohne Felder; andere Werte wirken nicht. Beides verschwindet aus der Adresse — sonst nimmt Chrome beim
-  // Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte Adresse zeigte die Meldung statt des Formulars.
+  // Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte Adresse zeigte die Meldung statt des Formulars. Damit
+  // springt der Browser nicht mehr zur Sprungmarke: Ins Bild bringt die Meldung allein focus() (ohne preventScroll).
   var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-bereits', fehler: '.lp-anmeldung-fehler' };
   var adresse = new URL(location.href), zustand = adresse.searchParams.get('anmeldung');
 

@@ -49,7 +49,10 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   sperrt die Prüfung.
 - Ohne `formularziel` im Profil ist das Anmeldeformular sichtbar gesperrt und die Freigabe gesperrt.
 - Das Formularziel antwortet immer mit 303 zurück auf die Seite: `?anmeldung=ok|bereits|fehler#anmeldung`. `lp.js`
-  zeigt dann den Dankestext (`danke`), „bereits angemeldet“ oder „Fehler“ (Texte fest, du/Sie aus dem Profil).
+  zeigt dann den Dankestext (`danke`), „bereits angemeldet“ oder „Fehler“ (Texte fest, du/Sie aus dem Profil) und
+  fokussiert ihn — das bringt ihn ins Bild, die Sprungmarke nimmt `lp.js` aus der Adresse. Ohne JavaScript gibt es auf
+  der Seite keine Rückmeldung: Der Browser springt nur zum Formular, ein `<noscript>`-Hinweis verweist auf die E-Mail.
+- Die Anmeldung trägt immer `"anker": "anmeldung"` (Ziel des Rücksprungs); sonst sperrt die Prüfung.
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
 ## Einen Baustein hinzufügen (wie GRIDKit)

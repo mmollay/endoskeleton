@@ -23,9 +23,12 @@ let bestanden = 0;
 const fehler = [];
 const pruefe = (bedingung, was) => { if (bedingung) { bestanden++; } else { fehler.push(was); } };
 
-/** Öffnet eine Musterbuch-Seite (optionen.suche z. B. '?anmeldung=ok#anmeldung'); fremd sammelt alle Anfragen außerhalb von lp.test. */
+/**
+ * Öffnet eine Musterbuch-Seite (optionen.suche z. B. '?anmeldung=ok#anmeldung', optionen.hoehe statt 900 px);
+ * fremd sammelt alle Anfragen außerhalb von lp.test.
+ */
 async function oeffnen(browser, name, breite, optionen = {}) {
-  const kontext = await browser.newContext({ viewport: { width: breite, height: 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
+  const kontext = await browser.newContext({ viewport: { width: breite, height: optionen.hoehe || 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
   const page = await kontext.newPage();
   const fremd = [];
   await page.route('**/*', (r) => {
@@ -156,8 +159,31 @@ function kontrastImBrowser(nur) {
     await kontext.close();
   }
 
+  // Ohne JavaScript nach dem Rücksprung: keine Meldung (die zeigt nur lp.js), aber der <noscript>-Hinweis erklärt den
+  // Ablauf, und die Sprungmarke #anmeldung bringt das Formular ins Bild (ohne weiches Scrollen, s. o.).
+  for (const seite of ['anmeldung--karte', 'anmeldung--breit']) {
+    const { page, kontext } = await oeffnen(browser, seite, 390, { ohneJs: true, suche: '?anmeldung=ok#anmeldung', hoehe: 300, reducedMotion: 'reduce' });
+    const ist = await page.evaluate(() => {
+      const h = document.querySelector('.lp-formular noscript .lp-anmeldung-hinweis');
+      return { hinweis: h !== null && h.getClientRects().length > 0 ? h.textContent : '', scroll: scrollY, anker: document.getElementById('anmeldung') !== null };
+    });
+    pruefe(ist.hinweis.includes('Nach dem Absenden bekommst du eine E-Mail'), `${seite} ohne JavaScript: Hinweis zum Ablauf sichtbar („${ist.hinweis}“)`);
+    pruefe(ist.anker && ist.scroll > 0, `${seite} ohne JavaScript: Sprungmarke #anmeldung wirkt (scrollY ${ist.scroll})`);
+    const schwach = await page.evaluate(kontrastImBrowser, '.lp-formular noscript .lp-anmeldung-hinweis');
+    pruefe(schwach.length === 0, `${seite} ohne JavaScript: Kontrast des Hinweises: ${schwach.join(' | ')}`);
+    await kontext.close();
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'anmeldung--karte', 390);
+    pruefe(await page.evaluate(() => [...document.querySelectorAll('.lp-anmeldung-hinweis')].every((e) => e.getClientRects().length === 0)), 'mit JavaScript kein <noscript>-Hinweis');
+    await kontext.close();
+  }
+
   // Rückmeldung der Weiterleitung (?anmeldung=…): passende Meldung sichtbar und fokussiert, Felder nur bei „fehler“;
   // unbekannte Werte und die Seite ohne Parameter bleiben wie bisher. Kontrast der sichtbaren Meldung gemessen.
+  // Nur 300 px hoch, damit das Formular unter der ersten Bildschirmhöhe liegt: Ins Bild bringt die Meldung allein der
+  // Fokus (focus() scrollt) — die Sprungmarke #anmeldung nimmt lp.js vor dem Sprung aus der Adresse. „Weniger
+  // Bewegung“, weil base.css sonst weich scrollt und die Lage beim Laden noch nicht feststeht.
   {
     const MELDUNGEN = ['lp-anmeldung-danke', 'lp-anmeldung-bereits', 'lp-anmeldung-fehler'];
     const faelle = [['ok', 'lp-anmeldung-danke', false], ['bereits', 'lp-anmeldung-bereits', false], ['fehler', 'lp-anmeldung-fehler', true],
@@ -165,10 +191,13 @@ function kontrastImBrowser(nur) {
     for (const seite of ['anmeldung--karte', 'anmeldung--breit']) {
       for (const [zustand, klasse, felder] of faelle) {
         const suche = zustand === null ? '' : `?anmeldung=${zustand}#anmeldung`;
-        const { page, kontext } = await oeffnen(browser, seite, 390, { suche });
+        const { page, kontext } = await oeffnen(browser, seite, 390, { suche, hoehe: 300, reducedMotion: 'reduce' });
         const ist = await page.evaluate((klassen) => {
           const fs = document.querySelector('.lp-formular fieldset');
+          const m = klassen.map((k) => document.querySelector(`.${k}`)).find((e) => e !== null && e.getClientRects().length > 0);
+          const r = m ? m.getBoundingClientRect() : null;
           return {
+            lage: r ? { oben: Math.round(r.top), unten: Math.round(r.bottom), hoehe: innerHeight, seitenoben: Math.round(r.top + scrollY) } : null,
             sichtbar: klassen.filter((k) => { const e = document.querySelector(`.${k}`); return e !== null && e.getClientRects().length > 0; }),
             fokus: document.activeElement === document.body ? 'body' : document.activeElement.className,
             felder: fs.getClientRects().length > 0,
@@ -182,6 +211,11 @@ function kontrastImBrowser(nur) {
         pruefe(ist.felder === felder, `${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'} (erwartet ${felder ? 'sichtbar' : 'ausgeblendet'})`);
         pruefe(ist.adresse === (klasse ? '' : suche), `${fall}: Adresse danach „${ist.adresse}“ (Teilen oder Neuladen zeigt wieder das Formular)`);
         pruefe(ist.durchgelaufen, `${fall}: lp.js läuft durch (Formularprüfung aktiv)`);
+        if (klasse && ist.lage) {
+          const { oben, unten, hoehe, seitenoben } = ist.lage;
+          pruefe(seitenoben > hoehe, `${fall}: Meldung liegt unter der ersten Bildschirmhöhe (${seitenoben} px) — sonst prüft „im Bild“ nichts`);
+          pruefe(oben >= 0 && unten <= hoehe, `${fall}: Meldung im sichtbaren Bereich (${oben}–${unten} px bei ${hoehe} px Höhe)`);
+        }
         if (klasse) {
           const schwach = await page.evaluate(kontrastImBrowser, `.${klasse}`);
           pruefe(schwach.length === 0, `${fall}: Kontrast der Meldung: ${schwach.join(' | ')}`);

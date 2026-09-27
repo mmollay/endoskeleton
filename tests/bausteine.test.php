@@ -167,6 +167,17 @@ return [
         T::notContains($h, 'Du bist bereits', 'bereits: kein du');
         T::notContains($h, 'Bitte prüfe deine', 'fehler: kein du');
     },
+    'anmeldung ohne JavaScript: Hinweis im <noscript> erklärt den Ablauf, du/Sie; ohne Formularziel keiner' => static function () use ($bau, $profilMit): void {
+        [$h, $x] = $bau(H::seite());
+        $hinweis = $x->query('//form[contains(@class,"lp-formular")]/noscript/p[contains(@class,"lp-anmeldung-hinweis")]');
+        T::eq($hinweis->length, 1, 'genau ein <noscript>-Hinweis im Formular');
+        T::contains((string) $hinweis->item(0)?->textContent, 'Nach dem Absenden bekommst du eine E-Mail von uns.', 'du');
+        T::eq($x->query('//form[contains(@class,"lp-formular")]/fieldset/following-sibling::noscript')->length, 1, 'steht nach den Feldern (beim Knopf)');
+        [$h] = $bau(H::seite(), $profilMit(static fn ($j) => ['anrede' => 'Sie'] + $j));
+        T::contains($h, 'Nach dem Absenden bekommen Sie eine E-Mail von uns.', 'Sie');
+        [$h] = $bau(H::seite(), $profilMit(static fn ($j) => ['formularziel' => ''] + $j));
+        T::notContains($h, '<noscript>', 'ohne Formularziel kein Hinweis zum Absenden');
+    },
     'Anrede aus dem Profil' => static function () use ($bau, $profilMit): void {
         [$h] = $bau(H::seite());
         T::contains($h, 'Bitte gib deine E-Mail-Adresse ein.', 'du');
