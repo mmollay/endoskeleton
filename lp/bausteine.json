@@ -159,7 +159,7 @@
       "klassen": {
         "lp-anmeldung": "3.51.0", "lp-anmeldung--karte": "3.51.0", "lp-anmeldung--breit": "3.51.0", "lp-formular": "3.51.0",
         "lp-feld": "3.51.0", "lp-feld-fehler": "3.51.0", "lp-einwilligung": "3.51.0", "lp-anmeldung-hinweis": "3.51.0",
-        "lp-anmeldung-danke": "3.51.0"
+        "lp-anmeldung-danke": "3.51.0", "lp-anmeldung-bereits": "3.51.0", "lp-anmeldung-fehler": "3.51.0"
       },
       "varianten": ["karte", "breit"],
       "felder": {

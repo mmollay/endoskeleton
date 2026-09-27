@@ -10,8 +10,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Musterbuch: Kopfbereich – schlicht">
 <meta property="og:description" content="Musterseite des Endoskeleton-Bausteins „Kopfbereich“ in der Variante „schlicht“.">
-<link rel="stylesheet" href="es/lp.css?v=2c53801fe1">
-<script src="es/lp.js?v=6b5d401e21" defer></script>
+<link rel="stylesheet" href="es/lp.css?v=d1e2b85322">
+<script src="es/lp.js?v=9ec9bab55a" defer></script>
 </head>
 <body class="lp-seite">
 <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
@@ -37,6 +37,7 @@
 <h2 class="lp-titel" id="lp-a2-titel">Jetzt kostenlos anmelden</h2>
 
 <form class="lp-formular" method="post" action="https://beispiel.invalid/anmelden">
+<p class="lp-anmeldung-fehler" role="status" tabindex="-1" hidden>Das hat leider nicht geklappt. Bitte prüfe deine Angaben und versuche es noch einmal.</p>
 <fieldset aria-labelledby="lp-a2-titel">
 <div class="lp-feld">
 <label for="lp-f-vorname">Vorname</label>
@@ -61,7 +62,8 @@
 <input type="hidden" name="einwilligung_kurz" value="0162f6464a52">
 <button type="submit" class="btn btn-primary lp-knopf">Ich bin dabei</button>
 </fieldset>
-<p class="lp-anmeldung-danke" role="status" hidden>Danke! Bitte bestätige deine Anmeldung in der E-Mail.</p>
+<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden>Danke! Bitte bestätige deine Anmeldung in der E-Mail.</p>
+<p class="lp-anmeldung-bereits" role="status" tabindex="-1" hidden>Du bist bereits angemeldet. Unsere E-Mail findest du in deinem Postfach – schau bitte auch im Spam-Ordner nach.</p>
 </form>
 </div>
 </section>

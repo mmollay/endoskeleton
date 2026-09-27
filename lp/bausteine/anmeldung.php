@@ -3,7 +3,8 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
  * Anmeldung: Felder mit Label, autocomplete und Fehlertext (als Beschreibung erst nach dem Absenden, lp.js); Einwilligung aus dem Profil, nie vorangehakt; Honigtopf;
  * Liste und Kurzprüfsumme des Einwilligungstexts als versteckte Felder. Ohne Formularziel sichtbar gesperrt
- * (Livegang gesperrt, bis die Anbindung steht). @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ * (Livegang gesperrt, bis die Anbindung steht). Rückmeldungen der Weiterleitung (?anmeldung=ok|bereits|fehler)
+ * liegen versteckt bereit; lp.js zeigt und fokussiert die passende. @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
@@ -25,6 +26,7 @@ $felder = [
 <?php if ($ziel === ''): ?>
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>
 <?php endif ?>
+<p class="lp-anmeldung-fehler" role="status" tabindex="-1" hidden><?= $k->e($k->du('Das hat leider nicht geklappt. Bitte prüfe deine Angaben und versuche es noch einmal.', 'Das hat leider nicht geklappt. Bitte prüfen Sie Ihre Angaben und versuchen Sie es noch einmal.')) ?></p>
 <fieldset aria-labelledby="<?= $k->id($nr, 'titel') ?>"<?= $ziel === '' ? ' disabled' : '' ?>>
 <?php foreach ($felder as $name => [$label, $typ, $auto, $pflicht, $fehler]): if (!in_array($name, $b['felder'], true)) { continue; } $id = "lp-f-$name"; ?>
 <div class="lp-feld">
@@ -48,7 +50,8 @@ $felder = [
 <input type="hidden" name="einwilligung_kurz" value="<?= substr(hash('sha256', (string) $p['einwilligung']), 0, 12) ?>">
 <button type="submit" class="btn btn-primary lp-knopf"><?= $k->e($b['knopf_text']) ?></button>
 </fieldset>
-<p class="lp-anmeldung-danke" role="status" hidden><?= $k->e($b['danke']) ?></p>
+<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><?= $k->e($b['danke']) ?></p>
+<p class="lp-anmeldung-bereits" role="status" tabindex="-1" hidden><?= $k->e($k->du('Du bist bereits angemeldet. Unsere E-Mail findest du in deinem Postfach – schau bitte auch im Spam-Ordner nach.', 'Sie sind bereits angemeldet. Unsere E-Mail finden Sie in Ihrem Postfach – sehen Sie bitte auch im Spam-Ordner nach.')) ?></p>
 </form>
 </div>
 </section>

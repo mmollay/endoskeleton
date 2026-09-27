@@ -48,6 +48,8 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Termine als `JJJJ-MM-TTTHH:MM` (Wiener Zeit). Gebaut werden alle; vergangene blendet `lp.js` aus. Sind alle vorbei,
   sperrt die Prüfung.
 - Ohne `formularziel` im Profil ist das Anmeldeformular sichtbar gesperrt und die Freigabe gesperrt.
+- Das Formularziel antwortet immer mit 303 zurück auf die Seite: `?anmeldung=ok|bereits|fehler#anmeldung`. `lp.js`
+  zeigt dann den Dankestext (`danke`), „bereits angemeldet“ oder „Fehler“ (Texte fest, du/Sie aus dem Profil).
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
 ## Einen Baustein hinzufügen (wie GRIDKit)

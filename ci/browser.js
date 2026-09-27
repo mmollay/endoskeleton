@@ -23,7 +23,7 @@ let bestanden = 0;
 const fehler = [];
 const pruefe = (bedingung, was) => { if (bedingung) { bestanden++; } else { fehler.push(was); } };
 
-/** Öffnet eine Musterbuch-Seite; fremd sammelt alle Anfragen außerhalb von lp.test. */
+/** Öffnet eine Musterbuch-Seite (optionen.suche z. B. '?anmeldung=ok#anmeldung'); fremd sammelt alle Anfragen außerhalb von lp.test. */
 async function oeffnen(browser, name, breite, optionen = {}) {
   const kontext = await browser.newContext({ viewport: { width: breite, height: 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
   const page = await kontext.newPage();
@@ -37,19 +37,23 @@ async function oeffnen(browser, name, breite, optionen = {}) {
     return r.fulfill({ status: 200, body: fs.readFileSync(f), contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
-  await page.goto(`http://lp.test/${name}${name ? '/' : ''}`);
+  await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
   return { page, fremd, kontext };
 }
 
-/** Kontrast jedes sichtbaren Textknotens gegen seinen tatsächlichen, deckenden Hintergrund (WCAG). */
-function kontrastImBrowser() {
+/**
+ * Kontrast jedes sichtbaren Textknotens gegen seinen tatsächlichen, deckenden Hintergrund (WCAG).
+ * Mit nur (CSS-Auswahl) nur diese Elemente — und ein Befund, wenn keines davon gemessen werden konnte.
+ */
+function kontrastImBrowser(nur) {
   const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
   const hell = ([r, g, b]) => {
     const k = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
     return 0.2126 * k(r) + 0.7152 * k(g) + 0.0722 * k(b);
   };
   const aus = [];
-  for (const el of document.querySelectorAll('body *')) {
+  let gemessen = 0;
+  for (const el of document.querySelectorAll(nur || 'body *')) {
     const text = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
     if (!text || el.closest('[hidden], script, .form-hp, .skip-link')) { continue; }
     const r = el.getBoundingClientRect();
@@ -65,6 +69,7 @@ function kontrastImBrowser() {
       grund = c; break;
     }
     if (!Array.isArray(grund)) { continue; }
+    gemessen++;
     const vorn = rgb(st.color);
     const a = hell(vorn), b = hell(grund);
     const verhaeltnis = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
@@ -72,6 +77,7 @@ function kontrastImBrowser() {
     const gross = groesse >= 24 || (groesse >= 18.66 && parseInt(st.fontWeight, 10) >= 700);
     if (verhaeltnis < (gross ? 3 : 4.5)) { aus.push(`${text.slice(0, 40)} (${verhaeltnis.toFixed(2)}:1)`); }
   }
+  if (nur && gemessen === 0) { aus.push(`${nur}: nicht gemessen`); }
   return aus;
 }
 
@@ -148,6 +154,41 @@ function kontrastImBrowser() {
     pruefe(fremd.length === 0 && page.url() === 'http://lp.test/anmeldung--karte/', `ohne JavaScript nichts abgeschickt (${fremd.join(', ')})`);
     pruefe(await page.evaluate(() => document.getElementById('lp-f-vorname').matches(':invalid')), 'ohne JavaScript meldet der Browser das Pflichtfeld');
     await kontext.close();
+  }
+
+  // Rückmeldung der Weiterleitung (?anmeldung=…): passende Meldung sichtbar und fokussiert, Felder nur bei „fehler“;
+  // unbekannte Werte und die Seite ohne Parameter bleiben wie bisher. Kontrast der sichtbaren Meldung gemessen.
+  {
+    const MELDUNGEN = ['lp-anmeldung-danke', 'lp-anmeldung-bereits', 'lp-anmeldung-fehler'];
+    const faelle = [['ok', 'lp-anmeldung-danke', false], ['bereits', 'lp-anmeldung-bereits', false], ['fehler', 'lp-anmeldung-fehler', true],
+      ['unsinn', null, true], ['constructor', null, true], [null, null, true]];
+    for (const seite of ['anmeldung--karte', 'anmeldung--breit']) {
+      for (const [zustand, klasse, felder] of faelle) {
+        const suche = zustand === null ? '' : `?anmeldung=${zustand}#anmeldung`;
+        const { page, kontext } = await oeffnen(browser, seite, 390, { suche });
+        const ist = await page.evaluate((klassen) => {
+          const fs = document.querySelector('.lp-formular fieldset');
+          return {
+            sichtbar: klassen.filter((k) => { const e = document.querySelector(`.${k}`); return e !== null && e.getClientRects().length > 0; }),
+            fokus: document.activeElement === document.body ? 'body' : document.activeElement.className,
+            felder: fs.getClientRects().length > 0,
+            adresse: location.search + location.hash,
+            durchgelaufen: document.querySelector('.lp-formular').noValidate,   // lp.js ist nicht abgebrochen
+          };
+        }, MELDUNGEN);
+        const fall = `${seite}${suche || ' ohne Parameter'}`;
+        pruefe(JSON.stringify(ist.sichtbar) === JSON.stringify(klasse ? [klasse] : []), `${fall}: sichtbare Meldung ${ist.sichtbar.join(', ') || 'keine'} (erwartet ${klasse || 'keine'})`);
+        pruefe(ist.fokus === (klasse || 'body'), `${fall}: Fokus auf ${ist.fokus} (erwartet ${klasse || 'body'})`);
+        pruefe(ist.felder === felder, `${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'} (erwartet ${felder ? 'sichtbar' : 'ausgeblendet'})`);
+        pruefe(ist.adresse === (klasse ? '' : suche), `${fall}: Adresse danach „${ist.adresse}“ (Teilen oder Neuladen zeigt wieder das Formular)`);
+        pruefe(ist.durchgelaufen, `${fall}: lp.js läuft durch (Formularprüfung aktiv)`);
+        if (klasse) {
+          const schwach = await page.evaluate(kontrastImBrowser, `.${klasse}`);
+          pruefe(schwach.length === 0, `${fall}: Kontrast der Meldung: ${schwach.join(' | ')}`);
+        }
+        await kontext.close();
+      }
+    }
   }
 
   // Häufige Fragen per Tastatur
