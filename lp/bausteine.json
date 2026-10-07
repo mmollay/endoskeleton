@@ -65,7 +65,8 @@
                                     "dauer_min": { "typ": "zahl", "label": "Dauer in Minuten", "min": 15, "max": 600 } } },
         "ort":       { "typ": "zeile", "label": "Ort", "max": 120, "pflicht": true },
         "wenn_leer": { "typ": "zeile", "label": "Text ohne Termin", "max": 120, "pflicht": true },
-        "preis":     { "typ": "zahl", "label": "Preis in Euro", "min": 1, "max": 9999 },
+        "preis":     { "typ": "zahl", "label": "Preis in Euro", "min": 1, "max": 9999,
+                       "fehlt": "Die Seite zeigt „Teilnahme kostenlos“ und meldet den Termin Suchmaschinen als kostenlos (`isAccessibleForFree`)" },
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "hoechstens": 2 },
@@ -171,7 +172,7 @@
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Knopf", "max": 40, "pflicht": true },
         "liste":      { "typ": "kennung", "label": "Verteilerliste", "muster": "^[a-z0-9][a-z0-9-]{1,59}$", "pflicht": true },
         "danke":      { "typ": "zeile", "label": "Dankestext", "max": 200, "pflicht": true },
-        "plaetze":    { "typ": "zahl", "label": "Plätze", "min": 1, "max": 10000 }
+        "plaetze":    { "typ": "zahl", "label": "Plätze", "min": 1, "max": 10000, "fehlt": "unbegrenzt" }
       },
       "regeln": { "hoechstens": 1 },
       "beispiel": {

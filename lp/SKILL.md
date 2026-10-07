@@ -122,7 +122,7 @@ Varianten: `karte`, `band` · seit 3.51.0, geändert 3.52.0 · höchstens 2-mal
 | `termine[].dauer_min` | zahl | – | 15–600 |
 | `ort` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
 | `wenn_leer` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
-| `preis` | zahl | – | 1–9999 |
+| `preis` | zahl | – | 1–9999; fehlt: Die Seite zeigt „Teilnahme kostenlos“ und meldet den Termin Suchmaschinen als kostenlos (`isAccessibleForFree`) |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json
@@ -256,7 +256,7 @@ Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.52.0 · höchstens 1-mal
 | `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
-| `plaetze` | zahl | – | 1–10000 |
+| `plaetze` | zahl | – | 1–10000; fehlt: unbegrenzt |
 
 ```json
 {

@@ -13,6 +13,7 @@ use Endo\Lp\Katalog;
 use Endo\Lp\Profil;
 use Endo\Lp\Pruefer;
 use Endo\Lp\Schema;
+use Endo\Lp\Skill;
 
 $k = Katalog::laden();
 /** Baut eine Seite und gibt [html, xpath, ordner] zurück; der Bau selbst hat keine Befunde. */
@@ -63,6 +64,12 @@ return [
         $e = $events($x)[0] ?? [];
         T::eq($e['isAccessibleForFree'] ?? null, false, 'JSON-LD: nicht frei');
         T::eq($e['offers'] ?? null, ['@type' => 'Offer', 'price' => 25, 'priceCurrency' => 'EUR'], 'JSON-LD: Angebot in Euro');
+    },
+    'SKILL.md und werkstatt.md sagen, was ein fehlender Preis bzw. fehlende Plätze auf der Seite bedeuten' => static function () use ($k): void {
+        foreach (['SKILL.md' => Skill::skill($k, ''), 'werkstatt.md' => Skill::werkstatt($k)] as $name => $text) {
+            T::ok(preg_match('/^\| `preis` \|.*fehlt: Die Seite zeigt „Teilnahme kostenlos“ und meldet den Termin Suchmaschinen als kostenlos/mu', $text) === 1, "$name: Zeile preis nennt die Folge eines fehlenden Preises");
+            T::ok(preg_match('/^\| `plaetze` \|.*fehlt: unbegrenzt/mu', $text) === 1, "$name: Zeile plaetze nennt „fehlt: unbegrenzt“");
+        }
     },
     'termin.preis: nur ganze Zahlen von 1 bis 9999' => static function () use ($k): void {
         $p = Profil::laden(H::testprofil());
