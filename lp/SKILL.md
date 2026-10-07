@@ -111,7 +111,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 
 ### `termin` — Termin
 
-Varianten: `karte`, `band` · seit 3.51.0, geändert 3.51.0 · höchstens 2-mal
+Varianten: `karte`, `band` · seit 3.51.0, geändert 3.52.0 · höchstens 2-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -122,6 +122,7 @@ Varianten: `karte`, `band` · seit 3.51.0, geändert 3.51.0 · höchstens 2-mal
 | `termine[].dauer_min` | zahl | – | 15–600 |
 | `ort` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
 | `wenn_leer` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
+| `preis` | zahl | – | 1–9999 |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json

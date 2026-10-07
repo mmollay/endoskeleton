@@ -51,10 +51,10 @@
       }
     },
     "termin": {
-      "name": "Termin", "seit": "3.51.0", "geaendert": "3.51.0",
+      "name": "Termin", "seit": "3.51.0", "geaendert": "3.52.0",
       "klassen": {
         "lp-termin": "3.51.0", "lp-termin--karte": "3.51.0", "lp-termin--band": "3.51.0", "lp-termin-liste": "3.51.0",
-        "lp-termin-eintrag": "3.51.0", "lp-termin-zeit": "3.51.0", "lp-termin-ort": "3.51.0", "lp-termin-leer": "3.51.0"
+        "lp-termin-eintrag": "3.51.0", "lp-termin-zeit": "3.51.0", "lp-termin-ort": "3.51.0", "lp-termin-leer": "3.51.0", "lp-termin-preis": "3.52.0"
       },
       "varianten": ["karte", "band"],
       "felder": {
@@ -65,6 +65,7 @@
                                     "dauer_min": { "typ": "zahl", "label": "Dauer in Minuten", "min": 15, "max": 600 } } },
         "ort":       { "typ": "zeile", "label": "Ort", "max": 120, "pflicht": true },
         "wenn_leer": { "typ": "zeile", "label": "Text ohne Termin", "max": 120, "pflicht": true },
+        "preis":     { "typ": "zahl", "label": "Preis in Euro", "min": 1, "max": 9999 },
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "hoechstens": 2 },
