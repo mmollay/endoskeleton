@@ -36,11 +36,12 @@
   // springt der Browser nicht mehr zur Sprungmarke: Ins Bild bringt die Meldung allein focus() (ohne preventScroll).
   var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-danke', fehler: '.lp-anmeldung-fehler', voll: '.lp-anmeldung-voll' };
   var adresse = new URL(location.href), zustand = adresse.searchParams.get('anmeldung');
+  var rueckmeldung = Object.prototype.hasOwnProperty.call(meldungen, zustand);
 
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
   // Ohne JavaScript prüft der Browser selbst (required); mit JavaScript übernehmen die eigenen Meldungen.
   document.querySelectorAll('form.lp-formular').forEach(function (form) {
-    var meldung = Object.prototype.hasOwnProperty.call(meldungen, zustand) && form.querySelector(meldungen[zustand]);
+    var meldung = rueckmeldung && form.querySelector(meldungen[zustand]);
     if (meldung) {
       meldung.hidden = false;
       if (zustand !== 'fehler') { form.querySelector('fieldset').hidden = true; }
@@ -65,8 +66,12 @@
 
   // Plätze (3.52.0): Ist die Anmeldung begrenzt, fragt die Seite den Stand beim Panel ab — nur Zahlen, ohne Cookies. Der Host
   // kommt aus dem Formularziel (data-lp-plaetze-quelle), nie fest aus diesem Skript. Bei „voll“ verschwinden die Felder;
-  // scheitert die Abfrage (Netz, Drosselung, Sperre), bleibt der feste Text „Begrenzt auf N Plätze.“ stehen.
+  // scheitert die Abfrage (Netz, Drosselung, Sperre), bleibt der feste Text „Begrenzt auf N Plätze.“ stehen. Nach einer
+  // Rückmeldung ohne Felder (ok, bereits, voll) ist die Zahl überholt: keine Abfrage, keine Anzeige — /lp/plaetze ist im
+  // Panel bis 60 s zwischengespeichert, /lp/anmelden zählt live, und sonst stünde „Noch 1 … frei“ neben „ausgebucht“.
+  // Nach „fehler“ wird gefragt; ist die Liste voll, ersetzt die Meldung „ausgebucht“ die Aufforderung, es noch einmal zu versuchen.
   document.querySelectorAll('.lp-anmeldung-plaetze[data-lp-plaetze-quelle]').forEach(function (anzeige) {
+    if (rueckmeldung && zustand !== 'fehler') { anzeige.hidden = true; return; }
     if (!window.fetch) { return; }
     var form = anzeige.closest('form');
     fetch(anzeige.dataset.lpPlaetzeQuelle + '?liste=' + encodeURIComponent(anzeige.dataset.lpPlaetzeListe), { credentials: 'omit' })
@@ -74,9 +79,14 @@
       .then(function (d) {
         if (!d || typeof d.frei !== 'number' || typeof d.gesamt !== 'number') { return; }
         if (d.voll === true) {
-          anzeige.textContent = 'Ausgebucht';
           var felder = form && form.querySelector('fieldset');
           if (felder) { felder.hidden = true; }
+          var fehler = form && form.querySelector('.lp-anmeldung-fehler'), voll = form && form.querySelector('.lp-anmeldung-voll');
+          if (fehler && voll && !fehler.hidden) {
+            fehler.hidden = true; anzeige.hidden = true; voll.hidden = false; voll.focus();
+            return;
+          }
+          anzeige.textContent = 'Ausgebucht';
           return;
         }
         anzeige.textContent = 'Noch ' + d.frei + ' von ' + d.gesamt + (d.gesamt === 1 ? ' Platz' : ' Plätzen') + ' frei';
