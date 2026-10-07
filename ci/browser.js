@@ -285,6 +285,36 @@ function kontrastImBrowser(nur) {
       pruefe(schwach.length === 0, `?anmeldung=voll: Kontrast der Meldung: ${schwach.join(' | ')}`);
       await kontext.close();
     }
+    // Rückmeldung und Plätze-Stand widersprechen sich nie: /lp/plaetze ist im Panel bis 60 s zwischengespeichert, /lp/anmelden
+    // zählt live — beim letzten Platz kommt „voll“ zurück, während die Abfrage noch „1 frei“ meldet. Ohne Felder (ok, voll)
+    // fragt die Seite nicht und zeigt keine Zahl; nach „fehler“ fragt sie, und ist die Liste voll, ersetzt „ausgebucht“ die
+    // Aufforderung, es noch einmal zu versuchen.
+    const RUECK = ['lp-anmeldung-danke', 'lp-anmeldung-fehler', 'lp-anmeldung-voll'];
+    const rueckfaelle = [
+      ['voll', { frei: 1, gesamt: 30, voll: false }, 'lp-anmeldung-voll', false, null, 0],
+      ['ok', { frei: 0, gesamt: 30, voll: true }, 'lp-anmeldung-danke', false, null, 0],
+      ['fehler', { frei: 0, gesamt: 30, voll: true }, 'lp-anmeldung-voll', false, null, 1],
+      ['fehler', { frei: 12, gesamt: 30, voll: false }, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1],
+    ];
+    for (const [zustand, daten, klasse, felder, anzeige, anzahl] of rueckfaelle) {
+      const fall = `?anmeldung=${zustand} mit Stand ${JSON.stringify(daten)}`;
+      const { page, abfragen, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { suche: `?anmeldung=${zustand}#anmeldung`, plaetze: { status: 200, daten } });
+      await page.waitForLoadState('networkidle');
+      const ist = await page.evaluate((klassen) => {
+        const a = document.querySelector('.lp-anmeldung-plaetze');
+        return {
+          sichtbar: klassen.filter((k) => document.querySelector(`.${k}`).getClientRects().length > 0),
+          fokus: document.activeElement.className,
+          felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0,
+          anzeige: a.getClientRects().length > 0 ? a.textContent.trim() : null,
+        };
+      }, RUECK);
+      pruefe(JSON.stringify(ist.sichtbar) === JSON.stringify([klasse]) && ist.fokus === klasse, `${fall}: genau die Meldung ${klasse} sichtbar und fokussiert (${JSON.stringify(ist)})`);
+      pruefe(ist.felder === felder, `${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'}`);
+      pruefe(ist.anzeige === anzeige, `${fall}: Plätze-Anzeige „${ist.anzeige}“ (erwartet ${anzeige === null ? 'keine' : `„${anzeige}“`})`);
+      pruefe(abfragen.length === anzahl, `${fall}: ${abfragen.length} Abfrage(n) (erwartet ${anzahl})`);
+      await kontext.close();
+    }
   }
 
   // Häufige Fragen per Tastatur
