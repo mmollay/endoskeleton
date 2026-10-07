@@ -13,6 +13,12 @@ final class Pruefer
 {
     /** Häufige ASCII-Ersatzschreibungen für Umlaute (Hinweis, nicht sperrend). */
     public const ASCII = '/\b\w*(fuer|ueber|koennen|moecht|waehl|zurueck|hinzufueg|aender|oeffn|groess|pruef|aerzt|maerz|schoen|taeglich|spaeter|naechst|koerper|gemaess|gebuehr|muess|wuerd|haeufig|frueh|loesung|uebersicht|moeglich|oesterreich)\w*/iu';
+    /**
+     * Wörter und Wendungen für „kostenlos“ — auch als Teil zusammengesetzter Wörter („Gratisabend“, „Kostenfreie Teilnahme“),
+     * weil eine KI genau so ausweicht. „nicht umsonst“ (= mit gutem Grund) zählt nicht.
+     */
+    private const KOSTENLOS = '/\b(kosten-?(?:los|frei)\w*|gratis\w*|gebührenfrei\w*|unentgeltlich\w*|(?<!nicht )umsonst\b|nulltarif\w*'
+        . '|ohne (?:kosten|gebühren?)\b|eintritt frei\b|freie[mnrs]? eintritt\b)/iu';
     private const PLATZHALTER = '/\{\{|\blorem ipsum\b|\bTODO\b/i';
     private const MAX_BILD = 400 * 1024;
     private const SEITEN = ['index.html', 'impressum.html', 'datenschutz.html'];
@@ -203,7 +209,7 @@ final class Pruefer
             return;
         }
         foreach ($this->textfelder() as $pfad => $text) {
-            if (preg_match('/\b(kostenlos\w*|gratis)\b/iu', self::normal($text), $m)) {
+            if (preg_match(self::KOSTENLOS, self::normal($text), $m)) {
                 $this->sperrend($pfad, "„{$m[1]}“ trotz Preis", $this->wo($pfad) . ": „{$m[1]}“ passt nicht zu einem Vortrag mit Preis — bitte umformulieren.");
             }
         }
