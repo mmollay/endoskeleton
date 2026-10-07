@@ -36,6 +36,7 @@ final class Pruefer
         $p->nachbau($bau->dateien);
         $p->ordner($bau->dateien);
         $p->texte();
+        $p->preis();
         $p->bildrechte();
         $p->rechtstexte();
         foreach (self::SEITEN as $datei) {
@@ -141,20 +142,7 @@ final class Pruefer
     /** Sperrliste, Grenzwörter, Platzhalter und ASCII-Umlaute in allen Textfeldern des Bauplans und in genutzten Alt-Texten. */
     private function texte(): void
     {
-        $felder = [];
-        $sammeln = static function (mixed $w, string $pfad) use (&$sammeln, &$felder): void {
-            if (is_string($w)) {
-                $felder[$pfad] = $w;
-            } elseif (is_array($w)) {
-                foreach ($w as $s => $x) {
-                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'anbieter', 'liste', 'art', 'beginn'], true)) {
-                        $sammeln($x, $pfad === '' ? (string) $s : "$pfad.$s");
-                    }
-                }
-            }
-        };
-        $sammeln($this->plan['meta'] ?? [], 'meta');
-        $sammeln($this->plan['bausteine'] ?? [], 'bausteine');
+        $felder = $this->textfelder();
         foreach ($this->plan['bausteine'] ?? [] as $i => $b) {
             foreach (['bild', 'vorschau'] as $f) {
                 if (isset($b[$f]['datei']) && !isset($b[$f]['alt']) && str_starts_with($b[$f]['datei'], 'bestand/')) {
@@ -182,6 +170,40 @@ final class Pruefer
             }
             if (preg_match(self::ASCII, $text, $m)) {
                 $this->hinweis($pfad, "ASCII-Umlaut? „{$m[0]}“", "$wo: „{$m[0]}“ — bitte mit echten Umlauten schreiben (ä, ö, ü, ß).");
+            }
+        }
+    }
+
+    /** Alle Textfelder des Bauplans (Pfad => Text), ohne technische Schlüssel. */
+    private function textfelder(): array
+    {
+        $felder = [];
+        $sammeln = static function (mixed $w, string $pfad) use (&$sammeln, &$felder): void {
+            if (is_string($w)) {
+                $felder[$pfad] = $w;
+            } elseif (is_array($w)) {
+                foreach ($w as $s => $x) {
+                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'anbieter', 'liste', 'art', 'beginn'], true)) {
+                        $sammeln($x, $pfad === '' ? (string) $s : "$pfad.$s");
+                    }
+                }
+            }
+        };
+        $sammeln($this->plan['meta'] ?? [], 'meta');
+        $sammeln($this->plan['bausteine'] ?? [], 'bausteine');
+        return $felder;
+    }
+
+    /** Hat ein Termin einen Preis, darf kein Text „kostenlos“ oder „gratis“ versprechen (Entwurf 2026-10-06, Abschnitt 4). */
+    private function preis(): void
+    {
+        $mitPreis = array_filter($this->plan['bausteine'] ?? [], static fn ($b) => ($b['typ'] ?? null) === 'termin' && is_int($b['preis'] ?? null));
+        if ($mitPreis === []) {
+            return;
+        }
+        foreach ($this->textfelder() as $pfad => $text) {
+            if (preg_match('/\b(kostenlos\w*|gratis)\b/iu', self::normal($text), $m)) {
+                $this->sperrend($pfad, "„{$m[1]}“ trotz Preis", $this->wo($pfad) . ": „{$m[1]}“ passt nicht zu einem Vortrag mit Preis — bitte umformulieren.");
             }
         }
     }
