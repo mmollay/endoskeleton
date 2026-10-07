@@ -65,8 +65,8 @@
                                     "dauer_min": { "typ": "zahl", "label": "Dauer in Minuten", "min": 15, "max": 600 } } },
         "ort":       { "typ": "zeile", "label": "Ort", "max": 120, "pflicht": true },
         "wenn_leer": { "typ": "zeile", "label": "Text ohne Termin", "max": 120, "pflicht": true },
-        "preis":     { "typ": "zahl", "label": "Preis in Euro", "min": 1, "max": 9999,
-                       "fehlt": "Die Seite zeigt „Teilnahme kostenlos“ und meldet den Termin Suchmaschinen als kostenlos (`isAccessibleForFree`)" },
+        "preis":     { "typ": "zahl", "label": "Preis in Euro", "min": 0, "max": 9999,
+                       "fehlt": "Die Seite zeigt keine Preiszeile und meldet Suchmaschinen weder „kostenlos“ noch einen Preis; „Teilnahme kostenlos“ und `isAccessibleForFree` gibt es nur bei ausdrücklich `preis` 0" },
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "hoechstens": 2 },

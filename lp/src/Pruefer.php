@@ -201,10 +201,10 @@ final class Pruefer
         return $felder;
     }
 
-    /** Hat ein Termin einen Preis, darf kein Text „kostenlos“ oder „gratis“ versprechen (Entwurf 2026-10-06, Abschnitt 4). */
+    /** Hat ein Termin einen Preis ab 1 Euro (bei 0 = ausdrücklich kostenlos passen die Texte), darf kein Text „kostenlos“ oder „gratis“ versprechen (Entwurf 2026-10-06, Abschnitt 4). */
     private function preis(): void
     {
-        $mitPreis = array_filter($this->plan['bausteine'] ?? [], static fn ($b) => ($b['typ'] ?? null) === 'termin' && is_int($b['preis'] ?? null));
+        $mitPreis = array_filter($this->plan['bausteine'] ?? [], static fn ($b) => ($b['typ'] ?? null) === 'termin' && is_int($b['preis'] ?? null) && $b['preis'] >= 1);
         if ($mitPreis === []) {
             return;
         }
