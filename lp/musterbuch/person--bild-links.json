@@ -1,0 +1,28 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Vortragende Person – bild-links",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Vortragende Person“ in der Variante „bild-links“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Vortragende Person – bild-links",
+            "text": "Baustein „person“ in der Variante „bild-links“ (seit 3.52.0, geändert 3.52.0)."
+        },
+        {
+            "typ": "person",
+            "variante": "bild-links",
+            "titel": "Wer spricht?",
+            "name": "Anna Beispiel",
+            "rolle": "Ernährungsberaterin",
+            "text": "Anna Beispiel berät zu Ernährung im Alltag. Sie erklärt verständlich und ohne Fachchinesisch.",
+            "bild": {
+                "datei": "bestand/beispiel-vortrag.webp"
+            }
+        }
+    ]
+}
