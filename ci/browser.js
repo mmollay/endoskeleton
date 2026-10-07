@@ -271,8 +271,8 @@ function kontrastImBrowser(nur) {
     pruefe(zwischen.sichtbar === 1 && zwischen.leer, `ein vergangener Termin ausgeblendet (${JSON.stringify(zwischen)})`);
     await kontext.close();
     ({ page, kontext } = await oeffnen(browser, 'termin--karte', 1280, { uhr: '2100-01-01T00:00:00+01:00' }));
-    const danach = await page.evaluate(() => ({ leer: !document.querySelector('.lp-termin-leer').hidden, liste: document.querySelector('.lp-termin-liste').hidden, ort: document.querySelector('.lp-termin-ort').hidden }));
-    pruefe(danach.leer && danach.liste && danach.ort, `alle vorbei: Ersatztext statt Liste (${JSON.stringify(danach)})`);
+    const danach = await page.evaluate(() => ({ leer: !document.querySelector('.lp-termin-leer').hidden, liste: document.querySelector('.lp-termin-liste').hidden, ort: document.querySelector('.lp-termin-ort').hidden, preis: document.querySelector('.lp-termin-preis').hidden }));
+    pruefe(danach.leer && danach.liste && danach.ort && danach.preis, `alle vorbei: Ersatztext statt Liste, Ort und Preis (${JSON.stringify(danach)})`);
     await kontext.close();
   }
 

@@ -23,7 +23,7 @@
       if (Date.parse(t.dataset.lpEnde) < jetzt) { t.hidden = true; } else { offen++; }
     });
     if (offen === 0) {
-      block.querySelectorAll('.lp-termin-liste, .lp-termin-ort, .lp-knopf').forEach(function (e) { e.hidden = true; });
+      block.querySelectorAll('.lp-termin-liste, .lp-termin-ort, .lp-termin-preis, .lp-knopf').forEach(function (e) { e.hidden = true; });
       block.querySelector('.lp-termin-leer').hidden = false;
     }
   });

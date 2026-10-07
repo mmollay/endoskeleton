@@ -55,6 +55,7 @@ Varianten: `karte`, `band` · höchstens 2-mal
 | `termine[].dauer_min` | zahl | – | 15–600 |
 | `ort` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
 | `wenn_leer` | zeile | ja | eine Zeile, ≤ 120 Zeichen |
+| `preis` | zahl | – | 1–9999 |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json

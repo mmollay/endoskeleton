@@ -244,6 +244,12 @@ section.lp-hero--bild-hinten {
   color: var(--heading);
 }
 
+.lp-termin-preis {
+  margin: 0;
+  font-weight: 600;
+  color: var(--heading);
+}
+
 .lp-termin--karte .lp-termin-liste {
   max-width: 46rem;
 }
