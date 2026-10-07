@@ -502,6 +502,13 @@ section.lp-anmeldung {
   max-width: 60rem;
 }
 
+.lp-anmeldung-danach {
+  max-width: 38rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--heading);
+}
+
 .lp-formular {
   display: grid;
   gap: var(--space-md);

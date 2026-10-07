@@ -10,9 +10,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - Neue Marke für den Gesprächs-Assistenten des Panels (Entwurf `docs/superpowers/specs/2026-10-06-landingpage-gespraech-design.md` im Panel-Repo). Bestehende Seiten der Marke 3.51.0 bauen weiter mit ihrem Stand.
 - **Preis im Termin** (`preis`, ganze Euro 1–9999, fehlt = kostenlos): Zeile „Teilnahme kostenlos“ bzw. „Teilnahme: 25 €“ unter dem Ort; JSON-LD `isAccessibleForFree` bzw. `offers` (EUR). `lp.js` blendet die Zeile mit aus, wenn kein Termin mehr offen ist.
 - **Prüfung „kostenlos trotz Preis“** (sperrend): Hat ein Termin einen Preis, meldet `pruefen.php` jedes Textfeld mit „kostenlos“ oder „gratis“ (gleich welche Schreibweise) mit Abschnitt und Feld. Die Vorlage `zoom-vortrag` sagt in der Anmeldung „Jetzt anmelden“.
+- **Was danach passiert** (`anmeldung.danach`, Absatz bis 300 Zeichen): ein Satz über dem Formular.
 
 ### Neue Klassen
 - `lp-termin-preis`
+- `lp-anmeldung-danach`
 
 ## [3.51.0] — 2026-09-27
 
