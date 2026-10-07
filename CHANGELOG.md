@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.52.0] — 2026-10-06
+
+### Added
+- Neue Marke für den Gesprächs-Assistenten des Panels (Entwurf `docs/superpowers/specs/2026-10-06-landingpage-gespraech-design.md` im Panel-Repo). Bestehende Seiten der Marke 3.51.0 bauen weiter mit ihrem Stand.
+
+### Neue Klassen
+
 ## [3.51.0] — 2026-09-27
 
 ### Added

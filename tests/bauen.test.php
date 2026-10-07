@@ -73,7 +73,7 @@ return [
                 T::ok(str_contains($attr, 'src="es/lp.js?v=') || str_contains($attr, 'type="application/ld+json"'), "$f: Skript nur als Datei oder JSON-LD: $attr");
             }
             T::ok(!preg_match('/&[aou]uml;|&szlig;/i', $h), "$f: echte Umlaute statt Entitäten");
-            T::contains($h, '<meta name="generator" content="SSI Endoskeleton 3.51.0">', "$f: Versionsmarke");
+            T::contains($h, '<meta name="generator" content="SSI Endoskeleton 3.52.0">', "$f: Versionsmarke");
         }
     },
     'ids eindeutig, Bezüge vorhanden' => static function () use ($gebaut, $dom, $alle): void {

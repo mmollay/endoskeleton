@@ -74,7 +74,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `vorschaubild` | bilddatei | – | `bestand/…` oder `img/…` |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.51.0)
+## Bausteine (Katalog 3.52.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
