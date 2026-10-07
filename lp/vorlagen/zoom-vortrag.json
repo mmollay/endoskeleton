@@ -2,7 +2,7 @@
   "format": 1,
   "meta": {
     "titel": "{{Titel der Seite, höchstens 60 Zeichen}}",
-    "beschreibung": "{{Ein Satz für Suchmaschinen: Thema, Datum, kostenlos}}"
+    "beschreibung": "{{Ein Satz für Suchmaschinen: Thema und Datum}}"
   },
   "bausteine": [
     {
@@ -22,7 +22,7 @@
       "punkte": ["{{Thema 1}}", "{{Thema 2}}", "{{Thema 3}}"]
     },
     {
-      "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt kostenlos anmelden",
+      "typ": "anmeldung", "variante": "karte", "anker": "anmeldung", "titel": "Jetzt anmelden",
       "felder": ["vorname", "email"], "knopf_text": "Ich bin dabei", "liste": "{{name-der-liste}}",
       "danke": "Danke! Bitte bestätige deine Anmeldung mit dem Link in unserer E-Mail."
     },
