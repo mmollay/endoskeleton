@@ -130,4 +130,36 @@ return [
         [, $x] = $bau($s);
         T::eq($x->query('//*[contains(@class,"lp-anmeldung-danach")]')->length, 0, 'nur Leerraum: kein Element');
     },
+    'anmeldung: Plätze — fester Text, Quelle aus dem Formularziel, versteckte Meldung „ausgebucht“' => static function () use ($bau, $profilMit): void {
+        $s = H::seite();
+        $s['bausteine'][1]['plaetze'] = 30;
+        [, $x] = $bau($s);
+        $p = $x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-plaetze")]')->item(0);
+        T::eq(trim((string) $p?->textContent), 'Begrenzt auf 30 Plätze.', 'fester Text ohne Skript');
+        T::eq($p?->getAttribute('data-lp-plaetze-liste'), 'beispiel-abend', 'Kennung der Liste');
+        T::eq($p?->getAttribute('data-lp-plaetze-quelle'), 'https://beispiel.invalid/lp/plaetze', 'Quelle = Host des Formularziels + /lp/plaetze');
+        T::eq($p?->getAttribute('aria-live'), 'polite', 'Änderungen werden angesagt');
+        $voll = $x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-voll")]')->item(0);
+        T::ok($voll !== null && $voll->hasAttribute('hidden') && $voll->getAttribute('role') === 'status' && $voll->getAttribute('tabindex') === '-1', 'Meldung versteckt bereit');
+        T::eq(trim((string) $voll?->textContent), 'Leider ausgebucht — alle Plätze sind vergeben.', 'Wortlaut');
+        $s['bausteine'][1]['plaetze'] = 1;
+        [, $x] = $bau($s);
+        T::eq(trim((string) $x->query('//*[contains(@class,"lp-anmeldung-plaetze")]')->item(0)?->textContent), 'Begrenzt auf 1 Platz.', 'Einzahl');
+        [, $x] = $bau(H::seite());
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-plaetze")]')->length, 0, 'ohne Plätze keine Anzeige');
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-voll")]')->length, 1, 'die Meldung „ausgebucht“ steht trotzdem bereit');
+        $s['bausteine'][1]['plaetze'] = 30;
+        [, $x] = $bau($s, $profilMit(static fn ($j) => ['formularziel' => ''] + $j));
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-plaetze")]')->length, 0, 'ohne Formularziel keine Abfrage');
+        foreach ([0, 10001, '30'] as $falsch) {
+            $s['bausteine'][1]['plaetze'] = $falsch;
+            T::ok(Schema::pruefen($s, Katalog::laden(), Profil::laden(H::testprofil()), T::tmp()) !== [], 'plaetze ' . var_export($falsch, true) . ' wird abgewiesen');
+        }
+    },
+    'lp.js: Plätze ohne Cookies abfragen, keine feste Adresse, Rücksprung „voll“' => static function (): void {
+        $js = (string) file_get_contents(H::wurzel() . '/lp/lp.js');
+        T::contains($js, "credentials: 'omit'", 'Abfrage ohne Cookies');
+        T::contains($js, "voll: '.lp-anmeldung-voll'", 'Rücksprung voll');
+        T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
+    },
 ];

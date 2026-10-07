@@ -28,13 +28,13 @@
     }
   });
 
-  // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|fehler#anmeldung): Meldung zeigen und fokussieren, bei ok ohne
+  // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|fehler|voll#anmeldung): Meldung zeigen und fokussieren, bei ok und voll ohne
   // Felder; andere Werte wirken nicht. „bereits“ gilt als ok (Abwehr in der Tiefe, falls eine Weiterleitungsstelle es
-  // noch schickt): Die Seite verrät nicht, ob eine Adresse schon auf der Liste steht. Parameter und Sprungmarke
-  // verschwinden aus der Adresse — sonst nimmt Chrome beim Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte
-  // Adresse zeigte die Meldung statt des Formulars. Damit springt der Browser nicht mehr zur Sprungmarke: Ins Bild bringt
-  // die Meldung allein focus() (ohne preventScroll).
-  var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-danke', fehler: '.lp-anmeldung-fehler' };
+  // noch schickt): Die Seite verrät nicht, ob eine Adresse schon auf der Liste steht. „voll“ (3.52.0) hängt nicht an der
+  // Adresse, nur an der Platzgrenze der Liste. Parameter und Sprungmarke verschwinden aus der Adresse — sonst nimmt Chrome
+  // beim Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte Adresse zeigte die Meldung statt des Formulars. Damit
+  // springt der Browser nicht mehr zur Sprungmarke: Ins Bild bringt die Meldung allein focus() (ohne preventScroll).
+  var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-danke', fehler: '.lp-anmeldung-fehler', voll: '.lp-anmeldung-voll' };
   var adresse = new URL(location.href), zustand = adresse.searchParams.get('anmeldung');
 
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
@@ -61,5 +61,26 @@
       });
       if (erstes) { ereignis.preventDefault(); erstes.focus(); }
     });
+  });
+
+  // Plätze (3.52.0): Ist die Anmeldung begrenzt, fragt die Seite den Stand beim Panel ab — nur Zahlen, ohne Cookies. Der Host
+  // kommt aus dem Formularziel (data-lp-plaetze-quelle), nie fest aus diesem Skript. Bei „voll“ verschwinden die Felder;
+  // scheitert die Abfrage (Netz, Drosselung, Sperre), bleibt der feste Text „Begrenzt auf N Plätze.“ stehen.
+  document.querySelectorAll('.lp-anmeldung-plaetze[data-lp-plaetze-quelle]').forEach(function (anzeige) {
+    if (!window.fetch) { return; }
+    var form = anzeige.closest('form');
+    fetch(anzeige.dataset.lpPlaetzeQuelle + '?liste=' + encodeURIComponent(anzeige.dataset.lpPlaetzeListe), { credentials: 'omit' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || typeof d.frei !== 'number' || typeof d.gesamt !== 'number') { return; }
+        if (d.voll === true) {
+          anzeige.textContent = 'Ausgebucht';
+          var felder = form && form.querySelector('fieldset');
+          if (felder) { felder.hidden = true; }
+          return;
+        }
+        anzeige.textContent = 'Noch ' + d.frei + ' von ' + d.gesamt + (d.gesamt === 1 ? ' Platz' : ' Plätzen') + ' frei';
+      })
+      .catch(function () { /* der feste Text bleibt stehen */ });
   });
 })();
