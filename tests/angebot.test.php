@@ -100,6 +100,25 @@ return [
         $s['bausteine'][0]['dachzeile'] = 'GRATIS-Abend';
         T::eq($trotz($pruefe($s)), ['bausteine.0.dachzeile'], 'Groß- und Kleinschreibung zählen nicht');
     },
+    'Prüfung: mit Preis sperren auch zusammengesetzte Wörter und andere Wendungen für „kostenlos“' => static function () use ($k, $pruefe): void {
+        $trotz = static fn (array $befunde): array => array_values(array_map(static fn ($b) => $b->pfad,
+            array_filter(H::sperrend($befunde), static fn ($b) => str_contains($b->technik, 'trotz Preis'))));
+        $t = $k->baustein('termin')['beispiel'];
+        $t['preis'] = 25;
+        $s = H::seite([$t]);
+        $s['meta']['beschreibung'] = 'Online-Abend mit Fragerunde.';
+        $s['bausteine'][0]['knopf']['text'] = 'Jetzt anmelden';
+        $s['bausteine'][2]['titel'] = 'Jetzt anmelden';
+        foreach (['Gratisabend', 'Gratisvortrag', 'Online-gratisVortrag', 'kostenfrei', 'Kostenfreie Teilnahme', 'kosten-los', 'Kostenloser Abend',
+            'Heute umsonst dabei', 'unentgeltlich', 'Gebührenfreier Abend', 'Eintritt frei', 'Freier Eintritt', 'ohne Kosten', 'zum Nulltarif'] as $wort) {
+            $s['bausteine'][0]['dachzeile'] = $wort;
+            T::eq($trotz($pruefe($s)), ['bausteine.0.dachzeile'], "„{$wort}“ sperrt");
+        }
+        foreach (['Nicht umsonst bekannt', 'Kostenbeitrag inklusive', 'Gratulation zum Jubiläum', 'Frei sprechen lernen', 'Eintritt in die Stille', 'Online-Abend'] as $wort) {
+            $s['bausteine'][0]['dachzeile'] = $wort;
+            T::eq($trotz($pruefe($s)), [], "„{$wort}“ sperrt nicht");
+        }
+    },
     'Vorlage zoom-vortrag: Anmeldung und Beschreibung ohne „kostenlos“' => static function (): void {
         $v = json_decode((string) file_get_contents(H::wurzel() . '/lp/vorlagen/zoom-vortrag.json'), true);
         T::eq($v['bausteine'][3]['titel'] ?? null, 'Jetzt anmelden', 'Titel der Anmeldung');
