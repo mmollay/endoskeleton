@@ -117,4 +117,17 @@ return [
         $s['bausteine'][1]['danach'] = str_repeat('x', 301);
         T::ok(Schema::pruefen($s, Katalog::laden(), Profil::laden(H::testprofil()), T::tmp()) !== [], 'mehr als 300 Zeichen werden abgewiesen');
     },
+    'anmeldung: „Was danach passiert“ hält die Absatz-Regeln des Katalogs (**fett**, Leerzeile, nur Leerraum)' => static function () use ($bau): void {
+        $s = H::seite();
+        $s['bausteine'][1]['danach'] = "**Wichtig:** Den Zoom-Link bekommst du per E-Mail.\n\nKommt keiner an, schau bitte im Spam-Ordner nach.";
+        [, $x] = $bau($s);
+        $ps = $x->query('//section[contains(@class,"lp-anmeldung")]//p[contains(@class,"lp-anmeldung-danach")]');
+        T::eq($ps->length, 2, 'Leerzeile = zwei Absätze');
+        T::eq($ps->length > 0 ? $x->query('strong', $ps->item(0))->item(0)?->textContent : null, 'Wichtig:', '**fett** wird <strong>');
+        T::ok($ps->length > 0 && !str_contains((string) $ps->item(0)->textContent, '**'), 'keine Sternchen auf der Seite');
+        T::ok($ps->length === 2 && $x->query('following-sibling::*[1][self::form[contains(@class,"lp-formular")]]', $ps->item(1))->length === 1, 'letzter Absatz direkt vor dem Formular');
+        $s['bausteine'][1]['danach'] = " \n ";
+        [, $x] = $bau($s);
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-danach")]')->length, 0, 'nur Leerraum: kein Element');
+    },
 ];

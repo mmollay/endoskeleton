@@ -25,9 +25,7 @@ $felder = [
 
 <?= $k->absaetze($b['text'] ?? '') ?>
 
-<?php if (($b['danach'] ?? '') !== ''): ?>
-<p class="lp-anmeldung-danach"><?= $k->e($b['danach']) ?></p>
-<?php endif ?>
+<?= $k->absaetze($b['danach'] ?? '', 'lp-anmeldung-danach') ?>
 <form class="lp-formular" method="post"<?= $ziel !== '' ? ' action="' . $k->e($ziel) . '"' : '' ?>>
 <?php if ($ziel === ''): ?>
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>

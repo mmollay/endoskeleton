@@ -23,14 +23,15 @@ final class Text
         return (string) preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', self::e($s));
     }
 
-    /** Leerzeile = neuer Absatz, Zeilenumbruch = <br>. */
-    public static function absaetze(string $s): string
+    /** Leerzeile = neuer Absatz, Zeilenumbruch = <br>. $klasse (optional) steht an jedem Absatz. */
+    public static function absaetze(string $s, string $klasse = ''): string
     {
+        $p = $klasse !== '' ? '<p class="' . self::e($klasse) . '">' : '<p>';
         $aus = [];
         foreach (preg_split('/\n[ \t]*\n/', str_replace("\r\n", "\n", $s)) ?: [] as $absatz) {
             $zeilen = array_values(array_filter(array_map('trim', explode("\n", $absatz)), static fn (string $z): bool => $z !== ''));
             if ($zeilen) {
-                $aus[] = '<p>' . implode("<br>\n", array_map([self::class, 'inline'], $zeilen)) . '</p>';
+                $aus[] = $p . implode("<br>\n", array_map([self::class, 'inline'], $zeilen)) . '</p>';
             }
         }
         return implode("\n", $aus);
