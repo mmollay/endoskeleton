@@ -51,45 +51,59 @@ $profilMit = static function (callable $aendern, ?callable $dateien = null): str
 };
 
 return [
-    'termin: ohne Preis „Teilnahme kostenlos“, mit Preis der Betrag in Euro; JSON-LD passt dazu' => static function () use ($k, $bau, $events): void {
+    'termin: ohne Preis keine Preiszeile und kein JSON-LD-Preis; preis 0 = „Teilnahme kostenlos“; sonst der Betrag in Euro' => static function () use ($k, $bau, $events): void {
+        $zeile = static fn (DOMXPath $x): string => trim((string) $x->query('//p[contains(@class,"lp-termin-preis")]')->item(0)?->textContent);
         $t = $k->baustein('termin')['beispiel'];
-        [, $x] = $bau(H::seite([$t]));
-        T::eq(trim((string) $x->query('//p[contains(@class,"lp-termin-preis")]')->item(0)?->textContent), 'Teilnahme kostenlos', 'ohne Preis');
+        [$html, $x] = $bau(H::seite([$t]));
+        T::eq($x->query('//p[contains(@class,"lp-termin-preis")]')->length, 0, 'ohne Preis: keine Preiszeile');
+        T::ok(!str_contains($html, 'Teilnahme kostenlos'), 'ohne Preis: nirgends „Teilnahme kostenlos“');
         $e = $events($x)[0] ?? [];
-        T::eq($e['isAccessibleForFree'] ?? null, true, 'JSON-LD: frei zugänglich');
-        T::ok(!isset($e['offers']), 'JSON-LD: ohne Angebot');
+        T::ok($e !== [] && !array_key_exists('isAccessibleForFree', $e), 'ohne Preis: JSON-LD ohne isAccessibleForFree');
+        T::ok($e !== [] && !array_key_exists('offers', $e), 'ohne Preis: JSON-LD ohne Angebot');
+        $t['preis'] = 0;
+        [, $x] = $bau(H::seite([$t]));
+        T::eq($zeile($x), 'Teilnahme kostenlos', 'preis 0');
+        $e = $events($x)[0] ?? [];
+        T::eq($e['isAccessibleForFree'] ?? null, true, 'preis 0: JSON-LD frei zugänglich');
+        T::ok($e !== [] && !array_key_exists('offers', $e), 'preis 0: JSON-LD ohne Angebot');
         $t['preis'] = 25;
         [, $x] = $bau(H::seite([$t]));
-        T::eq(trim((string) $x->query('//p[contains(@class,"lp-termin-preis")]')->item(0)?->textContent), 'Teilnahme: 25 €', 'mit Preis');
+        T::eq($zeile($x), 'Teilnahme: 25 €', 'mit Preis');
         $e = $events($x)[0] ?? [];
         T::eq($e['isAccessibleForFree'] ?? null, false, 'JSON-LD: nicht frei');
         T::eq($e['offers'] ?? null, ['@type' => 'Offer', 'price' => 25, 'priceCurrency' => 'EUR'], 'JSON-LD: Angebot in Euro');
     },
     'SKILL.md und werkstatt.md sagen, was ein fehlender Preis bzw. fehlende Plätze auf der Seite bedeuten' => static function () use ($k): void {
         foreach (['SKILL.md' => Skill::skill($k, ''), 'werkstatt.md' => Skill::werkstatt($k)] as $name => $text) {
-            T::ok(preg_match('/^\| `preis` \|.*fehlt: Die Seite zeigt „Teilnahme kostenlos“ und meldet den Termin Suchmaschinen als kostenlos/mu', $text) === 1, "$name: Zeile preis nennt die Folge eines fehlenden Preises");
+            T::ok(preg_match('/^\| `preis` \|.*0–9999.*fehlt: Die Seite zeigt keine Preiszeile und meldet Suchmaschinen weder „kostenlos“ noch einen Preis; „Teilnahme kostenlos“ und `isAccessibleForFree` gibt es nur bei ausdrücklich `preis` 0/mu', $text) === 1, "$name: Zeile preis nennt die Folge eines fehlenden Preises und die 0");
             T::ok(preg_match('/^\| `plaetze` \|.*fehlt: unbegrenzt/mu', $text) === 1, "$name: Zeile plaetze nennt „fehlt: unbegrenzt“");
         }
     },
-    'termin.preis: nur ganze Zahlen von 1 bis 9999' => static function () use ($k): void {
+    'termin.preis: nur ganze Zahlen von 0 bis 9999' => static function () use ($k): void {
         $p = Profil::laden(H::testprofil());
-        foreach ([0, 10000, '25', 2.5] as $falsch) {
+        foreach ([-1, 10000, '25', 2.5, '0'] as $falsch) {
             $t = $k->baustein('termin')['beispiel'];
             $t['preis'] = $falsch;
             T::ok(Schema::pruefen(H::seite([$t]), $k, $p, T::tmp()) !== [], 'preis ' . var_export($falsch, true) . ' wird abgewiesen');
         }
         $t = $k->baustein('termin')['beispiel'];
-        $t['preis'] = 9999;
-        T::eq(H::texte(Schema::pruefen(H::seite([$t]), $k, $p, T::tmp())), '', 'preis 9999 gilt');
+        foreach ([0, 9999] as $richtig) {
+            $t['preis'] = $richtig;
+            T::eq(H::texte(Schema::pruefen(H::seite([$t]), $k, $p, T::tmp())), '', "preis $richtig gilt");
+        }
     },
     'lp.js blendet den Preis mit aus, wenn kein Termin mehr offen ist' => static function (): void {
         T::contains((string) file_get_contents(H::wurzel() . '/lp/lp.js'), ".lp-termin-liste, .lp-termin-ort, .lp-termin-preis, .lp-knopf", 'Auswahl der ausgeblendeten Teile');
     },
-    'Prüfung: mit Preis sperrt „kostenlos“/„gratis“ in jedem Textfeld, ohne Preis nicht' => static function () use ($k, $pruefe): void {
+    'Prüfung: mit Preis ab 1 sperrt „kostenlos“/„gratis“ in jedem Textfeld, ohne Preis und bei preis 0 nicht' => static function () use ($k, $pruefe): void {
         $trotz = static fn (array $befunde): array => array_values(array_map(static fn ($b) => $b->pfad,
             array_filter(H::sperrend($befunde), static fn ($b) => str_contains($b->technik, 'trotz Preis'))));
         $t = $k->baustein('termin')['beispiel'];
         T::eq($trotz($pruefe(H::seite([$t]))), [], 'ohne Preis: kein Befund');
+        $t['preis'] = 0;
+        $null = H::seite([$t]);
+        T::ok(str_contains($null['meta']['beschreibung'], 'Kostenloser') && str_contains($null['bausteine'][0]['knopf']['text'], 'Kostenlos'), 'Ausgangsseite enthält „kostenlos“-Texte');
+        T::eq($trotz($pruefe($null)), [], 'preis 0: „kostenlos“-Texte passen, kein Befund');
         $t['preis'] = 25;
         $mit = $pruefe(H::seite([$t]));
         $pfade = $trotz($mit);

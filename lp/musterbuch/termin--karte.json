@@ -29,7 +29,8 @@
                 }
             ],
             "ort": "Online über Zoom – den Link bekommst du per E-Mail",
-            "wenn_leer": "Der nächste Termin steht bald fest."
+            "wenn_leer": "Der nächste Termin steht bald fest.",
+            "preis": 0
         }
     ]
 }
