@@ -20,6 +20,7 @@ return [
     'Absätze aus Leerzeilen, Zeilenumbruch als br' => static function (): void {
         T::eq(Text::absaetze("Erster\nZweite Zeile\n\nNeuer Absatz"), "<p>Erster<br>\nZweite Zeile</p>\n<p>Neuer Absatz</p>", 'zwei Absätze');
         T::eq(Text::absaetze("  \n\n  "), '', 'nur Leerraum = nichts');
+        T::eq(Text::absaetze("**Erster**\n\nZweiter", 'lp-x'), "<p class=\"lp-x\"><strong>Erster</strong></p>\n<p class=\"lp-x\">Zweiter</p>", 'Klasse an jedem Absatz');
     },
     'deutsches Datum' => static function (): void {
         T::eq(Text::datum('2026-10-06T19:00', 'de-AT'), 'Dienstag, 6. Oktober 2026, 19:00 Uhr', 'Vortragstermin');

@@ -24,9 +24,9 @@ final class Kontext
         return Text::inline($s);
     }
 
-    public function absaetze(?string $s): string
+    public function absaetze(?string $s, string $klasse = ''): string
     {
-        return Text::absaetze((string) $s);
+        return Text::absaetze((string) $s, $klasse);
     }
 
     /** Text je nach Anrede des Profils. */
