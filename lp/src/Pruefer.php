@@ -37,6 +37,7 @@ final class Pruefer
         $p->ordner($bau->dateien);
         $p->texte();
         $p->preis();
+        $p->person();
         $p->bildrechte();
         $p->rechtstexte();
         foreach (self::SEITEN as $datei) {
@@ -204,6 +205,20 @@ final class Pruefer
         foreach ($this->textfelder() as $pfad => $text) {
             if (preg_match('/\b(kostenlos\w*|gratis)\b/iu', self::normal($text), $m)) {
                 $this->sperrend($pfad, "„{$m[1]}“ trotz Preis", $this->wo($pfad) . ": „{$m[1]}“ passt nicht zu einem Vortrag mit Preis — bitte umformulieren.");
+            }
+        }
+    }
+
+    /** Eine Person ohne Namen zeigt die Seite nicht — stehen Rolle, Text oder Bild schon da, ist das wohl ein Versehen. */
+    private function person(): void
+    {
+        foreach ($this->plan['bausteine'] ?? [] as $i => $b) {
+            if (($b['typ'] ?? null) !== 'person' || trim((string) ($b['name'] ?? '')) !== '') {
+                continue;
+            }
+            if (trim((string) ($b['rolle'] ?? '')) !== '' || trim((string) ($b['text'] ?? '')) !== '' || isset($b['bild'])) {
+                $this->hinweis("bausteine.$i.name", 'Person ohne Namen — der Abschnitt wird nicht gezeigt',
+                    $this->wo("bausteine.$i") . ': Ohne Namen zeigt die Seite diesen Abschnitt nicht — bitte den Namen ergänzen.');
             }
         }
     }

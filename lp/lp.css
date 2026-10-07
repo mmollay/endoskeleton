@@ -630,6 +630,40 @@ section.lp-anmeldung {
   color: var(--heading);
 }
 
+/* ─── PERSON ────────────────────────────────────────────────────────────── */
+.lp-person-inhalt {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 46rem;
+}
+
+@media (min-width: 40rem) {
+  .lp-person--bild-links .lp-person-inhalt {
+    grid-template-columns: 12rem 1fr;
+    align-items: start;
+  }
+}
+
+.lp-person-bild {
+  width: 100%;
+  max-width: 12rem;
+  height: auto;
+  border-radius: var(--radius-lg);
+}
+
+.lp-person-name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.lp-person-rolle {
+  margin: 0;
+  color: var(--text-muted);
+}
+
 /* ─── ABSCHLUSS ─────────────────────────────────────────────────────────── */
 section.lp-abschluss--akzent {
   background: var(--lp-akzent);

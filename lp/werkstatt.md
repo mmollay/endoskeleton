@@ -207,6 +207,29 @@ Varianten: `karte`, `breit` · höchstens 1-mal
 }
 ```
 
+### Vortragende Person (`person`)
+
+Varianten: `schlicht`, `bild-links` · höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `name` | zeile | – | eine Zeile, ≤ 80 Zeichen |
+| `rolle` | zeile | – | eine Zeile, ≤ 100 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `bild` | bild | bei bild-links | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "person",
+    "variante": "schlicht",
+    "titel": "Wer spricht?",
+    "name": "Anna Beispiel",
+    "rolle": "Ernährungsberaterin",
+    "text": "Anna Beispiel berät zu Ernährung im Alltag. Sie erklärt verständlich und ohne Fachchinesisch."
+}
+```
+
 ### Abschluss (`abschluss`)
 
 Varianten: `akzent`, `schlicht`

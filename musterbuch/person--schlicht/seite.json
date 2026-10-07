@@ -1,0 +1,25 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Vortragende Person – schlicht",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Vortragende Person“ in der Variante „schlicht“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Vortragende Person – schlicht",
+            "text": "Baustein „person“ in der Variante „schlicht“ (seit 3.52.0, geändert 3.52.0)."
+        },
+        {
+            "typ": "person",
+            "variante": "schlicht",
+            "titel": "Wer spricht?",
+            "name": "Anna Beispiel",
+            "rolle": "Ernährungsberaterin",
+            "text": "Anna Beispiel berät zu Ernährung im Alltag. Sie erklärt verständlich und ohne Fachchinesisch."
+        }
+    ]
+}

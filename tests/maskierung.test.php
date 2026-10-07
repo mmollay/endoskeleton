@@ -36,6 +36,12 @@ foreach ($k->bausteine as $typ => $e) {
     foreach ($e['varianten'] as $variante) {
         $tests["$typ--$variante: kein Angriffstext roh im HTML"] = static function () use ($typ, $variante, $e, $vergiften): void {
             $gift = $vergiften(['variante' => $variante] + $e['beispiel'], $e['felder']);
+            // Ein Bild, das erst die Variante verlangt (person--bild-links), bringt das Beispiel nicht mit: aus dem Bestand.
+            foreach ($e['felder'] as $name => $def) {
+                if ($def['typ'] === 'bild' && !isset($gift[$name]) && in_array($variante, $def['pflicht_bei'] ?? [], true)) {
+                    $gift[$name] = ['datei' => 'bestand/beispiel-vortrag.webp'];
+                }
+            }
             $s = H::seite(in_array($typ, ['hero', 'anmeldung'], true) ? [] : [$gift], ['titel' => ANGRIFF, 'beschreibung' => ANGRIFF]);
             if ($typ === 'hero') { $s['bausteine'][0] = $gift; }
             if ($typ === 'anmeldung') { $s['bausteine'][1] = $gift; }

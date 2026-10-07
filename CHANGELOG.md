@@ -12,12 +12,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - **Prüfung „kostenlos trotz Preis“** (sperrend): Hat ein Termin einen Preis, meldet `pruefen.php` jedes Textfeld mit „kostenlos“ oder „gratis“ (gleich welche Schreibweise) mit Abschnitt und Feld. Die Vorlage `zoom-vortrag` sagt in der Anmeldung „Jetzt anmelden“.
 - **Was danach passiert** (`anmeldung.danach`, Absatz bis 300 Zeichen): ein Satz über dem Formular. Wie jeder Absatz mit `**fett**` und Leerzeile = neuer Absatz; jeder Absatz trägt die Klasse `lp-anmeldung-danach` (`Text::absaetze()` nimmt dafür optional eine Klasse).
 - **Plätze** (`anmeldung.plaetze`, 1–10000, fehlt = unbegrenzt): „Begrenzt auf N Plätze.“ im Formular; `lp.js` fragt `GET <Host des Formularziels>/lp/plaetze?liste=<kennung>` ohne Cookies ab und zeigt „Noch X von N Plätzen frei“ bzw. „Ausgebucht“ (Felder weg). Neue Rückmeldung `?anmeldung=voll` („Leider ausgebucht — alle Plätze sind vergeben.“). Datenschutz: Die Abfrage schickt die IP-Adresse des Besuchers beim Laden an den Host des Formularziels.
+- **Baustein „person“** (Vortragende Person): Titel, Name, Rolle, zwei bis drei Sätze, Bild aus dem freigegebenen Bestand (Variante `bild-links`). Ohne Namen baut er nichts; die Prüfung gibt einen Hinweis, wenn Rolle, Text oder Bild ohne Namen dastehen.
 
 ### Neue Klassen
 - `lp-termin-preis`
 - `lp-anmeldung-danach`
 - `lp-anmeldung-plaetze`
 - `lp-anmeldung-voll`
+- `lp-person`
+- `lp-person--schlicht`
+- `lp-person--bild-links`
+- `lp-person-inhalt`
+- `lp-person-name`
+- `lp-person-rolle`
+- `lp-person-text`
+- `lp-person-bild`
 
 ## [3.51.0] — 2026-09-27
 

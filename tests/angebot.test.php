@@ -162,4 +162,44 @@ return [
         T::contains($js, "voll: '.lp-anmeldung-voll'", 'Rücksprung voll');
         T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
     },
+    'person: ohne Namen nichts; mit Namen Titel, Name, Rolle, Text; Bild nur bei bild-links' => static function () use ($k, $bau): void {
+        [$h] = $bau(H::seite([['typ' => 'person', 'variante' => 'schlicht', 'titel' => 'Wer spricht?']]));
+        T::notContains($h, 'lp-person', 'ohne Namen kein Abschnitt');
+        $p = $k->baustein('person')['beispiel'];
+        [$h, $x] = $bau(H::seite([$p]));
+        $s = $x->query('//section[contains(@class,"lp-person--schlicht")]')->item(0);
+        T::ok($s !== null, 'Abschnitt mit Variante schlicht');
+        T::eq(trim((string) $x->query('.//h2[contains(@class,"lp-titel")]', $s)->item(0)?->textContent), 'Wer spricht?', 'Titel als h2');
+        T::eq(trim((string) $x->query('.//*[contains(@class,"lp-person-name")]', $s)->item(0)?->textContent), 'Anna Beispiel', 'Name');
+        T::eq(trim((string) $x->query('.//*[contains(@class,"lp-person-rolle")]', $s)->item(0)?->textContent), 'Ernährungsberaterin', 'Rolle');
+        T::contains($h, 'erklärt verständlich', 'Text');
+        T::eq($x->query('.//img', $s)->length, 0, 'schlicht ohne Bild');
+        [, $x] = $bau(H::seite([['bild' => ['datei' => 'bestand/beispiel-vortrag.webp']] + $p]));
+        T::eq($x->query('//section[contains(@class,"lp-person--schlicht")]//img')->length, 0, 'schlicht zeigt auch ein angegebenes Bild nicht');
+        $p['variante'] = 'bild-links';
+        $p['bild'] = ['datei' => 'bestand/beispiel-vortrag.webp'];
+        [, $x] = $bau(H::seite([$p]));
+        $img = $x->query('//section[contains(@class,"lp-person--bild-links")]//img[contains(@class,"lp-person-bild")]')->item(0);
+        T::ok($img !== null && $img->getAttribute('alt') === 'Stilisierte Bühne mit Rednerpult und Publikum' && $img->getAttribute('loading') === 'lazy',
+            'Bild mit Alt-Text aus dem Bestand, spät geladen');
+    },
+    'person: bild-links verlangt ein Bild; Prüfung: Bild ohne Freigabe sperrt, Angaben ohne Namen geben einen Hinweis' => static function () use ($k, $pruefe, $profilMit): void {
+        $p = $k->baustein('person')['beispiel'];
+        $p['variante'] = 'bild-links';
+        T::ok(Schema::pruefen(H::seite([$p]), $k, Profil::laden(H::testprofil()), T::tmp()) !== [], 'bild-links ohne Bild wird abgewiesen');
+        $p['bild'] = ['datei' => 'bestand/beispiel-vortrag.webp'];
+        $ohneFreigabe = $profilMit(static fn ($j) => $j, static function (string $ordner): void {
+            $l = json_decode((string) file_get_contents("$ordner/bilder/bilder.json"), true);
+            foreach ($l as &$e) {
+                if ($e['datei'] === 'beispiel-vortrag.webp') { $e['freigegeben'] = false; }
+            }
+            unset($e);
+            file_put_contents("$ordner/bilder/bilder.json", json_encode($l, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        });
+        $befunde = $pruefe(H::seite([$p]), $ohneFreigabe);
+        T::ok(array_filter(H::sperrend($befunde), static fn ($b) => $b->pfad === 'bausteine.1.bild') !== [], 'Bild der Person ohne Freigabe sperrt');
+        $befunde = $pruefe(H::seite([['typ' => 'person', 'variante' => 'schlicht', 'titel' => 'Wer spricht?', 'rolle' => 'Ernährungsberaterin']]));
+        T::ok(array_filter($befunde, static fn ($b) => $b->art === 'hinweis' && $b->pfad === 'bausteine.1.name') !== [], 'Hinweis: Person ohne Namen — ' . H::texte($befunde));
+        T::eq(H::texte(H::sperrend($befunde)), '', 'aber nichts Sperrendes');
+    },
 ];
