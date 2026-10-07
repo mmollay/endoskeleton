@@ -28,6 +28,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - `lp-person-text`
 - `lp-person-bild`
 
+### Bewusste Entscheidungen (06.10.2026)
+- Der Block „person“ steht in der Vorlage zwischen Anmeldung und Abschluss: So bleibt die Anmeldung an Stelle 4 (Index 3), auf die das Panel seine Fragen richtet. Ohne Namen baut er nichts.
+- `preis` und `plaetze` sind Zahlen; fehlen sie, gilt „kostenlos“ bzw. „unbegrenzt“.
+
 ## [3.51.0] — 2026-09-27
 
 ### Added
