@@ -202,4 +202,24 @@ return [
         T::ok(array_filter($befunde, static fn ($b) => $b->art === 'hinweis' && $b->pfad === 'bausteine.1.name') !== [], 'Hinweis: Person ohne Namen — ' . H::texte($befunde));
         T::eq(H::texte(H::sperrend($befunde)), '', 'aber nichts Sperrendes');
     },
+    'Vorlage zoom-vortrag: Person nach der Anmeldung, ohne Angaben unsichtbar; gefüllt ohne Sperrendes' => static function (): void {
+        $roh = (string) file_get_contents(H::wurzel() . '/lp/vorlagen/zoom-vortrag.json');
+        $v = json_decode($roh, true);
+        T::eq(array_column($v['bausteine'], 'typ'), ['hero', 'termin', 'themen', 'anmeldung', 'person', 'abschluss'], 'Reihenfolge der Bausteine');
+        T::eq($v['bausteine'][4], ['typ' => 'person', 'variante' => 'schlicht', 'titel' => 'Wer spricht?'], 'Person-Block ohne Platzhalter');
+        $gefuellt = json_decode(strtr($roh, [
+            '{{Titel der Seite, höchstens 60 Zeichen}}' => 'Gesund durch den Winter',
+            '{{Ein Satz für Suchmaschinen: Thema und Datum}}' => 'Online-Vortrag am 6. Oktober 2099.',
+            '{{Thema des Vortrags}}' => 'Gesund durch den Winter',
+            '{{Worum es geht, in ein bis zwei Sätzen}}' => 'Was du selbst tun kannst.',
+            '{{JJJJ-MM-TTTHH:MM}}' => '2099-10-06T19:00',
+            '{{Thema 1}}' => 'Schlaf', '{{Thema 2}}' => 'Bewegung', '{{Thema 3}}' => 'Ernährung',
+            '{{name-der-liste}}' => 'beispiel-abend',
+        ]), true);
+        T::notContains((string) json_encode($gefuellt, JSON_UNESCAPED_UNICODE), '{{', 'alle Platzhalter ersetzt');
+        $o = H::ordner($gefuellt);
+        T::eq(H::texte(H::sperrend(Bauer::bauen($o)->befunde)), '', 'Bau ohne Sperrendes');
+        T::notContains((string) file_get_contents("$o/index.html"), 'lp-person', 'Person ohne Namen nicht gebaut');
+        T::eq(H::texte(H::sperrend(Pruefer::pruefen($o, '2026-09-27T12:00'))), '', 'Prüfung ohne Sperrendes');
+    },
 ];

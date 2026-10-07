@@ -27,6 +27,9 @@
       "danke": "Danke! Bitte bestätige deine Anmeldung mit dem Link in unserer E-Mail."
     },
     {
+      "typ": "person", "variante": "schlicht", "titel": "Wer spricht?"
+    },
+    {
       "typ": "abschluss", "variante": "akzent", "titel": "Sei dabei",
       "knopf": { "text": "Platz sichern", "ziel": "#anmeldung" }
     }
