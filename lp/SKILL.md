@@ -256,6 +256,7 @@ Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.52.0 · höchstens 1-mal
 | `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+| `plaetze` | zahl | – | 1–10000 |
 
 ```json
 {

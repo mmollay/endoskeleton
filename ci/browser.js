@@ -25,14 +25,23 @@ const pruefe = (bedingung, was) => { if (bedingung) { bestanden++; } else { fehl
 
 /**
  * Öffnet eine Musterbuch-Seite (optionen.suche z. B. '?anmeldung=ok#anmeldung', optionen.hoehe statt 900 px);
- * fremd sammelt alle Anfragen außerhalb von lp.test.
+ * fremd sammelt alle Anfragen außerhalb von lp.test. Die Plätze-Abfrage (3.52.0) an https://beispiel.invalid/lp/plaetze
+ * (Formularziel des Testprofils) beantwortet eine Attrappe: optionen.plaetze = { status, daten } oder { abbruch: true };
+ * ohne Angabe 12 von 30 frei. abfragen sammelt ihre Adressen — sie zählen nicht als Fremdanfrage.
  */
 async function oeffnen(browser, name, breite, optionen = {}) {
   const kontext = await browser.newContext({ viewport: { width: breite, height: optionen.hoehe || 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
   const page = await kontext.newPage();
   const fremd = [];
+  const abfragen = [];
   await page.route('**/*', (r) => {
     const u = new URL(r.request().url());
+    if (u.host === 'beispiel.invalid' && u.pathname === '/lp/plaetze') {
+      abfragen.push(u.href);
+      const p = optionen.plaetze || { status: 200, daten: { frei: 12, gesamt: 30, voll: false } };
+      if (p.abbruch) { return r.abort(); }
+      return r.fulfill({ status: p.status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': 'http://lp.test' }, body: JSON.stringify(p.daten) });
+    }
     if (u.host !== 'lp.test') { fremd.push(u.href); return r.abort(); }
     let f = path.join(MUSTERBUCH, decodeURIComponent(u.pathname));
     if (f.endsWith(path.sep)) { f = path.join(f, 'index.html'); }
@@ -41,7 +50,7 @@ async function oeffnen(browser, name, breite, optionen = {}) {
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
   await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
-  return { page, fremd, kontext };
+  return { page, fremd, kontext, abfragen };
 }
 
 /**
@@ -184,8 +193,10 @@ function kontrastImBrowser(nur) {
   // Nur 300 px hoch, damit das Formular unter der ersten Bildschirmhöhe liegt: Ins Bild bringt die Meldung allein der
   // Fokus (focus() scrollt) — die Sprungmarke #anmeldung nimmt lp.js vor dem Sprung aus der Adresse. „Weniger
   // Bewegung“, weil base.css sonst weich scrollt und die Lage beim Laden noch nicht feststeht.
-  // Datenschutz (27.09.2026): Nach außen gibt es nur ok | fehler. Ein „bereits“ (älterer Stand der Weiterleitungsstelle)
-  // zeigt genau dieselbe Seite wie „ok“ — sonst ließe sich an einer fremden Adresse die Anmeldung ablesen.
+  // Datenschutz (27.09.2026): Nach außen gibt es nur ok | fehler (seit 3.52.0 dazu voll, das nicht an der Adresse
+  // hängt). Ein „bereits“ (älterer Stand der Weiterleitungsstelle) zeigt genau dieselbe Seite wie „ok“ — sonst ließe sich
+  // an einer fremden Adresse die Anmeldung ablesen. Gemessen wird erst nach der Plätze-Abfrage (networkidle): Sonst
+  // stünde im Seitentext je nach Zeitpunkt der feste Text oder der Stand der Attrappe, und der Vergleich wackelte.
   {
     const MELDUNGEN = ['lp-anmeldung-danke', 'lp-anmeldung-fehler'];
     const ZUSATZ = 'Falls du schon angemeldet warst, bekommst du keine neue E-Mail.';
@@ -196,6 +207,7 @@ function kontrastImBrowser(nur) {
       for (const [zustand, klasse, felder] of faelle) {
         const suche = zustand === null ? '' : `?anmeldung=${zustand}#anmeldung`;
         const { page, kontext } = await oeffnen(browser, seite, 390, { suche, hoehe: 300, reducedMotion: 'reduce' });
+        await page.waitForLoadState('networkidle');
         const ist = await page.evaluate((klassen) => {
           const fs = document.querySelector('.lp-formular fieldset');
           const m = klassen.map((k) => document.querySelector(`.${k}`)).find((e) => e !== null && e.getClientRects().length > 0);
@@ -235,6 +247,43 @@ function kontrastImBrowser(nur) {
         await kontext.close();
       }
       pruefe(seitentext.ok === seitentext.bereits && seitentext.ok.includes(ZUSATZ), `${seite}: ok und bereits im sichtbaren Text nicht unterscheidbar`);
+    }
+  }
+
+  // Plätze (3.52.0): mit Skript der Stand des Panels, bei voll ohne Felder; bei Drosselung, Netzfehler oder ohne Skript
+  // der feste Text; der Rücksprung ?anmeldung=voll zeigt und fokussiert die Meldung.
+  {
+    const FEST = 'Begrenzt auf 30 Plätze.';
+    const faelle = [
+      ['frei', { status: 200, daten: { frei: 12, gesamt: 30, voll: false } }, 'Noch 12 von 30 Plätzen frei', true],
+      ['voll', { status: 200, daten: { frei: 0, gesamt: 30, voll: true } }, 'Ausgebucht', false],
+      ['gedrosselt', { status: 429, daten: { fehler: 'grenze' } }, FEST, true],
+      ['Netzfehler', { abbruch: true }, FEST, true],
+    ];
+    for (const [fall, plaetze, text, felder] of faelle) {
+      const { page, fremd, abfragen, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { plaetze });
+      await page.waitForLoadState('networkidle');
+      const ist = await page.evaluate(() => ({ text: document.querySelector('.lp-anmeldung-plaetze').textContent.trim(), felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0 }));
+      pruefe(ist.text === text, `Plätze ${fall}: Text „${ist.text}“ (erwartet „${text}“)`);
+      pruefe(ist.felder === felder, `Plätze ${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'}`);
+      pruefe(abfragen.length === 1 && abfragen[0] === 'https://beispiel.invalid/lp/plaetze?liste=beispiel-abend', `Plätze ${fall}: genau eine Abfrage mit der Liste (${abfragen.join(', ')})`);
+      pruefe(fremd.length === 0, `Plätze ${fall}: keine Fremdanfrage (${fremd.join(', ')})`);
+      await kontext.close();
+    }
+    {
+      const { page, abfragen, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { ohneJs: true });
+      const text = await page.evaluate(() => document.querySelector('.lp-anmeldung-plaetze').textContent.trim());
+      pruefe(text === FEST && abfragen.length === 0, `Plätze ohne JavaScript: fester Text, keine Abfrage („${text}“, ${abfragen.length})`);
+      await kontext.close();
+    }
+    {
+      const { page, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { suche: '?anmeldung=voll#anmeldung', hoehe: 300, reducedMotion: 'reduce' });
+      const ist = await page.evaluate(() => ({ sichtbar: !document.querySelector('.lp-anmeldung-voll').hidden, fokus: document.activeElement.className,
+        felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0, adresse: location.search + location.hash }));
+      pruefe(ist.sichtbar && ist.fokus === 'lp-anmeldung-voll' && !ist.felder && ist.adresse === '', `?anmeldung=voll: Meldung sichtbar und fokussiert, Felder weg, Adresse sauber (${JSON.stringify(ist)})`);
+      const schwach = await page.evaluate(kontrastImBrowser, '.lp-anmeldung-voll');
+      pruefe(schwach.length === 0, `?anmeldung=voll: Kontrast der Meldung: ${schwach.join(' | ')}`);
+      await kontext.close();
     }
   }
 

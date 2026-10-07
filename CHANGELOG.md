@@ -11,10 +11,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - **Preis im Termin** (`preis`, ganze Euro 1–9999, fehlt = kostenlos): Zeile „Teilnahme kostenlos“ bzw. „Teilnahme: 25 €“ unter dem Ort; JSON-LD `isAccessibleForFree` bzw. `offers` (EUR). `lp.js` blendet die Zeile mit aus, wenn kein Termin mehr offen ist.
 - **Prüfung „kostenlos trotz Preis“** (sperrend): Hat ein Termin einen Preis, meldet `pruefen.php` jedes Textfeld mit „kostenlos“ oder „gratis“ (gleich welche Schreibweise) mit Abschnitt und Feld. Die Vorlage `zoom-vortrag` sagt in der Anmeldung „Jetzt anmelden“.
 - **Was danach passiert** (`anmeldung.danach`, Absatz bis 300 Zeichen): ein Satz über dem Formular. Wie jeder Absatz mit `**fett**` und Leerzeile = neuer Absatz; jeder Absatz trägt die Klasse `lp-anmeldung-danach` (`Text::absaetze()` nimmt dafür optional eine Klasse).
+- **Plätze** (`anmeldung.plaetze`, 1–10000, fehlt = unbegrenzt): „Begrenzt auf N Plätze.“ im Formular; `lp.js` fragt `GET <Host des Formularziels>/lp/plaetze?liste=<kennung>` ohne Cookies ab und zeigt „Noch X von N Plätzen frei“ bzw. „Ausgebucht“ (Felder weg). Neue Rückmeldung `?anmeldung=voll` („Leider ausgebucht — alle Plätze sind vergeben.“). Datenschutz: Die Abfrage schickt die IP-Adresse des Besuchers beim Laden an den Host des Formularziels.
 
 ### Neue Klassen
 - `lp-termin-preis`
 - `lp-anmeldung-danach`
+- `lp-anmeldung-plaetze`
+- `lp-anmeldung-voll`
 
 ## [3.51.0] — 2026-09-27
 

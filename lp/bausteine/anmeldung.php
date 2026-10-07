@@ -3,11 +3,12 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
  * Anmeldung: Felder mit Label, autocomplete und Fehlertext (als Beschreibung erst nach dem Absenden, lp.js); Einwilligung aus dem Profil, nie vorangehakt; Honigtopf;
  * Liste und Kurzprüfsumme des Einwilligungstexts als versteckte Felder. Ohne Formularziel sichtbar gesperrt
- * (Livegang gesperrt, bis die Anbindung steht). Rückmeldungen der Weiterleitung (?anmeldung=ok|fehler) liegen
- * versteckt bereit; lp.js zeigt und fokussiert die passende. Eine eigene Meldung „bereits angemeldet“ gibt es nicht
- * (Datenschutz: die Seite verrät nicht, ob eine Adresse schon auf der Liste steht) — der feste Zusatzsatz nach dem
- * Dankestext deckt diesen Fall mit ab. Ohne JavaScript bleibt es beim Formular, ein <noscript>-Hinweis erklärt den
- * Ablauf per E-Mail. @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ * (Livegang gesperrt, bis die Anbindung steht). Rückmeldungen der Weiterleitung (?anmeldung=ok|fehler|voll) liegen
+ * versteckt bereit; lp.js zeigt und fokussiert die passende. Plätze (3.52.0): Mit `plaetze` und Formularziel steht
+ * „Begrenzt auf N Plätze.“ im Formular; lp.js fragt den Stand am Host des Formularziels ab (/lp/plaetze). Eine eigene
+ * Meldung „bereits angemeldet“ gibt es nicht (Datenschutz: die Seite verrät nicht, ob eine Adresse schon auf der Liste
+ * steht) — der feste Zusatzsatz nach dem Dankestext deckt diesen Fall mit ab. Ohne JavaScript bleibt es beim Formular,
+ * ein <noscript>-Hinweis erklärt den Ablauf per E-Mail. @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
@@ -31,6 +32,10 @@ $felder = [
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>
 <?php endif ?>
 <p class="lp-anmeldung-fehler" role="status" tabindex="-1" hidden><?= $k->e($k->du('Das hat leider nicht geklappt. Bitte prüfe deine Angaben und versuche es noch einmal.', 'Das hat leider nicht geklappt. Bitte prüfen Sie Ihre Angaben und versuchen Sie es noch einmal.')) ?></p>
+<?php if (isset($b['plaetze']) && $ziel !== ''): $plaetze = (int) $b['plaetze']; ?>
+<p class="lp-anmeldung-plaetze" data-lp-plaetze-liste="<?= $k->e($b['liste']) ?>" data-lp-plaetze-quelle="<?= $k->e('https://' . parse_url($ziel, PHP_URL_HOST) . '/lp/plaetze') ?>" aria-live="polite">Begrenzt auf <?= $plaetze === 1 ? '1 Platz' : $plaetze . ' Plätze' ?>.</p>
+<?php endif ?>
+<p class="lp-anmeldung-voll" role="status" tabindex="-1" hidden>Leider ausgebucht — alle Plätze sind vergeben.</p>
 <fieldset aria-labelledby="<?= $k->id($nr, 'titel') ?>"<?= $ziel === '' ? ' disabled' : '' ?>>
 <?php foreach ($felder as $name => [$label, $typ, $auto, $pflicht, $fehler]): if (!in_array($name, $b['felder'], true)) { continue; } $id = "lp-f-$name"; ?>
 <div class="lp-feld">

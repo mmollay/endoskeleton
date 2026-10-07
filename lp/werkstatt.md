@@ -189,6 +189,7 @@ Varianten: `karte`, `breit` · höchstens 1-mal
 | `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+| `plaetze` | zahl | – | 1–10000 |
 
 ```json
 {
