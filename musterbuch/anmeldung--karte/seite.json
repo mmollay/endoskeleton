@@ -25,7 +25,8 @@
             "knopf_text": "Ich bin dabei",
             "liste": "beispiel-abend",
             "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail.",
-            "text": "Trag dich ein – den Zugangslink bekommst du per E-Mail."
+            "text": "Trag dich ein – den Zugangslink bekommst du per E-Mail.",
+            "danach": "Den Zoom-Link bekommst du am Tag vor dem Vortrag per E-Mail."
         }
     ]
 }

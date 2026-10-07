@@ -156,16 +156,17 @@
       }
     },
     "anmeldung": {
-      "name": "Anmeldung", "seit": "3.51.0", "geaendert": "3.51.0",
+      "name": "Anmeldung", "seit": "3.51.0", "geaendert": "3.52.0",
       "klassen": {
         "lp-anmeldung": "3.51.0", "lp-anmeldung--karte": "3.51.0", "lp-anmeldung--breit": "3.51.0", "lp-formular": "3.51.0",
         "lp-feld": "3.51.0", "lp-feld-fehler": "3.51.0", "lp-einwilligung": "3.51.0", "lp-anmeldung-hinweis": "3.51.0",
-        "lp-anmeldung-danke": "3.51.0", "lp-anmeldung-fehler": "3.51.0"
+        "lp-anmeldung-danke": "3.51.0", "lp-anmeldung-fehler": "3.51.0", "lp-anmeldung-danach": "3.52.0"
       },
       "varianten": ["karte", "breit"],
       "felder": {
         "titel":      { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
         "text":       { "typ": "absatz", "label": "Text", "max": 400 },
+        "danach":     { "typ": "absatz", "label": "Was nach der Anmeldung passiert", "max": 300 },
         "felder":     { "typ": "auswahl", "label": "Formularfelder", "mehrfach": true, "werte": ["vorname", "nachname", "email", "telefon"], "enthaelt": ["email"], "pflicht": true },
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Knopf", "max": 40, "pflicht": true },
         "liste":      { "typ": "kennung", "label": "Verteilerliste", "muster": "^[a-z0-9][a-z0-9-]{1,59}$", "pflicht": true },

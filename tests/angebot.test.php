@@ -105,4 +105,16 @@ return [
         T::eq($v['bausteine'][3]['titel'] ?? null, 'Jetzt anmelden', 'Titel der Anmeldung');
         T::eq($v['meta']['beschreibung'] ?? null, '{{Ein Satz für Suchmaschinen: Thema und Datum}}', 'Platzhalter der Beschreibung');
     },
+    'anmeldung: „Was danach passiert“ steht vor dem Formular, ohne Angabe kein Element' => static function () use ($bau): void {
+        $s = H::seite();
+        $s['bausteine'][1]['danach'] = 'Den Zoom-Link bekommst du am Tag vor dem Vortrag per E-Mail.';
+        [, $x] = $bau($s);
+        $p = $x->query('//section[contains(@class,"lp-anmeldung")]//p[contains(@class,"lp-anmeldung-danach")]')->item(0);
+        T::eq(trim((string) $p?->textContent), 'Den Zoom-Link bekommst du am Tag vor dem Vortrag per E-Mail.', 'Satz steht da');
+        T::ok($p !== null && (new DOMXPath($p->ownerDocument))->query('following-sibling::form[contains(@class,"lp-formular")]', $p)->length === 1, 'vor dem Formular');
+        [, $x] = $bau(H::seite());
+        T::eq($x->query('//*[contains(@class,"lp-anmeldung-danach")]')->length, 0, 'ohne Angabe kein Element');
+        $s['bausteine'][1]['danach'] = str_repeat('x', 301);
+        T::ok(Schema::pruefen($s, Katalog::laden(), Profil::laden(H::testprofil()), T::tmp()) !== [], 'mehr als 300 Zeichen werden abgewiesen');
+    },
 ];

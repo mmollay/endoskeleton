@@ -184,6 +184,7 @@ Varianten: `karte`, `breit` · höchstens 1-mal
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `danach` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `felder` | auswahl | ja | Liste aus `vorname`, `nachname`, `email`, `telefon`, muss `email` enthalten |
 | `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
