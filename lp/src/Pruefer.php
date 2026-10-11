@@ -237,7 +237,7 @@ final class Pruefer
             return;
         }
         foreach ($this->textfelder() as $pfad => $text) {
-            $lesarten = Sperrliste::lesarten($text);
+            $lesarten = Sperrliste::lesarten($text, true);   // mit Leerzeichen um Satzzeichen: „Kosten – frei wählbar“ ist nicht „kosten-frei“
             if ($lesarten === null) {
                 $this->nichtPruefbar($pfad);   // ob der Text „kostenlos“ verspricht, lässt sich nicht sagen
                 continue;

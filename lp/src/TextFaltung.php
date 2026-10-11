@@ -4,6 +4,10 @@
  * Wer hier etwas ändert, ändert es dort mit (und umgekehrt); tests/faltung.test.php prüft die Eigenschaften, die für beide gelten.
  * Der Baukasten hat keine Abhängigkeit zum Panel: Diese Datei steht für sich, reines PHP mit mbstring und PCRE, ohne Composer und ohne `intl`.
  *
+ * ABWEICHUNG vom Panel (Baukasten 3.54.1, Befunde der unabhängigen Prüfung — im Panel noch nicht): (1) lesartenMit() entscheidet „mehrdeutig?“ auch am Text nach den Schritten schriftformen … sternchen
+ * (Zalgo-Haufen mit Umlautmarke, vor dem ein Nullbreiten- oder Verwechslungszeichen steht); (2) das Satzende in satzstrang() kennt schließende Zeichen und „…“; (3) lesartenOhnePunkte() ist öffentlich.
+ * Bis das Panel dieselben Änderungen hat, sagen die beiden Kopien auf diesen Eingaben nicht dasselbe — der Baukasten ist dann strenger bei (1) und milder bei (2). Mit dem Panel zugleich übernehmen.
+ *
  * Die Faltung eines Texts für den Vergleich mit der Sperrliste der Landingpages (Wörter, die auf einer Seite nicht stehen dürfen).
  *
  * Anlass (rc1084): Die Sperrliste ließ sich durch Schreibweisen umgehen, die der Leser für dasselbe Wort hält — Umlaut in NFD (a + kombinierender Punkt), kyrillisches „а“
@@ -507,6 +511,17 @@ final class TextFaltung
     }
 
     /**
+     * Die Lesarten wie lesarten(), aber ohne den Schritt „Leerzeichen um Satzzeichen fallen weg“ (Lesart OHNE_PUNKTE, wie sie der Satzstrang braucht): „Kosten – frei wählbar“ bleibt „kosten - frei wählbar“
+     * statt „kosten-frei wählbar“. Für Regex-Suchen, die einen Bindestrich ohne Leerzeichen von einem mit Leerzeichen unterscheiden müssen (Pruefer::preis). null, wenn der Text nicht prüfbar ist.
+     *
+     * @return ?list<string>
+     */
+    public static function lesartenOhnePunkte(string $text): ?array
+    {
+        return self::lesartenMit($text, self::OHNE_PUNKTE);
+    }
+
+    /**
      * Ein Eintrag der Sperrliste in der Vergleichsform — in zwei Fassungen: mit und ohne Zusammenziehen von Buchstabenreihen (ein Eintrag wie „i. d. R“ aus einzelnen Buchstaben
      * soll auch dort gefunden werden, wo der Text nicht dieselbe Reihe bildet), ohne Doppelte. Richtungs-Steuerzeichen sind im Eintrag nur Formatierung (Copy & Paste), nicht Anzeige:
      * Sie fallen weg, der Eintrag gilt weiter. null, wenn er sich nicht falten lässt.
@@ -541,7 +556,7 @@ final class TextFaltung
             return null;
         }
         foreach ($saetze as $i => $t) {
-            $t = preg_replace('~(?<! )[.!?:;,]+(?= |$)~u', "\0", $t);
+            $t = preg_replace('~(?<![ .!?:;,\x{2026}])[.!?:;,\x{2026}]+[\p{Pe}\p{Pf}\p{Pi}"\']*(?= |$)~u', "\0", $t);
             $t = $t === null ? null : self::strang($t, true, true);
             if ($t === null) {
                 return null;
@@ -576,7 +591,19 @@ final class TextFaltung
             return null;
         }
         $weitere = $gespreizt ? [self::OHNE_REIHEN] : [];
-        $mehrdeutig = preg_match(self::MEHRDEUTIG, $text);
+        // Ob ein Text mehrdeutig ist, entscheidet sich an dem Text, der verglichen wird: nach den Schritten, die Verwechslungszeichen, Unsichtbares, Vollbreit und Sterne wegräumen
+        // (sonst trennt ein U+200B zwischen a und den Marken den Zalgo-Haufen im Rohtext, den die Faltung danach zu einem Umlaut zusammensetzt).
+        $vor = $text;
+        foreach (['schriftformen', 'verwechslungen', 'unsichtbares', 'vollbreit', 'sternchen'] as $schritt) {
+            $vor = self::$schritt($vor);
+            if ($vor === null) {
+                return null;
+            }
+        }
+        $mehrdeutig = preg_match(self::MEHRDEUTIG, $text);   // im Rohtext: ein Füller (Schritt „unsichtbares“ löscht ihn) …
+        if ($mehrdeutig === 0) {
+            $mehrdeutig = preg_match(self::MEHRDEUTIG, $vor);   // … und im vorbereiteten Text: ein Zalgo-Haufen, der erst nach dem Wegräumen von Unsichtbarem zusammensteht
+        }
         if ($mehrdeutig === false) {
             return null;
         }
