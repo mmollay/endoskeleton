@@ -9,6 +9,7 @@ _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand
 - Texte ohne HTML. Leerzeile = neuer Absatz, `**fett**` ist die einzige Auszeichnung. Echte Umlaute (ä, ö, ü, ß).
 - Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.
 - Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `"dekorativ": true`).
+- Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.
 - Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.
 
 ## Abschnitte

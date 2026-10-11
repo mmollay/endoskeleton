@@ -71,7 +71,8 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
 | `beschreibung` | zeile | ja | eine Zeile, ≤ 160 Zeichen |
-| `vorschaubild` | bilddatei | – | `bestand/…` oder `img/…` |
+| `vorschaubild` | bilddatei | – | `bestand/…` oder `img/…`; fehlt: beim Teilen des Links erscheint das Bild des Kopfbereichs; ohne Bild dort keine Bildkarte |
+| `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt keine Vorschaukarte (og:image, twitter:card) aus; setzt der Betreiber, nicht der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
 ## Bausteine (Katalog 3.52.0)

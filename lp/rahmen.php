@@ -6,6 +6,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  *
  * @var Endo\Lp\Kontext $k
  * @var string $titel @var string $beschreibung @var bool $noindex @var string $inhalt
+ * @var ?array{url: string, bild: ?string, breite: int, hoehe: int, alt: string} $og  Vorschaukarte beim Teilen (Endo\Lp\Vorschau), nur auf der Startseite
  * @var string $css @var string $js @var string $logo @var string $version
  */
 $p = $k->profil->daten;
@@ -25,6 +26,19 @@ $f = $p['firma'];
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?= $k->e($titel) ?>">
 <meta property="og:description" content="<?= $k->e($beschreibung) ?>">
+<?php if ($og !== null): ?>
+<meta property="og:url" content="<?= $k->e($og['url']) ?>">
+<?php if ($og['bild'] !== null): ?>
+<meta property="og:image" content="<?= $k->e($og['bild']) ?>">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="<?= (int) $og['breite'] ?>">
+<meta property="og:image:height" content="<?= (int) $og['hoehe'] ?>">
+<?php if ($og['alt'] !== ''): ?>
+<meta property="og:image:alt" content="<?= $k->e($og['alt']) ?>">
+<?php endif ?>
+<meta name="twitter:card" content="summary_large_image">
+<?php endif ?>
+<?php endif ?>
 <link rel="stylesheet" href="<?= $k->e($css) ?>">
 <script src="<?= $k->e($js) ?>" defer></script>
 </head>

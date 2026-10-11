@@ -45,6 +45,7 @@ final class Pruefer
         $p->preis();
         $p->person();
         $p->bildrechte();
+        $p->vorschau();
         $p->rechtstexte();
         foreach (self::SEITEN as $datei) {
             $p->html($datei);
@@ -245,11 +246,7 @@ final class Pruefer
         if ($html === '') {
             return;   // fehlt: meldet schon der Nachbau-Vergleich
         }
-        $d = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        $d->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NONET);
-        libxml_clear_errors();
-        $x = new \DOMXPath($d);
+        $x = new \DOMXPath(self::dom($html));
         if ($x->query('//h1')->length !== 1) {
             $this->sperrend($datei, "$datei: genau eine H1 erwartet, " . $x->query('//h1')->length . ' gefunden', 'Die Seite braucht genau eine Hauptüberschrift.');
         }
@@ -312,6 +309,52 @@ final class Pruefer
         foreach ($x->query('//img') as $img) {
             $this->bild($datei, $img);
         }
+    }
+
+    /**
+     * Die Vorschaukarte beim Teilen, so wie sie in index.html steht (Endo\Lp\Vorschau): og:url und og:image nur auf der eigenen
+     * Adresse (kein fremder Host — ein fremdes og:url nähme der Seite ihre Geteilt-Zähler und Karten), und die genannte Vorschaudatei
+     * muss da sein, ein JPEG von 1200×630 und höchstens 300 KB (WhatsApp zeigt größere oft nicht).
+     */
+    private function vorschau(): void
+    {
+        $x = new \DOMXPath(self::dom((string) @file_get_contents("$this->seite/index.html")));
+        $meta = [];
+        foreach ($x->query('//meta[@property="og:url" or @property="og:image"]') as $m) {
+            $meta[$m->getAttribute('property')] = $m->getAttribute('content');
+        }
+        $eigen = is_string($this->plan['meta']['adresse'] ?? null) ? parse_url($this->plan['meta']['adresse']) : false;
+        foreach ($meta as $name => $url) {
+            $u = parse_url($url);
+            if ($eigen === false || !is_array($u) || ($u['scheme'] ?? '') !== 'https' || ($u['host'] ?? '') !== ($eigen['host'] ?? null) || isset($u['port']) || isset($u['user'])
+                || !str_starts_with($u['path'] ?? '', $eigen['path'] ?? '/')) {
+                $this->sperrend('index.html', "index.html: $name zeigt auf einen fremden Host oder eine fremde Adresse ($url)", 'Die Vorschaukarte beim Teilen des Links zeigt auf eine fremde Adresse.');
+            }
+        }
+        if (!isset($meta['og:image'])) {
+            return;
+        }
+        $mass = is_file("$this->seite/" . Vorschau::DATEI) ? @getimagesize("$this->seite/" . Vorschau::DATEI) : null;
+        $kunde = 'Das Vorschaubild für das Teilen des Links ist nicht in Ordnung — bitte neu bauen.';
+        if (!is_file("$this->seite/" . Vorschau::DATEI)) {
+            $this->sperrend(Vorschau::DATEI, Vorschau::DATEI . ' fehlt, obwohl index.html og:image nennt', 'Das Vorschaubild für das Teilen des Links fehlt — bitte neu bauen.');
+        } elseif ($mass === false || $mass[2] !== IMAGETYPE_JPEG) {
+            $this->sperrend(Vorschau::DATEI, Vorschau::DATEI . ' ist kein JPEG', $kunde);
+        } elseif ($mass[0] !== Vorschau::BREITE || $mass[1] !== Vorschau::HOEHE) {
+            $this->sperrend(Vorschau::DATEI, sprintf('%s ist %d×%d, nicht %d×%d', Vorschau::DATEI, $mass[0], $mass[1], Vorschau::BREITE, Vorschau::HOEHE), $kunde);
+        } elseif (filesize("$this->seite/" . Vorschau::DATEI) > Vorschau::MAX_BYTES) {
+            $this->sperrend(Vorschau::DATEI, sprintf('%s ist zu groß: %d KB (erlaubt %d KB)', Vorschau::DATEI, (int) (filesize("$this->seite/" . Vorschau::DATEI) / 1000), Vorschau::MAX_BYTES / 1000),
+                'Das Vorschaubild für das Teilen des Links ist zu groß — WhatsApp zeigt es dann nicht.');
+        }
+    }
+
+    private static function dom(string $html): \DOMDocument
+    {
+        $d = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $d->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NONET);
+        libxml_clear_errors();
+        return $d;
     }
 
     private function bild(string $datei, \DOMElement $img): void
