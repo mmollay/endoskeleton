@@ -64,6 +64,9 @@ final class Bauer
         foreach ($k->kopien as $ziel => $quelle) {
             $dateien[$ziel] = (string) file_get_contents($quelle);
         }
+        $vorschau = Vorschau::bauen($plan, $profil, $seite, $katalog);
+        $befunde = array_merge($befunde, $vorschau['befunde']);
+        $dateien += $vorschau['dateien'];
         $dateien['es/lp.css'] = self::css($endo, $version, $profil);
         $dateien['es/lp.js'] = (string) file_get_contents("$endo/lp/lp.js");
         $rahmen = [
@@ -73,13 +76,13 @@ final class Bauer
         ];
         $indexieren = ($meta['indexieren'] ?? false) === true;
         $dateien['index.html'] = self::vorlage("$endo/lp/rahmen.php", $rahmen + [
-            'titel' => $meta['titel'], 'beschreibung' => $meta['beschreibung'], 'noindex' => !$indexieren,
+            'titel' => $meta['titel'], 'beschreibung' => $meta['beschreibung'], 'noindex' => !$indexieren, 'og' => $vorschau['og'],
             'inhalt' => implode("\n", $bloecke),
         ]);
         $firma = (string) $profil->daten['firma']['name'];
         foreach (['impressum' => 'Impressum', 'datenschutz' => 'Datenschutzerklärung'] as $name => $ueberschrift) {
             $dateien["$name.html"] = self::vorlage("$endo/lp/rahmen.php", $rahmen + [
-                'titel' => "$ueberschrift – $firma", 'beschreibung' => "$ueberschrift von $firma", 'noindex' => true,
+                'titel' => "$ueberschrift – $firma", 'beschreibung' => "$ueberschrift von $firma", 'noindex' => true, 'og' => null,
                 'inhalt' => "<section class=\"lp-block lp-rechtsseite\" aria-labelledby=\"lp-recht-titel\">\n<div class=\"lp-block-innen container\">\n"
                     . "<h1 id=\"lp-recht-titel\">$ueberschrift</h1>\n" . Rechtstext::html($profil->rechtstext($name), $profil->hosts())
                     . "\n<p><a href=\"index.html\">Zurück zur Seite</a></p>\n</div>\n</section>",

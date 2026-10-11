@@ -38,6 +38,7 @@ final class Skill
             . "- Texte ohne HTML. Leerzeile = neuer Absatz, `**fett**` ist die einzige Auszeichnung. Echte Umlaute (ä, ö, ü, ß).\n"
             . "- Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.\n"
             . "- Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `\"dekorativ\": true`).\n"
+            . "- Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.\n"
             . "- Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.\n\n## Abschnitte\n";
         foreach ($k->bausteine as $typ => $e) {
             $s .= "\n### {$e['name']} (`$typ`)\n\nVarianten: " . implode(', ', array_map(static fn ($v) => "`$v`", $e['varianten']))
