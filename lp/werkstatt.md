@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.52.0)
+# Landingpage bearbeiten (Endoskeleton 3.53.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 

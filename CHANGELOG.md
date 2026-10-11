@@ -4,6 +4,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.53.0] — 2026-10-11
+
+### Added
+- **Vorschaukarte beim Teilen des Seitenlinks** (WhatsApp, Telegram, Facebook, Messenger, LinkedIn, Slack, X): Bisher gab die Seite nur `og:type`, `og:title` und `og:description` aus. Mit dem neuen Feld `meta.adresse` (die absolute Adresse der Live-Seite, `https://<host>/`; setzt der Betreiber, nie der Kunde) kommen `og:url`, `og:image` (+ `og:image:type`, `:width`, `:height`, `:alt`) und `twitter:card` = `summary_large_image` dazu — nur auf der Startseite, nicht auf Impressum und Datenschutz. Crawler lösen nichts Relatives auf und holen nur absolute Adressen; der Baukasten kennt seinen Host nicht, deshalb kommt die Adresse aus dem Bauplan. Host: ein Eintrag aus `link_hosts` des Profils oder eine Unteradresse davon (genau an der Punkt-Grenze); sonst Hinweis und keine Karte.
+- **`es/vorschau.jpg`**: Das Bild der Karte ist `meta.vorschaubild`, sonst das Bild des Kopfbereichs. Der Bau macht daraus mit GD ein JPEG von 1200 × 630 (1,91:1), aus der Mitte zugeschnitten, Durchsichtiges auf `--bg` des Profils, Qualität 85 abwärts, bis es höchstens 300 KB hat (WhatsApp zeigt größere oft nicht); Baseline, ohne Metadaten (keine Standortdaten aus Handyfotos). JPEG, weil es das einzige Format ist, das alle Netzwerke lesen — und weil Apache auf dem Webserver `.webp` ohne `Content-Type` ausliefert (Debians `mime.types` kennt `image/webp` nicht). Die Adresse trägt `?v=<Prüfsumme>` (neues Bild = neue Adresse, Facebook speichert Bilder 30 Tage nach Adresse). Gleiches Bild, gleiche Bytes.
+- **Nie eine kaputte Karte**: Ohne Bild (Kopfbereich „schlicht“) gibt es `og:url` ohne Bild und ohne `twitter:card`; ein Bild, das GD nicht lesen kann (auch bewegtes WebP) oder das über 16 Megapixel hat, ergibt einen Hinweis statt eines Abbruchs; fehlt GD ganz, endet der Bau mit einem technischen Fehler (Ende 2). Hinweise: Adresse außerhalb der freigegebenen Websites, Vorschaubild ohne Adresse, Bild kleiner als 600 × 315 („zu klein für die große Karte“), Bild nicht aufbereitbar.
+- **Prüfer**: `og:url` und `og:image` zeigen nur auf die eigene Adresse (https, kein Port, kein Benutzer, gleicher Host wie `meta.adresse` — ein fremdes `og:url` nähme der Seite ihre geteilten Verweise); `es/vorschau.jpg` muss da sein, ein JPEG, genau 1200 × 630 und höchstens 300 KB groß sein. Sperrend.
+- **robots.txt**: Eine Seite ohne Suchmaschine (`indexieren` aus, die Vorgabe des Panels) MIT Karte lässt zusätzlich facebookexternalhit, Facebot, Twitterbot, LinkedInBot, Slackbot(-LinkExpanding), TelegramBot, WhatsApp und Discordbot zu; alle anderen bleiben ausgesperrt, die Seite bleibt `noindex`. Facebook, LinkedIn, X und Slack halten sich an robots.txt — mit „Disallow: /“ für alle gäbe es dort keine Karte. Ohne Karte und bei `indexieren` an bleibt robots.txt, wie sie war.
+- `SKILL.md` und `werkstatt.md` nennen die Regeln (Karte, Adresse nur vom Betreiber, Bild).
+
+### Kompatibilität
+- Neue Marke 3.53.0. Seiten der Marken 3.51.0 und 3.52.0 bauen weiter mit ihrem Stand; sie kennen `meta.adresse` nicht und lehnen es ab — der Betreiber setzt es nur bei einer Marke, deren Katalog (`lp/bausteine.json`, `seite.felder`) das Feld nennt. Ohne `meta.adresse` ist jede gebaute Datei Byte für Byte die der bisherigen Marke (außer der Versionsangabe); das Musterbuch hat keine Karte.
+
+### Neue Klassen
+- Keine (die Karte liegt im `<head>`; Gestaltung, Bausteine und `lp.css` sind unverändert).
+
 ## [3.52.0] — 2026-10-06
 
 ### Added
