@@ -15,7 +15,7 @@ $typen = ['zeile', 'absatz', 'zahl', 'zeitpunkt', 'auswahl', 'url', 'anker', 'ke
 
 return [
     'Katalogversion = VERSION' => static fn () => T::eq($k->version, $version, 'version in bausteine.json'),
-    'die neun Bausteine von 3.53.0' => static fn () => T::eq(array_keys($k->bausteine), ['hero', 'termin', 'themen', 'video', 'erfahrungen', 'faq', 'anmeldung', 'person', 'abschluss'], 'Typen'),
+    'die neun Bausteine von 3.54.0' => static fn () => T::eq(array_keys($k->bausteine), ['hero', 'termin', 'themen', 'video', 'erfahrungen', 'faq', 'anmeldung', 'person', 'abschluss'], 'Typen'),
     'jeder Eintrag vollständig' => static function () use ($k, $version, $typen): void {
         foreach ($k->bausteine as $typ => $e) {
             foreach (['name', 'seit', 'geaendert', 'klassen', 'varianten', 'felder', 'regeln', 'beispiel'] as $s) {
