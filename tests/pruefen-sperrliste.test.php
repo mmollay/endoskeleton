@@ -188,6 +188,14 @@ return [
             $s['bausteine'][0]['dachzeile'] = $wort;
             T::eq($trotz($pruefe($s, $ohneListe)), ['bausteine.0.dachzeile'], "„{$wort}“ sperrt");
         }
+        foreach (["Kosten \u{2013} frei wählbar", 'Kosten - frei Haus', "Kosten \u{2014} freiwillige Spende"] as $wort) {
+            $s['bausteine'][0]['dachzeile'] = $wort;
+            T::eq($trotz($pruefe($s, $ohneListe)), [], "„{$wort}“ (Strich MIT Leerzeichen) sperrt nicht");
+        }
+        foreach (["Kosten\u{2011}los", 'Kosten-frei'] as $wort) {
+            $s['bausteine'][0]['dachzeile'] = $wort;
+            T::eq($trotz($pruefe($s, $ohneListe)), ['bausteine.0.dachzeile'], "„{$wort}“ (Bindestrich OHNE Leerzeichen) sperrt");
+        }
         foreach (['Nicht umsonst bekannt', 'Kostenbeitrag inklusive', 'Gratulation zum Jubiläum', 'Frei sprechen lernen', 'Eintritt in die Stille', 'Online-Abend', 'Kostenübersicht', 'Das ist nicht gratis-ähnlich: 25 € Beitrag'] as $wort) {
             $s['bausteine'][0]['dachzeile'] = $wort;
             $erwartet = str_contains($wort, 'gratis') ? ['bausteine.0.dachzeile'] : [];   // „gratis-ähnlich“ enthält das Wort „gratis“ und ist wie bisher ein Treffer

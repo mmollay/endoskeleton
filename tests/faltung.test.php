@@ -19,6 +19,7 @@
  *   FA08 begrenzte Zeit und fail-closed: zu lang, ungültiges UTF-8, Richtungszeichen und jeder gescheiterte Regex-Schritt lassen NIE durch
  *   FA09 Eigenschaften: Tabellen ohne deutsche Buchstaben; NFC = NFD für alle 790 Akzentbuchstaben; 994 Kompatibilitätszeichen; Marken und Unsichtbares mitten im Wort; Lesarten; Stabilität
  *   FA10 der gewöhnliche Text der Baukasten-Dokumente wird mit eigenen Beispiellisten NICHT häufiger gesperrt als vorher
+ *   FA12 Härtung (Befunde der unabhängigen Prüfung, im Panel noch nicht): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen, Auslassungszeichen, lesartenOhnePunkte
  *   FA11 eine Stelle: nur der Prüfer ruft die Suche auf, nur die Suche die Faltung, und niemand vergleicht selbst
  *
  * Keine Kundenlisten: Die Wörter der Listen sind erfundene Beispiele. Die Fixtures sind Auszüge aus der Unicode-Datenbank (tests/fixtures/sperrliste-*.json).
@@ -708,6 +709,57 @@ return [
             'FA08 treffer(): null = nicht prüfbar (Eintrag zu lang, Text kein UTF-8), [] = nichts gefunden, sonst ALLE getroffenen Einträge der Liste in ihrer Reihenfolge');
     },
 
+
+    'FA12 Härtung (Befunde der unabhängigen Prüfung, im Panel noch nicht): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen und Auslassungszeichen' => static function () use ($expect, $sp): void {
+        // B2: Ob ein Text mehrdeutig ist (Umlaut oder Zalgo?), entscheidet sich an dem Text, der verglichen wird — nicht am Rohtext
+        $zalgo = [
+            'a + ¨ + Akzent (schon vorher erkannt)'      => "ga\u{0308}\u{0301}rantiert",
+            'Nullbreitenzeichen zwischen a und Marken'   => "ga\u{200B}\u{0308}\u{0301}rantiert",
+            'Nullbreitenzeichen zwischen den Marken'     => "ga\u{0308}\u{200B}\u{0301}rantiert",
+            'weiches Trennzeichen vor den Marken'        => "ga\u{00AD}\u{0308}\u{0301}rantiert",
+            'Sternchen vor den Marken'                   => "ga*\u{0308}\u{0301}rantiert",
+            'vollbreites a + Marken'                     => "g\u{FF41}\u{0308}\u{0301}rantiert",
+            'kyrillisches а + Marken'                    => "g\u{0430}\u{0308}\u{0301}rantiert",
+            'mathematisches a + Marken'                  => "g\u{1D5BA}\u{0308}\u{0301}rantiert",
+        ];
+        $schlecht = [];
+        foreach ($zalgo as $was => $text) {
+            if ($sp("Das ist $text gut", ['garantiert']) !== 'garantiert') {
+                $schlecht[] = $was;
+            }
+        }
+        $expect($schlecht === [], 'FA12 Zalgo-Haufen mit Umlautmarke wird auch gefunden, wenn Unsichtbares oder ein Verwechslungszeichen davor steht — nicht erkannt: ' . implode('; ', $schlecht));
+        $expect($sp("Heilkra\u{0308}uter", ['Heilkräuter']) === 'Heilkräuter' && $sp("Blu\u{0308}ten", ['bluten']) === null && $sp("Blu\u{200B}\u{0308}ten", ['bluten']) === null && $sp("Lo\u{0308}sung", ['Losung']) === null,
+            'FA12 ein einzelnes ¨ bleibt ein Umlaut (NFD = NFC), auch mit Unsichtbarem davor: Blüten ≠ bluten, Lösung ≠ Losung');
+        // B3: Ein Satzende vor einem schließenden Zeichen oder das Auslassungszeichen trennt eine Wendung
+        $satzende = [
+            ["Sie sagt: \u{201E}Das hilft.\u{201C} Gegen die Angst gibt es Wege.", 'hilft gegen'],
+            ['Das hilft.) Gegen die Angst', 'hilft gegen'],
+            ["Was hilft?\u{AB} Gegen Angst hilft Mut.", 'hilft gegen'],
+            ["Das hilft\u{2026}  Gegen Angst", 'hilft gegen'],
+            ["Das ist 100 %.\u{201C} Sicher ist nichts.", '100 % sicher'],
+            ["Durchfall.\u{201C} Verschwunden war er nie.", 'Durchfall verschwunden'],
+            ['Das hilft... Gegen Angst', 'hilft gegen'],
+        ];
+        $zuUnrecht = [];
+        foreach ($satzende as [$text, $wort]) {
+            if ($sp($text, [$wort]) !== null) {
+                $zuUnrecht[] = $text;
+            }
+        }
+        $expect($zuUnrecht === [], 'FA12 Satzende vor schließendem Zeichen (Zitat, Klammer) und Auslassungszeichen trennen die Wendung — zu Unrecht gesperrt: ' . implode(' | ', $zuUnrecht));
+        $bleibt = [["Das hilft gegen Angst", 'hilft gegen'], ["Das hilft\u{3000}gegen Angst", 'hilft gegen'], ['Das hilft , gegen Angst', 'hilft gegen'], ['Nach Tag drei: Durch fall verschwunden.', 'Durchfall verschwunden'], ['Das ist 100 % sicher', '100 % sicher']];
+        $verloren = [];
+        foreach ($bleibt as [$text, $wort]) {
+            if ($sp($text, [$wort]) !== $wort) {
+                $verloren[] = $text;
+            }
+        }
+        $expect($verloren === [], 'FA12 Wendungen ohne Satzende werden weiter gefunden — nicht mehr gefunden: ' . implode(' | ', $verloren));
+        // B4: lesartenOhnePunkte lässt Leerzeichen um Satzzeichen stehen
+        $expect(TextFaltung::lesartenOhnePunkte('Kosten – frei wählbar') === ['kosten - frei waehlbar'] && TextFaltung::lesarten('Kosten – frei wählbar') === ['kosten-frei waehlbar'] && TextFaltung::lesartenOhnePunkte(str_repeat('a', TextFaltung::MAX_BYTES + 1)) === null,
+            'FA12 lesartenOhnePunkte(): „Kosten – frei“ bleibt mit Leerzeichen (lesarten() zieht es zusammen); zu lang ist null — ' . json_encode([TextFaltung::lesartenOhnePunkte('Kosten – frei wählbar'), TextFaltung::lesarten('Kosten – frei wählbar')], JSON_UNESCAPED_UNICODE));
+    },
 
     'FA10 der gewöhnliche Text der Baukasten-Dokumente und -Vorlagen wird mit eigenen Beispiellisten nicht häufiger gesperrt als vorher' => static function () use ($expect, $sp, $vorher): void {
         $listen = [   // erfundene Beispiele (keine Kundenlisten): Heilversprechen, Sicherheitsversprechen, Wendungen

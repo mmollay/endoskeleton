@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.54.1] — 2026-10-11
+
+### Fixed
+- **Prüfer: drei Lücken aus der unabhängigen Prüfung von 3.54.0** (im Panel gibt es dieselben; diese Änderung gehört in Panel und Baukasten zugleich, sonst sagen die beiden Kopien der Faltung auf diesen Eingaben nicht dasselbe — der Kopf von `lp/src/TextFaltung.php` nennt die Abweichung):
+  - Ein Zalgo-Haufen mit Umlautmarke (`ga` + Marke ¨ + Akzent + `rantiert`) wurde nicht gefunden, wenn davor ein Nullbreitenzeichen, ein weiches Trennzeichen, ein Sternchen oder ein Verwechslungszeichen stand: Ob der Text mehrdeutig ist, wurde am Rohtext entschieden, nicht an dem Text, der verglichen wird. Jetzt auch am Text nach dem Wegräumen von Unsichtbarem, Vollbreit und Verwechslungszeichen (der Füller wird weiter im Rohtext erkannt).
+  - Ein Satzende vor einem schließenden Anführungszeichen oder einer Klammer („Das hilft.“ Gegen die Angst“) und das Auslassungszeichen „…“ trennten eine Wendung nicht — Fehlalarm in Zitaten. Zeichenfolgen wie „ .. “ umgingen die Regel „Leerzeichen vor dem Satzzeichen = kein Satzende“.
+  - „Kosten – frei wählbar“ (Strich mit Leerzeichen) galt in einem Text mit Preis als „kosten-frei“, weil die Faltung Leerzeichen um Satzzeichen zusammenzieht. `TextFaltung::lesartenOhnePunkte()` (bisher nur für den Satzstrang) ist öffentlich; `Pruefer::preis()` sucht darin.
+- Tests: `faltung` FA12 (75 Prüfungen) und `pruefen-sperrliste` (161); gegen 3.54.0 rot, danach grün. Neue Marke 3.54.1 (enthält 3.54.0); Seiten bekommen sie erst beim Neubau.
+
 ## [3.54.0] — 2026-10-11
 
 ### Added
