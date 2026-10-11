@@ -328,7 +328,7 @@ final class Pruefer
             $u = parse_url($url);
             if ($eigen === false || !is_array($u) || ($u['scheme'] ?? '') !== 'https' || ($u['host'] ?? '') !== ($eigen['host'] ?? null) || isset($u['port']) || isset($u['user'])
                 || !str_starts_with($u['path'] ?? '', $eigen['path'] ?? '/')) {
-                $this->sperrend('index.html', "index.html: $name zeigt auf einen fremden Host oder eine fremde Adresse ($url)", 'Die Vorschaukarte beim Teilen des Links zeigt auf eine fremde Adresse.');
+                $this->sperrend('index.html', "index.html: $name zeigt auf einen fremden Host oder eine fremde Adresse ($url)", 'Die Vorschau beim Teilen des Links zeigt auf eine fremde Adresse.');
             }
         }
         if (!isset($meta['og:image'])) {

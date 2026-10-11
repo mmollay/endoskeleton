@@ -88,7 +88,7 @@ final class Bauer
                     . "\n<p><a href=\"index.html\">Zurück zur Seite</a></p>\n</div>\n</section>",
             ]);
         }
-        $dateien['robots.txt'] = $indexieren ? "User-agent: *\nAllow: /\n" : "User-agent: *\nDisallow: /\n";
+        $dateien['robots.txt'] = $indexieren ? "User-agent: *\nAllow: /\n" : ($vorschau['og'] !== null ? Vorschau::ROBOTS_OHNE_SUCHE : "User-agent: *\nDisallow: /\n");
         ksort($dateien, SORT_STRING);
 
         if ($schreiben) {

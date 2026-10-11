@@ -20,6 +20,14 @@ final class Vorschau
     public const BREITE = 1200;
     public const HOEHE = 630;
     public const MAX_BYTES = 300000;
+    /**
+     * robots.txt einer Seite, die nicht in Suchmaschinen erscheinen soll, aber eine Karte hat: Die Crawler, die beim Teilen den Titel und das
+     * Bild holen, halten sich (außer WhatsApp und Telegram) an robots.txt — mit „Disallow: /“ für alle gäbe es auf Facebook, LinkedIn, X und Slack
+     * keine Karte. Suchmaschinen bleiben ausgesperrt, die Seite bleibt noindex. Ohne Karte bleibt robots.txt, wie sie war.
+     */
+    public const ROBOTS_OHNE_SUCHE = "User-agent: facebookexternalhit\nUser-agent: Facebot\nUser-agent: Twitterbot\nUser-agent: LinkedInBot\n"
+        . "User-agent: Slackbot-LinkExpanding\nUser-agent: Slackbot\nUser-agent: TelegramBot\nUser-agent: WhatsApp\nUser-agent: Discordbot\nAllow: /\n\n"
+        . "User-agent: *\nDisallow: /\n";
     /** Darunter zeigen Facebook & Co. nur eine kleine Karte mit Bild am Rand statt der großen. */
     public const MIN_BREITE = 600;
     public const MIN_HOEHE = 315;
@@ -44,7 +52,7 @@ final class Vorschau
         }
         if (!self::erlaubt($adresse, $profil)) {
             return ['befunde' => [Befund::hinweis('meta.adresse', "Adresse $adresse gehört nicht zu den freigegebenen Websites des Profils (link_hosts) — keine Vorschaukarte",
-                'Seiteneinstellungen: Die Adresse der Seite gehört zu keiner freigegebenen Website des Kundenprofils — beim Teilen des Links erscheint keine Vorschaukarte.')]] + $leer;
+                'Seiteneinstellungen: Die Adresse der Seite gehört zu keiner freigegebenen Website des Kundenprofils — beim Teilen des Links erscheint keine Vorschau.')]] + $leer;
         }
         $og = ['url' => $adresse, 'bild' => null, 'breite' => self::BREITE, 'hoehe' => self::HOEHE, 'alt' => ''];
         $quelle = self::quelle($plan, $profil, $seite);
@@ -55,14 +63,14 @@ final class Vorschau
         $jpeg = self::jpeg($quelle['pfad'], (string) Kontrast::hex($profil->tokens['--bg'] ?? ''));
         if ($jpeg === null) {
             return ['og' => $og, 'befunde' => [Befund::hinweis($quelle['plan'], "{$quelle['datei']} konnte nicht als Vorschaubild aufbereitet werden (kein lesbares WebP, PNG oder JPEG, zu groß oder zu fein)",
-                "$wo: Das Bild konnte nicht für die Vorschaukarte aufbereitet werden — beim Teilen des Links erscheint die Karte ohne Bild.")]] + $leer;
+                "$wo: Das Bild konnte nicht für die Vorschau beim Teilen des Links aufbereitet werden — der Link erscheint dort ohne Bild.")]] + $leer;
         }
         $befunde = [];
         [$b, $h] = array_slice((array) @getimagesize($quelle['pfad']), 0, 2);
         if ($b < self::MIN_BREITE || $h < self::MIN_HOEHE) {
             $befunde[] = Befund::hinweis($quelle['plan'], sprintf('%s ist %d×%d Pixel — zu klein für die große Vorschaukarte (mindestens %d×%d, empfohlen %d×%d)',
                 $quelle['datei'], $b, $h, self::MIN_BREITE, self::MIN_HOEHE, self::BREITE, self::HOEHE),
-                "$wo: Das Bild ist zu klein für die große Vorschaukarte — beim Teilen erscheint es nur klein oder unscharf.");
+                "$wo: Das Bild ist zu klein, um beim Teilen des Links (zum Beispiel in WhatsApp oder Facebook) groß zu erscheinen.");
         }
         $og['bild'] = $adresse . self::DATEI . '?v=' . substr(hash('sha256', $jpeg), 0, 10);
         $og['alt'] = $quelle['alt'];
