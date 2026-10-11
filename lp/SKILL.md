@@ -44,7 +44,14 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   `bilder.json` `"freigegeben": true`; im Seitenordner liegen nur Bilder, die der Bauplan verwendet.
 - Sprungmarken (`anker`): `inhalt` und alles mit `lp-` sind vergeben. Der Abschluss-Knopf führt nur auf eine
   Sprungmarke der Seite.
-- `meta.vorschaubild` wird ab Teil 4 (feste Adresse) als `og:image` ausgegeben; bis dahin nur geprüft.
+- Teilen des Seitenlinks (WhatsApp, Telegram, Facebook, LinkedIn, Slack, X): Mit `meta.adresse` (die absolute Adresse
+  `https://<host>/` der Live-Seite, vom Betreiber gesetzt, Host aus `link_hosts` oder eine Unteradresse davon) gibt der Bau
+  `og:url`, `og:image` (+ Typ, Maße, Alt-Text) und `twitter:card` aus. Das Bild ist `meta.vorschaubild`, sonst das Bild des
+  Kopfbereichs; der Bau macht daraus `es/vorschau.jpg` (JPEG, 1200 × 630, aus der Mitte zugeschnitten, höchstens 300 KB —
+  WebP liefern nicht alle Server mit Content-Type und nicht alle Netzwerke lesen es). Ohne Bild oder Adresse gibt es keine
+  Bildkarte, nie eine kaputte. Eine Seite, die nicht in Suchmaschinen erscheinen soll, bekommt mit Karte eine robots.txt,
+  die nur den Link-Vorschau-Crawlern erlaubt, sie zu lesen (sonst zeigen Facebook, LinkedIn, X und Slack nichts).
+  Ohne `meta.adresse` bleibt `meta.vorschaubild` ohne Wirkung (die Prüfung weist darauf hin).
 - Termine als `JJJJ-MM-TTTHH:MM` (Wiener Zeit). Gebaut werden alle; vergangene blendet `lp.js` aus. Sind alle vorbei,
   sperrt die Prüfung.
 - Ohne `formularziel` im Profil ist das Anmeldeformular sichtbar gesperrt und die Freigabe gesperrt.
@@ -71,8 +78,8 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
 | `beschreibung` | zeile | ja | eine Zeile, ≤ 160 Zeichen |
-| `vorschaubild` | bilddatei | – | `bestand/…` oder `img/…`; fehlt: beim Teilen des Links erscheint das Bild des Kopfbereichs; ohne Bild dort keine Bildkarte |
-| `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt keine Vorschaukarte (og:image, twitter:card) aus; setzt der Betreiber, nicht der Kunde |
+| `vorschaubild` | bilddatei | – | `bestand/…` oder `img/…`; fehlt: beim Teilen des Links erscheint das Bild des Kopfbereichs (ohne Kopfbild: keine Bildkarte) |
+| `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
 ## Bausteine (Katalog 3.52.0)

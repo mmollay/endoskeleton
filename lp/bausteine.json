@@ -4,8 +4,8 @@
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
       "beschreibung": { "typ": "zeile", "label": "Beschreibung für Suchmaschinen", "max": 160, "pflicht": true },
-      "vorschaubild": { "typ": "bilddatei", "label": "Vorschaubild", "fehlt": "beim Teilen des Links erscheint das Bild des Kopfbereichs; ohne Bild dort keine Bildkarte" },
-      "adresse":      { "typ": "kennung", "label": "Adresse der Seite im Netz", "muster": "^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\\z", "fehlt": "die Seite gibt keine Vorschaukarte (og:image, twitter:card) aus; setzt der Betreiber, nicht der Kunde" },
+      "vorschaubild": { "typ": "bilddatei", "label": "Vorschaubild", "fehlt": "beim Teilen des Links erscheint das Bild des Kopfbereichs (ohne Kopfbild: keine Bildkarte)" },
+      "adresse":      { "typ": "kennung", "label": "Adresse der Seite im Netz", "muster": "^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\\z", "fehlt": "die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde" },
       "indexieren":   { "typ": "janein", "label": "In Suchmaschinen zeigen" }
     }
   },

@@ -364,6 +364,27 @@ return [
         T::ok(!is_file("$o/es/vorschau.jpg"), 'und ohne Datei');
     },
 
+    'robots.txt: Seite nicht für Suchmaschinen (Vorgabe) MIT Karte lässt die Crawler der Link-Vorschau zu, alle anderen nicht' => static function () use ($bauen, $seite): void {
+        [$o] = $bauen($seite());
+        $robots = (string) file_get_contents("$o/robots.txt");
+        [$erste, $zweite] = explode("\n\n", rtrim($robots, "\n"), 2) + ['', ''];
+        foreach (['facebookexternalhit', 'Facebot', 'Twitterbot', 'LinkedInBot', 'Slackbot-LinkExpanding', 'TelegramBot', 'WhatsApp', 'Discordbot'] as $bot) {
+            T::contains($erste, "User-agent: $bot\n", "$bot darf die Seite lesen");
+        }
+        T::ok(str_ends_with($erste, "\nAllow: /") && !str_contains($erste, 'Disallow') && !str_contains($erste, 'User-agent: *'), 'diese Gruppe erlaubt nur');
+        T::eq($zweite, "User-agent: *\nDisallow: /", 'alle anderen (Suchmaschinen) bleiben ausgesperrt');
+        T::contains((string) file_get_contents("$o/index.html"), '<meta name="robots" content="noindex, nofollow">', 'und die Seite bleibt noindex');
+    },
+
+    'robots.txt: ohne Karte und bei indexieren = true unverändert' => static function () use ($bauen, $seite): void {
+        [$o] = $bauen(H::seite());
+        T::eq((string) file_get_contents("$o/robots.txt"), "User-agent: *\nDisallow: /\n", 'ohne Adresse wie bisher');
+        [$o] = $bauen($seite(['adresse' => 'https://evil.invalid/']));
+        T::eq((string) file_get_contents("$o/robots.txt"), "User-agent: *\nDisallow: /\n", 'Adresse außerhalb der freigegebenen Websites: wie bisher');
+        [$o] = $bauen($seite(['indexieren' => true]));
+        T::eq((string) file_get_contents("$o/robots.txt"), "User-agent: *\nAllow: /\n", 'indexieren true: wie bisher');
+    },
+
     'Bestandsschutz: ohne meta.adresse ist die Ausgabe Byte für Byte die der bisherigen Marke (Musterbuch)' => static function (): void {
         $w = H::wurzel();
         foreach (glob("$w/musterbuch/*/index.html") ?: [] as $f) {
