@@ -82,7 +82,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.53.0)
+## Bausteine (Katalog 3.54.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
