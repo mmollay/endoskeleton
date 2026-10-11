@@ -255,13 +255,16 @@ return [
         T::ok(!is_file("$o/es/vorschau.jpg"), 'keine Datei');
     },
 
-    'riesiges Kopfbild (20 Megapixel laut Kopfdaten): nicht entpackt, Hinweis, Bau gelingt' => static function () use ($bauen, $seite, $kopfMit, $metas, $hat): void {
-        // Nur die Kopfdaten eines PNG (Signatur + IHDR mit 5000×4000): GD müsste 80 MB für Bildpunkte anlegen — das geschieht nicht.
-        $kopf = "\x89PNG\r\n\x1a\n" . pack('N', 13) . 'IHDR' . pack('NNCCCCC', 5000, 4000, 8, 2, 0, 0, 0) . pack('N', 0);
-        [$o, $e] = $bauen($seite([], $kopfMit('img/kopf.png')), static function (string $o) use ($kopf): void {
+    'riesiges Kopfbild (16 Megapixel und mehr): nicht entpackt, Hinweis, Bau gelingt' => static function () use ($bauen, $seite, $kopfMit, $metas, $hat): void {
+        // Ein gültiges 1-Bit-PNG von 4001×4000 (gepackt wenige KB): GD könnte es lesen — der Baukasten tut es nicht, die Grenze schützt den Speicher des Baus.
+        $chunk = static fn (string $typ, string $daten): string => pack('N', strlen($daten)) . $typ . $daten . pack('N', crc32($typ . $daten));
+        $png = "\x89PNG\r\n\x1a\n" . $chunk('IHDR', pack('NNCCCCC', 4001, 4000, 1, 0, 0, 0, 0))
+            . $chunk('IDAT', (string) gzcompress(str_repeat("\x00" . str_repeat("\xff", 501), 4000), 9)) . $chunk('IEND', '');
+        [$o, $e] = $bauen($seite([], $kopfMit('img/kopf.png')), static function (string $o) use ($png): void {
             mkdir("$o/img", 0700, true);
-            file_put_contents("$o/img/kopf.png", $kopf);
+            file_put_contents("$o/img/kopf.png", $png);
         });
+        T::ok(@imagecreatefromstring($png) !== false, 'Vorbedingung: das PNG ist gültig und lesbar (sonst bewiese der Test die Grenze nicht)');
         T::eq(H::texte(H::sperrend($e->befunde)), '', 'kein sperrender Befund');
         $hat($e->befunde, 'hinweis', 'aufbereitet', 'Hinweis');
         T::ok(!isset($metas((string) file_get_contents("$o/index.html"))['og:image']) && !is_file("$o/es/vorschau.jpg"), 'keine Bildkarte');
@@ -347,6 +350,12 @@ return [
             file_put_contents("$o/index.html", str_replace('property="og:url" content="https://ki.beispiel.invalid/"', 'property="og:url" content="https://evil.invalid/"', (string) file_get_contents("$o/index.html")));
         });
         $hat($b, 'sperrend', 'fremden Host', 'og:url auf fremdem Host');
+        foreach (['https://ki.beispiel.invalid:8443/' => 'mit Port', 'https://nutzer@ki.beispiel.invalid/' => 'mit Benutzer', 'http://ki.beispiel.invalid/' => 'ohne https'] as $falsch => $was) {
+            $b = $pruefe(static function (string $o) use ($falsch): void {
+                file_put_contents("$o/index.html", str_replace('property="og:url" content="https://ki.beispiel.invalid/"', 'property="og:url" content="' . $falsch . '"', (string) file_get_contents("$o/index.html")));
+            });
+            $hat($b, 'sperrend', 'fremden Host', "og:url $was");
+        }
     },
 
     'Prüfer: Karte ohne Bild und Seite ohne Adresse haben nichts zu prüfen' => static function () use ($bauen, $seite): void {
