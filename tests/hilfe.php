@@ -51,6 +51,23 @@ final class H
         return $d;
     }
 
+    /**
+     * Kopie des Testprofils mit eigener Sperrliste und eigenen Grenzwörtern (für die Prüfung der Texte); $weiter darf die Kopie noch ändern.
+     *
+     * @param list<string> $sperr
+     * @param list<string> $grenz
+     */
+    public static function profilMitListen(array $sperr, array $grenz, ?callable $weiter = null): string
+    {
+        $p = self::profilKopie();
+        $j = json_decode((string) file_get_contents("$p/profil.json"), true);
+        $j['sperrliste'] = $sperr;
+        $j['grenzwoerter'] = $grenz;
+        file_put_contents("$p/profil.json", json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        if ($weiter) { $weiter($p); }
+        return $p;
+    }
+
     /** @param list<\Endo\Lp\Befund> $befunde */
     public static function sperrend(array $befunde): array
     {

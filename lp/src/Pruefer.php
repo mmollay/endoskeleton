@@ -15,16 +15,19 @@ final class Pruefer
     public const ASCII = '/\b\w*(fuer|ueber|koennen|moecht|waehl|zurueck|hinzufueg|aender|oeffn|groess|pruef|aerzt|maerz|schoen|taeglich|spaeter|naechst|koerper|gemaess|gebuehr|muess|wuerd|haeufig|frueh|loesung|uebersicht|moeglich|oesterreich)\w*/iu';
     /**
      * Wörter und Wendungen für „kostenlos“ — auch als Teil zusammengesetzter Wörter („Gratisabend“, „Kostenfreie Teilnahme“),
-     * weil eine KI genau so ausweicht. „nicht umsonst“ (= mit gutem Grund) zählt nicht.
+     * weil eine KI genau so ausweicht. „nicht umsonst“ (= mit gutem Grund) zählt nicht. Gesucht wird im GEFALTETEN Text (TextFaltung):
+     * klein, ü = ue, ß = ss, ohne Verwechslungszeichen und Unsichtbares — darum „gebuehr…“ statt „gebühr…“.
      */
-    private const KOSTENLOS = '/\b(kosten-?(?:los|frei)\w*|gratis\w*|gebührenfrei\w*|unentgeltlich\w*|(?<!nicht )umsonst\b|nulltarif\w*'
-        . '|ohne (?:kosten|gebühren?)\b|eintritt frei\b|freie[mnrs]? eintritt\b)/iu';
+    private const KOSTENLOS = '/\b(kosten-?(?:los|frei)\w*|gratis\w*|gebuehrenfrei\w*|unentgeltlich\w*|(?<!nicht )umsonst\b|nulltarif\w*'
+        . '|ohne (?:kosten|gebuehr(?:en)?)\b|eintritt frei\b|freie[mnrs]? eintritt\b)/u';
     private const PLATZHALTER = '/\{\{|\blorem ipsum\b|\bTODO\b/i';
     private const MAX_BILD = 400 * 1024;
     private const SEITEN = ['index.html', 'impressum.html', 'datenschutz.html'];
 
     /** @var list<Befund> */
     private array $befunde = [];
+    /** @var array<string,true> Felder, deren Text sich nicht prüfen ließ (ein Befund je Feld, auch wenn Sperrliste und Preis-Prüfung es beide merken) */
+    private array $unpruefbar = [];
 
     private function __construct(private readonly string $seite, private readonly Profil $profil, private readonly array $plan)
     {
@@ -139,14 +142,6 @@ final class Pruefer
         }
     }
 
-    /** Für den Vergleich mit der Sperrliste: ohne **, weiche Trennzeichen und Nullbreitenzeichen, Leerraum zusammengefasst. */
-    private static function normal(string $text): string
-    {
-        $t = str_replace('**', '', $text);
-        $t = (string) preg_replace('/[\x{00AD}\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u', '', $t);
-        return trim((string) preg_replace('/\s+/u', ' ', $t));
-    }
-
     /** Sperrliste, Grenzwörter, Platzhalter und ASCII-Umlaute in allen Textfeldern des Bauplans und in genutzten Alt-Texten. */
     private function texte(): void
     {
@@ -158,20 +153,21 @@ final class Pruefer
                 }
             }
         }
-        $sperr = array_filter((array) ($this->profil->daten['sperrliste'] ?? []), 'is_string');
-        $grenz = array_filter((array) ($this->profil->daten['grenzwoerter'] ?? []), 'is_string');
+        $sperr = $this->liste('sperrliste');
+        $grenz = $this->liste('grenzwoerter');
         foreach ($felder as $pfad => $text) {
             $wo = $this->wo($pfad);
-            $vergleich = self::normal($text);
-            foreach ($sperr as $w) {
-                if (self::normal($w) !== '' && mb_stripos($vergleich, self::normal($w)) !== false) {
-                    $this->sperrend($pfad, "Sperrliste: „{$w}“", "$wo: „{$w}“ darf auf der Seite nicht stehen (Sperrliste).");
-                }
+            // Verglichen wird, was der Leser sieht (Endo\Lp\Sperrliste, Endo\Lp\TextFaltung): nicht „ob die Zeichen gleich sind“.
+            $gesperrt = Sperrliste::treffer($text, $sperr);
+            $grenzen = $gesperrt === null ? null : Sperrliste::treffer($text, $grenz);
+            if ($gesperrt === null || $grenzen === null) {
+                $this->nichtPruefbar($pfad);   // nie still frei
             }
-            foreach ($grenz as $w) {
-                if (self::normal($w) !== '' && mb_stripos($vergleich, self::normal($w)) !== false) {
-                    $this->hinweis($pfad, "Grenzwort: „{$w}“", "$wo: „{$w}“ bitte gegenlesen — keine Heil- oder Wirkversprechen.");
-                }
+            foreach ($gesperrt ?? [] as $w) {
+                $this->sperrend($pfad, "Sperrliste: „{$w}“", "$wo: „{$w}“ darf auf der Seite nicht stehen (Sperrliste).");
+            }
+            foreach ($grenzen ?? [] as $w) {
+                $this->hinweis($pfad, "Grenzwort: „{$w}“", "$wo: „{$w}“ bitte gegenlesen — keine Heil- oder Wirkversprechen.");
             }
             if (preg_match(self::PLATZHALTER, $text) || (trim($text) !== '' && preg_match('/^[\s.…]+$/u', $text))) {
                 $this->sperrend($pfad, 'Platzhalter im Text', "$wo: Hier steht noch ein Platzhalter statt echtem Text.");
@@ -180,6 +176,37 @@ final class Pruefer
                 $this->hinweis($pfad, "ASCII-Umlaut? „{$m[0]}“", "$wo: „{$m[0]}“ — bitte mit echten Umlauten schreiben (ä, ö, ü, ß).");
             }
         }
+    }
+
+    /**
+     * Die Einträge einer Liste des Profils (Sperrliste, Grenzwörter), nur Texte. Ein Eintrag, der sich nicht prüfen lässt (über 64 KB, kein gültiges UTF-8), ist ein sperrender Befund am Profil
+     * und wird übersprungen — die übrigen Einträge prüfen weiter. Ein Eintrag, der gefaltet nichts übrig lässt (nur „*“), zählt nicht (Sperrliste::treffer).
+     *
+     * @return list<string>
+     */
+    private function liste(string $schluessel): array
+    {
+        [$name, $label] = $schluessel === 'sperrliste' ? ['Sperrliste', 'der Sperrliste'] : ['Grenzwort', 'der Liste der Grenzwörter'];
+        $liste = [];
+        foreach (array_filter((array) ($this->profil->daten[$schluessel] ?? []), 'is_string') as $w) {
+            if (Sperrliste::eintraege($w) === null) {
+                $this->sperrend("profil.$schluessel", "$name: Eintrag nicht prüfbar (" . strlen($w) . ' Bytes)',
+                    "Kundenprofil: Ein Eintrag $label lässt sich nicht prüfen (zu lang oder mit ungültigen Zeichen) — bitte kürzen oder ändern.");
+                continue;
+            }
+            $liste[] = $w;
+        }
+        return $liste;
+    }
+
+    /** Ein Text, der sich nicht mit den Listen vergleichen lässt (zu lang, ungültige oder umkehrende Zeichen), sperrt — einmal je Feld. */
+    private function nichtPruefbar(string $pfad): void
+    {
+        if (isset($this->unpruefbar[$pfad])) {
+            return;
+        }
+        $this->unpruefbar[$pfad] = true;
+        $this->sperrend($pfad, 'Sperrliste: Text nicht prüfbar', $this->wo($pfad) . ': Dieser Text lässt sich nicht auf unerlaubte Wörter prüfen — er ist zu lang oder enthält ungewöhnliche Schriftzeichen. Bitte kürzen und gewöhnliche Buchstaben verwenden.');
     }
 
     /** Alle Textfelder des Bauplans (Pfad => Text), ohne technische Schlüssel. */
@@ -210,8 +237,22 @@ final class Pruefer
             return;
         }
         foreach ($this->textfelder() as $pfad => $text) {
-            if (preg_match(self::KOSTENLOS, self::normal($text), $m)) {
-                $this->sperrend($pfad, "„{$m[1]}“ trotz Preis", $this->wo($pfad) . ": „{$m[1]}“ passt nicht zu einem Vortrag mit Preis — bitte umformulieren.");
+            $lesarten = Sperrliste::lesarten($text);
+            if ($lesarten === null) {
+                $this->nichtPruefbar($pfad);   // ob der Text „kostenlos“ verspricht, lässt sich nicht sagen
+                continue;
+            }
+            foreach ($lesarten as $gefaltet) {
+                $gefunden = preg_match(self::KOSTENLOS, $gefaltet, $m);
+                if ($gefunden === false) {
+                    $this->nichtPruefbar($pfad);   // ein gescheiterter Regex heißt nie „kein Treffer“
+                    break;
+                }
+                if ($gefunden === 1) {
+                    $wort = strtr($m[1], ['gebuehr' => 'gebühr']);   // die Faltung schreibt ü als ue
+                    $this->sperrend($pfad, "„{$wort}“ trotz Preis", $this->wo($pfad) . ": „{$wort}“ passt nicht zu einem Vortrag mit Preis — bitte umformulieren.");
+                    break;
+                }
             }
         }
     }
