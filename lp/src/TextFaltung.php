@@ -38,9 +38,9 @@
  *  11 akzente            AKZENTE: ä/ö/ü/æ/œ → ae/oe/ue (so schreibt man Umlaute ohne Umlautzeichen), alle anderen Buchstaben mit Akzent, Haken oder Strich → der Buchstabe ohne; dazu HAKEN
  *  12 marken, 13 verwechslungen   noch einmal: das Auffalten kann selbst ein kombinierendes Zeichen oder ein griechisches Zeichen erzeugen (ΐ → ι + Zeichen)
  *
- * Lesarten: Zwei Dinge lassen sich auf zwei Arten lesen, und dann gelten beide (lesarten()): ein Hangul-Füller, Braille-Leerzeichen oder dünnes Leerzeichen (U+2009, U+200A) mitten im Text (Lücke oder nichts?) und ein
+ * Lesarten: Zwei Dinge lassen sich auf zwei Arten lesen, und dann gelten beide (lesarten()): ein Hangul-Füller oder Braille-Leerzeichen mitten im Text (Lücke oder nichts?) und ein
  * a/o/u mit einem Haufen Marken, unter denen eine Umlautmarke ist (Umlaut oder Zierrat im Zalgo-Text? — ein einzelnes ¨ ist ein Umlaut). Dazu die Lesart OHNE Zusammenziehen der
- * Buchstabenreihen, wenn der Text eine Reihe hatte. Ein Eintrag hat ebenso zwei Fassungen, mit und ohne Zusammenziehen (eintraege(): „u. a.“ aus einzelnen Buchstaben soll auch neben
+ * Buchstabenreihen, wenn der Text eine Reihe hatte, und die Lesart ohne schmale Leerzeichen, wenn eines zwischen zwei Buchstaben steht (SCHMAL). Ein Eintrag hat ebenso zwei Fassungen, mit und ohne Zusammenziehen (eintraege(): „u. a.“ aus einzelnen Buchstaben soll auch neben
  * anderen Einzelbuchstaben gefunden werden). Für Wendungen gibt es den Satzstrang (satzstrang(), je Lesart).
  *
  * Unicode-Stand: Die Tabellen stammen aus Unicode 13 (Python), die Fixtures zusätzlich aus Unicode 17 für die Zeichen ab 14 (Node/ICU, sperrliste-kompat.json „neuer“); PCRE auf dem Server kennt
@@ -71,12 +71,20 @@ final class TextFaltung
     /** Längster Text in Bytes, der gefaltet wird — länger ist „nicht prüfbar“. Eine ganze Seite ist im Panel höchstens 64 KB groß, ein einzelnes Textfeld der Seite ist viel kürzer. */
     public const MAX_BYTES = 65536;
 
-    /** Lesart: Hangul-Füller und Braille-Leerzeichen sind Lücken, dünne Leerzeichen (U+2009, U+200A) sind nichts, ein U+0308 ist kein Umlaut. */
+    /** Lesart: Hangul-Füller und Braille-Leerzeichen sind Lücken, ein U+0308 ist kein Umlaut. */
     private const ALT = 1;
     /** Lesart: Buchstabenreihen bleiben, wie sie sind. */
     private const OHNE_REIHEN = 2;
     /** Für den Satzstrang: Leerzeichen um Satzzeichen bleiben stehen, damit man ein Satzende erkennt. */
     private const OHNE_PUNKTE = 4;
+    /** Lesart: Ein schmales Leerzeichen zwischen zwei Buchstaben ist nichts (SCHMALES_LEERZEICHEN), nicht eine Lücke. */
+    private const SCHMAL = 8;
+    /**
+     * Ein schmales Leerzeichen (U+2006 Sechstelgeviert, U+2009 Schmalspatium, U+200A Haarspatium, U+202F schmales geschütztes Leerzeichen; in den Schriften des Servers 0,125–0,25 em breit, ein
+     * gewöhnliches Leerzeichen 0,26–0,32 em) MITTEN IM WORT, links und rechts ein Buchstabe (rechts darf eine Marke davor stehen): Der Leser liest „hei lt“ mit einem Haarspatium als ein Wort — Lücke oder nichts? gilt wie beim Hangul-Füller
+     * in beiden Lesarten. Mehrere schmale Leerzeichen hintereinander sind EIN Lauf (besitzergreifend, linear): Zwei Haarspatien sind schmaler als ein Schmalspatium. Nur zwischen Buchstaben: Neben Satzzeichen, Ziffern und Währung („z. B.“, „5 €“, „Mo – Fr“) sind schmale Leerzeichen gewöhnliche Typografie und bleiben eine Lücke.
+     */
+    private const SCHMALES_LEERZEICHEN = '~(?<=[\p{L}\p{M}])[\x{2006}\x{2009}\x{200A}\x{202F}]++(?=\p{M}*\p{L})~u';
     /** Marken, die ein Umlaut-Punktpaar ersetzen oder sein können: ¨ darüber, kleines e darüber (alte Schreibung des ü), Doppelakut (ő ű sehen wie ö ü aus). */
     private const UMLAUTMARKE = '\x{0308}\x{0364}\x{030B}';
 
@@ -87,10 +95,10 @@ final class TextFaltung
     private const PUNKTE = '~ ?([^' . self::B . '\p{N}\s]) ?~u';
     private const NICHT_BUCHSTABE = '~[^' . self::B . '\p{N}]+~u';
     /**
-     * Was einen Text mehrdeutig macht (Lesart ALT): ein Füller oder ein dünnes Leerzeichen (Lücke oder nichts?) und ein a/o/u mit einem Haufen Marken (zwei oder mehr), unter denen eine Umlautmarke ist (Umlaut oder
+     * Was einen Text mehrdeutig macht (Lesart ALT): ein Füller (Lücke oder nichts?) und ein a/o/u mit einem Haufen Marken (zwei oder mehr), unter denen eine Umlautmarke ist (Umlaut oder
      * Zierrat im Zalgo-Text?). Ein einzelnes ¨ darüber ist ein Umlaut, kein Zierrat — NFD sperrt also nicht anders als NFC.
      */
-    private const MEHRDEUTIG = '~[\x{115F}\x{1160}\x{2800}\x{3164}\x{FFA0}\x{2009}\x{200A}]|[aouAOU](?=[\p{Mn}\p{Me}]*[' . self::UMLAUTMARKE . '])[\p{Mn}\p{Me}]{2,}~u';
+    private const MEHRDEUTIG = '~[\x{115F}\x{1160}\x{2800}\x{3164}\x{FFA0}]|[aouAOU](?=[\p{Mn}\p{Me}]*[' . self::UMLAUTMARKE . '])[\p{Mn}\p{Me}]{2,}~u';
 
     /** Die 58 griechischen Zeichen jeder mathematischen Schrift U+1D6A8–1D7C9 in ihrer Reihenfolge (aus NFKD). */
     private const MATHE_GRIECHISCH = "\u{0391}\u{0392}\u{0393}\u{0394}\u{0395}\u{0396}\u{0397}\u{0398}\u{0399}\u{039A}\u{039B}\u{039C}\u{039D}\u{039E}\u{039F}\u{03A0}\u{03A1}\u{0398}\u{03A3}\u{03A4}\u{03A5}\u{03A6}\u{03A7}\u{03A8}\u{03A9}\u{2207}\u{03B1}\u{03B2}\u{03B3}\u{03B4}\u{03B5}\u{03B6}\u{03B7}\u{03B8}\u{03B9}\u{03BA}\u{03BB}\u{03BC}\u{03BD}\u{03BE}\u{03BF}\u{03C0}\u{03C1}\u{03C2}\u{03C3}\u{03C4}\u{03C5}\u{03C6}\u{03C7}\u{03C8}\u{03C9}\u{2202}\u{03B5}\u{03B8}\u{03BA}\u{03C6}\u{03C1}\u{03C0}";
@@ -467,18 +475,19 @@ final class TextFaltung
     ];
 
     /**
-     * Ersatz ← lateinische Buchstaben mit Haken, Strich, Balken, Tilde, Schwanz, Locke … (ƒ ɠ ɨ ɍ ƭ ɫ ꞓ …), die Unicode NICHT zerlegt (anders als á oder ñ: es gibt kein „f + Haken“, das NFD ergäbe) — für den Leser
-     * sind es die Grundbuchstaben, und ein Wort mit „ƒ“ statt „f“ liest sich wie das Wort. Erzeugt aus der Unicode-Datenbank (Python unicodedata, Unicode 13): alle Zeichen mit dem Namen LATIN SMALL|CAPITAL
-     * LETTER <Buchstabe> WITH <Zusatz>, die nicht zerlegbar sind (NFKD ist das Zeichen selbst), dazu ɵ (U+0275, BARRED O: so faltet das Auffalten Ɵ). tests/fixtures/sperrliste-haken.json hält alle Paare (auch die schon
-     * in AKZENTE stehenden ø đ ħ ł ŧ ǥ …), SL13 prüft jedes. Kein Zeichen ist ein deutscher Buchstabe, keines steht in einer anderen Tabelle. Ein Zeichen ab Unicode 14 fehlt (Stand: Python 3.9). Die Zeichen stehen als
-     * Nummern da, die Buchstaben daneben als Kommentar.
+     * Ersatz ← lateinische Buchstaben mit Haken, Strich, Balken, Tilde, Schwanz, Locke … (ƒ ɠ ɨ ɍ ƭ ɫ ʉ …), die Unicode NICHT zerlegt (anders als á oder ñ: es gibt kein „f + Haken“, das NFD ergäbe) — für den Leser
+     * sind es die Grundbuchstaben, und ein Wort mit „ƒ“ statt „f“ liest sich wie das Wort. Erzeugt aus der Unicode-Datenbank (Python unicodedata, Unicode 13): alle Zeichen, deren Name LATIN SMALL|CAPITAL
+     * LETTER <Buchstabe> WITH <Zusatz>, <Buchstabe> BAR …, BARRED <Buchstabe> oder LONG S WITH … lautet und die nicht zerlegbar sind (NFKD ist das Zeichen selbst). tests/fixtures/sperrliste-haken.json hält alle
+     * Paare (auch die schon in AKZENTE stehenden ø đ ħ ł ŧ ǥ …), SL13/FA13 prüfen jedes. Kein Zeichen ist ein deutscher Buchstabe, keines steht in einer anderen Tabelle. Auch die Großbuchstaben stehen da,
+     * obwohl die Kleinschreibung (Schritt 10) sie vorher auffaltet: Welche Zeichen das Auffalten kennt, hängt von der PHP-Version ab. Nicht dabei, weil sie nicht „Buchstabe + Zusatz“ heißen: gedrehte,
+     * offene und Kapitälchen-Formen, kyrillische Verwandte (ө ү қ), ĸ, ɟ, ꬰ. Ein Zeichen ab Unicode 14 fehlt (Stand: Python 3.9). Die Zeichen stehen als Nummern da, die Buchstaben daneben als Kommentar.
      */
     private const HAKEN = [
         'a' => "\u{023A}\u{1D8F}\u{2C65}",   // Ⱥ ᶏ ⱥ
         'b' => "\u{0181}\u{0182}\u{0183}\u{0243}\u{0253}\u{1D6C}\u{1D80}\u{A796}\u{A797}",   // Ɓ Ƃ ƃ Ƀ ɓ ᵬ ᶀ Ꞗ ꞗ
         'c' => "\u{0187}\u{0188}\u{023B}\u{023C}\u{0255}\u{A792}\u{A793}\u{A794}\u{A7C4}",   // Ƈ ƈ Ȼ ȼ ɕ Ꞓ ꞓ ꞔ Ꞔ
         'd' => "\u{0110}\u{018A}\u{018B}\u{018C}\u{0221}\u{0256}\u{0257}\u{1D6D}\u{1D81}\u{1D91}\u{A7C7}\u{A7C8}",   // Đ Ɗ Ƌ ƌ ȡ ɖ ɗ ᵭ ᶁ ᶑ Ꟈ ꟈ
-        'e' => "\u{0246}\u{0247}\u{1D92}\u{2C78}\u{AB34}",   // Ɇ ɇ ᶒ ⱸ ꬴ
+        'e' => "\u{0246}\u{0247}\u{1D92}\u{2C78}\u{AB33}\u{AB34}",   // Ɇ ɇ ᶒ ⱸ ꬳ ꬴ
         'f' => "\u{0191}\u{0192}\u{1D6E}\u{1D82}\u{A798}\u{A799}",   // Ƒ ƒ ᵮ ᶂ Ꞙ ꞙ
         'g' => "\u{0193}\u{01E4}\u{0260}\u{1D83}\u{A7A0}\u{A7A1}",   // Ɠ Ǥ ɠ ᶃ Ꞡ ꞡ
         'h' => "\u{0126}\u{0266}\u{2C67}\u{2C68}\u{A795}\u{A7AA}",   // Ħ ɦ Ⱨ ⱨ ꞕ Ɦ
@@ -492,9 +501,9 @@ final class TextFaltung
         'p' => "\u{01A4}\u{01A5}\u{1D71}\u{1D7D}\u{1D88}\u{2C63}\u{A750}\u{A751}\u{A752}\u{A753}\u{A754}\u{A755}",   // Ƥ ƥ ᵱ ᵽ ᶈ Ᵽ Ꝑ ꝑ Ꝓ ꝓ Ꝕ ꝕ
         'q' => "\u{024B}\u{02A0}\u{A756}\u{A757}\u{A758}\u{A759}",   // ɋ ʠ Ꝗ ꝗ Ꝙ ꝙ
         'r' => "\u{024C}\u{024D}\u{027C}\u{027D}\u{027E}\u{1D72}\u{1D73}\u{1D89}\u{2C64}\u{A7A6}\u{A7A7}\u{AB49}",   // Ɍ ɍ ɼ ɽ ɾ ᵲ ᵳ ᶉ Ɽ Ꞧ ꞧ ꭉ
-        's' => "\u{023F}\u{0282}\u{1D74}\u{1D8A}\u{2C7E}\u{A7A8}\u{A7A9}\u{A7C5}\u{A7C9}\u{A7CA}",   // ȿ ʂ ᵴ ᶊ Ȿ Ꞩ ꞩ Ʂ Ꟊ ꟊ
+        's' => "\u{023F}\u{0282}\u{1D74}\u{1D8A}\u{1E9C}\u{1E9D}\u{2C7E}\u{A7A8}\u{A7A9}\u{A7C5}\u{A7C9}\u{A7CA}",   // ȿ ʂ ᵴ ᶊ ẜ ẝ Ȿ Ꞩ ꞩ Ʂ Ꟊ ꟊ
         't' => "\u{0166}\u{01AB}\u{01AC}\u{01AD}\u{01AE}\u{0236}\u{023E}\u{0288}\u{1D75}\u{2C66}",   // Ŧ ƫ Ƭ ƭ Ʈ ȶ Ⱦ ʈ ᵵ ⱦ
-        'u' => "\u{1D99}\u{A7B8}\u{A7B9}\u{AB4E}\u{AB52}",   // ᶙ Ꞹ ꞹ ꭎ ꭒ
+        'u' => "\u{0244}\u{0289}\u{1D99}\u{A7B8}\u{A7B9}\u{AB4E}\u{AB4F}\u{AB52}",   // Ʉ ʉ ᶙ Ꞹ ꞹ ꭎ ꭏ ꭒ
         'v' => "\u{01B2}\u{028B}\u{1D8C}\u{2C71}\u{2C74}\u{A75E}\u{A75F}",   // Ʋ ʋ ᶌ ⱱ ⱴ Ꝟ ꝟ
         'w' => "\u{2C72}\u{2C73}",   // Ⱳ ⱳ
         'x' => "\u{1D8D}\u{AB56}\u{AB57}\u{AB58}\u{AB59}",   // ᶍ ꭖ ꭗ ꭘ ꭙ
@@ -644,6 +653,19 @@ final class TextFaltung
         if ($mehrdeutig === 1) {
             $weitere[] = self::ALT;
         }
+        $schmal = preg_match(self::SCHMALES_LEERZEICHEN, $text);   // im Rohtext …
+        if ($schmal === 0) {
+            $schmal = preg_match(self::SCHMALES_LEERZEICHEN, $vor);   // … und im vorbereiteten Text (zwischen Leerzeichen und Buchstaben stand ein Nullbreitenzeichen)
+        }
+        if ($schmal === false) {
+            return null;
+        }
+        if ($schmal === 1) {
+            $weitere[] = self::SCHMAL;
+            if ($mehrdeutig === 1) {
+                $weitere[] = self::ALT | self::SCHMAL;   // ein Haufen Marken UND ein schmales Leerzeichen im selben Text: beides zugleich als „nichts“ lesen
+            }
+        }
         $liste = [$erste];
         foreach ($weitere as $lesart) {
             $t = self::lauf($text, $zusatz | $lesart);
@@ -664,10 +686,16 @@ final class TextFaltung
         if (strlen($text) > self::MAX_BYTES || !mb_check_encoding($text, 'UTF-8') || preg_match('~[\x{202A}-\x{202E}\x{2066}-\x{2069}]~u', $text) !== 0) {
             return null;   // die Richtungs-Steuerzeichen (LRE … RLO, LRI … PDI) kehren die Anzeige um: Die Reihenfolge, die der Leser sieht, ist nicht die im Text
         }
-        $t = ($lesart & self::ALT) !== 0 ? strtr($text, ["\u{115F}" => ' ', "\u{1160}" => ' ', "\u{2800}" => ' ', "\u{3164}" => ' ', "\u{FFA0}" => ' ', "\u{2009}" => '', "\u{200A}" => '', "\u{0308}" => '', "\u{0364}" => '', "\u{030B}" => '']) : $text;
+        $t = ($lesart & self::ALT) !== 0 ? strtr($text, ["\u{115F}" => ' ', "\u{1160}" => ' ', "\u{2800}" => ' ', "\u{3164}" => ' ', "\u{FFA0}" => ' ', "\u{0308}" => '', "\u{0364}" => '', "\u{030B}" => '']) : $text;
         foreach (self::SCHRITTE as $schritt) {
             if (($schritt === 'reihen' && ($lesart & self::OHNE_REIHEN) !== 0) || ($schritt === 'punkte' && ($lesart & self::OHNE_PUNKTE) !== 0)) {
                 continue;
+            }
+            if ($schritt === 'leerraum' && ($lesart & self::SCHMAL) !== 0) {
+                $t = preg_replace(self::SCHMALES_LEERZEICHEN, '', $t);
+                if ($t === null) {
+                    return null;
+                }
             }
             $neu = self::$schritt($t);
             if ($neu === null) {

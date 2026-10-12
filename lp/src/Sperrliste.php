@@ -118,7 +118,7 @@ final class Sperrliste
     /**
      * Die Lesarten eines Texts (TextFaltung::lesarten) — oder null, wenn er sich nicht prüfen lässt. Der Prüfer fragt über diese Stelle, nie die Faltung selbst.
      *
-     * Zusätzlich zur Faltung (Baukasten, nicht im Panel): Die Faltung rechnet mit mbstring-Funktionen, die die INTERNE Kodierung nehmen (mb_str_split, mb_ord, mb_convert_kana …). Steht sie nicht auf UTF-8
+     * Zusätzlich zur Faltung (der Wächter steht nicht in der gemeinsamen Datei; das Panel hat seinen eigenen in Antworten::sperrwort): Die Faltung rechnet mit mbstring-Funktionen, die die INTERNE Kodierung nehmen (mb_str_split, mb_ord, mb_convert_kana …). Steht sie nicht auf UTF-8
      * (default_charset in der php.ini), zerlegt die Faltung die Tabellen byteweise und liefert STILL ein falsches Ergebnis: Kyrillisch und Vollbreit würden nicht mehr erkannt. Das darf nie „frei“ heißen.
      *
      * @param bool $ohnePunkte Leerzeichen um Satzzeichen bleiben stehen (TextFaltung::lesartenOhnePunkte)
