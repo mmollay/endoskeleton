@@ -19,7 +19,8 @@
  *   FA08 begrenzte Zeit und fail-closed: zu lang, ungültiges UTF-8, Richtungszeichen und jeder gescheiterte Regex-Schritt lassen NIE durch
  *   FA09 Eigenschaften: Tabellen ohne deutsche Buchstaben; NFC = NFD für alle 790 Akzentbuchstaben; 994 Kompatibilitätszeichen; Marken und Unsichtbares mitten im Wort; Lesarten; Stabilität
  *   FA10 der gewöhnliche Text der Baukasten-Dokumente wird mit eigenen Beispiellisten NICHT häufiger gesperrt als vorher
- *   FA12 Härtung (Befunde der unabhängigen Prüfung, im Panel noch nicht): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen, Auslassungszeichen, lesartenOhnePunkte
+ *   FA12 Härtung (Befunde der unabhängigen Prüfung; seit Panel rc1092 in beiden Kopien): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen, Auslassungszeichen, lesartenOhnePunkte
+ *   FA13 Härtung 2 (Panel rc1092, beide Kopien): Buchstaben mit Haken/Strich/Tilde ohne Unicode-Zerlegung (tests/fixtures/sperrliste-haken.json), dünne Leerzeichen
  *   FA11 eine Stelle: nur der Prüfer ruft die Suche auf, nur die Suche die Faltung, und niemand vergleicht selbst
  *
  * Keine Kundenlisten: Die Wörter der Listen sind erfundene Beispiele. Die Fixtures sind Auszüge aus der Unicode-Datenbank (tests/fixtures/sperrliste-*.json).
@@ -467,8 +468,12 @@ return [
         $unsinn = [];
         $eintraege = 0;
         $tabellen = [];
-        foreach (['VERWECHSLUNG', 'KOMPAT', 'VORAB', 'AKZENTE'] as $name) {
-            $tabellen[$name] = (new \ReflectionClassConstant(TextFaltung::class, $name))->getValue();
+        foreach (['VERWECHSLUNG', 'KOMPAT', 'VORAB', 'AKZENTE', 'HAKEN'] as $name) {
+            try {
+                $tabellen[$name] = (new \ReflectionClassConstant(TextFaltung::class, $name))->getValue();
+            } catch (\ReflectionException) {
+                $tabellen[$name] = [];   // eine fehlende Tabelle ist hier leer; dass sie da sein muss, sagt FA13
+            }
             foreach ($tabellen[$name] as $ersatz => $zeichen) {
                 foreach (mb_str_split($zeichen) as $z) {
                     $eintraege++;
@@ -490,7 +495,7 @@ return [
                 }
             }
         }
-        $expect($eintraege >= 900 && $unsinn === [], "FA09 die vier Tabellen ($eintraege Zeichen): kein Zeichen ist ein deutscher Buchstabe (a–z, ä, ö, ü, ß; in AKZENTE nur ä/ö/ü als Umschrift), und jedes wird zu seinem Ersatz — falsch: " . implode('; ', array_slice($unsinn, 0, 8)));
+        $expect($eintraege >= 900 && $unsinn === [], "FA09 die fünf Tabellen ($eintraege Zeichen): kein Zeichen ist ein deutscher Buchstabe (a–z, ä, ö, ü, ß; in AKZENTE nur ä/ö/ü als Umschrift), und jedes wird zu seinem Ersatz — falsch: " . implode('; ', array_slice($unsinn, 0, 8)));
         $deutsch = 'abcdefghijklmnopqrstuvwxyzäöüß';
         $verbogen = [];
         foreach (mb_str_split($deutsch) as $b) {
@@ -710,7 +715,7 @@ return [
     },
 
 
-    'FA12 Härtung (Befunde der unabhängigen Prüfung, im Panel noch nicht): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen und Auslassungszeichen' => static function () use ($expect, $sp): void {
+    'FA12 Härtung (Befunde der unabhängigen Prüfung, seit Panel rc1092 in beiden Kopien): Zalgo mit Unsichtbarem davor, Satzende vor Anführungszeichen und Auslassungszeichen' => static function () use ($expect, $sp): void {
         // B2: Ob ein Text mehrdeutig ist (Umlaut oder Zalgo?), entscheidet sich an dem Text, der verglichen wird — nicht am Rohtext
         $zalgo = [
             'a + ¨ + Akzent (schon vorher erkannt)'      => "ga\u{0308}\u{0301}rantiert",
@@ -748,17 +753,121 @@ return [
             }
         }
         $expect($zuUnrecht === [], 'FA12 Satzende vor schließendem Zeichen (Zitat, Klammer) und Auslassungszeichen trennen die Wendung — zu Unrecht gesperrt: ' . implode(' | ', $zuUnrecht));
-        $bleibt = [["Das hilft gegen Angst", 'hilft gegen'], ["Das hilft\u{3000}gegen Angst", 'hilft gegen'], ['Das hilft , gegen Angst', 'hilft gegen'], ['Nach Tag drei: Durch fall verschwunden.', 'Durchfall verschwunden'], ['Das ist 100 % sicher', '100 % sicher']];
+        $bleibt = [["Das hilft gegen Angst", 'hilft gegen'], ["Das hilft\u{3000}gegen Angst", 'hilft gegen'], ['Das hilft , gegen Angst', 'hilft gegen'], ['Das hilft .. gegen Angst', 'hilft gegen'], ['Das hilft ... gegen Angst', 'hilft gegen'], ['Das hilft ,. gegen Angst', 'hilft gegen'], ["Das hilft \u{2026} gegen Angst", 'hilft gegen'], ["Das hilft .\u{2026}. gegen Angst", 'hilft gegen'], ['Nach Tag drei: Durch fall verschwunden.', 'Durchfall verschwunden'], ['Das ist 100 % sicher', '100 % sicher']];
         $verloren = [];
         foreach ($bleibt as [$text, $wort]) {
             if ($sp($text, [$wort]) !== $wort) {
                 $verloren[] = $text;
             }
         }
-        $expect($verloren === [], 'FA12 Wendungen ohne Satzende werden weiter gefunden — nicht mehr gefunden: ' . implode(' | ', $verloren));
+        $expect($verloren === [], 'FA12 Wendungen ohne Satzende werden weiter gefunden (auch mit Satzzeichen nach einem Leerzeichen: „hilft .. gegen“ ist kein Satzende) — nicht mehr gefunden: ' . implode(' | ', $verloren));
         // B4: lesartenOhnePunkte lässt Leerzeichen um Satzzeichen stehen
         $expect(TextFaltung::lesartenOhnePunkte('Kosten – frei wählbar') === ['kosten - frei waehlbar'] && TextFaltung::lesarten('Kosten – frei wählbar') === ['kosten-frei waehlbar'] && TextFaltung::lesartenOhnePunkte(str_repeat('a', TextFaltung::MAX_BYTES + 1)) === null,
             'FA12 lesartenOhnePunkte(): „Kosten – frei“ bleibt mit Leerzeichen (lesarten() zieht es zusammen); zu lang ist null — ' . json_encode([TextFaltung::lesartenOhnePunkte('Kosten – frei wählbar'), TextFaltung::lesarten('Kosten – frei wählbar')], JSON_UNESCAPED_UNICODE));
+    },
+
+    'FA13 Härtung 2 (Panel rc1092): Buchstaben mit Haken/Strich/Tilde ohne Unicode-Zerlegung und dünne Leerzeichen' => static function () use ($expect, $sp, $liste): void {
+        // B5: Buchstaben mit Haken, Strich, Tilde, Schwanz …, die Unicode NICHT zerlegt (ƒ ɠ ɍ ɨ ƭ …): der Leser liest den Grundbuchstaben (Fixture aus der Unicode-Datenbank, Tabelle HAKEN)
+        $haken = json_decode((string) file_get_contents(__DIR__ . '/fixtures/sperrliste-haken.json'), true);
+        $falsch = [];
+        foreach ((array) ($haken['paare'] ?? []) as [$cp, $grund]) {
+            if (TextFaltung::falten('xy' . mb_chr($cp) . 'xy') !== 'xy' . $grund . 'xy') {
+                $falsch[] = sprintf('U+%04X', $cp);
+            }
+        }
+        $expect(count((array) ($haken['paare'] ?? [])) === 216 && $falsch === [], 'FA13 (B5) jeder der ' . count((array) ($haken['paare'] ?? [])) . ' lateinischen Buchstaben „X mit Haken/Strich/Tilde/…“ ohne Zerlegung (Unicode ' . ($haken['unicode'] ?? '?') . ') faltet zum Grundbuchstaben — falsch: ' . implode(' ', array_slice($falsch, 0, 12)) . (count($falsch) > 12 ? ' … (' . count($falsch) . ')' : ''));
+        $tabellen = [];
+        foreach (['VERWECHSLUNG', 'KOMPAT', 'VORAB', 'AKZENTE', 'HAKEN'] as $name) {
+            try {
+                $tabellen[$name] = (new \ReflectionClassConstant(TextFaltung::class, $name))->getValue();
+            } catch (\ReflectionException) {
+                $tabellen[$name] = [];
+            }
+        }
+        $andere = [];
+        foreach (['VERWECHSLUNG', 'KOMPAT', 'VORAB', 'AKZENTE'] as $name) {
+            foreach ($tabellen[$name] as $zeichen) {
+                foreach (mb_str_split($zeichen) as $z) {
+                    $andere[$z] = true;
+                }
+            }
+        }
+        $doppelt = [];
+        $deutsch = [];
+        $hakenZeichen = 0;
+        foreach ($tabellen['HAKEN'] as $ersatz => $zeichen) {
+            foreach (mb_str_split($zeichen) as $z) {
+                $hakenZeichen++;
+                if (isset($andere[$z])) {
+                    $doppelt[] = sprintf('U+%04X', mb_ord($z));
+                }
+                if (preg_match('/^[A-Za-zÄÖÜäöüß]$/u', $z) === 1 || preg_match('/^[a-z]$/', (string) $ersatz) !== 1 || TextFaltung::falten("xy{$z}xy") !== "xy{$ersatz}xy") {
+                    $deutsch[] = sprintf('U+%04X', mb_ord($z));
+                }
+            }
+        }
+        $expect($hakenZeichen >= 200 && $doppelt === [] && $deutsch === [], "FA13 (B5) die Tabelle HAKEN ist da ($hakenZeichen Zeichen), überschneidet sich mit keiner anderen Tabelle, kein Zeichen ist ein deutscher Buchstabe und jedes wird zu seinem Ersatz — doppelt: " . implode(' ', $doppelt) . '; falsch: ' . implode(' ', array_slice($deutsch, 0, 8)));
+        $beispiele = [
+            'f mit Haken ×2 in „Wirkstoff“'          => ["Der Wirksto\u{0192}\u{0192} hilft", 'Wirkstoff'],
+            'g mit Haken (klein) in „garantiert“'    => ["Das ist \u{0260}arantiert", 'garantiert'],
+            'G mit Haken (groß) in „GARANTIERT“'     => ["Das ist \u{0193}ARANTIERT", 'garantiert'],
+            't mit Haken in „garantiert“'            => ["Das ist garan\u{01AD}iert", 'garantiert'],
+            'r mit Strich in „risikofrei“'           => ["Das ist \u{024D}isikofrei", 'risikofrei'],
+            'i mit Strich in der Wendung'            => ["Das h\u{0268}lft gegen Angst", 'hilft gegen'],
+            'h mit Haken in „heilt“'                 => ["Das \u{0266}eilt alles", 'heilt'],
+            'O mit Tilde (Ɵ) in „Wirkstoff“'         => ["Wirkst\u{019F}ff", 'Wirkstoff'],
+            'l mit Tilde in „Heilkräuter“'           => ["Hei\u{026B}kräuter", 'Heilkräuter'],
+            'z mit Haken ×2 in „zertifiziert“'       => ["Das ist \u{0225}ertifi\u{0225}iert", 'zertifiziert'],
+            'c mit Locke in „Cannabis“'              => ["Das \u{0255}annabis", 'Cannabis'],
+        ];
+        $schlecht = [];
+        foreach ($beispiele as $was => [$text, $wort]) {
+            if ($sp($text, [$wort]) !== $wort) {
+                $schlecht[] = $was;
+            }
+        }
+        $expect($schlecht === [], 'FA13 (B5) ein Sperrwort mit Buchstaben mit Haken/Strich/Tilde wird erkannt (' . count($beispiele) . ' Fälle) — nicht erkannt: ' . implode('; ', $schlecht));
+        $schlecht = [];
+        foreach (['Soren' => 'Søren', 'Lodz' => 'Łódź', 'Dorde' => 'Đorđe', 'Hamrun' => 'Ħamrun'] as $wort => $text) {
+            if ($sp("Das ist $text aus dem Norden", [$wort]) !== $wort) {
+                $schlecht[] = $text;
+            }
+        }
+        $expect($schlecht === [] && $sp('Das ist schön', ['schon']) === null, 'FA13 (B5) die Buchstaben, die vorher schon galten (ø ł đ ħ), gelten weiter; der Umlaut ohne Punkte bleibt ein anderes Wort — ' . implode(' ', $schlecht));
+
+        // Dünne Leerzeichen (Schmal- und Haarspatium): zwischen Buchstaben so schmal, dass der Leser KEINE Lücke sieht — Lücke oder nichts? gilt wie beim Hangul-Füller in beiden Lesarten
+        $duenn = [
+            'Haarspatium U+200A in „heilt“'          => ["Das hei\u{200A}lt alles", 'heilt'],
+            'Schmalspatium U+2009 in „heilt“'        => ["Das hei\u{2009}lt alles", 'heilt'],
+            'Haarspatium in „Wirkstoff“'             => ["Der Wirk\u{200A}stoff hilft", 'Wirkstoff'],
+        ];
+        $schlecht = [];
+        foreach ($duenn as $was => [$text, $wort]) {
+            if ($sp($text, [$wort]) !== $wort) {
+                $schlecht[] = $was;
+            }
+        }
+        $expect($schlecht === [], 'FA13 dünne Leerzeichen mitten in einem kurzen Wort trennen es nicht — nicht erkannt: ' . implode('; ', $schlecht));
+        $expect(TextFaltung::lesarten("hei\u{2009}lt") === ['hei lt', 'heilt'] && TextFaltung::lesarten("hei\u{200A}lt") === ['hei lt', 'heilt'] && TextFaltung::lesarten("100\u{2009}% sicher") === ['100%sicher'] && TextFaltung::lesarten('hei lt') === ['hei lt'],
+            'FA13 dünne Leerzeichen: zwei Lesarten (Lücke oder nichts), außer wo es auf dasselbe hinausläuft; ein gewöhnliches Leerzeichen bleibt eine Lücke — ' . json_encode([TextFaltung::lesarten("hei\u{2009}lt"), TextFaltung::lesarten("100\u{2009}% sicher"), TextFaltung::lesarten('hei lt')], JSON_UNESCAPED_UNICODE));
+        $bleibt = [["Das hilft\u{2009}gegen Angst", 'hilft gegen'], ["Das ist 100\u{2009}% sicher", '100 % sicher'], ["Das hilft\u{200A}gegen Angst", 'hilft gegen']];
+        $verloren = [];
+        foreach ($bleibt as [$text, $wort]) {
+            if ($sp($text, [$wort]) !== $wort) {
+                $verloren[] = $text;
+            }
+        }
+        $expect($verloren === [], 'FA13 Wendungen mit dünnem Leerzeichen als Wortabstand werden weiter gefunden — nicht mehr gefunden: ' . implode(' | ', $verloren));
+        $frei = ["Das gilt z.\u{2009}B. für Kinder, d.\u{2009}h. für alle", "Das kostet 5\u{2009}€ oder 12\u{2009}kg Gepäck", "Wir\u{2009}haben\u{2009}Zeit und\u{200A}Ruhe", "Mo\u{2009}–\u{2009}Fr 9\u{2009}–\u{2009}17\u{2009}Uhr"];
+        $zuUnrecht = [];
+        foreach ($frei as $text) {
+            if ($sp($text, $liste) !== null) {
+                $zuUnrecht[] = $text;
+            }
+        }
+        $expect($zuUnrecht === [], 'FA13 gewöhnlicher Text mit dünnen Leerzeichen (z. B., 5 €, Zeitangaben) bleibt frei — zu Unrecht gesperrt: ' . implode(' | ', $zuUnrecht));
+        $expect($sp("Ich\u{2009}eilte nach Hause", ['heilt']) === 'heilt' && $sp('Ich eilte nach Hause', ['heilt']) === null,
+            'FA13 bekannte Nebenwirkung, festgehalten: ein dünnes Leerzeichen zwischen zwei Wörtern lässt einen KURZEN Eintrag über die Wortgrenze treffen („Ich eilte“ → „heilt“); mit gewöhnlichem Leerzeichen nicht');
     },
 
     'FA10 der gewöhnliche Text der Baukasten-Dokumente und -Vorlagen wird mit eigenen Beispiellisten nicht häufiger gesperrt als vorher' => static function () use ($expect, $sp, $vorher): void {
