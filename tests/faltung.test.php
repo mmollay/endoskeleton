@@ -719,6 +719,7 @@ return [
         // B2: Ob ein Text mehrdeutig ist (Umlaut oder Zalgo?), entscheidet sich an dem Text, der verglichen wird — nicht am Rohtext
         $zalgo = [
             'a + ¨ + Akzent (schon vorher erkannt)'      => "ga\u{0308}\u{0301}rantiert",
+            'Großbuchstabe A + Marken'                   => "GA\u{0308}\u{0301}RANTIERT",
             'Nullbreitenzeichen zwischen a und Marken'   => "ga\u{200B}\u{0308}\u{0301}rantiert",
             'Nullbreitenzeichen zwischen den Marken'     => "ga\u{0308}\u{200B}\u{0301}rantiert",
             'weiches Trennzeichen vor den Marken'        => "ga\u{00AD}\u{0308}\u{0301}rantiert",
@@ -745,6 +746,12 @@ return [
             ["Das ist 100 %.\u{201C} Sicher ist nichts.", '100 % sicher'],
             ["Durchfall.\u{201C} Verschwunden war er nie.", 'Durchfall verschwunden'],
             ['Das hilft... Gegen Angst', 'hilft gegen'],
+            ["Das hilft.\u{201D} Gegen Angst", 'hilft gegen'],
+            ["Das hilft.\u{2019} Gegen Angst", 'hilft gegen'],
+            ["Was hilft?\u{00BB} Gegen Angst", 'hilft gegen'],
+            ["Das hilft.\u{203A} Gegen Angst", 'hilft gegen'],
+            ['Das hilft." Gegen Angst', 'hilft gegen'],
+            ["Das hilft.' Gegen Angst", 'hilft gegen'],
         ];
         $zuUnrecht = [];
         foreach ($satzende as [$text, $wort]) {
@@ -775,7 +782,7 @@ return [
                 $falsch[] = sprintf('U+%04X', $cp);
             }
         }
-        $expect(count((array) ($haken['paare'] ?? [])) === 216 && $falsch === [], 'FA13 (B5) jeder der ' . count((array) ($haken['paare'] ?? [])) . ' lateinischen Buchstaben „X mit Haken/Strich/Tilde/…“ ohne Zerlegung (Unicode ' . ($haken['unicode'] ?? '?') . ') faltet zum Grundbuchstaben — falsch: ' . implode(' ', array_slice($falsch, 0, 12)) . (count($falsch) > 12 ? ' … (' . count($falsch) . ')' : ''));
+        $expect(count((array) ($haken['paare'] ?? [])) === 222 && $falsch === [], 'FA13 (B5) jeder der ' . count((array) ($haken['paare'] ?? [])) . ' lateinischen Buchstaben „X mit Haken/Strich/Tilde/…“ ohne Zerlegung (Unicode ' . ($haken['unicode'] ?? '?') . ') faltet zum Grundbuchstaben — falsch: ' . implode(' ', array_slice($falsch, 0, 12)) . (count($falsch) > 12 ? ' … (' . count($falsch) . ')' : ''));
         $tabellen = [];
         foreach (['VERWECHSLUNG', 'KOMPAT', 'VORAB', 'AKZENTE', 'HAKEN'] as $name) {
             try {
@@ -819,6 +826,10 @@ return [
             'l mit Tilde in „Heilkräuter“'           => ["Hei\u{026B}kräuter", 'Heilkräuter'],
             'z mit Haken ×2 in „zertifiziert“'       => ["Das ist \u{0225}ertifi\u{0225}iert", 'zertifiziert'],
             'c mit Locke in „Cannabis“'              => ["Das \u{0255}annabis", 'Cannabis'],
+            'u mit Balken (ʉ) in „unhackbar“'        => ["Das ist \u{0289}nhackbar", 'unhackbar'],
+            'U mit Balken (Ʉ, groß) in „unhackbar“'  => ["Das ist \u{0244}NHACKBAR", 'unhackbar'],
+            'e mit Balken (ꬳ) in „risikofrei“'       => ["Das ist risikofr\u{AB33}i", 'risikofrei'],
+            'langes s mit Strich (ẜ) in „Wirkstoff“' => ["Der Wirk\u{1E9C}toff", 'Wirkstoff'],
         ];
         $schlecht = [];
         foreach ($beispiele as $was => [$text, $wort]) {
@@ -840,6 +851,20 @@ return [
             'Haarspatium U+200A in „heilt“'          => ["Das hei\u{200A}lt alles", 'heilt'],
             'Schmalspatium U+2009 in „heilt“'        => ["Das hei\u{2009}lt alles", 'heilt'],
             'Haarspatium in „Wirkstoff“'             => ["Der Wirk\u{200A}stoff hilft", 'Wirkstoff'],
+            'Sechstelgeviert U+2006 in „heilt“'      => ["Das hei\u{2006}lt alles", 'heilt'],
+            'schmales Leerzeichen U+202F in „heilt“' => ["Das hei\u{202F}lt alles", 'heilt'],
+            'U+2006 in „Heilung“'                    => ["Gegen alles: Hei\u{2006}lung", 'Heilung'],
+            'U+202F in „Heilung“'                    => ["Gegen alles: Hei\u{202F}lung", 'Heilung'],
+            'schmales Leerzeichen nach unsichtbarem Zeichen' => ["Das hei\u{200B}\u{2009}lt alles", 'heilt'],
+            'schmale Leerzeichen hintereinander (U+2009 U+200A)' => ["Das hei\u{2009}\u{200A}lt alles", 'heilt'],
+            'zwei Haarspatien hintereinander'        => ["Das hei\u{200A}\u{200A}lt alles", 'heilt'],
+            'drei Haarspatien hintereinander'        => ["Das hei\u{200A}\u{200A}\u{200A}lt alles", 'heilt'],
+            'U+202F und U+2006 hintereinander'       => ["Das hei\u{202F}\u{2006}lt alles", 'heilt'],
+            'Lauf mit Nullbreitenzeichen dazwischen' => ["Das hei\u{2009}\u{200B}\u{200A}lt alles", 'heilt'],
+            'schmales Leerzeichen, dann eine Marke'  => ["Das hei\u{2009}\u{0301}lt alles", 'heilt'],
+            'eine Marke, dann schmales Leerzeichen'  => ["Das hei\u{0301}\u{2009}lt alles", 'heilt'],
+            'Zalgo-Haufen und schmales Leerzeichen im selben Wort (Wunder)' => ["Das Wu\u{0308}\u{0301}\u{2009}nder hilft", 'Wunder'],
+            'Zalgo-Haufen und schmales Leerzeichen im selben Wort (Opium)'  => ["Das O\u{0308}\u{0301}pi\u{2009}um", 'Opium'],
         ];
         $schlecht = [];
         foreach ($duenn as $was => [$text, $wort]) {
@@ -848,8 +873,24 @@ return [
             }
         }
         $expect($schlecht === [], 'FA13 dünne Leerzeichen mitten in einem kurzen Wort trennen es nicht — nicht erkannt: ' . implode('; ', $schlecht));
-        $expect(TextFaltung::lesarten("hei\u{2009}lt") === ['hei lt', 'heilt'] && TextFaltung::lesarten("hei\u{200A}lt") === ['hei lt', 'heilt'] && TextFaltung::lesarten("100\u{2009}% sicher") === ['100%sicher'] && TextFaltung::lesarten('hei lt') === ['hei lt'],
-            'FA13 dünne Leerzeichen: zwei Lesarten (Lücke oder nichts), außer wo es auf dasselbe hinausläuft; ein gewöhnliches Leerzeichen bleibt eine Lücke — ' . json_encode([TextFaltung::lesarten("hei\u{2009}lt"), TextFaltung::lesarten("100\u{2009}% sicher"), TextFaltung::lesarten('hei lt')], JSON_UNESCAPED_UNICODE));
+        $lesarten = [TextFaltung::lesarten("hei\u{2009}lt"), TextFaltung::lesarten("hei\u{200A}lt"), TextFaltung::lesarten("100\u{2009}% sicher"), TextFaltung::lesarten('hei lt'),
+            TextFaltung::lesarten("z.\u{2009}B. und 5\u{202F}€"), TextFaltung::lesarten("Mo\u{2009}\u{2013}\u{2009}Fr"), TextFaltung::lesarten("hei\u{2006}lt"), TextFaltung::lesarten("hei\u{2009}\u{200A}lt"), TextFaltung::lesarten("hei\u{2009}\u{0301}lt")];
+        $expect($lesarten === [['hei lt', 'heilt'], ['hei lt', 'heilt'], ['100%sicher'], ['hei lt'], ['z.b.und 5€'], ['mo-fr'], ['hei lt', 'heilt'], ['hei lt', 'heilt'], ['hei lt', 'heilt']],
+            'FA13 dünne Leerzeichen: zwei Lesarten (Lücke oder nichts) NUR zwischen zwei Buchstaben — neben Satzzeichen, Ziffern und Währung („z. B.“, „5 €“, „Mo – Fr“) bleibt es eine; ein gewöhnliches Leerzeichen bleibt eine Lücke — ' . json_encode($lesarten, JSON_UNESCAPED_UNICODE));
+        // Schmale Leerzeichen um einen Strich bleiben Lücken: sonst gälte „Kosten – frei wählbar“ im Prüfer wieder als „kosten-frei“ (Befund der Prüfung, B-3)
+        $strich = [];
+        foreach (["\u{2009}", "\u{200A}", "\u{202F}", "\u{2006}"] as $z) {
+            $strich[] = TextFaltung::lesartenOhnePunkte("Kosten{$z}\u{2013}{$z}frei wählbar");
+        }
+        $expect($strich === array_fill(0, 4, ['kosten - frei waehlbar']), 'FA13 Schmalspatium, Haarspatium, U+202F und U+2006 um einen Strich bleiben eine Lücke (eine Lesart „kosten - frei“) — ' . json_encode($strich, JSON_UNESCAPED_UNICODE));
+        // NFD-Umlaut = NFC, auch wenn irgendwo im Text ein dünnes Leerzeichen steht (Befund B-4: die Lesart „nichts“ nahm früher auch alle ¨ im ganzen Text weg)
+        $nfd = [];
+        foreach (["Blu\u{0308}ten und z.\u{2009}B. Rosen", "Blu\u{0308}ten, 5\u{2009}€", "Blu\u{0308}ten und hei\u{2009}lt", "Bl\u{00FC}ten und z.\u{2009}B. Rosen"] as $text) {
+            if ($sp($text, ['bluten']) !== null) {
+                $nfd[] = $text;
+            }
+        }
+        $expect($nfd === [] && $sp("Blu\u{0308}ten und hei\u{2009}lt", ['heilt']) === 'heilt', 'FA13 ein dünnes Leerzeichen im Text macht aus „Blüten“ (NFC oder NFD) kein „bluten“, findet aber „hei lt“ weiter — zu Unrecht gesperrt: ' . implode(' | ', $nfd));
         $bleibt = [["Das hilft\u{2009}gegen Angst", 'hilft gegen'], ["Das ist 100\u{2009}% sicher", '100 % sicher'], ["Das hilft\u{200A}gegen Angst", 'hilft gegen']];
         $verloren = [];
         foreach ($bleibt as [$text, $wort]) {
@@ -866,6 +907,22 @@ return [
             }
         }
         $expect($zuUnrecht === [], 'FA13 gewöhnlicher Text mit dünnen Leerzeichen (z. B., 5 €, Zeitangaben) bleibt frei — zu Unrecht gesperrt: ' . implode(' | ', $zuUnrecht));
+        // Jedes Paar der Fixture steht in HAKEN oder AKZENTE mit demselben Grundbuchstaben — auch die Großbuchstaben, die das Auffalten (Schritt 10) vorher kleinschreibt: Welche Zeichen es kennt, hängt von der PHP-Version ab
+        $zuordnung = [];
+        foreach (['HAKEN', 'AKZENTE'] as $name) {
+            foreach ($tabellen[$name] as $ersatz => $zeichen) {
+                foreach (mb_str_split($zeichen) as $z) {
+                    $zuordnung[$z] ??= (string) $ersatz;
+                }
+            }
+        }
+        $fehlt = [];
+        foreach ((array) ($haken['paare'] ?? []) as [$cp, $grund]) {
+            if (($zuordnung[mb_chr($cp)] ?? null) !== $grund) {
+                $fehlt[] = sprintf('U+%04X', $cp);
+            }
+        }
+        $expect($fehlt === [] && $zuordnung !== [], 'FA13 (B5) jedes Paar der Fixture steht in HAKEN oder AKZENTE mit demselben Grundbuchstaben (auch die Großbuchstaben, nicht nur über das Auffalten) — fehlt: ' . implode(' ', array_slice($fehlt, 0, 10)));
         $expect($sp("Ich\u{2009}eilte nach Hause", ['heilt']) === 'heilt' && $sp('Ich eilte nach Hause', ['heilt']) === null,
             'FA13 bekannte Nebenwirkung, festgehalten: ein dünnes Leerzeichen zwischen zwei Wörtern lässt einen KURZEN Eintrag über die Wortgrenze treffen („Ich eilte“ → „heilt“); mit gewöhnlichem Leerzeichen nicht');
     },

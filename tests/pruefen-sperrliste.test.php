@@ -67,6 +67,7 @@ return [
             'Titel, Wort mit Trenner mitten drin'    => [$hero('titel', 'Der Wirk-stoff hilft'), 'Wirkstoff', 'bausteine.0.titel'],
             'Titel, Prozentwendung ohne Leerzeichen' => [$hero('titel', 'Jetzt 100% sicher'), '100 % sicher', 'bausteine.0.titel'],
             'Titel, Unsichtbares im Wort'            => [$hero('titel', "Das ist gar\u{2065}an\u{3164}tiert"), 'garantiert', 'bausteine.0.titel'],
+            'Fließtext, u mit Balken (ʉ) statt u'    => [$hero('text', "Heilkr\u{00E4}\u{0289}ter für alle, Schritt für Schritt erklärt."), 'Heilkräuter', 'bausteine.0.text'],
             'Titel, f mit Haken (ƒ) statt f'         => [$hero('titel', "Der Wirksto\u{0192}\u{0192} im Alltag"), 'Wirkstoff', 'bausteine.0.titel'],
             'Dachzeile, Haarspatium in der Wendung'  => [$hero('dachzeile', "Es hilft\u{200A}gegen Angst"), 'hilft gegen', 'bausteine.0.dachzeile'],
             'Beschreibung der Seite, Ligatur'        => [H::seite([], ['beschreibung' => "Der Wirksto\u{FB00} im Alltag"]), 'Wirkstoff', 'meta.beschreibung'],
@@ -194,11 +195,11 @@ return [
             $s['bausteine'][0]['dachzeile'] = $wort;
             T::eq($trotz($pruefe($s, $ohneListe)), ['bausteine.0.dachzeile'], "„{$wort}“ sperrt");
         }
-        foreach (["Kosten \u{2013} frei wählbar", 'Kosten - frei Haus', "Kosten \u{2014} freiwillige Spende"] as $wort) {
+        foreach (["Kosten \u{2013} frei wählbar", 'Kosten - frei Haus', "Kosten \u{2014} freiwillige Spende", "Kosten\u{2009}\u{2013}\u{2009}frei wählbar", "Kosten\u{200A}\u{2013}\u{200A}frei wählbar", "Kosten\u{202F}\u{2013}\u{202F}frei wählbar", "Kosten\u{2009}\u{2013}frei wählbar"] as $wort) {
             $s['bausteine'][0]['dachzeile'] = $wort;
             T::eq($trotz($pruefe($s, $ohneListe)), [], "„{$wort}“ (Strich MIT Leerzeichen) sperrt nicht");
         }
-        foreach (["Kosten\u{2011}los", 'Kosten-frei'] as $wort) {
+        foreach (["Kosten\u{2011}los", 'Kosten-frei', "Kosten\u{2009}frei", "Kosten\u{200A}\u{200A}frei", "Kosten\u{2009}\u{200A}frei"] as $wort) {
             $s['bausteine'][0]['dachzeile'] = $wort;
             T::eq($trotz($pruefe($s, $ohneListe)), ['bausteine.0.dachzeile'], "„{$wort}“ (Bindestrich OHNE Leerzeichen) sperrt");
         }
