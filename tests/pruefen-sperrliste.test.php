@@ -67,6 +67,8 @@ return [
             'Titel, Wort mit Trenner mitten drin'    => [$hero('titel', 'Der Wirk-stoff hilft'), 'Wirkstoff', 'bausteine.0.titel'],
             'Titel, Prozentwendung ohne Leerzeichen' => [$hero('titel', 'Jetzt 100% sicher'), '100 % sicher', 'bausteine.0.titel'],
             'Titel, Unsichtbares im Wort'            => [$hero('titel', "Das ist gar\u{2065}an\u{3164}tiert"), 'garantiert', 'bausteine.0.titel'],
+            'Titel, f mit Haken (ƒ) statt f'         => [$hero('titel', "Der Wirksto\u{0192}\u{0192} im Alltag"), 'Wirkstoff', 'bausteine.0.titel'],
+            'Dachzeile, Haarspatium in der Wendung'  => [$hero('dachzeile', "Es hilft\u{200A}gegen Angst"), 'hilft gegen', 'bausteine.0.dachzeile'],
             'Beschreibung der Seite, Ligatur'        => [H::seite([], ['beschreibung' => "Der Wirksto\u{FB00} im Alltag"]), 'Wirkstoff', 'meta.beschreibung'],
             'Listenpunkt, Buchstabenreihe'           => [(static function () use ($b) { $t = $b('themen'); $t['punkte'][1] = 'Alles g.a.r.a.n.t.i.e.r.t'; return H::seite([$t]); })(), 'garantiert', 'bausteine.1.punkte.1'],
             'Listenpunkt, griechisches ο'            => [(static function () use ($b) { $t = $b('themen'); $t['punkte'][2] = "Der Wirkst\u{03BF}ff und du"; return H::seite([$t]); })(), 'Wirkstoff', 'bausteine.1.punkte.2'],
@@ -106,6 +108,9 @@ return [
         T::eq(count($listenbefunde($befunde)), 2, 'genau die zwei Hinweise');
         $befunde = $pruefe($hero('titel', 'Wirkung: w i r k u n g'));
         T::eq($pfade($befunde, 'hinweis', 'Grenzwort: „Wirkung“'), ['bausteine.0.titel'], 'Grenzwort als Buchstabenreihe');
+        $befunde = $pruefe($hero('text', "Das hei\u{200A}lt vieles und die W\u{0268}rkung ist spürbar."));
+        T::eq($pfade($befunde, 'hinweis', 'Grenzwort: „heilt“'), ['bausteine.0.text'], 'Haarspatium mitten in „heilt“ gibt den Hinweis');
+        T::eq($pfade($befunde, 'hinweis', 'Grenzwort: „Wirkung“'), ['bausteine.0.text'], 'i mit Strich (ɨ) in „Wirkung“ gibt den Hinweis');
     },
     'PS03 gewöhnliche deutsche Texte bleiben frei (kein Treffer der Listen)' => static function () use ($pruefe, $listenbefunde, $b): void {
         $themen = $b('themen');
@@ -115,6 +120,7 @@ return [
         $s = H::seite([$themen, $faq]);
         $s['bausteine'][0]['text'] = 'Wunder-Kräuter, Mütter und Väter: z. B. u. a. Option A, B, C oder D. Option 1, 2, 3.';
         $s['bausteine'][0]['titel'] = 'Frische Kräuter aus dem Garten';
+        $s['bausteine'][0]['dachzeile'] = "Mo\u{2009}–\u{2009}Fr 9\u{2009}–\u{2009}17\u{2009}Uhr, z.\u{2009}B. 5\u{2009}€";
         $s['meta']['beschreibung'] = 'Ein ruhiger Abend über Kräuter, Tees und schöne Gewohnheiten – für alle, die etwas Neues lernen möchten.';
         T::eq($listenbefunde($pruefe($s)), [], 'keine Sperrlisten- oder Grenzwort-Befunde');
         $s['bausteine'][0]['titel'] = 'Привет, мир! Ελληνικά, 日本語, Emoji 🎉✨';
@@ -223,7 +229,7 @@ return [
         T::eq($gefunden, ['Sperrliste: „garantiert“', 'Sperrliste: „hilft gegen“', 'Sperrliste: „Wirkstoff“'], 'alle drei getroffenen Einträge in der Reihenfolge der Liste, nicht nur der erste');
     },
     'PS07 das Format der Befunde bleibt, wie das Panel es liest' => static function () use ($pruefe, $hero): void {
-        // Das Panel erkennt Treffer an diesen technik-Zeilen (app/Services/Landingpage/Befunde.php: SPERRLISTE, GRENZWORT) und zeigt sonst den Satz des Baukastens ohne Ortsangabe.
+        // Das Panel erkennt Treffer an diesen technik-Zeilen (app/Services/Landingpage/Befunde.php: SPERRLISTE, GRENZWORT; seit rc1092 auch NICHT_PRUEFBAR = „Sperrliste: Text nicht prüfbar“) und zeigt sonst den Satz des Baukastens ohne Ortsangabe.
         $sperrliste = '/^Sperrliste: „(.+)“$/us';
         $grenzwort = '/^Grenzwort: „(.+)“$/us';
         $ort = '~^(?:Abschnitt \d+ „[^“]*“(?:, Eintrag \d+)?|Seiteneinstellungen): ~u';

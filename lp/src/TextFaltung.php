@@ -1,12 +1,9 @@
 <?php
 /**
- * Kopie von panel app/Support/TextFaltung.php (rc1084) — beide müssen gleich bleiben: gleiche Tabellen, gleiche Schritte, gleiche Reihenfolge.
+ * Kopie von panel app/Support/TextFaltung.php (rc1084, gehärtet in rc1092) — beide müssen gleich bleiben: gleiche Tabellen, gleiche Schritte, gleiche Reihenfolge.
  * Wer hier etwas ändert, ändert es dort mit (und umgekehrt); tests/faltung.test.php prüft die Eigenschaften, die für beide gelten.
  * Der Baukasten hat keine Abhängigkeit zum Panel: Diese Datei steht für sich, reines PHP mit mbstring und PCRE, ohne Composer und ohne `intl`.
- *
- * ABWEICHUNG vom Panel (Baukasten 3.54.1, Befunde der unabhängigen Prüfung — im Panel noch nicht): (1) lesartenMit() entscheidet „mehrdeutig?“ auch am Text nach den Schritten schriftformen … sternchen
- * (Zalgo-Haufen mit Umlautmarke, vor dem ein Nullbreiten- oder Verwechslungszeichen steht); (2) das Satzende in satzstrang() kennt schließende Zeichen und „…“; (3) lesartenOhnePunkte() ist öffentlich.
- * Bis das Panel dieselben Änderungen hat, sagen die beiden Kopien auf diesen Eingaben nicht dasselbe — der Baukasten ist dann strenger bei (1) und milder bei (2). Mit dem Panel zugleich übernehmen.
+
  *
  * Die Faltung eines Texts für den Vergleich mit der Sperrliste der Landingpages (Wörter, die auf einer Seite nicht stehen dürfen).
  *
@@ -14,13 +11,14 @@
  * statt „a“, Vollbreit-Zeichen („ｇarantiert“). Auf dem Panel-Server gibt es keine Erweiterung `intl` (keine Klasse Normalizer); sie zu aktivieren wäre eine Änderung des Servers, und der Baukasten setzt sie ebenso wenig voraus. Diese Klasse
  * erledigt das in reinem PHP mit mbstring und PCRE, in kleinen Schritten, jeder mit genau einer Aufgabe.
  *
- * Was „dasselbe“ heißt (die drei Quellen der Gleichheit, jede im Test an einer Liste aus der Unicode-Datenbank geprüft, tests/fixtures/sperrliste-*.json):
+ * Was „dasselbe“ heißt (die vier Quellen der Gleichheit, jede im Test an einer Liste aus der Unicode-Datenbank geprüft, tests/fixtures/sperrliste-*.json):
  *  1 Kompatibilität (NFKC): Jedes Zeichen, das Unicode selbst zu EINEM ASCII-Buchstaben oder EINER Ziffer zerlegt — Vollbreit, mathematische und eingekreiste Schriften, hoch- und
  *    tiefgestellte Buchstaben, römische Ziffern, Letterlike Symbols (ℂ ℓ ℕ …) —, wird dieser Buchstabe. Vollbreit macht mbstring, die großen Blöcke rechnet schriftformen(),
  *    den Rest nennt KOMPAT.
  *  2 Kanonische Zerlegung (NFC = NFD): Ein Buchstabe mit Akzent oder Diaerese ist gleich dem Grundbuchstaben + kombinierendem Zeichen. Ohne `Normalizer` steht die Zuordnung in AKZENTE
  *    (für lateinische, griechische und kyrillische Buchstaben, erzeugt aus der Zerlegungstabelle von Unicode 13); dazu fällt jedes kombinierende Zeichen weg.
  *  3 Verwechslung: Zeichen anderer Schriften, die genauso aussehen wie ein lateinischer Buchstabe (VERWECHSLUNG). Kein Zeichen davon ist ein deutscher Buchstabe.
+ *  4 Zusatz ohne Zerlegung: lateinische Buchstaben mit Haken, Strich, Tilde, Schwanz … (ƒ ɠ ɨ ɍ ƭ), die Unicode nicht zerlegt — der Leser liest den Grundbuchstaben (HAKEN, rc1092).
  *
  * Was falten() macht (Reihenfolge ist Absicht; Text und Eintrag der Liste gehen durch dieselbe Faltung, also zählt nur, dass beide gleich enden):
  *   1 schriftformen      mathematische Buchstaben und Ziffern (𝗴𝗮𝗿𝗮…, auch Griechisch), eingekreiste/geklammerte/quadratische Buchstaben (ⓖⓐⓡ…) und „Outlined Latin“ → Buchstabe, nach Rechnung
@@ -37,10 +35,10 @@
  *   9 reihen             drei oder mehr EINZELNE Buchstaben hintereinander, getrennt durch je 1–3 Zeichen, die kein Buchstabe und keine Ziffer sind (g a r a n t …, g.a.r…, g - a - r …),
  *                        werden zu einem Wort — nach Schritt 8, damit „g - a - r“ (drei Zeichen Abstand) nur noch „g-a-r“ ist
  *  10 klein              Kleinschreibung samt Auffalten (MB_CASE_FOLD: ß → ss, ſ → s, ﬁ → fi)
- *  11 akzente            AKZENTE: ä/ö/ü/æ/œ → ae/oe/ue (so schreibt man Umlaute ohne Umlautzeichen), alle anderen Buchstaben mit Akzent, Haken oder Strich → der Buchstabe ohne
+ *  11 akzente            AKZENTE: ä/ö/ü/æ/œ → ae/oe/ue (so schreibt man Umlaute ohne Umlautzeichen), alle anderen Buchstaben mit Akzent, Haken oder Strich → der Buchstabe ohne; dazu HAKEN
  *  12 marken, 13 verwechslungen   noch einmal: das Auffalten kann selbst ein kombinierendes Zeichen oder ein griechisches Zeichen erzeugen (ΐ → ι + Zeichen)
  *
- * Lesarten: Zwei Dinge lassen sich auf zwei Arten lesen, und dann gelten beide (lesarten()): ein Hangul-Füller oder Braille-Leerzeichen mitten im Text (Lücke oder nichts?) und ein
+ * Lesarten: Zwei Dinge lassen sich auf zwei Arten lesen, und dann gelten beide (lesarten()): ein Hangul-Füller, Braille-Leerzeichen oder dünnes Leerzeichen (U+2009, U+200A) mitten im Text (Lücke oder nichts?) und ein
  * a/o/u mit einem Haufen Marken, unter denen eine Umlautmarke ist (Umlaut oder Zierrat im Zalgo-Text? — ein einzelnes ¨ ist ein Umlaut). Dazu die Lesart OHNE Zusammenziehen der
  * Buchstabenreihen, wenn der Text eine Reihe hatte. Ein Eintrag hat ebenso zwei Fassungen, mit und ohne Zusammenziehen (eintraege(): „u. a.“ aus einzelnen Buchstaben soll auch neben
  * anderen Einzelbuchstaben gefunden werden). Für Wendungen gibt es den Satzstrang (satzstrang(), je Lesart).
@@ -73,7 +71,7 @@ final class TextFaltung
     /** Längster Text in Bytes, der gefaltet wird — länger ist „nicht prüfbar“. Eine ganze Seite ist im Panel höchstens 64 KB groß, ein einzelnes Textfeld der Seite ist viel kürzer. */
     public const MAX_BYTES = 65536;
 
-    /** Lesart: Hangul-Füller und Braille-Leerzeichen sind Lücken, ein U+0308 ist kein Umlaut. */
+    /** Lesart: Hangul-Füller und Braille-Leerzeichen sind Lücken, dünne Leerzeichen (U+2009, U+200A) sind nichts, ein U+0308 ist kein Umlaut. */
     private const ALT = 1;
     /** Lesart: Buchstabenreihen bleiben, wie sie sind. */
     private const OHNE_REIHEN = 2;
@@ -89,10 +87,10 @@ final class TextFaltung
     private const PUNKTE = '~ ?([^' . self::B . '\p{N}\s]) ?~u';
     private const NICHT_BUCHSTABE = '~[^' . self::B . '\p{N}]+~u';
     /**
-     * Was einen Text mehrdeutig macht (Lesart ALT): ein Füller (Lücke oder nichts?) und ein a/o/u mit einem Haufen Marken (zwei oder mehr), unter denen eine Umlautmarke ist (Umlaut oder
+     * Was einen Text mehrdeutig macht (Lesart ALT): ein Füller oder ein dünnes Leerzeichen (Lücke oder nichts?) und ein a/o/u mit einem Haufen Marken (zwei oder mehr), unter denen eine Umlautmarke ist (Umlaut oder
      * Zierrat im Zalgo-Text?). Ein einzelnes ¨ darüber ist ein Umlaut, kein Zierrat — NFD sperrt also nicht anders als NFC.
      */
-    private const MEHRDEUTIG = '~[\x{115F}\x{1160}\x{2800}\x{3164}\x{FFA0}]|[aouAOU](?=[\p{Mn}\p{Me}]*[' . self::UMLAUTMARKE . '])[\p{Mn}\p{Me}]{2,}~u';
+    private const MEHRDEUTIG = '~[\x{115F}\x{1160}\x{2800}\x{3164}\x{FFA0}\x{2009}\x{200A}]|[aouAOU](?=[\p{Mn}\p{Me}]*[' . self::UMLAUTMARKE . '])[\p{Mn}\p{Me}]{2,}~u';
 
     /** Die 58 griechischen Zeichen jeder mathematischen Schrift U+1D6A8–1D7C9 in ihrer Reihenfolge (aus NFKD). */
     private const MATHE_GRIECHISCH = "\u{0391}\u{0392}\u{0393}\u{0394}\u{0395}\u{0396}\u{0397}\u{0398}\u{0399}\u{039A}\u{039B}\u{039C}\u{039D}\u{039E}\u{039F}\u{03A0}\u{03A1}\u{0398}\u{03A3}\u{03A4}\u{03A5}\u{03A6}\u{03A7}\u{03A8}\u{03A9}\u{2207}\u{03B1}\u{03B2}\u{03B3}\u{03B4}\u{03B5}\u{03B6}\u{03B7}\u{03B8}\u{03B9}\u{03BA}\u{03BB}\u{03BC}\u{03BD}\u{03BE}\u{03BF}\u{03C0}\u{03C1}\u{03C2}\u{03C3}\u{03C4}\u{03C5}\u{03C6}\u{03C7}\u{03C8}\u{03C9}\u{2202}\u{03B5}\u{03B8}\u{03BA}\u{03C6}\u{03C1}\u{03C0}";
@@ -469,6 +467,42 @@ final class TextFaltung
     ];
 
     /**
+     * Ersatz ← lateinische Buchstaben mit Haken, Strich, Balken, Tilde, Schwanz, Locke … (ƒ ɠ ɨ ɍ ƭ ɫ ꞓ …), die Unicode NICHT zerlegt (anders als á oder ñ: es gibt kein „f + Haken“, das NFD ergäbe) — für den Leser
+     * sind es die Grundbuchstaben, und ein Wort mit „ƒ“ statt „f“ liest sich wie das Wort. Erzeugt aus der Unicode-Datenbank (Python unicodedata, Unicode 13): alle Zeichen mit dem Namen LATIN SMALL|CAPITAL
+     * LETTER <Buchstabe> WITH <Zusatz>, die nicht zerlegbar sind (NFKD ist das Zeichen selbst), dazu ɵ (U+0275, BARRED O: so faltet das Auffalten Ɵ). tests/fixtures/sperrliste-haken.json hält alle Paare (auch die schon
+     * in AKZENTE stehenden ø đ ħ ł ŧ ǥ …), SL13 prüft jedes. Kein Zeichen ist ein deutscher Buchstabe, keines steht in einer anderen Tabelle. Ein Zeichen ab Unicode 14 fehlt (Stand: Python 3.9). Die Zeichen stehen als
+     * Nummern da, die Buchstaben daneben als Kommentar.
+     */
+    private const HAKEN = [
+        'a' => "\u{023A}\u{1D8F}\u{2C65}",   // Ⱥ ᶏ ⱥ
+        'b' => "\u{0181}\u{0182}\u{0183}\u{0243}\u{0253}\u{1D6C}\u{1D80}\u{A796}\u{A797}",   // Ɓ Ƃ ƃ Ƀ ɓ ᵬ ᶀ Ꞗ ꞗ
+        'c' => "\u{0187}\u{0188}\u{023B}\u{023C}\u{0255}\u{A792}\u{A793}\u{A794}\u{A7C4}",   // Ƈ ƈ Ȼ ȼ ɕ Ꞓ ꞓ ꞔ Ꞔ
+        'd' => "\u{0110}\u{018A}\u{018B}\u{018C}\u{0221}\u{0256}\u{0257}\u{1D6D}\u{1D81}\u{1D91}\u{A7C7}\u{A7C8}",   // Đ Ɗ Ƌ ƌ ȡ ɖ ɗ ᵭ ᶁ ᶑ Ꟈ ꟈ
+        'e' => "\u{0246}\u{0247}\u{1D92}\u{2C78}\u{AB34}",   // Ɇ ɇ ᶒ ⱸ ꬴ
+        'f' => "\u{0191}\u{0192}\u{1D6E}\u{1D82}\u{A798}\u{A799}",   // Ƒ ƒ ᵮ ᶂ Ꞙ ꞙ
+        'g' => "\u{0193}\u{01E4}\u{0260}\u{1D83}\u{A7A0}\u{A7A1}",   // Ɠ Ǥ ɠ ᶃ Ꞡ ꞡ
+        'h' => "\u{0126}\u{0266}\u{2C67}\u{2C68}\u{A795}\u{A7AA}",   // Ħ ɦ Ⱨ ⱨ ꞕ Ɦ
+        'i' => "\u{0197}\u{0268}\u{1D96}",   // Ɨ ɨ ᶖ
+        'j' => "\u{0248}\u{0249}\u{029D}\u{A7B2}",   // Ɉ ɉ ʝ Ʝ
+        'k' => "\u{0198}\u{0199}\u{1D84}\u{2C69}\u{2C6A}\u{A740}\u{A741}\u{A742}\u{A743}\u{A744}\u{A745}\u{A7A2}\u{A7A3}",   // Ƙ ƙ ᶄ Ⱪ ⱪ Ꝁ ꝁ Ꝃ ꝃ Ꝅ ꝅ Ꞣ ꞣ
+        'l' => "\u{0141}\u{019A}\u{0234}\u{023D}\u{026B}\u{026C}\u{026D}\u{1D85}\u{2C60}\u{2C61}\u{2C62}\u{A748}\u{A749}\u{A78E}\u{A7AD}\u{AB37}\u{AB38}\u{AB39}",   // Ł ƚ ȴ Ƚ ɫ ɬ ɭ ᶅ Ⱡ ⱡ Ɫ Ꝉ ꝉ ꞎ Ɬ ꬷ ꬸ ꬹ
+        'm' => "\u{0271}\u{1D6F}\u{1D86}\u{2C6E}\u{AB3A}",   // ɱ ᵯ ᶆ Ɱ ꬺ
+        'n' => "\u{019D}\u{019E}\u{0220}\u{0235}\u{0272}\u{0273}\u{1D70}\u{1D87}\u{A790}\u{A791}\u{A7A4}\u{A7A5}\u{AB3B}",   // Ɲ ƞ Ƞ ȵ ɲ ɳ ᵰ ᶇ Ꞑ ꞑ Ꞥ ꞥ ꬻ
+        'o' => "\u{00D8}\u{019F}\u{0275}\u{2C7A}\u{A74A}\u{A74B}\u{A74C}\u{A74D}",   // Ø Ɵ ɵ ⱺ Ꝋ ꝋ Ꝍ ꝍ
+        'p' => "\u{01A4}\u{01A5}\u{1D71}\u{1D7D}\u{1D88}\u{2C63}\u{A750}\u{A751}\u{A752}\u{A753}\u{A754}\u{A755}",   // Ƥ ƥ ᵱ ᵽ ᶈ Ᵽ Ꝑ ꝑ Ꝓ ꝓ Ꝕ ꝕ
+        'q' => "\u{024B}\u{02A0}\u{A756}\u{A757}\u{A758}\u{A759}",   // ɋ ʠ Ꝗ ꝗ Ꝙ ꝙ
+        'r' => "\u{024C}\u{024D}\u{027C}\u{027D}\u{027E}\u{1D72}\u{1D73}\u{1D89}\u{2C64}\u{A7A6}\u{A7A7}\u{AB49}",   // Ɍ ɍ ɼ ɽ ɾ ᵲ ᵳ ᶉ Ɽ Ꞧ ꞧ ꭉ
+        's' => "\u{023F}\u{0282}\u{1D74}\u{1D8A}\u{2C7E}\u{A7A8}\u{A7A9}\u{A7C5}\u{A7C9}\u{A7CA}",   // ȿ ʂ ᵴ ᶊ Ȿ Ꞩ ꞩ Ʂ Ꟊ ꟊ
+        't' => "\u{0166}\u{01AB}\u{01AC}\u{01AD}\u{01AE}\u{0236}\u{023E}\u{0288}\u{1D75}\u{2C66}",   // Ŧ ƫ Ƭ ƭ Ʈ ȶ Ⱦ ʈ ᵵ ⱦ
+        'u' => "\u{1D99}\u{A7B8}\u{A7B9}\u{AB4E}\u{AB52}",   // ᶙ Ꞹ ꞹ ꭎ ꭒ
+        'v' => "\u{01B2}\u{028B}\u{1D8C}\u{2C71}\u{2C74}\u{A75E}\u{A75F}",   // Ʋ ʋ ᶌ ⱱ ⱴ Ꝟ ꝟ
+        'w' => "\u{2C72}\u{2C73}",   // Ⱳ ⱳ
+        'x' => "\u{1D8D}\u{AB56}\u{AB57}\u{AB58}\u{AB59}",   // ᶍ ꭖ ꭗ ꭘ ꭙ
+        'y' => "\u{01B3}\u{01B4}\u{024E}\u{024F}\u{1EFE}\u{1EFF}\u{AB5A}",   // Ƴ ƴ Ɏ ɏ Ỿ ỿ ꭚ
+        'z' => "\u{01B5}\u{01B6}\u{0224}\u{0225}\u{0240}\u{0290}\u{0291}\u{1D76}\u{1D8E}\u{2C6B}\u{2C6C}\u{2C7F}\u{A7C6}",   // Ƶ ƶ Ȥ ȥ ɀ ʐ ʑ ᵶ ᶎ Ⱬ ⱬ Ɀ Ᶎ
+    ];
+
+    /**
      * Wie AKZENTE, aber VOR der Kleinschreibung (Schritt 2): Buchstaben mit Akzent, deren Grundbuchstabe als GROSSbuchstabe einen lateinischen vortäuscht (Έ = Ε + Akzent, Ε sieht aus
      * wie E; das kleine ε nicht) oder deren Auffalten sie in mehrere Zeichen zerlegt (ΰ). Nach der Kleinschreibung gingen sie verloren — und NFC = NFD gälte nicht. Erzeugt wie AKZENTE.
      */
@@ -630,7 +664,7 @@ final class TextFaltung
         if (strlen($text) > self::MAX_BYTES || !mb_check_encoding($text, 'UTF-8') || preg_match('~[\x{202A}-\x{202E}\x{2066}-\x{2069}]~u', $text) !== 0) {
             return null;   // die Richtungs-Steuerzeichen (LRE … RLO, LRI … PDI) kehren die Anzeige um: Die Reihenfolge, die der Leser sieht, ist nicht die im Text
         }
-        $t = ($lesart & self::ALT) !== 0 ? strtr($text, ["\u{115F}" => ' ', "\u{1160}" => ' ', "\u{2800}" => ' ', "\u{3164}" => ' ', "\u{FFA0}" => ' ', "\u{0308}" => '', "\u{0364}" => '', "\u{030B}" => '']) : $text;
+        $t = ($lesart & self::ALT) !== 0 ? strtr($text, ["\u{115F}" => ' ', "\u{1160}" => ' ', "\u{2800}" => ' ', "\u{3164}" => ' ', "\u{FFA0}" => ' ', "\u{2009}" => '', "\u{200A}" => '', "\u{0308}" => '', "\u{0364}" => '', "\u{030B}" => '']) : $text;
         foreach (self::SCHRITTE as $schritt) {
             if (($schritt === 'reihen' && ($lesart & self::OHNE_REIHEN) !== 0) || ($schritt === 'punkte' && ($lesart & self::OHNE_PUNKTE) !== 0)) {
                 continue;
@@ -753,7 +787,7 @@ final class TextFaltung
     /** 11: Umlaute zur Umschrift, Akzente und Striche weg. */
     private static function akzente(string $t): ?string
     {
-        return strtr($t, self::$akzente ??= self::karte(self::AKZENTE));
+        return strtr($t, self::$akzente ??= self::karte(self::AKZENTE) + self::karte(self::HAKEN));
     }
 
     /** @param array<int|string,string> $tabelle Ersatz => Zeichen (mehrere in einem String) @return array<string,string> Zeichen => Ersatz */
