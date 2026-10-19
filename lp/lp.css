@@ -37,7 +37,7 @@ body.lp-seite {
 }
 
 section.lp-block {
-  padding: var(--space-3xl) 0;
+  padding: var(--space-2xl) 0;   /* 3.54.3: 3 rem statt 4 rem — zwischen zwei Blöcken auf gleichem Grund 6 rem statt 8 rem (Martin, 19.10.2026: „zu groß“); unter 48 rem 2 rem, siehe unten */
   background: var(--bg);
 }
 
@@ -196,7 +196,7 @@ section.lp-block {
 section.lp-hero--bild-hinten {
   position: relative;
   overflow: hidden;
-  padding: var(--space-3xl) 0;
+  padding: var(--space-2xl) 0;
 }
 
 .lp-hero--bild-hinten .lp-block-innen {
@@ -690,7 +690,7 @@ section.lp-abschluss--akzent {
 /* Unter 48 rem war der Rhythmus der des Desktops: jeder Block 4 rem Innenabstand oben UND unten (zwischen zwei Blöcken auf gleichem Grund 8 rem Leere, mehr als ein halber
    Bildschirm), dazu 1,5 rem Raster-Abstand zwischen den Zeilen. Auf dem Handy sind es 2 rem je Block (4 rem zwischen zwei Blöcken; in einem getönten Band 2 rem) und 1 rem im Raster;
    die Überschrift behält einen etwas größeren Abstand nach unten (1,5 rem), damit sie zu ihrem Inhalt gehört. Alles über die Abstandsstufen: Die Voreinstellungen
-   compact/spacious (spacing/*.css) skalieren mit. Größere Bildschirme bleiben, wie sie waren. */
+   compact/spacious (spacing/*.css) skalieren mit. Ab 48 rem gilt der Wert oben (3 rem je Block seit 3.54.3, vorher 4 rem). */
 @media (max-width: 47.99rem) {
   section.lp-block,
   section.lp-hero--bild-hinten {

@@ -1,9 +1,9 @@
 <?php
 /**
- * Kompakter auf dem Handy (3.54.2): lp/lp.css verkleinert die Abstände unter 48 rem — und nur dort.
+ * Kompaktere Abstände (3.54.2 Handy, 3.54.3 auch ab 48 rem): lp/lp.css verkleinert die Blockabstände — unter 48 rem auf 2 rem, darüber auf 3 rem.
  *
  * Anlass: Martin, 19.10.2026, Bildschirmfoto einer Seite auf dem Handy: „die Abstände sind zu groß“. Jeder Block hatte 4 rem Innenabstand oben und unten (8 rem Leere
- * zwischen zwei Blöcken auf gleichem Grund) und 1,5 rem Raster-Abstand. Gemessen an der MUSTER-Seite bei 390 px: 3.433 px Höhe vorher, 3.017 px nachher; bei 768 px unverändert.
+ * zwischen zwei Blöcken auf gleichem Grund) und 1,5 rem Raster-Abstand. Gemessen an der MUSTER-Seite bei 390 px: 3.433 px Höhe vorher, 3.017 px nachher; bei 768 px unverändert. 3.54.3 (Martin, gleicher Tag, Bildschirmfoto am Computer: „auch hier die Abstände besser“): ab 48 rem 3 rem statt 4 rem.
  */
 
 declare(strict_types=1);
@@ -42,11 +42,13 @@ return [
             T::ok(preg_match('/' . preg_quote($stufe, '/') . ':\s*[0-9.]+rem;/', $base) === 1, "base.css definiert {$stufe}");
         }
     },
-    'größere Bildschirme bleiben, wie sie waren' => static function () use ($medienRumpf): void {
+    'ab 48 rem gelten 3 rem je Block (seit 3.54.3, vorher 4 rem), der Rest bleibt, wie er war' => static function () use ($medienRumpf): void {
         $css = (string) file_get_contents(H::wurzel() . '/lp/lp.css');
         $handy = (string) $medienRumpf($css, 'max-width: 47.99rem');
         $ohne = str_replace($handy, '', $css);
-        T::ok(preg_match('/section\.lp-block\s*\{\s*padding:\s*var\(--space-3xl\) 0;/', $ohne) === 1, 'außerhalb des Blocks gilt weiter 4 rem Innenabstand (--space-3xl)');
+        T::ok(preg_match('/section\.lp-block\s*\{\s*padding:\s*var\(--space-2xl\) 0;/', $ohne) === 1, 'außerhalb des Blocks gilt 3 rem Innenabstand (--space-2xl)');
+        T::ok(preg_match('/section\.lp-hero--bild-hinten\s*\{[^}]*padding:\s*var\(--space-2xl\) 0;/', $ohne) === 1, 'auch der Kopfbereich mit Bild dahinter hat 3 rem');
+        T::notContains($ohne, 'var(--space-3xl)', 'die 4 rem (--space-3xl) kommen im Stylesheet nicht mehr vor');
         T::ok(preg_match('/\.lp-block-innen\s*\{\s*display:\s*grid;\s*gap:\s*var\(--space-lg\);/', $ohne) === 1, 'außerhalb des Blocks gilt weiter 1,5 rem Raster-Abstand');
         T::ok(preg_match('/\.lp-hero \.lp-block-innen\s*\{\s*align-items:\s*center;\s*gap:\s*var\(--space-xl\);/', $ohne) === 1, 'außerhalb des Blocks gilt weiter 2 rem im Kopfbereich');
     },

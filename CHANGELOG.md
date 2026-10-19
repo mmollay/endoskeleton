@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.54.3] — 2026-10-19
+
+### Changed
+- **Landingpages: auch am Computer kompaktere Abstände** (`lp/lp.css`; Anlass: Martin, 19.10.2026, Bildschirmfoto am Computer zur Seite „Der Weg zum gesunden Pferd“: „auch hier die Abstände entsprechend besser“). Ab 48 rem hat jeder Block 3 rem Innenabstand (`--space-2xl`, auch beim Kopfbereich mit Bild dahinter) statt 4 rem — zwischen zwei Blöcken auf gleichem Grund 6 rem statt 8 rem. Unter 48 rem bleibt es bei den 2 rem aus 3.54.2. Gemessen an der MUSTER-Seite: bei 1280 px 2.925 → 2.704 px Höhe, bei 768 px 3.333 → 3.141 px, bei 390 px unverändert gegenüber 3.54.2 (3.017 px).
+- Das Musterbuch ist neu gebaut; Test `kompakt` prüft die neuen Werte (21 Prüfungen).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit die alten Abstände, bis sie neu gebaut werden.
+
 ## [3.54.2] — 2026-10-19
 
 ### Changed
