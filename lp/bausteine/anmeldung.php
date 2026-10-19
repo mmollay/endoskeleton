@@ -19,6 +19,10 @@ $felder = [
     'telefon'  => ['Telefon (freiwillig)', 'tel', 'tel', false, ''],
 ];
 ?>
+<?php
+/** Maskierter Text, in dem „E-Mail“ nicht am Bindestrich umbricht (3.54.4: „E-“ am Zeilenende und „Mail“ in der nächsten sah aus wie ein Fehler). */
+$mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-ohne-umbruch">E-Mail</span>', $k->e($t));
+?>
 <?= $k->oeffnen($b, $nr) ?>
 
 <div class="lp-block-innen container">
@@ -62,7 +66,7 @@ $felder = [
 <?php if ($ziel !== ''): ?>
 <noscript><p class="lp-anmeldung-hinweis"><?= $k->e($k->du('Nach dem Absenden bekommst du eine E-Mail von uns. Kommt keine an, schau bitte im Spam-Ordner nach und versuche es sonst noch einmal.', 'Nach dem Absenden bekommen Sie eine E-Mail von uns. Kommt keine an, sehen Sie bitte im Spam-Ordner nach und versuchen Sie es sonst noch einmal.')) ?></p></noscript>
 <?php endif ?>
-<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><?= $k->e($b['danke']) ?> <?= $k->e($k->du('Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.')) ?></p>
+<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><span class="lp-anmeldung-danke-text"><?= $mail($b['danke']) ?></span> <span class="lp-anmeldung-danke-nachsatz"><?= $mail($k->du('Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.')) ?></span></p>
 </form>
 </div>
 </section>

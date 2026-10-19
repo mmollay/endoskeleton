@@ -1,5 +1,5 @@
 {
-  "version": "3.54.3",
+  "version": "3.54.4",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -162,7 +162,7 @@
       "klassen": {
         "lp-anmeldung": "3.51.0", "lp-anmeldung--karte": "3.51.0", "lp-anmeldung--breit": "3.51.0", "lp-formular": "3.51.0",
         "lp-feld": "3.51.0", "lp-feld-fehler": "3.51.0", "lp-einwilligung": "3.51.0", "lp-anmeldung-hinweis": "3.51.0",
-        "lp-anmeldung-danke": "3.51.0", "lp-anmeldung-fehler": "3.51.0", "lp-anmeldung-danach": "3.52.0", "lp-anmeldung-plaetze": "3.52.0", "lp-anmeldung-voll": "3.52.0"
+        "lp-anmeldung-danke": "3.51.0", "lp-anmeldung-danke-text": "3.54.4", "lp-anmeldung-danke-nachsatz": "3.54.4", "lp-ohne-umbruch": "3.54.4", "lp-anmeldung-fehler": "3.51.0", "lp-anmeldung-danach": "3.52.0", "lp-anmeldung-plaetze": "3.52.0", "lp-anmeldung-voll": "3.52.0"
       },
       "varianten": ["karte", "breit"],
       "felder": {

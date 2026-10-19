@@ -241,7 +241,9 @@ function kontrastImBrowser(nur) {
           pruefe(oben >= 0 && unten <= hoehe, `${fall}: Meldung im sichtbaren Bereich (${oben}–${unten} px bei ${hoehe} px Höhe)`);
         }
         if (klasse) {
-          const schwach = await page.evaluate(kontrastImBrowser, `.${klasse}`);
+          // Seit 3.54.4 trägt die Danke-Meldung ihren Text in zwei Spannen (der <p> selbst hat keinen eigenen Textknoten mehr): gemessen werden die Spannen.
+          const ziel = klasse === 'lp-anmeldung-danke' ? '.lp-anmeldung-danke-text, .lp-anmeldung-danke-nachsatz' : `.${klasse}`;
+          const schwach = await page.evaluate(kontrastImBrowser, ziel);
           pruefe(schwach.length === 0, `${fall}: Kontrast der Meldung: ${schwach.join(' | ')}`);
         }
         await kontext.close();

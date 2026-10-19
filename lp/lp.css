@@ -624,6 +624,54 @@ section.lp-anmeldung {
   color: var(--error);
 }
 
+/* Danke nach der Anmeldung (3.54.4; Martin, 19.10.2026: „bitte besser formatieren“): ein Haken in der Hauptfarbe, daneben der Dank als Überschrift und der Zusatzsatz klein darunter —
+   vorher stand beides als ein fetter Block im Kasten. --heading und --text auf --lp-akzent, --text-on-primary auf --primary prüft die Kontrast-Matrix. */
+/* :not([hidden]): „display: grid“ ist bei gleicher Spezifität sonst stärker als „.lp-seite [hidden]“ — die Meldung stünde schon beim Laden da (der Browsertest ci/browser.js zeigt es). */
+.lp-formular .lp-anmeldung-danke {
+  padding: var(--space-md);
+  background: var(--lp-akzent);
+}
+
+.lp-formular .lp-anmeldung-danke:not([hidden]) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-md);
+  row-gap: var(--space-xs);
+}
+
+.lp-formular .lp-anmeldung-danke::before {
+  content: "✓";
+  content: "✓" / "";        /* der Haken ist Schmuck: Vorleseprogramme sagen ihn nicht an */
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.lp-anmeldung-danke-text {
+  grid-column: 2;
+  font-size: var(--fs-md);
+  line-height: 1.4;
+}
+
+.lp-anmeldung-danke-nachsatz {
+  grid-column: 2;
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.lp-ohne-umbruch {
+  white-space: nowrap;
+}
+
 .lp-formular .lp-anmeldung-plaetze {
   margin: 0;
   font-weight: 600;

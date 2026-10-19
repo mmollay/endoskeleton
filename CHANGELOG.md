@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.54.4] — 2026-10-19
+
+### Changed
+- **Anmeldung: die Danke-Meldung ist besser formatiert** (`lp/lp.css`, `lp/bausteine/anmeldung.php`; Anlass: Martin, 19.10.2026, Bildschirmfoto der Meldung nach der Anmeldung: „auch hier bitte, besser formatieren“). Vorher standen Dank und Zusatzsatz („Falls du schon angemeldet warst …“) als ein fetter Block im umrandeten Kasten, und „E-Mail“ brach am Bindestrich um („E-“ am Zeilenende). Jetzt: ein runder Haken in der Hauptfarbe (CSS-Zeichen, für Vorleseprogramme stumm), daneben der Dank in größerer Schrift und der Zusatzsatz klein und normal darunter, der Kasten in der Akzentfarbe (`--lp-akzent`) mit Rand in der Hauptfarbe. „E-Mail“ bleibt zusammen. Die Meldung bleibt ein `<p>` mit `role="status"` (Fokus und Ablauf in `lp.js` unverändert); Text und Reihenfolge sind gleich.
+- Neue Klassen: `lp-anmeldung-danke-text`, `lp-anmeldung-danke-nachsatz` (die zwei Sätze der Meldung) und `lp-ohne-umbruch` (hält „E-Mail“ zusammen).
+- Kontrast: `--heading`/`--text` auf `--lp-akzent` und `--text-on-primary` auf `--primary` stehen schon in der Farbpaar-Matrix des Katalogs — kein neues Paar.
+- Das Musterbuch ist neu gebaut; Test `danke` prüft Markup und Regeln (auch: `display: grid` nur mit `:not([hidden])` — der Browsertest hatte gezeigt, dass die Meldung sonst schon beim Laden sichtbar war). Der Browsertest `ci/browser.js` misst den Kontrast jetzt an den zwei Spannen (391 Prüfungen grün).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit die alte Meldung, bis sie neu gebaut werden.
+
 ## [3.54.3] — 2026-10-19
 
 ### Changed
