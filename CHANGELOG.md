@@ -4,6 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.54.2] — 2026-10-19
+
+### Changed
+- **Landingpages: kompakter auf dem Handy** (`lp/lp.css`, neuer Abschnitt „KOMPAKTER AUF DEM HANDY“ in `@media (max-width: 47.99rem)`; Anlass: Martin, 19.10.2026, Bildschirmfoto einer MUSTER-Seite: „die Abstände sind zu groß“). Unter 48 rem hatte jeder Block 4 rem Innenabstand oben UND unten — zwischen zwei Blöcken auf gleichem Grund 8 rem Leere — und 1,5 rem Raster-Abstand. Jetzt: 2 rem je Block (`--space-xl`, auch beim Kopfbereich mit Bild dahinter), 1 rem im Raster (`--space-md`), 1,5 rem zwischen Text und Bild des Kopfbereichs, die Überschrift behält 0,5 rem Abstand nach unten. Nur Abstandsstufen: die Voreinstellungen compact/spacious skalieren mit. Ab 48 rem ändert sich nichts. Gemessen an der MUSTER-Seite „Der Weg zum gesunden Pferd“: bei 390 px 3.433 → 3.017 px Höhe, bei 360 px 3.493 → 3.077 px, bei 768 px unverändert (3.333 px).
+- Das Musterbuch (`musterbuch/`) ist neu gebaut (`php ci/musterbuch-bauen.php`): `es/lp.css` und die Versionszeile im Kopf ändern sich.
+- Test `kompakt` (Block unter 48 rem mit genau diesen Werten, Stufen vorhanden, außerhalb des Blocks gilt der alte Wert, Reihenfolge im Stylesheet).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit die alten Abstände, bis sie neu gebaut werden.
+
 ## [3.54.1] — 2026-10-11
 
 ### Fixed

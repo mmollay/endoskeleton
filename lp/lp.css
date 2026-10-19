@@ -686,6 +686,31 @@ section.lp-abschluss--akzent {
   justify-self: center;
 }
 
+/* ─── KOMPAKTER AUF DEM HANDY ───────────────────────────────────────────── */
+/* Unter 48 rem war der Rhythmus der des Desktops: jeder Block 4 rem Innenabstand oben UND unten (zwischen zwei Blöcken auf gleichem Grund 8 rem Leere, mehr als ein halber
+   Bildschirm), dazu 1,5 rem Raster-Abstand zwischen den Zeilen. Auf dem Handy sind es 2 rem je Block (4 rem zwischen zwei Blöcken; in einem getönten Band 2 rem) und 1 rem im Raster;
+   die Überschrift behält einen etwas größeren Abstand nach unten (1,5 rem), damit sie zu ihrem Inhalt gehört. Alles über die Abstandsstufen: Die Voreinstellungen
+   compact/spacious (spacing/*.css) skalieren mit. Größere Bildschirme bleiben, wie sie waren. */
+@media (max-width: 47.99rem) {
+  section.lp-block,
+  section.lp-hero--bild-hinten {
+    padding: var(--space-xl) 0;
+  }
+
+  .lp-block .lp-block-innen {
+    gap: var(--space-md);
+  }
+
+  .lp-block .lp-block-innen > h1,
+  .lp-block .lp-block-innen > h2 {
+    margin-bottom: var(--space-sm);
+  }
+
+  .lp-hero .lp-block-innen {
+    gap: var(--space-lg);
+  }
+}
+
 /* ─── WENIGER BEWEGUNG ──────────────────────────────────────────────────── */
 /* base.css setzt die Dauer nur über „*" — .btn (transition: … 0.2s) ist spezifischer und gewinnt dort. */
 @media (prefers-reduced-motion: reduce) {
