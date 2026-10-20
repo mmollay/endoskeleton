@@ -16,7 +16,13 @@ final class Profil
     public const SCHRIFTEN = ['--font-body', '--font-heading'];
 
     private const SCHLUESSEL = ['format', 'name', 'version', 'sprache', 'anrede', 'vorschlag', 'firma', 'logo', 'einwilligung',
-        'formularziel', 'link_hosts', 'sperrliste', 'grenzwoerter'];
+        'einwilligung_newsletter', 'formularziel', 'link_hosts', 'sperrliste', 'grenzwoerter'];
+
+    /**
+     * Der Wortlaut des freiwilligen Newsletter-Häkchens (3.55.0), wenn das Profil keinen eigenen (`einwilligung_newsletter`) hat; `%s` ist der Name der
+     * Marke. Die Pflicht-Einwilligung (`einwilligung`) deckt seit 3.55.0 nur Zugangslink und Erinnerung — das Panel prüft beide Texte über ihre Kurzsumme.
+     */
+    public const NEWSLETTER_STANDARD = 'Ja, ich möchte zusätzlich Neuigkeiten von %s per E-Mail bekommen. Jederzeit abbestellbar.';
     private const FIRMA = ['name', 'strasse', 'plz_ort', 'land', 'email', 'telefon', 'uid', 'firmenbuch'];
     private const RECHTSTEXTE = ['impressum' => 'Das Impressum', 'datenschutz' => 'Die Datenschutzerklärung'];
     private const WO = 'Kundenprofil';
@@ -159,6 +165,10 @@ final class Profil
         if (!self::text($d['einwilligung'] ?? null) || mb_strlen($d['einwilligung']) < 20 || mb_strlen($d['einwilligung']) > 600) {
             $fehler('einwilligung', 'einwilligung muss 20–600 Zeichen haben', 'Der Einwilligungstext für das Formular fehlt oder ist zu lang.');
         }
+        if (array_key_exists('einwilligung_newsletter', $d)
+            && (!self::text($d['einwilligung_newsletter']) || mb_strlen($d['einwilligung_newsletter']) < 20 || mb_strlen($d['einwilligung_newsletter']) > 600)) {
+            $fehler('einwilligung_newsletter', 'einwilligung_newsletter muss fehlen oder 20–600 Zeichen haben', 'Der Text des Newsletter-Häkchens ist leer oder zu lang.');
+        }
         $ziel = $d['formularziel'] ?? null;
         if (!is_string($ziel) || ($ziel !== '' && !Text::https($ziel, $this->hosts()))) {
             $fehler('formularziel', 'formularziel muss leer oder https auf einen Host aus link_hosts sein (ohne Benutzer, ohne Port)', 'Das Formularziel muss leer oder eine sichere Adresse (https) auf einer freigegebenen Website sein.');
@@ -258,6 +268,22 @@ final class Profil
     private static function text(mixed $w): bool
     {
         return is_string($w) && trim($w) !== '';
+    }
+
+    /**
+     * Der Wortlaut des freiwilligen Newsletter-Häkchens: `einwilligung_newsletter` des Profils, sonst NEWSLETTER_STANDARD mit dem Namen der Marke.
+     * Immer getrimmt — die Kurzsumme (versteckt im Formular, geprüft im Panel) hängt an genau diesen Zeichen.
+     *
+     * @param array<string, mixed> $daten profil.json
+     */
+    public static function newsletterText(array $daten): string
+    {
+        $eigen = $daten['einwilligung_newsletter'] ?? null;
+        if (self::text($eigen)) {
+            return trim($eigen);
+        }
+        $name = trim((string) ($daten['name'] ?? ''));
+        return sprintf(self::NEWSLETTER_STANDARD, $name !== '' ? $name : 'uns');
     }
 
     private static function ohneKommentare(string $css): string

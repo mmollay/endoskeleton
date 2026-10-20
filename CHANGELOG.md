@@ -4,6 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.55.0] — 2026-10-20
+
+### Added
+- **Anmeldung: zwei Häkchen statt eines** (`lp/bausteine/anmeldung.php`, `lp/src/Profil.php`, `lp/src/Pruefer.php`, `lp/bausteine.json`, `lp/lp.css`; Anlass: Martin, 19./20.10.2026: „zwei Häkchen: eines für den Newsletter und das andere ohne Newsletter“ — bisher war der Newsletter Bedingung für die Anmeldung, Kopplungsverbot Art. 7 Abs. 4 DSGVO). Das Pflicht-Häkchen `einwilligung` (Text `einwilligung` des Profils, wie bisher `required`, nie vorangehakt) deckt nur noch Zugangslink und Erinnerung. Neu darunter das **freiwillige** Häkchen `newsletter` (Wert `ja`, nie `required`, nie vorangehakt, im Label das Wort „(freiwillig)“ — nicht nur eine Farbe) mit eigenem Wortlaut: `einwilligung_newsletter` des Profils (neues, freiwilliges Profilfeld, 20–600 Zeichen), sonst der Standard `Profil::NEWSLETTER_STANDARD` „Ja, ich möchte zusätzlich Neuigkeiten von <Name der Marke> per E-Mail bekommen. Jederzeit abbestellbar.“ (`Profil::newsletterText`). Die Kurzsumme dieses Wortlauts (erste 12 Hex-Zeichen von sha256) geht als verstecktes Feld `newsletter_kurz` mit — das Panel legt für den Newsletter einen eigenen Nachweis mit eigenem Wortlaut an.
+- **Nur mit Ziel:** Das zweite Häkchen steht nur, wenn der Bauplan in der Anmeldung `"newsletter": true` trägt (neues Feld `newsletter`, `janein`, fehlt = kein Häkchen). Das setzt das Panel beim Bau, wenn für die Seite eine allgemeine Newsletter-Gruppe gewählt ist — kein Häkchen ohne Ziel. Ohne das Feld ist das Formular Byte für Byte wie in 3.54.4 (gleiche Felder `einwilligung`, `einwilligung_kurz`); ältere Weiterleitungsstellen verstehen es weiter.
+- **Prüfer:** Ein Newsletter-Häkchen mit `required` oder `checked` oder ohne `newsletter_kurz` sperrt (`Newsletter-Häkchen als Pflicht`, `… vorangehakt`, `newsletter_kurz fehlt`). Die Pflicht-Einwilligung wird weiter wie bisher geprüft.
+- Neue Klassen: `lp-einwilligung--freiwillig` (Hülle des freiwilligen Häkchens), `lp-freiwillig` (das Wort „(freiwillig)“, gedämpft, ohne Umbruch). Vertrag an die Weiterleitungsstelle: zusätzlich zu den bisherigen Feldern `newsletter=ja` (nur wenn angehakt) und `newsletter_kurz` (immer, wenn das Häkchen da ist).
+- Musterbuch `anmeldung--karte` zeigt beide Häkchen (Testprofil mit `einwilligung_newsletter`), `anmeldung--breit` weiter nur eines; `lp/SKILL.md` und `lp/werkstatt.md` neu erzeugt. Tests: `bausteine` (Markup, Reihenfolge, Kurzsummen, Standardwortlaut, Sie-Form, `false`), `pruefen` (vier Sperren), `profil` (Feldregeln, `newsletterText`), `schema` (`newsletter` nur ja/nein); Browsertest `ci/browser.js`: beide Häkchen bei 360/390/1280 px sichtbar und bedienbar, Absenden nur mit Häkchen 1 (Newsletter allein genügt nicht), Newsletter nie `aria-invalid`, per Tab und Leertaste erreichbar, Kontrast hell und dunkel, ohne `newsletter` nur ein Häkchen.
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit das alte Formular mit einem Häkchen, bis sie neu gebaut werden. Der Wortlaut der Pflicht-Einwilligung steht im Profil des Kunden (`einwilligung`) — dort muss „und Neuigkeiten“ heraus, damit das Pflicht-Häkchen wirklich nur Zugangslink und Erinnerung deckt.
+
 ## [3.54.4] — 2026-10-19
 
 ### Changed

@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.54.4 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.55.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3537,6 +3537,12 @@ section.lp-anmeldung {
 
 .lp-einwilligung .lp-feld-fehler {
   grid-column: 2;
+}
+
+/* Freiwilliges Newsletter-Häkchen (3.55.0): optisch wie die Pflicht-Einwilligung, dazu das Wort „(freiwillig)“ im Label — kein Unterschied nur über Farbe. */
+.lp-freiwillig {
+  white-space: nowrap;
+  color: var(--text-muted);
 }
 
 .lp-anmeldung-hinweis {

@@ -141,6 +141,52 @@ return [
         T::eq($x->query('//fieldset[@disabled]')->length, 0, 'mit Ziel nicht gesperrt');
         T::notContains($h, 'wird gerade eingerichtet', 'kein Hinweis');
     },
+    'anmeldung: zwei Häkchen (3.55.0) — Newsletter nur mit "newsletter": true, nie Pflicht, nie vorangehakt, eigene Kurzsumme' => static function () use ($bau, $profilMit): void {
+        // ohne newsletter im Bauplan: kein zweites Häkchen, keine zweite Kurzsumme — das Formular ist wie bisher
+        [$h, $x] = $bau(H::seite());
+        T::eq($x->query('//input[@name="newsletter"]')->length, 0, 'ohne "newsletter": kein Häkchen');
+        T::eq($x->query('//input[@name="newsletter_kurz"]')->length, 0, 'ohne "newsletter": keine Kurzsumme');
+        T::notContains($h, 'lp-einwilligung--freiwillig', 'ohne "newsletter": keine Klasse des freiwilligen Häkchens');
+
+        $s = H::seite();
+        $s['bausteine'][1]['newsletter'] = true;
+        [$h, $x] = $bau($s);
+        $nl = $x->query('//input[@name="newsletter"]')->item(0);
+        T::ok($nl !== null && $nl->getAttribute('type') === 'checkbox' && $nl->getAttribute('value') === 'ja', 'Newsletter-Häkchen: checkbox, Wert ja');
+        T::ok($nl !== null && !$nl->hasAttribute('required'), 'Newsletter-Häkchen ist keine Pflicht (Kopplungsverbot)');
+        T::ok($nl !== null && !$nl->hasAttribute('checked'), 'Newsletter-Häkchen nie vorangehakt');
+        $label = $x->query('//label[@for="' . $nl?->getAttribute('id') . '"]')->item(0);
+        T::eq($x->query('//label[@for="' . $nl?->getAttribute('id') . '"]')->length, 1, 'Newsletter-Häkchen: genau ein Label');
+        T::contains((string) $label?->textContent, 'Ja, ich möchte zusätzlich Neuigkeiten der Beispiel Akademie per E-Mail bekommen. Jederzeit abbestellbar.', 'Wortlaut aus dem Profil (einwilligung_newsletter)');
+        T::contains((string) $label?->textContent, '(freiwillig)', 'als freiwillig beschriftet, nicht nur über Farbe');
+        T::eq($x->query('//*[contains(@class,"lp-einwilligung--freiwillig")]//input[@name="newsletter"]')->length, 1, 'Klasse des freiwilligen Häkchens');
+        $ein = $x->query('//input[@name="einwilligung"]')->item(0);
+        T::ok($ein !== null && $ein->hasAttribute('required') && !$ein->hasAttribute('checked'), 'Pflicht-Häkchen bleibt Pflicht und nie vorangehakt');
+        // Reihenfolge: Pflicht zuerst, dann das freiwillige, dann der Honigtopf
+        T::ok(strpos($h, 'name="einwilligung"') < strpos($h, 'name="newsletter"') && strpos($h, 'name="newsletter"') < strpos($h, 'class="form-hp"'), 'Reihenfolge Pflicht → freiwillig → Honigtopf');
+        $profil = json_decode((string) file_get_contents(H::testprofil() . '/profil.json'), true);
+        T::eq($x->query('//input[@type="hidden" and @name="newsletter_kurz" and @value="' . substr(hash('sha256', $profil['einwilligung_newsletter']), 0, 12) . '"]')->length, 1, 'Kurzsumme des Newsletter-Wortlauts');
+        T::eq($x->query('//input[@type="hidden" and @name="einwilligung_kurz" and @value="' . substr(hash('sha256', $profil['einwilligung']), 0, 12) . '"]')->length, 1, 'Kurzsumme der Pflicht-Einwilligung unverändert');
+        T::ok(substr(hash('sha256', $profil['einwilligung_newsletter']), 0, 12) !== substr(hash('sha256', $profil['einwilligung']), 0, 12), 'zwei verschiedene Kurzsummen');
+        T::eq($x->query('//*[@id="lp-f-newsletter-fehler"]')->length, 0, 'kein Fehlertext für ein freiwilliges Häkchen');
+
+        // ohne eigenen Text im Profil: der Standardwortlaut mit dem Namen der Marke
+        [$h, $x] = $bau($s, $profilMit(static function ($j) { unset($j['einwilligung_newsletter']); return $j; }));
+        $nl = $x->query('//input[@name="newsletter"]')->item(0);
+        $text = sprintf(Endo\Lp\Profil::NEWSLETTER_STANDARD, 'Testprofil');
+        T::contains((string) $x->query('//label[@for="' . $nl?->getAttribute('id') . '"]')->item(0)?->textContent, $text, 'Standardwortlaut mit dem Namen der Marke');
+        T::eq($x->query('//input[@type="hidden" and @name="newsletter_kurz" and @value="' . substr(hash('sha256', $text), 0, 12) . '"]')->length, 1, 'Kurzsumme des Standardwortlauts');
+        T::eq($text, 'Ja, ich möchte zusätzlich Neuigkeiten von Testprofil per E-Mail bekommen. Jederzeit abbestellbar.', 'der Standardwortlaut (Freigabe Martin)');
+
+        // Sie-Form: das Häkchen steht ebenso, der Text kommt unverändert aus dem Profil
+        [$h, $x] = $bau($s, $profilMit(static fn ($j) => ['anrede' => 'Sie'] + $j));
+        T::eq($x->query('//input[@name="newsletter" and not(@required)]')->length, 1, 'auch in der Sie-Form freiwillig');
+
+        // "newsletter": false wirkt wie fehlend
+        $s['bausteine'][1]['newsletter'] = false;
+        [$h, $x] = $bau($s);
+        T::eq($x->query('//input[@name="newsletter"]')->length, 0, '"newsletter": false — kein Häkchen');
+    },
     'anmeldung ohne Formularziel: sichtbar gesperrt' => static function () use ($bau, $profilMit): void {
         [$h, $x] = $bau(H::seite(), $profilMit(static fn ($j) => ['formularziel' => ''] + $j));
         T::eq($x->query('//form[contains(@class,"lp-formular")]/fieldset[@disabled]')->length, 1, 'Felder gesperrt');

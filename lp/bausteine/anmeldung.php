@@ -9,9 +9,17 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  * Meldung „bereits angemeldet“ gibt es nicht (Datenschutz: die Seite verrät nicht, ob eine Adresse schon auf der Liste
  * steht) — der feste Zusatzsatz nach dem Dankestext deckt diesen Fall mit ab. Ohne JavaScript bleibt es beim Formular,
  * ein <noscript>-Hinweis erklärt den Ablauf per E-Mail. @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ *
+ * Zwei Häkchen (3.55.0, Martin 20.10.2026; Kopplungsverbot Art. 7 Abs. 4 DSGVO): Das Pflicht-Häkchen `einwilligung` deckt nur Zugangslink und
+ * Erinnerung (Text `einwilligung` des Profils). Das freiwillige Häkchen `newsletter` (nie Pflicht, nie vorangehakt, als „freiwillig“ beschriftet) steht
+ * nur, wenn der Bauplan `"newsletter": true` trägt — das setzt das Panel, wenn für die Seite eine allgemeine Newsletter-Gruppe gewählt ist (kein Häkchen
+ * ohne Ziel). Sein Text kommt aus `einwilligung_newsletter` des Profils, sonst aus Profil::NEWSLETTER_STANDARD mit dem Namen der Marke; die Kurzprüfsumme
+ * dieses Wortlauts geht als verstecktes Feld `newsletter_kurz` mit (eigener Nachweis mit eigenem Wortlaut im Panel). Ohne `newsletter` ist das Formular
+ * Byte für Byte wie bisher — ältere Weiterleitungsstellen verstehen es weiter.
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
+$newsletterText = ($b['newsletter'] ?? false) === true ? Endo\Lp\Profil::newsletterText($p) : '';
 $felder = [
     'vorname'  => ['Vorname', 'text', 'given-name', true, $k->du('Bitte gib deinen Vornamen ein.', 'Bitte geben Sie Ihren Vornamen ein.')],
     'nachname' => ['Nachname', 'text', 'family-name', true, $k->du('Bitte gib deinen Nachnamen ein.', 'Bitte geben Sie Ihren Nachnamen ein.')],
@@ -55,12 +63,21 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <label for="lp-f-einwilligung"><?= $k->e($p['einwilligung']) ?> Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</label>
 <p class="lp-feld-fehler" id="lp-f-einwilligung-fehler" hidden><?= $k->e($k->du('Bitte bestätige die Einwilligung.', 'Bitte bestätigen Sie die Einwilligung.')) ?></p>
 </div>
+<?php if ($newsletterText !== ''): ?>
+<div class="lp-feld lp-einwilligung lp-einwilligung--freiwillig">
+<input id="lp-f-newsletter" name="newsletter" type="checkbox" value="ja">
+<label for="lp-f-newsletter"><?= $mail($newsletterText) ?> <span class="lp-freiwillig">(freiwillig)</span></label>
+</div>
+<?php endif ?>
 <div class="form-hp" aria-hidden="true">
 <label for="lp-f-website">Website</label>
 <input id="lp-f-website" name="website" type="text" tabindex="-1" autocomplete="off">
 </div>
 <input type="hidden" name="liste" value="<?= $k->e($b['liste']) ?>">
 <input type="hidden" name="einwilligung_kurz" value="<?= substr(hash('sha256', (string) $p['einwilligung']), 0, 12) ?>">
+<?php if ($newsletterText !== ''): ?>
+<input type="hidden" name="newsletter_kurz" value="<?= substr(hash('sha256', $newsletterText), 0, 12) ?>">
+<?php endif ?>
 <button type="submit" class="btn btn-primary lp-knopf"><?= $k->e($b['knopf_text']) ?></button>
 </fieldset>
 <?php if ($ziel !== ''): ?>

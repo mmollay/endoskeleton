@@ -17,6 +17,7 @@
   },
   "logo": { "datei": "logo.svg", "alt": "Beispiel Akademie", "breite": 180, "hoehe": 48 },
   "einwilligung": "Ja, ich möchte die Zugangsdaten und Neuigkeiten der Beispiel Akademie per E-Mail bekommen. Diese Einwilligung kann ich jederzeit widerrufen.",
+  "einwilligung_newsletter": "Ja, ich möchte zusätzlich Neuigkeiten der Beispiel Akademie per E-Mail bekommen. Jederzeit abbestellbar.",
   "formularziel": "https://beispiel.invalid/anmelden",
   "link_hosts": ["www.example.com", "beispiel.invalid"],
   "sperrliste": ["garantiert geheilt"],

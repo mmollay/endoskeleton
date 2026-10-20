@@ -63,6 +63,11 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Datenschutz: Die Seite verrät nie, ob eine Adresse schon auf der Liste steht — keine Meldung „bereits angemeldet“.
   Ein `?anmeldung=bereits` (älterer Stand der Weiterleitungsstelle) zeigt `lp.js` genau wie `ok`.
 - Die Anmeldung trägt immer `"anker": "anmeldung"` (Ziel des Rücksprungs); sonst sperrt die Prüfung.
+- Zwei Häkchen (3.55.0): Die Pflicht-Einwilligung (`einwilligung` des Profils) deckt nur Zugangslink und Erinnerung.
+  Trägt die Anmeldung `"newsletter": true`, steht darunter ein zweites, freiwilliges Häkchen `newsletter` (nie Pflicht, nie
+  vorangehakt, „(freiwillig)“ im Label) mit dem Text `einwilligung_newsletter` des Profils, sonst „Ja, ich möchte zusätzlich
+  Neuigkeiten von <Name> per E-Mail bekommen. Jederzeit abbestellbar.“; seine Kurzsumme geht als `newsletter_kurz` mit.
+  `newsletter` setzt der Betreiber (das Panel, wenn eine Newsletter-Gruppe gewählt ist) — nie selbst setzen oder entfernen.
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
 ## Einen Baustein hinzufügen (wie GRIDKit)
@@ -82,7 +87,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.54.4)
+## Bausteine (Katalog 3.55.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -253,7 +258,7 @@ Varianten: `standard` · seit 3.51.0, geändert 3.51.0 · höchstens 1-mal
 
 ### `anmeldung` — Anmeldung
 
-Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.52.0 · höchstens 1-mal
+Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.55.0 · höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -265,6 +270,7 @@ Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.52.0 · höchstens 1-mal
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
 | `plaetze` | zahl | – | 1–10000; fehlt: unbegrenzt |
+| `newsletter` | janein | – | `true` / `false`; fehlt: kein Newsletter-Häkchen |
 
 ```json
 {

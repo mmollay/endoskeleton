@@ -145,6 +145,7 @@ function kontrastImBrowser(nur) {
     pruefe(leer.fokus === 'lp-f-vorname', `Fokus auf dem ersten Fehlerfeld (${leer.fokus})`);
     pruefe(['vorname', 'email', 'einwilligung'].every((n) => leer.ungueltig.includes(n)), `aria-invalid an allen Pflichtfeldern (${leer.ungueltig})`);
     pruefe(leer.fehlerSichtbar, 'Fehlertext sichtbar');
+    pruefe(!leer.ungueltig.includes('newsletter'), `das freiwillige Newsletter-Häkchen wird nie als ungültig markiert (${leer.ungueltig})`);
     await page.fill('#lp-f-vorname', 'Anna');
     await page.fill('#lp-f-email', 'keine-adresse');
     await page.click('.lp-formular button[type="submit"]');
@@ -155,6 +156,70 @@ function kontrastImBrowser(nur) {
     await page.click('.lp-formular button[type="submit"]');
     pruefe(await page.evaluate(() => document.querySelectorAll('[aria-invalid="true"]').length) === 0, 'vollständig ausgefüllt: keine Fehler');
     pruefe(await page.evaluate(() => !document.getElementById('lp-f-vorname').hasAttribute('aria-describedby')), 'nach der Korrektur keine Fehlerbeschreibung mehr');
+    pruefe(await page.evaluate(() => !document.getElementById('lp-f-newsletter').checked), 'das Newsletter-Häkchen blieb dabei leer — Absenden braucht es nicht');
+    await kontext.close();
+  }
+
+  // Zwei Häkchen (3.55.0): Pflicht-Einwilligung und freiwilliger Newsletter — sichtbar, bedienbar, nie gekoppelt; ohne "newsletter" im Bauplan nur eines
+  for (const breite of [360, 390, 1280]) {
+    const { page, kontext } = await oeffnen(browser, 'anmeldung--karte', breite);
+    const lage = await page.evaluate(() => {
+      const ein = document.getElementById('lp-f-einwilligung'), nl = document.getElementById('lp-f-newsletter');
+      const sichtbar = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+      const label = (e) => document.querySelector(`label[for="${e.id}"]`);
+      return {
+        beide: !!ein && !!nl && sichtbar(ein) && sichtbar(nl) && sichtbar(label(ein)) && sichtbar(label(nl)),
+        einPflicht: !!ein && ein.required && !ein.checked, nlFrei: !!nl && !nl.required && !nl.checked,
+        nlUnterEin: !!ein && !!nl && nl.getBoundingClientRect().top > ein.getBoundingClientRect().top,
+        freiwillig: !!nl && /\(freiwillig\)/.test(label(nl).textContent),
+        nlText: nl ? label(nl).textContent.replace(/\s+/g, ' ').trim() : '',
+        kasten: nl ? nl.getBoundingClientRect().width : 0,
+      };
+    });
+    pruefe(lage.beide, `@${breite}: beide Häkchen samt Beschriftung sichtbar`);
+    pruefe(lage.einPflicht && lage.nlFrei, `@${breite}: Einwilligung Pflicht, Newsletter freiwillig, beide leer`);
+    pruefe(lage.nlUnterEin, `@${breite}: Newsletter-Häkchen steht unter der Pflicht-Einwilligung`);
+    pruefe(lage.freiwillig, `@${breite}: Newsletter als „(freiwillig)“ beschriftet`);
+    pruefe(lage.nlText.startsWith('Ja, ich möchte zusätzlich Neuigkeiten der Beispiel Akademie per E-Mail bekommen. Jederzeit abbestellbar.'), `@${breite}: Wortlaut (${lage.nlText})`);
+    pruefe(lage.kasten >= 18, `@${breite}: Häkchen groß genug (${lage.kasten}px)`);
+    // Absenden nur mit Häkchen 1: alles ausgefüllt, Newsletter leer → kein Fehler; Häkchen 1 leer → Fehler dort, auch wenn Newsletter angehakt ist
+    await page.evaluate(() => document.querySelector('.lp-formular').addEventListener('submit', (e) => e.preventDefault()));
+    await page.fill('#lp-f-vorname', 'Anna');
+    await page.fill('#lp-f-email', 'anna@beispiel.invalid');
+    await page.check('#lp-f-newsletter');
+    await page.click('.lp-formular button[type="submit"]');
+    const nurNl = await page.evaluate(() => ({ fokus: document.activeElement.id, ungueltig: [...document.querySelectorAll('[aria-invalid="true"]')].map((e) => e.name) }));
+    pruefe(nurNl.ungueltig.join() === 'einwilligung' && nurNl.fokus === 'lp-f-einwilligung', `@${breite}: Newsletter allein genügt nicht — Fehler an der Pflicht-Einwilligung (${nurNl.ungueltig}, Fokus ${nurNl.fokus})`);
+    pruefe(await page.evaluate(() => !document.getElementById('lp-f-einwilligung-fehler').hidden), `@${breite}: Fehlertext der Pflicht-Einwilligung sichtbar`);
+    await page.uncheck('#lp-f-newsletter');
+    await page.check('#lp-f-einwilligung');
+    await page.click('.lp-formular button[type="submit"]');
+    pruefe(await page.evaluate(() => document.querySelectorAll('[aria-invalid="true"]').length) === 0, `@${breite}: mit Häkchen 1 und ohne Newsletter: keine Fehler`);
+    // Tastatur: das Newsletter-Häkchen ist per Tab erreichbar und mit der Leertaste schaltbar
+    await page.focus('#lp-f-einwilligung');
+    const halte = [];
+    for (let i = 0; i < 3 && halte[halte.length - 1] !== 'lp-f-newsletter'; i++) {
+      await page.keyboard.press('Tab');
+      halte.push(await page.evaluate(() => document.activeElement.id || document.activeElement.tagName.toLowerCase()));
+    }
+    pruefe(halte.join(' → ') === 'a → lp-f-newsletter', `@${breite}: Tab von der Einwilligung über den Datenschutz-Link zum Newsletter-Häkchen (${halte.join(' → ')})`);
+    await page.keyboard.press('Space');
+    pruefe(await page.evaluate(() => document.getElementById('lp-f-newsletter').checked), `@${breite}: Leertaste hakt den Newsletter an`);
+    await page.keyboard.press('Space');
+    pruefe(await page.evaluate(() => !document.getElementById('lp-f-newsletter').checked), `@${breite}: Leertaste nimmt den Haken wieder weg`);
+    if (breite !== 390) {
+      await page.emulateMedia({ colorScheme: 'dark' });
+      const schwachDunkel = await page.evaluate(kontrastImBrowser, '.lp-einwilligung label, .lp-einwilligung label *');
+      pruefe(schwachDunkel.length === 0, `@${breite} dunkel: Kontrast der Häkchen-Texte: ${schwachDunkel.join(' | ')}`);
+      await page.screenshot({ path: path.join(BILDER, `anmeldung--karte-${breite}-zwei-haekchen-dunkel.png`), fullPage: true });
+      await page.emulateMedia({ colorScheme: 'light' });
+    }
+    await page.screenshot({ path: path.join(BILDER, `anmeldung--karte-${breite}-zwei-haekchen.png`), fullPage: true });
+    await kontext.close();
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'anmeldung--breit', 390);
+    pruefe(await page.evaluate(() => !document.getElementById('lp-f-newsletter') && !document.querySelector('[name="newsletter_kurz"]') && !!document.getElementById('lp-f-einwilligung')), 'ohne "newsletter" im Bauplan: nur die Pflicht-Einwilligung, keine zweite Kurzsumme');
     await kontext.close();
   }
 

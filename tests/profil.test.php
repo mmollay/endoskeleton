@@ -30,6 +30,19 @@ return [
         T::eq($p->bild('fehlt.webp'), null, 'unbekanntes Bild');
         T::eq($p->hosts(), ['www.example.com', 'beispiel.invalid'], 'erlaubte Hosts');
     },
+    'Newsletter-Wortlaut (3.55.0): freiwilliges Feld, 20–600 Zeichen, Standard mit dem Namen der Marke' => static function () use ($mitJson): void {
+        T::eq(H::texte($mitJson(static function ($j) { unset($j['einwilligung_newsletter']); return $j; })), '', 'ohne das Feld gültig (Standardwortlaut)');
+        $b = H::sperrend($mitJson(static fn ($j) => ['einwilligung_newsletter' => 'zu kurz'] + $j));
+        T::eq(count($b), 1, 'zu kurz: ein Befund: ' . H::texte($b));
+        T::contains($b[0]->technik ?? '', 'einwilligung_newsletter', 'nennt das Feld');
+        $b = H::sperrend($mitJson(static fn ($j) => ['einwilligung_newsletter' => str_repeat('a', 601)] + $j));
+        T::eq(count($b), 1, 'zu lang: ein Befund');
+        $b = H::sperrend($mitJson(static fn ($j) => ['einwilligung_newsletter' => ''] + $j));
+        T::eq(count($b), 1, 'leer: ein Befund');
+        T::eq(Endo\Lp\Profil::newsletterText(['name' => 'MUSTER']), 'Ja, ich möchte zusätzlich Neuigkeiten von MUSTER per E-Mail bekommen. Jederzeit abbestellbar.', 'Standard mit Markenname');
+        T::eq(Endo\Lp\Profil::newsletterText(['name' => 'X', 'einwilligung_newsletter' => '  Eigener Text des Kunden, lang genug.  ']), 'Eigener Text des Kunden, lang genug.', 'eigener Text, getrimmt');
+        T::eq(Endo\Lp\Profil::newsletterText([]), 'Ja, ich möchte zusätzlich Neuigkeiten von uns per E-Mail bekommen. Jederzeit abbestellbar.', 'ohne Namen: „uns“');
+    },
     'fehlendes Pflicht-Token' => static function () use ($mitCss, $testCss): void {
         $b = H::sperrend($mitCss(str_replace("  --lp-akzent: #e3eef7;\n", '', $testCss)));
         T::eq(count($b), 1, 'ein sperrender Befund: ' . H::texte($b));

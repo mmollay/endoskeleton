@@ -63,6 +63,11 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Datenschutz: Die Seite verrät nie, ob eine Adresse schon auf der Liste steht — keine Meldung „bereits angemeldet“.
   Ein `?anmeldung=bereits` (älterer Stand der Weiterleitungsstelle) zeigt `lp.js` genau wie `ok`.
 - Die Anmeldung trägt immer `"anker": "anmeldung"` (Ziel des Rücksprungs); sonst sperrt die Prüfung.
+- Zwei Häkchen (3.55.0): Die Pflicht-Einwilligung (`einwilligung` des Profils) deckt nur Zugangslink und Erinnerung.
+  Trägt die Anmeldung `"newsletter": true`, steht darunter ein zweites, freiwilliges Häkchen `newsletter` (nie Pflicht, nie
+  vorangehakt, „(freiwillig)“ im Label) mit dem Text `einwilligung_newsletter` des Profils, sonst „Ja, ich möchte zusätzlich
+  Neuigkeiten von <Name> per E-Mail bekommen. Jederzeit abbestellbar.“; seine Kurzsumme geht als `newsletter_kurz` mit.
+  `newsletter` setzt der Betreiber (das Panel, wenn eine Newsletter-Gruppe gewählt ist) — nie selbst setzen oder entfernen.
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
 ## Einen Baustein hinzufügen (wie GRIDKit)

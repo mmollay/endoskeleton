@@ -593,6 +593,12 @@ section.lp-anmeldung {
   grid-column: 2;
 }
 
+/* Freiwilliges Newsletter-Häkchen (3.55.0): optisch wie die Pflicht-Einwilligung, dazu das Wort „(freiwillig)“ im Label — kein Unterschied nur über Farbe. */
+.lp-freiwillig {
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
 .lp-anmeldung-hinweis {
   padding: var(--space-md);
   border-radius: var(--radius-md);

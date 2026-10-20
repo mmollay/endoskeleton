@@ -130,6 +130,14 @@ return [
         $ohne = static fn (string $muster) => static fn ($o) => file_put_contents("$o/index.html", (string) preg_replace($muster, '', (string) file_get_contents("$o/index.html")));
         $hat($pruefe(H::seite(), null, HEUTE, $ohne('#<div class="form-hp".*?</div>\n#s')), 'sperrend', 'Honigtopf', 'Honigtopf fehlt');
         $hat($pruefe(H::seite(), null, HEUTE, $ohne('#<input id="lp-f-einwilligung"[^>]*>#')), 'sperrend', 'Einwilligung fehlt', 'Einwilligung fehlt');
+        // Zwei Häkchen (3.55.0): das Newsletter-Häkchen darf weder Pflicht noch vorangehakt sein und braucht seine Kurzsumme
+        $mitNl = H::seite(); $mitNl['bausteine'][1]['newsletter'] = true;
+        $tausch = static fn (string $von, string $nach) => static fn ($o) => file_put_contents("$o/index.html", str_replace($von, $nach, (string) file_get_contents("$o/index.html")));
+        T::eq(H::texte(H::sperrend($pruefe($mitNl))), '', 'Seite mit Newsletter-Häkchen prüft sauber');
+        $hat($pruefe($mitNl, null, HEUTE, $tausch('name="newsletter" type="checkbox" value="ja"', 'name="newsletter" type="checkbox" value="ja" required')), 'sperrend', 'Newsletter-Häkchen als Pflicht', 'Newsletter als Pflicht');
+        $hat($pruefe($mitNl, null, HEUTE, $tausch('name="newsletter" type="checkbox" value="ja"', 'name="newsletter" type="checkbox" value="ja" checked')), 'sperrend', 'Newsletter-Häkchen vorangehakt', 'Newsletter vorangehakt');
+        $hat($pruefe($mitNl, null, HEUTE, $ohne('#<input type="hidden" name="newsletter_kurz"[^>]*>\n#')), 'sperrend', 'newsletter_kurz fehlt', 'Kurzsumme des Newsletter-Wortlauts fehlt');
+        $hat($pruefe($mitNl, null, HEUTE, $tausch('name="einwilligung" type="checkbox" value="ja" required', 'name="einwilligung" type="checkbox" value="ja"')), 'sperrend', 'Einwilligung fehlt', 'Pflicht-Häkchen ohne required gilt als fehlend');
     },
     'keine Fehlalarme bei „online =“ oder „style =“ im Text' => static function () use ($pruefe): void {
         T::eq(H::texte(H::sperrend($pruefe(H::seite([], ['beschreibung' => 'Teilnahme online = kostenlos. Dein neuer style = gesund.'])))), '', 'nur Text, kein Attribut');

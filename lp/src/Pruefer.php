@@ -477,6 +477,18 @@ final class Pruefer
         } elseif (preg_match('/\schecked\b/', $m[0])) {
             $this->sperrend('index.html', 'Einwilligung vorangehakt', 'Die Einwilligung im Formular ist schon angehakt — das ist nicht erlaubt.');
         }
+        // Das Newsletter-Häkchen (3.55.0) ist freiwillig: nie Pflicht (Kopplungsverbot), nie vorangehakt, sein Wortlaut geht als Kurzsumme mit.
+        if (preg_match('/<input[^>]*name="newsletter"[^>]*>/', $html, $n)) {
+            if (str_contains($n[0], ' required')) {
+                $this->sperrend('index.html', 'Newsletter-Häkchen als Pflicht', 'Das Newsletter-Häkchen darf keine Pflicht sein — die Anmeldung muss auch ohne Newsletter gehen.');
+            }
+            if (preg_match('/\schecked\b/', $n[0])) {
+                $this->sperrend('index.html', 'Newsletter-Häkchen vorangehakt', 'Das Newsletter-Häkchen ist schon angehakt — das ist nicht erlaubt.');
+            }
+            if (!preg_match('/<input[^>]*name="newsletter_kurz"[^>]*value="[0-9a-f]{12}"/', $html)) {
+                $this->sperrend('index.html', 'newsletter_kurz fehlt', 'Dem Newsletter-Häkchen fehlt die Prüfsumme seines Wortlauts.');
+            }
+        }
         if (!preg_match('/<div class="form-hp"[^>]*>\s*<label[^>]*>[^<]*<\/label>\s*<input[^>]*tabindex="-1"/', $html)) {
             $this->sperrend('index.html', 'Honigtopf fehlt', 'Dem Formular fehlt der Schutz gegen automatische Anmeldungen.');
         }

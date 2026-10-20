@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.54.4)
+# Landingpage bearbeiten (Endoskeleton 3.55.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -191,6 +191,7 @@ Varianten: `karte`, `breit` · höchstens 1-mal
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
 | `plaetze` | zahl | – | 1–10000; fehlt: unbegrenzt |
+| `newsletter` | janein | – | `true` / `false`; fehlt: kein Newsletter-Häkchen |
 
 ```json
 {

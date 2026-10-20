@@ -35,11 +35,15 @@ return [
         $s = H::seite(); $s['bausteine'] = [];
         $einer($s, 'bausteine', 'keine Bausteine');
     },
-    'Meta-Angaben' => static function () use ($einer): void {
+    'Meta-Angaben' => static function () use ($einer, $pruefe): void {
         $einer(H::seite([], ['titel' => str_repeat('ä', 61)]), 'meta.titel', 'Titel zu lang');
         $s = H::seite(); unset($s['meta']['beschreibung']);
         $einer($s, 'meta.beschreibung', 'Beschreibung fehlt');
         $einer(H::seite([], ['indexieren' => 'ja']), 'meta.indexieren', 'indexieren kein Wahrheitswert');
+        $s = H::seite(); $s['bausteine'][1]['newsletter'] = 'ja';
+        $einer($s, 'bausteine.1.newsletter', 'newsletter (3.55.0) kein Wahrheitswert');
+        $s = H::seite(); $s['bausteine'][1]['newsletter'] = true;
+        T::eq(H::texte($pruefe($s)), '', 'newsletter: true ist gültig');
         $einer(H::seite([], ['vorschaubild' => 'bestand/fehlt.webp']), 'meta.vorschaubild', 'Vorschaubild unbekannt');
     },
     'Typ, Variante, unbekanntes Feld' => static function () use ($einer, $b): void {
