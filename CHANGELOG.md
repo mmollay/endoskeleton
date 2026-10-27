@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.56.0] — 2026-10-27
+
+### Added
+- **Statistik der Landingpages: der Beacon in `lp/lp.js`** (Anlass: Martin, 27.10.2026, Statistik für die Landingpages ohne Cookies; Gegenstück im Panel: Annahme `POST /lp/treffer` und Tab „Statistik“). Ein kleiner abgegrenzter Block am Ende von `lp.js` meldet mit `navigator.sendBeacon` (Inhaltstyp `text/plain`, also eine einfache Anfrage ohne Preflight) drei Ereignisse: `aufruf` (einmal je Seitenaufruf, sobald die Seite sichtbar ist — bei Vorab-Laden erst dann), `formular` (einmal beim ersten Fokus in einem Feld des Anmeldeformulars; das Lockfeld zählt nicht) und `absenden` (einmal, nachdem die Prüfung der Seite das Absenden durchgelassen hat; das Senden selbst wird weder verzögert noch verändert).
+- **Anonym by design:** kein Cookie, kein `localStorage`/`sessionStorage`/IndexedDB (die Einmal-Sperren sind Variablen der Seite), keine Kennung des Besuchers. Gesendet werden nur Kennung der Anmeldeliste (wie das Formular sie mitschickt), Pfad, Host des Verweisers (nie Pfad oder Anfrage; der eigene Host zählt als „direkt“), `utm_source`/`utm_medium`/`utm_campaign` (auf 60 Zeichen gekürzt, nur `A–Z a–z 0–9 Leerzeichen _ . -`) und die Fensterbreite — zusammen weit unter 1 KB, jedes Feld unter 400 Zeichen.
+- **Adresse und Verzicht ohne neue Einstellung:** Die Adresse folgt dem Formularziel der Seite (`…/lp/anmelden` → `…/lp/treffer`, gleicher Host). Seiten ohne Anmeldeformular oder ohne Formularziel senden nichts. „Do Not Track“, „Global Privacy Control“ und `data-lp-statistik="aus"` am `<body>` schalten die Messung ab. Jeder Fehler wird verschluckt: ein werfender `sendBeacon` stört das Absenden nicht. Die Rückkehrseite einer Anmeldung (`?anmeldung=…`) sendet keinen zweiten `aufruf`.
+- Keine neue `lp-`-Klasse, keine neue Einstellung im Profil, kein Eingriff in `base.css`, Presets, `pages/`, `api/`. Tests: `angebot` (lp.js: Beacon, Verzicht, kein Speicherzugriff) und `ci/browser.js` (Doppelgänger für `/lp/treffer`: Reihenfolge und Einmal-Sperren, Felder und Größe, UTM, Verweiser nur als Host, Vorab-Laden, DNT/GPC/Abmeldung, Seite ohne Formular, werfender `sendBeacon`, Spione für Cookies und Web-Speicher). `lp/SKILL.md` neu erzeugt, Musterbuch neu gebaut.
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und messen erst nach einem Neubau mit diesem Stand. Die Datenschutzerklärung steht im Profil des Kunden (`rechtliches/datenschutz.txt`), nicht im Baukasten: Der Satz „Wir zählen Aufrufe dieser Seite anonym — ohne Cookies und ohne Speicherung Ihrer IP-Adresse.“ gehört dort hinein.
+
 ## [3.55.0] — 2026-10-20
 
 ### Added

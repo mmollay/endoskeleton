@@ -202,6 +202,19 @@ return [
         T::contains($js, "voll: '.lp-anmeldung-voll'", 'Rücksprung voll');
         T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
     },
+    'lp.js: Statistik (3.56.0) — Beacon aus dem Formularziel, Verzicht bei DNT/GPC/Abmeldung, kein Cookie, kein Web-Speicher' => static function (): void {
+        $js = (string) file_get_contents(H::wurzel() . '/lp/lp.js');
+        T::contains($js, "type: 'text/plain;charset=UTF-8'", 'text/plain macht den Beacon zur einfachen Anfrage (kein CORS)');
+        T::contains($js, "navigator.doNotTrack !== '1'", 'Do Not Track');
+        T::contains($js, 'navigator.globalPrivacyControl !== true', 'Global Privacy Control');
+        T::contains($js, "dataset.lpStatistik !== 'aus'", 'Abmeldung über data-lp-statistik');
+        T::contains($js, "replace(/anmelden$/, 'treffer')", 'Adresse leitet sich aus dem Formularziel ab');
+        T::contains($js, '.hostname', 'vom Verweiser bleibt nur der Host');
+        T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
+        foreach (['localStorage', 'sessionStorage', 'indexedDB', 'document.cookie'] as $speicher) {
+            T::notContains($js, $speicher, "kein Zugriff auf $speicher (auch das wäre ein Zugriff auf das Endgerät)");
+        }
+    },
     'person: ohne Namen nichts; mit Namen Titel, Name, Rolle, Text; Bild nur bei bild-links' => static function () use ($k, $bau): void {
         [$h] = $bau(H::seite([['typ' => 'person', 'variante' => 'schlicht', 'titel' => 'Wer spricht?']]));
         T::notContains($h, 'lp-person', 'ohne Namen kein Abschnitt');

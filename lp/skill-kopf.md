@@ -68,6 +68,11 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   vorangehakt, „(freiwillig)“ im Label) mit dem Text `einwilligung_newsletter` des Profils, sonst „Ja, ich möchte zusätzlich
   Neuigkeiten von <Name> per E-Mail bekommen. Jederzeit abbestellbar.“; seine Kurzsumme geht als `newsletter_kurz` mit.
   `newsletter` setzt der Betreiber (das Panel, wenn eine Newsletter-Gruppe gewählt ist) — nie selbst setzen oder entfernen.
+- Statistik (3.56.0): `lp.js` zählt anonym Aufruf, Formularbeginn und Absenden beim Panel (Formularziel `…/lp/anmelden` →
+  `…/lp/treffer`) — ohne Cookies, ohne Web-Speicher, ohne Kennung des Besuchers; gesendet werden nur Verweiser-Host, UTM
+  und Fensterbreite. Es gibt dafür keine Einstellung. Abmeldung einer Seite: `data-lp-statistik="aus"` am `<body>` (Do Not
+  Track und Global Privacy Control beachtet `lp.js` immer). Die Datenschutzerklärung der Seite (`rechtliches/datenschutz.txt`
+  im Profil) sollte es nennen: „Wir zählen Aufrufe dieser Seite anonym — ohne Cookies und ohne Speicherung Ihrer IP-Adresse.“
 - Nichts Kundenspezifisches ins Endoskeleton-Repo (es ist öffentlich) — Profile liegen in `lp.<kundendomain>/_profil/`.
 
 ## Einen Baustein hinzufügen (wie GRIDKit)

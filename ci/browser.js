@@ -17,6 +17,34 @@ const path = require('path');
 const MUSTERBUCH = path.join(__dirname, '..', 'musterbuch');
 const BILDER = path.join(__dirname, 'bilder');
 const BREITEN = [320, 360, 390, 1280];
+// Spione für die Statistik (3.56.0): zählen jeden Zugriff auf Cookies, Web-Speicher und IndexedDB in window.__zugriffe.
+const SPION = `(() => {
+  window.__zugriffe = [];
+  const merke = (w) => window.__zugriffe.push(w);
+  for (const m of ['getItem', 'setItem', 'removeItem', 'clear', 'key']) {
+    const alt = Storage.prototype[m];
+    Storage.prototype[m] = function (...a) { merke('Storage.' + m); return alt.apply(this, a); };
+  }
+  for (const name of ['localStorage', 'sessionStorage']) {
+    const halter = Object.getOwnPropertyDescriptor(window, name) ? window : Window.prototype;
+    const d = Object.getOwnPropertyDescriptor(halter, name);
+    if (d && d.get) { Object.defineProperty(halter, name, { ...d, get() { merke(name); return d.get.call(this); } }); }
+  }
+  const c = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+  Object.defineProperty(Document.prototype, 'cookie', { configurable: true, get() { merke('cookie lesen'); return c.get.call(this); }, set(v) { merke('cookie schreiben'); c.set.call(this, v); } });
+  const auf = IDBFactory.prototype.open;
+  IDBFactory.prototype.open = function (...a) { merke('indexedDB'); return auf.apply(this, a); };
+})();`;
+const DNT = `Object.defineProperty(Navigator.prototype, 'doNotTrack', { configurable: true, get: () => '1' });`;
+const GPC = `Object.defineProperty(Navigator.prototype, 'globalPrivacyControl', { configurable: true, get: () => true });`;
+const WERFENDER_BEACON = `Navigator.prototype.sendBeacon = function () { throw new Error('Beacon kaputt'); };`;
+const VERWEISER = (url) => `Object.defineProperty(Document.prototype, 'referrer', { configurable: true, get: () => ${JSON.stringify(url)} });`;
+// Vorab-Laden: die Seite ist zunächst unsichtbar; window.__zeigen() macht sie sichtbar und meldet es.
+const UNSICHTBAR = `(() => {
+  let sicht = 'hidden';
+  Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get: () => sicht });
+  window.__zeigen = () => { sicht = 'visible'; document.dispatchEvent(new Event('visibilitychange')); };
+})();`;
 const TYPEN = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
 
 let bestanden = 0;
@@ -28,14 +56,29 @@ const pruefe = (bedingung, was) => { if (bedingung) { bestanden++; } else { fehl
  * fremd sammelt alle Anfragen außerhalb von lp.test. Die Plätze-Abfrage (3.52.0) an https://beispiel.invalid/lp/plaetze
  * (Formularziel des Testprofils) beantwortet eine Attrappe: optionen.plaetze = { status, daten } oder { abbruch: true };
  * ohne Angabe 12 von 30 frei. abfragen sammelt ihre Adressen — sie zählen nicht als Fremdanfrage.
+ * Die Statistik (3.56.0) meldet an das Formularziel mit /anmelden → /treffer (https://beispiel.invalid/treffer, im Panel /lp/treffer); eine Attrappe antwortet 204 und sammelt die Beacons
+ * (beacons: Adresse, Methode, Inhaltstyp, Text) — sie zählen ebenfalls nicht als Fremdanfrage. Mit optionen.anmelden antwortet sie auch
+ * auf das Anmeldeziel mit 204 (anmeldungen), sonst bleibt das Absenden eine Fremdanfrage. optionen.init: Skripte vor der Seite
+ * (Spione, DNT), optionen.umschreiben: Änderung am HTML der Seite.
  */
 async function oeffnen(browser, name, breite, optionen = {}) {
   const kontext = await browser.newContext({ viewport: { width: breite, height: optionen.hoehe || 900 }, reducedMotion: optionen.reducedMotion || 'no-preference', javaScriptEnabled: optionen.ohneJs !== true });
   const page = await kontext.newPage();
   const fremd = [];
   const abfragen = [];
+  const beacons = [];
+  const anmeldungen = [];
+  for (const skript of optionen.init || []) { await kontext.addInitScript(skript); }
   await page.route('**/*', (r) => {
     const u = new URL(r.request().url());
+    if (u.host === 'beispiel.invalid' && /^\/(lp\/)?treffer$/.test(u.pathname)) {
+      beacons.push({ adresse: u.href, methode: r.request().method(), typ: r.request().headers()['content-type'] || '', text: r.request().postData() || '' });
+      return r.fulfill({ status: 204 });
+    }
+    if (optionen.anmelden && u.host === 'beispiel.invalid' && /^\/(lp\/)?anmelden$/.test(u.pathname)) {
+      anmeldungen.push(r.request().method());
+      return r.fulfill({ status: 204 });
+    }
     if (u.host === 'beispiel.invalid' && u.pathname === '/lp/plaetze') {
       abfragen.push(u.href);
       const p = optionen.plaetze || { status: 200, daten: { frei: 12, gesamt: 30, voll: false } };
@@ -46,11 +89,12 @@ async function oeffnen(browser, name, breite, optionen = {}) {
     let f = path.join(MUSTERBUCH, decodeURIComponent(u.pathname));
     if (f.endsWith(path.sep)) { f = path.join(f, 'index.html'); }
     if (!f.startsWith(MUSTERBUCH) || !fs.existsSync(f)) { return r.fulfill({ status: 404, body: 'fehlt' }); }
-    return r.fulfill({ status: 200, body: fs.readFileSync(f), contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
+    const inhalt = fs.readFileSync(f);
+    return r.fulfill({ status: 200, body: optionen.umschreiben && f.endsWith('.html') ? optionen.umschreiben(inhalt.toString('utf8')) : inhalt, contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
   await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
-  return { page, fremd, kontext, abfragen };
+  return { page, fremd, kontext, abfragen, beacons, anmeldungen };
 }
 
 /**
@@ -420,6 +464,137 @@ function kontrastImBrowser(nur) {
     const danach = await page.evaluate(() => ({ leer: !document.querySelector('.lp-termin-leer').hidden, liste: document.querySelector('.lp-termin-liste').hidden, ort: document.querySelector('.lp-termin-ort').hidden, preis: document.querySelector('.lp-termin-preis').hidden }));
     pruefe(danach.leer && danach.liste && danach.ort && danach.preis, `alle vorbei: Ersatztext statt Liste, Ort und Preis (${JSON.stringify(danach)})`);
     await kontext.close();
+  }
+
+  // Statistik (3.56.0): Beacon an /lp/treffer — nur die Ereignisse des Vertrags, anonym, ohne Cookies und ohne Web-Speicher
+  {
+    const ausfuellen = async (page) => {
+      await page.fill('#lp-f-vorname', 'Anna');
+      await page.fill('#lp-f-email', 'anna@beispiel.invalid');
+      await page.check('#lp-f-einwilligung');
+    };
+    const warten = (page) => page.waitForTimeout(300);
+    const art = (b) => b.map((x) => JSON.parse(x.text).art);
+
+    // Ablauf: aufruf beim Laden, formular beim ersten Fokus (nur einmal), absenden nur bei echtem Absenden (nur einmal)
+    {
+      const { page, fremd, kontext, beacons, anmeldungen } = await oeffnen(browser, 'anmeldung--karte', 390, { anmelden: true, init: [SPION], suche: '?utm_source=Insta%20gram%3Cb%3E&utm_medium=social&utm_campaign=' + 'a'.repeat(100) });
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf', `Statistik: beim Laden genau ein aufruf (${art(beacons)})`);
+      const liste = await page.evaluate(() => document.querySelector('input[name="liste"]').value);
+      const a = beacons[0] ? JSON.parse(beacons[0].text) : {};
+      pruefe(a.v === 1 && a.liste === liste && a.liste !== '' && a.pfad === '/anmeldung--karte/' && a.ref === '' && a.breite === 390, `Statistik: Felder des aufruf (${beacons[0] && beacons[0].text})`);
+      pruefe(a.utm && a.utm.quelle === 'Insta gramb' && a.utm.medium === 'social' && a.utm.kampagne === 'a'.repeat(60), `Statistik: UTM bereinigt und auf 60 Zeichen gekürzt (${JSON.stringify(a.utm)})`);
+      pruefe(Object.keys(a).sort().join() === 'art,breite,liste,pfad,ref,utm,v' && Object.keys(a.utm || {}).sort().join() === 'kampagne,medium,quelle', 'Statistik: genau die Felder des Vertrags');
+      pruefe(beacons[0] && beacons[0].adresse === 'https://beispiel.invalid/treffer', `Statistik: Adresse aus dem Formularziel abgeleitet (${beacons[0] && beacons[0].adresse})`);
+      pruefe(beacons[0] && beacons[0].methode === 'POST' && beacons[0].typ.startsWith('text/plain'), `Statistik: POST als text/plain, einfache Anfrage ohne Preflight (${beacons[0] && beacons[0].typ})`);
+      pruefe(beacons.every((b) => b.text.length < 1000 && Object.values(JSON.parse(b.text)).every((w) => JSON.stringify(w).length < 400)), 'Statistik: Nachricht unter 1 KB, jedes Feld unter 400 Zeichen');
+
+      await page.evaluate(() => document.getElementById('lp-f-website').focus());
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf', `Statistik: Fokus im Lockfeld zählt nicht als formular (${art(beacons)})`);
+      await page.focus('#lp-f-vorname');
+      await page.focus('#lp-f-email');
+      await page.click('#lp-f-einwilligung');
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,formular', `Statistik: formular einmal beim ersten Fokus (${art(beacons)})`);
+
+      await page.click('.lp-formular button[type="submit"]');
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,formular', `Statistik: ein Absenden, das die Prüfung abweist, ist noch kein absenden (${art(beacons)})`);
+      await ausfuellen(page);
+      let vorher = anmeldungen.length;
+      await page.click('.lp-formular button[type="submit"]');
+      await warten(page);
+      await page.click('.lp-formular button[type="submit"]');
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,formular,absenden', `Statistik: absenden genau einmal (${art(beacons)})`);
+      pruefe(anmeldungen.length - vorher === 2 && anmeldungen.every((m) => m === 'POST'), `Statistik: das vorhandene Absenden läuft unverändert (${anmeldungen})`);
+
+      const spur = await page.evaluate(() => ({ zugriffe: window.__zugriffe.slice(), cookie: document.cookie }));
+      pruefe(spur.zugriffe.length === 0 && spur.cookie === '' && (await kontext.cookies()).length === 0, `Statistik: keine Cookies, kein Web-Speicher, kein IndexedDB (${spur.zugriffe})`);
+      await page.evaluate(() => { localStorage.getItem('probe'); });
+      pruefe((await page.evaluate(() => window.__zugriffe.length)) > 0, 'Statistik: der Speicher-Spion schlägt an (Gegenprobe der Messung)');
+      pruefe(fremd.length === 0, `Statistik: keine Fremdanfrage (${fremd.join(', ')})`);
+      await kontext.close();
+    }
+
+    // Im Panel heißt das Ziel …/lp/anmelden: daraus wird …/lp/treffer (gleicher Host)
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { umschreiben: (h) => h.replace('beispiel.invalid/anmelden"', 'beispiel.invalid/lp/anmelden"') });
+      await warten(page);
+      pruefe(beacons.length === 1 && beacons[0].adresse === 'https://beispiel.invalid/lp/treffer', `Statistik: /lp/anmelden → /lp/treffer (${beacons.map((b) => b.adresse)})`);
+      await kontext.close();
+    }
+
+    // Verweiser nur als Host (kein Pfad, keine Anfrage), der eigene Host zählt als direkt
+    for (const [verweiser, erwartet] of [['https://verweis.beispiel.invalid/p/AbC/?x=1&y=2#z', 'verweis.beispiel.invalid'], ['http://lp.test/anderes/?x=1', ''], ['', '']]) {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [VERWEISER(verweiser)] });
+      await warten(page);
+      const ref = beacons[0] ? JSON.parse(beacons[0].text).ref : null;
+      pruefe(ref === erwartet && !(beacons[0] && beacons[0].text.includes('AbC')), `Statistik: Verweiser „${verweiser}“ → „${erwartet}“ (${ref})`);
+      await kontext.close();
+    }
+
+    // Vorab-Laden: unsichtbar kein Beacon, sobald sichtbar genau einer (auch bei mehrfachem Wechsel)
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR] });
+      await warten(page);
+      pruefe(beacons.length === 0, `Statistik: solange die Seite unsichtbar ist, nichts (${beacons.length})`);
+      await page.evaluate(() => { window.__zeigen(); window.__zeigen(); });
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf', `Statistik: sichtbar → genau ein aufruf (${art(beacons)})`);
+      await kontext.close();
+    }
+
+    // Verzicht: Do Not Track, Global Privacy Control, Abmeldung am body, Seite ohne Formular, Formular ohne Statistik-Ziel
+    const ohneAction = (html) => html.replace(/ action="[^"]*"/, '');
+    const fremdesZiel = (html) => html.replace(/\/anmelden"/, '/andere/stelle"');
+    for (const [was, name, optionen] of [
+      ['Do Not Track', 'anmeldung--karte', { init: [DNT] }],
+      ['Global Privacy Control', 'anmeldung--karte', { init: [GPC] }],
+      ['data-lp-statistik="aus"', 'anmeldung--karte', { umschreiben: (h) => h.replace('<body class="lp-seite"', '<body class="lp-seite" data-lp-statistik="aus"') }],
+      ['Seite ohne Anmeldeformular', 'faq--standard', {}],
+      ['Formular ohne Ziel', 'anmeldung--karte', { umschreiben: ohneAction }],
+      ['Formular mit fremdem Ziel (nicht …/anmelden)', 'anmeldung--karte', { umschreiben: fremdesZiel }],
+    ]) {
+      const { page, fremd, kontext, beacons } = await oeffnen(browser, name, 390, optionen);
+      if (name === 'anmeldung--karte') {
+        await page.focus('#lp-f-vorname');
+        await ausfuellen(page);
+        await page.evaluate(() => document.querySelector('.lp-formular').addEventListener('submit', (e) => e.preventDefault()));
+        await page.click('.lp-formular button[type="submit"]');
+      }
+      await warten(page);
+      pruefe(beacons.length === 0, `Statistik: ${was} → kein Beacon (${beacons.length})`);
+      pruefe(fremd.length === 0, `Statistik: ${was} → auch keine Anfrage an eine andere Adresse (${fremd.join(', ')})`);
+      await kontext.close();
+    }
+
+    // Ein werfender sendBeacon darf weder Fehler in der Seite noch das Absenden stören
+    {
+      const { page, kontext, anmeldungen } = await oeffnen(browser, 'anmeldung--karte', 390, { anmelden: true, init: [WERFENDER_BEACON] });
+      const fehler = [];
+      page.on('pageerror', (e) => fehler.push(e.message));
+      await page.focus('#lp-f-vorname');
+      await ausfuellen(page);
+      const abgebrochen = await page.evaluate(() => new Promise((ok) => {
+        document.addEventListener('submit', (e) => setTimeout(() => ok(e.defaultPrevented), 0));
+        document.querySelector('.lp-formular button[type="submit"]').click();
+      }));
+      await warten(page);
+      pruefe(abgebrochen === false && anmeldungen.length === 1, `Statistik: werfender sendBeacon — das Absenden läuft trotzdem (abgebrochen: ${abgebrochen}, Anmeldungen: ${anmeldungen.length})`);
+      pruefe(fehler.length === 0, `Statistik: werfender sendBeacon — kein Fehler in der Seite (${fehler.join(' | ')})`);
+      await kontext.close();
+    }
+
+    // Rückkehr von der Weiterleitungsstelle (?anmeldung=ok): die Seite wurde schon gezählt, kein zweiter aufruf
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { suche: '?anmeldung=ok#anmeldung' });
+      await warten(page);
+      pruefe(beacons.length === 0, `Statistik: Rückkehr nach der Anmeldung zählt keinen zweiten aufruf (${beacons.length})`);
+      await kontext.close();
+    }
   }
 
   // Weniger Bewegung: keine Übergänge
