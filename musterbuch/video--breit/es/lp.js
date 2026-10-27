@@ -99,7 +99,9 @@
   // kommt aus dem Formularziel (…/lp/anmelden → …/lp/treffer); eine Seite ohne Anmeldeformular sendet nichts. Do Not Track,
   // Global Privacy Control und data-lp-statistik="aus" am body schalten die Messung ab. Jeder Fehler wird verschluckt. Das
   // Absenden zählt erst, wenn die Prüfung oben es durchgelassen hat (dieser Block steht nach ihr); die Rückkehrseite einer
-  // Anmeldung (?anmeldung=…) ist schon gezählt.
+  // Anmeldung (?anmeldung=…) ist schon gezählt. Verlassen (3.57.0): Beim ersten pagehide oder Verstecken des Tabs geht einmal
+  // „verlassen“ mit dauer (ganze Sekunden sichtbarer Zeit, 0–3600) und tiefe (weitester unterer Fensterrand in Prozent der
+  // Seitenhöhe, auf 0|25|50|75|100 gerundet) hinaus; ohne gezählten aufruf (nie sichtbar, Rückkehrseite) nichts.
   try {
     var form = document.querySelector('form.lp-formular'), liste = form && form.querySelector('input[name="liste"]');
     var aktion = form && form.getAttribute('action'), ziel = aktion && new URL(aktion, location.href);
@@ -108,7 +110,7 @@
       ziel.pathname = ziel.pathname.replace(/anmelden$/, 'treffer'); ziel.search = ''; ziel.hash = '';
       var suche = new URLSearchParams(location.search), gesendet = {};
       var utm = function (name) { return (suche.get('utm_' + name) || '').replace(/[^A-Za-z0-9 _.-]/g, '').slice(0, 60); };
-      var melden = function (art) {
+      var melden = function (art, dauer, tiefe) {
         if (gesendet[art]) { return; }
         gesendet[art] = true;
         try {
@@ -116,16 +118,31 @@
           navigator.sendBeacon(ziel.href, new Blob([JSON.stringify({
             v: 1, liste: liste.value.slice(0, 60), art: art, pfad: location.pathname.slice(0, 120),
             ref: verweiser === location.hostname ? '' : verweiser.slice(0, 100),
-            utm: { quelle: utm('source'), medium: utm('medium'), kampagne: utm('campaign') }, breite: window.innerWidth
+            utm: { quelle: utm('source'), medium: utm('medium'), kampagne: utm('campaign') }, breite: window.innerWidth,
+            dauer: dauer, tiefe: tiefe
           })], { type: 'text/plain;charset=UTF-8' }));
         } catch (e) { /* die Statistik darf die Anmeldung nie stören */ }
       };
+      var seit = null, unten = 0;
       var sichtbar = function () {
-        if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', sichtbar); melden('aufruf'); }
+        if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', sichtbar); seit = performance.now(); melden('aufruf'); }
       };
       if (!rueckmeldung) { document.addEventListener('visibilitychange', sichtbar); sichtbar(); }
       form.addEventListener('focusin', function (ereignis) { if (ereignis.target.closest && !ereignis.target.closest('.form-hp')) { melden('formular'); } });
       form.addEventListener('submit', function (ereignis) { if (!ereignis.defaultPrevented) { melden('absenden'); } });
+      // Scroll-Ereignisse kommen höchstens einmal je Bildwechsel; gelesen wird nur die Position, die Seitenhöhe erst beim Verlassen.
+      var tiefer = function () { unten = Math.max(unten, window.scrollY + window.innerHeight); };
+      var gehen = function () {
+        try {
+          if (seit === null) { return; }
+          tiefer();
+          melden('verlassen', Math.min(3600, Math.round((performance.now() - seit) / 1000)),
+            Math.round(Math.min(1, unten / Math.max(1, document.documentElement.scrollHeight)) * 4) * 25);
+        } catch (e) { /* die Statistik darf das Verlassen nie stören */ }
+      };
+      window.addEventListener('scroll', tiefer, { passive: true });
+      window.addEventListener('pagehide', gehen);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') { gehen(); } });
     }
   } catch (e) { /* die Statistik darf die Seite nie stören */ }
 })();

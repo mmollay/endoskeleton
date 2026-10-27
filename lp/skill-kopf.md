@@ -70,7 +70,8 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   `newsletter` setzt der Betreiber (das Panel, wenn eine Newsletter-Gruppe gewählt ist) — nie selbst setzen oder entfernen.
 - Statistik (3.56.0): `lp.js` zählt anonym Aufruf, Formularbeginn und Absenden beim Panel (Formularziel `…/lp/anmelden` →
   `…/lp/treffer`) — ohne Cookies, ohne Web-Speicher, ohne Kennung des Besuchers; gesendet werden nur Verweiser-Host, UTM
-  und Fensterbreite. Es gibt dafür keine Einstellung. Abmeldung einer Seite: `data-lp-statistik="aus"` am `<body>` (Do Not
+  und Fensterbreite; beim Verlassen der Seite (3.57.0) einmal auch die sichtbare Zeit (ganze Sekunden, höchstens 3600) und
+  die Scrolltiefe (0 | 25 | 50 | 75 | 100 %). Es gibt dafür keine Einstellung. Abmeldung einer Seite: `data-lp-statistik="aus"` am `<body>` (Do Not
   Track und Global Privacy Control beachtet `lp.js` immer). Die Datenschutzerklärung der Seite (`rechtliches/datenschutz.txt`
   im Profil) sollte es nennen, z. B.: „Wir zählen Aufrufe dieser Seite anonym — ohne Cookies und ohne Speicherung Ihrer
   IP-Adresse.“ Den Wortlaut vorher mit der Gegenstelle abgleichen (auch ein Webserver-Protokoll führt Adressen).

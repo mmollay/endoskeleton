@@ -45,6 +45,19 @@ const UNSICHTBAR = `(() => {
   let sicht = 'hidden';
   Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get: () => sicht });
   window.__zeigen = () => { sicht = 'visible'; document.dispatchEvent(new Event('visibilitychange')); };
+  window.__verstecken = () => { sicht = 'hidden'; document.dispatchEvent(new Event('visibilitychange')); };
+})();`;
+// Spion für das Verlassen (3.57.0): merkt sich, ob jeder Scroll-Hörer passiv ist, und zählt die Lesezugriffe auf scrollHeight.
+const SCROLLSPION = `(() => {
+  window.__scrollHoerer = [];
+  window.__hoehenLesen = 0;
+  const alt = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function (art, f, o) {
+    if (art === 'scroll') { window.__scrollHoerer.push(!!(o && typeof o === 'object' && o.passive)); }
+    return alt.call(this, art, f, o);
+  };
+  const d = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollHeight');
+  Object.defineProperty(Element.prototype, 'scrollHeight', { ...d, get() { window.__hoehenLesen++; return d.get.call(this); } });
 })();`;
 const TYPEN = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
 
@@ -476,6 +489,7 @@ function kontrastImBrowser(nur) {
     };
     const warten = (page) => page.waitForTimeout(300);
     const art = (b) => b.map((x) => JSON.parse(x.text).art);
+    const gehen = (page) => page.evaluate(() => { window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })); });
 
     // Ablauf: aufruf beim Laden, formular beim ersten Fokus (nur einmal), absenden nur bei echtem Absenden (nur einmal)
     {
@@ -566,8 +580,9 @@ function kontrastImBrowser(nur) {
         await page.evaluate(() => document.querySelector('.lp-formular').addEventListener('submit', (e) => e.preventDefault()));
         await page.click('.lp-formular button[type="submit"]');
       }
+      await gehen(page);
       await warten(page);
-      pruefe(beacons.length === 0, `Statistik: ${was} → kein Beacon (${beacons.length})`);
+      pruefe(beacons.length === 0, `Statistik: ${was} → kein Beacon, auch kein verlassen (${beacons.length})`);
       pruefe(fremd.length === 0, `Statistik: ${was} → auch keine Anfrage an eine andere Adresse (${fremd.join(', ')})`);
       await kontext.close();
     }
@@ -583,6 +598,7 @@ function kontrastImBrowser(nur) {
         document.addEventListener('submit', (e) => setTimeout(() => ok(e.defaultPrevented), 0));
         document.querySelector('.lp-formular button[type="submit"]').click();
       }));
+      await gehen(page);
       await warten(page);
       pruefe(abgebrochen === false && anmeldungen.length === 1, `Statistik: sendBeacon wirft ab Aufruf ${ab + 1} — das Absenden läuft trotzdem (abgebrochen: ${abgebrochen}, Anmeldungen: ${anmeldungen.length})`);
       pruefe(fehler.length === 0, `Statistik: sendBeacon wirft ab Aufruf ${ab + 1} — kein Fehler in der Seite (${fehler.join(' | ')})`);
@@ -593,7 +609,146 @@ function kontrastImBrowser(nur) {
     {
       const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { suche: '?anmeldung=ok#anmeldung' });
       await warten(page);
-      pruefe(beacons.length === 0, `Statistik: Rückkehr nach der Anmeldung zählt keinen zweiten aufruf (${beacons.length})`);
+      await gehen(page);
+      await warten(page);
+      pruefe(beacons.length === 0, `Statistik: Rückkehr nach der Anmeldung zählt keinen zweiten aufruf und kein verlassen (${beacons.length})`);
+      await kontext.close();
+    }
+
+    // Verlassen (3.57.0): eine Meldung je Seitenaufruf mit sichtbarer Zeit (ganze Sekunden, 0–3600) und weitester Scrolltiefe
+    const verlassene = (b) => b.map((x) => JSON.parse(x.text)).filter((m) => m.art === 'verlassen');
+    const TIEFEN = [0, 25, 50, 75, 100];
+
+    // Rahmen wie bei den anderen Arten; pagehide und Verstecken des Tabs zusammen senden genau eine Meldung; kein Speicher
+    {
+      const { page, fremd, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR, SPION], uhr: '2026-10-27T10:00:00', hoehe: 400, suche: '?utm_source=mail' });
+      await warten(page);
+      await page.evaluate(() => window.__zeigen());
+      await page.clock.fastForward(12000);
+      await gehen(page);
+      await page.evaluate(() => window.__verstecken());
+      await gehen(page);
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,verlassen', `Verlassen: pagehide und Verstecken senden genau eine Meldung (${art(beacons)})`);
+      const m = verlassene(beacons)[0] || {};
+      const liste = await page.evaluate(() => document.querySelector('input[name="liste"]').value);
+      pruefe(Object.keys(m).sort().join() === 'art,breite,dauer,liste,pfad,ref,tiefe,utm,v', `Verlassen: genau die Felder des Vertrags (${Object.keys(m).sort()})`);
+      pruefe(m.v === 1 && m.liste === liste && m.liste !== '' && m.pfad === '/anmeldung--karte/' && m.ref === '' && m.breite === 390 && m.utm && m.utm.quelle === 'mail', `Verlassen: derselbe Rahmen wie aufruf (${beacons[1] && beacons[1].text})`);
+      pruefe(Number.isInteger(m.dauer) && m.dauer >= 12 && m.dauer <= 14, `Verlassen: 12 Sekunden sichtbar → dauer 12 (${m.dauer})`);
+      pruefe(TIEFEN.includes(m.tiefe), `Verlassen: tiefe aus 0|25|50|75|100 (${m.tiefe})`);
+      pruefe(beacons[1] && beacons[1].adresse === 'https://beispiel.invalid/treffer' && beacons[1].methode === 'POST' && beacons[1].typ.startsWith('text/plain'), `Verlassen: POST als text/plain an dieselbe Adresse (${beacons[1] && beacons[1].adresse})`);
+      pruefe(beacons.every((b) => b.text.length < 1000 && Object.values(JSON.parse(b.text)).every((w) => JSON.stringify(w).length < 400)), 'Verlassen: Nachricht unter 1 KB, jedes Feld unter 400 Zeichen');
+      // Rückkehr aus dem Zurück-Zwischenspeicher: wie bei aufruf kein neuer Seitenaufruf, also keine zweite Meldung
+      await page.evaluate(() => { window.__zeigen(); window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })); });
+      await page.clock.fastForward(5000);
+      await gehen(page);
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,verlassen', `Verlassen: Rückkehr aus dem Zwischenspeicher zählt nichts Neues (${art(beacons)})`);
+      const spur = await page.evaluate(() => ({ zugriffe: window.__zugriffe.slice(), cookie: document.cookie }));
+      pruefe(spur.zugriffe.length === 0 && spur.cookie === '' && (await kontext.cookies()).length === 0, `Verlassen: keine Cookies, kein Web-Speicher, kein IndexedDB (${spur.zugriffe})`);
+      await page.evaluate(() => { sessionStorage.getItem('probe'); });
+      pruefe((await page.evaluate(() => window.__zugriffe.length)) > 0, 'Verlassen: der Speicher-Spion schlägt an (Gegenprobe der Messung)');
+      pruefe(fremd.length === 0, `Verlassen: keine Fremdanfrage (${fremd.join(', ')})`);
+      await kontext.close();
+    }
+
+    // Sichtbare Zeit statt Wanduhrzeit: was im Hintergrund-Tab vergeht, zählt nicht; später Wechsel ändert die gesendete Zeit nicht
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR], uhr: '2026-10-27T10:00:00' });
+      await warten(page);
+      await page.clock.fastForward(20000);
+      await page.evaluate(() => window.__zeigen());
+      await page.clock.fastForward(7000);
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      const m = verlassene(beacons)[0] || {};
+      pruefe(m.dauer >= 7 && m.dauer <= 9, `Verlassen: 20 s im Hintergrund zählen nicht, 7 s sichtbar → dauer 7 (${m.dauer})`);
+      await page.evaluate(() => window.__zeigen());
+      await page.clock.fastForward(5000);
+      await gehen(page);
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      pruefe(verlassene(beacons).length === 1, `Verlassen: nach dem Zurückkehren kein zweites verlassen (${verlassene(beacons).length})`);
+      await kontext.close();
+    }
+
+    // Nie sichtbar gewesen (Vorab-Laden, Hintergrund-Tab): kein aufruf, also auch kein verlassen
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR] });
+      await warten(page);
+      await gehen(page);
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      pruefe(beacons.length === 0, `Verlassen: nie sichtbar → nichts (${beacons.length})`);
+      await kontext.close();
+    }
+
+    // Obergrenze 3600 Sekunden; sofortiges Verlassen ist 0
+    for (const [verstrichen, bereich, was] of [[2 * 3600 * 1000, [3600, 3600], 'zwei Stunden → 3600'], [0, [0, 1], 'sofort → 0']]) {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR], uhr: '2026-10-27T10:00:00' });
+      await warten(page);
+      await page.evaluate(() => window.__zeigen());
+      if (verstrichen) { await page.clock.fastForward(verstrichen); }
+      await gehen(page);
+      await warten(page);
+      const d = (verlassene(beacons)[0] || {}).dauer;
+      pruefe(d >= bereich[0] && d <= bereich[1], `Verlassen: dauer ${was} (${d})`);
+      await kontext.close();
+    }
+
+    // Scrolltiefe: unterer Rand des Sichtfensters im Verhältnis zur Seitenhöhe, gerundet auf 25 %; die weiteste Stelle bleibt, auch wenn man zurückscrollt
+    for (const [anteil, zurueck, erwartet] of [[0, false, 0], [0.3, false, 25], [0.5, false, 50], [0.5, true, 50], [0.8, false, 75], [1, false, 100]]) {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { hoehe: 400 });
+      await page.evaluate(() => { document.body.style.paddingBottom = '6000px'; });
+      const hoehe = await page.evaluate(() => document.documentElement.scrollHeight);
+      const nach = async (y) => { await page.evaluate((oben) => window.scrollTo({ top: oben, behavior: 'instant' }), y); await warten(page); };
+      if (anteil > 0) { await nach(Math.max(0, anteil * hoehe - 400)); }
+      if (zurueck) { await nach(0); }
+      await gehen(page);
+      await warten(page);
+      const m = verlassene(beacons)[0] || {};
+      pruefe(m.tiefe === erwartet, `Verlassen: ${anteil * 100} % der Seite gesehen${zurueck ? ', dann zurück nach oben' : ''} → tiefe ${erwartet} (${m.tiefe}, Seitenhöhe ${hoehe})`);
+      await kontext.close();
+    }
+
+    // Eine Seite, die ganz ins Fenster passt, gilt als bis unten gesehen
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 1280, { hoehe: 20000 });
+      await gehen(page);
+      await warten(page);
+      pruefe((verlassene(beacons)[0] || {}).tiefe === 100, `Verlassen: Seite passt ins Fenster → tiefe 100 (${(verlassene(beacons)[0] || {}).tiefe})`);
+      await kontext.close();
+    }
+
+    // Der Scroll-Zähler bremst die Seite nicht: passiver Hörer, beim Scrollen keine Abfrage der Seitenhöhe (nur einmal beim Verlassen)
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [SCROLLSPION], hoehe: 400 });
+      await page.evaluate(() => { document.body.style.paddingBottom = '6000px'; });
+      await warten(page);
+      const hoerer = await page.evaluate(() => window.__scrollHoerer.slice());
+      pruefe(hoerer.length > 0 && hoerer.every((p) => p === true), `Verlassen: jeder Scroll-Hörer ist passiv (${hoerer})`);
+      const vor = await page.evaluate(() => window.__hoehenLesen);
+      for (let i = 1; i <= 15; i++) {
+        await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), i * 200);
+        await page.waitForTimeout(40);
+      }
+      const waehrend = await page.evaluate(() => window.__hoehenLesen);
+      pruefe(waehrend === vor, `Verlassen: beim Scrollen keine Abfrage der Seitenhöhe (${vor} → ${waehrend})`);
+      await gehen(page);
+      await warten(page);
+      const danach = await page.evaluate(() => window.__hoehenLesen);
+      pruefe(danach - waehrend <= 1 && verlassene(beacons).length === 1, `Verlassen: beim Verlassen höchstens eine Abfrage der Seitenhöhe (${danach - waehrend})`);
+      await kontext.close();
+    }
+
+    // Echtes Verlassen: Navigation zu einer anderen Seite sendet genau ein verlassen (pagehide und Verstecken feuern beide)
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, {});
+      await warten(page);
+      await page.goto('http://lp.test/faq--standard/');
+      await warten(page);
+      pruefe(art(beacons).join() === 'aufruf,verlassen', `Verlassen: Navigation weg von der Seite sendet genau ein verlassen (${art(beacons)})`);
       await kontext.close();
     }
   }

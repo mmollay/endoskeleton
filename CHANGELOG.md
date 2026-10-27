@@ -4,6 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.57.0] — 2026-10-27
+
+### Added
+- **Statistik: Verweildauer und Scrolltiefe beim Verlassen** (`lp/lp.js`, im vorhandenen Beacon-Block von 3.56.0; Anlass: Martin, 27.10.2026, „A + B als Schalter je Seite“, Nachtrag 1 zum Statistik-Vertrag; Gegenstück im Panel: Annahme von `art: "verlassen"`). Beim ersten `pagehide` oder Verstecken des Tabs (`visibilitychange` → `hidden`) geht **einmal je Seitenaufruf** eine Meldung `art: "verlassen"` mit `dauer` (ganze Sekunden SICHTBARER Zeit, 0–3600) und `tiefe` (weitester unterer Fensterrand in Prozent der Seitenhöhe, auf 0 | 25 | 50 | 75 | 100 gerundet) an dieselbe Adresse hinaus: `sendBeacon`, `text/plain`, derselbe Rahmen (`v: 1`, `liste`, `pfad`, `ref`, `utm`, `breite`). `v` bleibt 1 (additiv).
+- **Sichtbare Zeit, keine Wanduhr:** Die Uhr (`performance.now()`) beginnt, wenn die Seite zum ersten Mal sichtbar ist — derselbe Moment wie `aufruf`. Was ein Tab im Hintergrund oder beim Vorab-Laden verstreicht, zählt nicht. Eine Seite, die nie sichtbar war, und die Rückkehrseite einer Anmeldung (`?anmeldung=…`, kein `aufruf`) senden auch kein `verlassen`. Rückkehr aus dem Zurück-Zwischenspeicher (`pageshow persisted`) zählt wie bei `aufruf` nicht als neuer Seitenaufruf.
+- **Grenzen, die man wissen muss:** Gesendet wird beim ERSTEN Verstecken. Wer den Tab nur kurz wechselt, beendet damit die Messung dieses Aufrufs (die Zeit danach fehlt) — das ist der Preis dafür, dass die Meldung auf dem Handy überhaupt ankommt (dort ist das Verstecken oft das letzte Ereignis). Eine Seite, die ganz ins Fenster passt, gilt als bis unten gesehen (`tiefe` 100).
+- **Bremst nichts:** Der Scroll-Hörer ist passiv, Scroll-Ereignisse kommen höchstens einmal je Bildwechsel, und im Hörer wird nur die Position gelesen (keine Abfrage der Seitenhöhe); die Seitenhöhe wird einmal beim Verlassen gelesen. Alle Regeln aus 3.56.0 gelten unverändert: kein Cookie, kein Web-Speicher, „Do Not Track“/„Global Privacy Control“ und `data-lp-statistik="aus"` senden nichts, Seiten ohne Anmeldeformular senden nichts, alle Fehler werden verschluckt, nichts verzögert Absenden oder Verlassen.
+- Keine neue `lp-`-Klasse, keine neue Einstellung, kein Eingriff in `base.css`, Presets, `pages/`, `api/`. Tests: `angebot` (Quelltext: Art, Ereignisse, passiver Hörer, Obergrenze, keine Wanduhr) und `ci/browser.js` (Form und Rahmen, genau eine Meldung bei `pagehide` + Verstecken + echter Navigation, Sichtzeit statt Wanduhr mit gefälschter Uhr und Tab-Wechsel, Obergrenze 3600, Scrolltiefe 0 → 100 mit Zurückscrollen, passiver Hörer ohne Höhenabfrage beim Scrollen, DNT/GPC/`aus` und Rückkehrseite ohne Meldung, kein Cookie/Web-Speicher mit Spion). Musterbuch und Skill neu erzeugt.
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und messen Dauer und Tiefe erst nach einem Neubau mit diesem Stand. Der Datenschutz-Satz aus 3.56.0 („anonym, ohne Cookies, ohne Speicherung Ihrer IP-Adresse“) bleibt wahr: Dauer und Scrolltiefe sind keine Kennung und werden nirgends auf dem Endgerät gespeichert.
+
 ## [3.56.0] — 2026-10-27
 
 ### Added
