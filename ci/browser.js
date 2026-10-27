@@ -37,7 +37,8 @@ const SPION = `(() => {
 })();`;
 const DNT = `Object.defineProperty(Navigator.prototype, 'doNotTrack', { configurable: true, get: () => '1' });`;
 const GPC = `Object.defineProperty(Navigator.prototype, 'globalPrivacyControl', { configurable: true, get: () => true });`;
-const WERFENDER_BEACON = `Navigator.prototype.sendBeacon = function () { throw new Error('Beacon kaputt'); };`;
+// sendBeacon wirft: immer, oder erst ab dem zweiten Aufruf (dann werfen formular und absenden aus dem Ereignis heraus).
+const WERFENDER_BEACON = (ab) => `{ let n = 0; Navigator.prototype.sendBeacon = function () { if (n++ >= ${ab}) { throw new Error('Beacon kaputt'); } return true; }; }`;
 const VERWEISER = (url) => `Object.defineProperty(Document.prototype, 'referrer', { configurable: true, get: () => ${JSON.stringify(url)} });`;
 // Vorab-Laden: die Seite ist zunächst unsichtbar; window.__zeigen() macht sie sichtbar und meldet es.
 const UNSICHTBAR = `(() => {
@@ -572,8 +573,8 @@ function kontrastImBrowser(nur) {
     }
 
     // Ein werfender sendBeacon darf weder Fehler in der Seite noch das Absenden stören
-    {
-      const { page, kontext, anmeldungen } = await oeffnen(browser, 'anmeldung--karte', 390, { anmelden: true, init: [WERFENDER_BEACON] });
+    for (const ab of [0, 1]) {
+      const { page, kontext, anmeldungen } = await oeffnen(browser, 'anmeldung--karte', 390, { anmelden: true, init: [WERFENDER_BEACON(ab)] });
       const fehler = [];
       page.on('pageerror', (e) => fehler.push(e.message));
       await page.focus('#lp-f-vorname');
@@ -583,8 +584,8 @@ function kontrastImBrowser(nur) {
         document.querySelector('.lp-formular button[type="submit"]').click();
       }));
       await warten(page);
-      pruefe(abgebrochen === false && anmeldungen.length === 1, `Statistik: werfender sendBeacon — das Absenden läuft trotzdem (abgebrochen: ${abgebrochen}, Anmeldungen: ${anmeldungen.length})`);
-      pruefe(fehler.length === 0, `Statistik: werfender sendBeacon — kein Fehler in der Seite (${fehler.join(' | ')})`);
+      pruefe(abgebrochen === false && anmeldungen.length === 1, `Statistik: sendBeacon wirft ab Aufruf ${ab + 1} — das Absenden läuft trotzdem (abgebrochen: ${abgebrochen}, Anmeldungen: ${anmeldungen.length})`);
+      pruefe(fehler.length === 0, `Statistik: sendBeacon wirft ab Aufruf ${ab + 1} — kein Fehler in der Seite (${fehler.join(' | ')})`);
       await kontext.close();
     }
 
