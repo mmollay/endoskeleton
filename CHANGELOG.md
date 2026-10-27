@@ -4,6 +4,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.54.5] — 2026-10-27
+
+### Changed
+- **Anmeldung: nach dem Anmeldeschluss steht „geschlossen“ statt „prüfe deine Angaben“** (`lp/bausteine/anmeldung.php`, `lp/lp.js`, `lp/lp.css`; Anlass: Martin, 27.10.2026 — eine Seite meldete nach Ablauf der Anmeldefrist „Das hat leider nicht geklappt. Bitte prüfe deine Angaben …“, obwohl die Angaben stimmten). Die Weiterleitungsstelle hängt bei abgelaufener Frist `&grund=geschlossen` an den Rücksprung (`?anmeldung=fehler&grund=geschlossen#anmeldung`; `anmeldung=fehler` bleibt, damit ältere Seiten weiter den Fehlertext zeigen). Neu ist ein versteckter Absatz neben „ausgebucht“: „Die Anmeldung ist im Moment geschlossen. Das liegt nicht an deinen Angaben. Bitte melde dich direkt bei uns.“ (Sie-Form über die Anrede des Profils). `lp.js` zeigt ihn und fokussiert ihn, blendet die Felder aus (wie bei „voll“), blendet keine Plätze-Zahl ein und entfernt `anmeldung` und `grund` aus der Adresse. Nur der eine Wert `geschlossen` wirkt; jeder andere `grund`-Wert, und `?anmeldung=geschlossen` allein, ändert nichts. Fehlt der Absatz (Seite aus einer älteren Marke), bleibt es beim bisherigen Fehlertext.
+- Neue Klasse: `lp-anmeldung-geschlossen` (gleiche Optik wie `lp-anmeldung-voll`: dieselbe CSS-Regel, kein neuer Stil, Farben aus `--primary`/`--heading` wie bisher — Paar schon in der Kontrast-Matrix).
+- Der Fehlertext „Das hat leider nicht geklappt …“ bekommt den Zusatz „Klappt es wieder nicht, melde dich bitte direkt bei uns.“ (Sie: „… melden Sie sich bitte direkt bei uns.“) — für alle anderen Fehler, bei denen es der Besucher noch einmal versuchen soll.
+- Dazu im Panel: Rücksprung mit `grund=geschlossen` ab rc1276 (Zweig `lp/geschlossen`). Das Musterbuch ist neu gebaut; Tests `bausteine`/`angebot` prüfen Wortlaut und Markup, `ci/browser.js` das Verhalten (geschlossen, anderer `grund`-Wert, Seite ohne den Absatz).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit den alten Fehlertext, bis sie neu gebaut werden.
+
 ## [3.54.4] — 2026-10-19
 
 ### Changed

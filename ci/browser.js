@@ -46,7 +46,8 @@ async function oeffnen(browser, name, breite, optionen = {}) {
     let f = path.join(MUSTERBUCH, decodeURIComponent(u.pathname));
     if (f.endsWith(path.sep)) { f = path.join(f, 'index.html'); }
     if (!f.startsWith(MUSTERBUCH) || !fs.existsSync(f)) { return r.fulfill({ status: 404, body: 'fehlt' }); }
-    return r.fulfill({ status: 200, body: fs.readFileSync(f), contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
+    const inhalt = optionen.umbau && f.endsWith('.html') ? optionen.umbau(fs.readFileSync(f, 'utf8')) : fs.readFileSync(f);
+    return r.fulfill({ status: 200, body: inhalt, contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
   await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
@@ -315,6 +316,61 @@ function kontrastImBrowser(nur) {
       pruefe(ist.felder === felder, `${fall}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'}`);
       pruefe(ist.anzeige === anzeige, `${fall}: Plätze-Anzeige „${ist.anzeige}“ (erwartet ${anzeige === null ? 'keine' : `„${anzeige}“`})`);
       pruefe(abfragen.length === anzahl, `${fall}: ${abfragen.length} Abfrage(n) (erwartet ${anzahl})`);
+      await kontext.close();
+    }
+
+    // Anmeldefrist abgelaufen (3.54.5): ?anmeldung=fehler&grund=geschlossen zeigt „geschlossen“ statt des Fehlertexts, ohne Felder und ohne Zahl.
+    // Nur dieser eine Wert wirkt; jeder andere grund (und grund oder ?anmeldung=geschlossen allein) ändert nichts. Eine Seite aus einer älteren Marke
+    // (ohne den Absatz) zeigt den bisherigen Fehlertext. Der Stand des Panels sagt überall „12 von 30 frei“ — ein Leck würde die Zahl sichtbar machen.
+    const MELDUNGEN = [...RUECK, 'lp-anmeldung-geschlossen'];
+    const ohneAbsatz = (html) => html.replace(/<p class="lp-anmeldung-geschlossen"[^>]*>.*?<\/p>/s, '');
+    const frist = [
+      // [Name, Suche, Umbau, sichtbare Meldung, Felder, Plätze-Anzeige, Abfragen, Adresse danach]
+      ['geschlossen', '?anmeldung=fehler&grund=geschlossen#anmeldung', null, 'lp-anmeldung-geschlossen', false, null, 0, ''],
+      ['anderer Wert', '?anmeldung=fehler&grund=quatsch#anmeldung', null, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+      ['Wert in Großschrift', '?anmeldung=fehler&grund=GESCHLOSSEN#anmeldung', null, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+      ['grund ohne fehler', '?anmeldung=voll&grund=geschlossen#anmeldung', null, 'lp-anmeldung-voll', false, null, 0, ''],
+      ['?anmeldung=geschlossen allein', '?anmeldung=geschlossen#anmeldung', null, null, true, 'Noch 12 von 30 Plätzen frei', 1, '?anmeldung=geschlossen#anmeldung'],
+      ['grund allein', '?grund=geschlossen#anmeldung', null, null, true, 'Noch 12 von 30 Plätzen frei', 1, '?grund=geschlossen#anmeldung'],
+      ['Seite ohne den Absatz', '?anmeldung=fehler&grund=geschlossen#anmeldung', ohneAbsatz, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+    ];
+    for (const [fall, suche, umbau, klasse, felder, anzeige, anzahl, adresse] of frist) {
+      const { page, abfragen, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { suche, umbau: umbau || undefined, hoehe: 300, reducedMotion: 'reduce', plaetze: { status: 200, daten: { frei: 12, gesamt: 30, voll: false } } });
+      await page.waitForLoadState('networkidle');
+      const ist = await page.evaluate((klassen) => {
+        const a = document.querySelector('.lp-anmeldung-plaetze');
+        return {
+          sichtbar: klassen.filter((k) => (document.querySelector(`.${k}`)?.getClientRects().length ?? 0) > 0),
+          fokus: document.activeElement.className,
+          felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0,
+          anzeige: a.getClientRects().length > 0 ? a.textContent.trim() : null,
+          adresse: location.search + location.hash,
+        };
+      }, MELDUNGEN);
+      const name = `Frist ${fall} (${suche})`;
+      pruefe(JSON.stringify(ist.sichtbar) === JSON.stringify(klasse ? [klasse] : []) && (klasse === null || ist.fokus === klasse), `${name}: sichtbar ${JSON.stringify(ist.sichtbar)}, Fokus ${ist.fokus}`);
+      pruefe(ist.felder === felder, `${name}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'}`);
+      pruefe(ist.anzeige === anzeige, `${name}: Plätze-Anzeige „${ist.anzeige}“ (erwartet ${anzeige === null ? 'keine' : `„${anzeige}“`})`);
+      pruefe(abfragen.length === anzahl, `${name}: ${abfragen.length} Abfrage(n) (erwartet ${anzahl})`);
+      pruefe(ist.adresse === adresse, `${name}: Adresse danach „${ist.adresse}“ (erwartet „${adresse}“)`);
+      await kontext.close();
+    }
+    {
+      // Optik wie „voll“ (eine CSS-Regel) und lesbar: Wortlaut, Kontrast, Umbruch bei Handybreite ohne waagrechtes Scrollen.
+      const { page, kontext } = await oeffnen(browser, 'anmeldung--karte', 320, { suche: '?anmeldung=fehler&grund=geschlossen#anmeldung', hoehe: 300, reducedMotion: 'reduce' });
+      const ist = await page.evaluate(() => {
+        const stil = (el) => { const c = getComputedStyle(el); return ['borderTopWidth', 'borderTopColor', 'borderTopLeftRadius', 'paddingTop', 'paddingLeft', 'fontWeight', 'fontSize', 'color', 'marginTop'].map((k) => c[k]).join('|'); };
+        const zu = document.querySelector('.lp-anmeldung-geschlossen'), voll = document.querySelector('.lp-anmeldung-voll');
+        voll.hidden = false;
+        const gleich = stil(zu) === stil(voll);
+        voll.hidden = true;
+        return { gleich, text: zu.textContent.trim(), breit: document.documentElement.scrollWidth > document.documentElement.clientWidth };
+      });
+      pruefe(ist.gleich, 'Frist geschlossen: gleiche Optik wie „voll“ (Rahmen, Abstand, Schrift, Farbe)');
+      pruefe(ist.text === 'Die Anmeldung ist im Moment geschlossen. Das liegt nicht an deinen Angaben. Bitte melde dich direkt bei uns.', `Frist geschlossen: Wortlaut „${ist.text}“`);
+      pruefe(!ist.breit, 'Frist geschlossen: bei 320 px kein waagrechtes Scrollen');
+      const schwach = await page.evaluate(kontrastImBrowser, '.lp-anmeldung-geschlossen');
+      pruefe(schwach.length === 0, `Frist geschlossen: Kontrast der Meldung: ${schwach.join(' | ')}`);
       await kontext.close();
     }
   }
