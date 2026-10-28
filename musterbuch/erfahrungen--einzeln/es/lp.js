@@ -29,7 +29,9 @@
   });
 
   // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|fehler|voll#anmeldung): Meldung zeigen und fokussieren, bei ok und voll ohne
-  // Felder; andere Werte wirken nicht. „bereits“ gilt als ok (Abwehr in der Tiefe, falls eine Weiterleitungsstelle es
+  // Felder; andere Werte wirken nicht. „geschlossen“ (3.54.5): Ist die Anmeldefrist der Liste abgelaufen, kommt ?anmeldung=fehler&grund=geschlossen;
+  // dann steht statt des Fehlertexts „Die Anmeldung ist im Moment geschlossen“ da, ohne Felder — die Angaben des Besuchers waren ja in Ordnung.
+  // Nur dieser eine Wert von grund wirkt; fehlt der Absatz (Seite aus einer älteren Marke), bleibt es beim bisherigen Fehlertext. „bereits“ gilt als ok (Abwehr in der Tiefe, falls eine Weiterleitungsstelle es
   // noch schickt): Die Seite verrät nicht, ob eine Adresse schon auf der Liste steht. „voll“ (3.52.0) hängt nicht an der
   // Adresse, nur an der Platzgrenze der Liste. Parameter und Sprungmarke verschwinden aus der Adresse — sonst nimmt Chrome
   // beim Sprung zu #anmeldung den Fokus wieder weg, und eine geteilte Adresse zeigte die Meldung statt des Formulars. Damit
@@ -37,15 +39,16 @@
   var meldungen = { ok: '.lp-anmeldung-danke', bereits: '.lp-anmeldung-danke', fehler: '.lp-anmeldung-fehler', voll: '.lp-anmeldung-voll' };
   var adresse = new URL(location.href), zustand = adresse.searchParams.get('anmeldung');
   var rueckmeldung = Object.prototype.hasOwnProperty.call(meldungen, zustand);
+  var geschlossen = zustand === 'fehler' && adresse.searchParams.get('grund') === 'geschlossen' && document.querySelector('.lp-anmeldung-geschlossen') !== null;
 
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
   // Ohne JavaScript prüft der Browser selbst (required); mit JavaScript übernehmen die eigenen Meldungen.
   document.querySelectorAll('form.lp-formular').forEach(function (form) {
-    var meldung = rueckmeldung && form.querySelector(meldungen[zustand]);
+    var meldung = rueckmeldung && form.querySelector(geschlossen ? '.lp-anmeldung-geschlossen' : meldungen[zustand]);
     if (meldung) {
       meldung.hidden = false;
-      if (zustand !== 'fehler') { form.querySelector('fieldset').hidden = true; }
-      adresse.searchParams.delete('anmeldung'); adresse.hash = '';
+      if (zustand !== 'fehler' || geschlossen) { form.querySelector('fieldset').hidden = true; }
+      adresse.searchParams.delete('anmeldung'); adresse.searchParams.delete('grund'); adresse.hash = '';
       try { history.replaceState(history.state, '', adresse.href); } catch (e) { /* ohne Verlauf nur ohne Fokus */ }
       meldung.focus();
     }
@@ -67,11 +70,11 @@
   // Plätze (3.52.0): Ist die Anmeldung begrenzt, fragt die Seite den Stand beim Panel ab — nur Zahlen, ohne Cookies. Der Host
   // kommt aus dem Formularziel (data-lp-plaetze-quelle), nie fest aus diesem Skript. Bei „voll“ verschwinden die Felder;
   // scheitert die Abfrage (Netz, Drosselung, Sperre), bleibt der feste Text „Begrenzt auf N Plätze.“ stehen. Nach einer
-  // Rückmeldung ohne Felder (ok, bereits, voll) ist die Zahl überholt: keine Abfrage, keine Anzeige — /lp/plaetze ist im
+  // Rückmeldung ohne Felder (ok, bereits, voll, geschlossen) ist die Zahl überholt: keine Abfrage, keine Anzeige — /lp/plaetze ist im
   // Panel bis 60 s zwischengespeichert, /lp/anmelden zählt live, und sonst stünde „Noch 1 … frei“ neben „ausgebucht“.
   // Nach „fehler“ wird gefragt; ist die Liste voll, ersetzt die Meldung „ausgebucht“ die Aufforderung, es noch einmal zu versuchen.
   document.querySelectorAll('.lp-anmeldung-plaetze[data-lp-plaetze-quelle]').forEach(function (anzeige) {
-    if (rueckmeldung && zustand !== 'fehler') { anzeige.hidden = true; return; }
+    if (rueckmeldung && (zustand !== 'fehler' || geschlossen)) { anzeige.hidden = true; return; }
     if (!window.fetch) { return; }
     var form = anzeige.closest('form');
     fetch(anzeige.dataset.lpPlaetzeQuelle + '?liste=' + encodeURIComponent(anzeige.dataset.lpPlaetzeListe), { credentials: 'omit' })

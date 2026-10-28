@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.57.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.58.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3562,7 +3562,8 @@ section.lp-anmeldung {
    und --error auf --card-bg prüft die Kontrast-Matrix. Der Rahmen gibt auch dem Fokusrahmen einen sauberen Sitz. */
 .lp-formular .lp-anmeldung-danke,
 .lp-formular .lp-anmeldung-fehler,
-.lp-formular .lp-anmeldung-voll {
+.lp-formular .lp-anmeldung-voll,
+.lp-formular .lp-anmeldung-geschlossen {
   margin: 0;                 /* Abstände setzt das Raster; „.lp-block p + p“ träfe sonst die zweite Meldung */
   padding: var(--space-sm) var(--space-md);
   border: 2px solid var(--primary);

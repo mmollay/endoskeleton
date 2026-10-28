@@ -200,6 +200,8 @@ return [
         $js = (string) file_get_contents(H::wurzel() . '/lp/lp.js');
         T::contains($js, "credentials: 'omit'", 'Abfrage ohne Cookies');
         T::contains($js, "voll: '.lp-anmeldung-voll'", 'Rücksprung voll');
+        T::contains($js, "searchParams.get('grund') === 'geschlossen'", '3.54.5: nur der eine Wert grund=geschlossen wirkt (Browsertest ci/browser.js prüft das Verhalten)');
+        T::notContains($js, "geschlossen: '", '3.54.5: „geschlossen“ steht nicht in der Tabelle der Rückmeldungen — ?anmeldung=geschlossen allein wirkt nicht');
         T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
     },
     'lp.js: Statistik (3.56.0) — Beacon aus dem Formularziel, Verzicht bei DNT/GPC/Abmeldung, kein Cookie, kein Web-Speicher' => static function (): void {

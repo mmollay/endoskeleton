@@ -440,6 +440,61 @@ function kontrastImBrowser(nur) {
       pruefe(abfragen.length === anzahl, `${fall}: ${abfragen.length} Abfrage(n) (erwartet ${anzahl})`);
       await kontext.close();
     }
+
+    // Anmeldefrist abgelaufen (3.54.5): ?anmeldung=fehler&grund=geschlossen zeigt „geschlossen“ statt des Fehlertexts, ohne Felder und ohne Zahl.
+    // Nur dieser eine Wert wirkt; jeder andere grund (und grund oder ?anmeldung=geschlossen allein) ändert nichts. Eine Seite aus einer älteren Marke
+    // (ohne den Absatz) zeigt den bisherigen Fehlertext. Der Stand des Panels sagt überall „12 von 30 frei“ — ein Leck würde die Zahl sichtbar machen.
+    const MELDUNGEN = [...RUECK, 'lp-anmeldung-geschlossen'];
+    const ohneAbsatz = (html) => html.replace(/<p class="lp-anmeldung-geschlossen"[^>]*>.*?<\/p>/s, '');
+    const frist = [
+      // [Name, Suche, Umbau, sichtbare Meldung, Felder, Plätze-Anzeige, Abfragen, Adresse danach]
+      ['geschlossen', '?anmeldung=fehler&grund=geschlossen#anmeldung', null, 'lp-anmeldung-geschlossen', false, null, 0, ''],
+      ['anderer Wert', '?anmeldung=fehler&grund=quatsch#anmeldung', null, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+      ['Wert in Großschrift', '?anmeldung=fehler&grund=GESCHLOSSEN#anmeldung', null, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+      ['grund ohne fehler', '?anmeldung=voll&grund=geschlossen#anmeldung', null, 'lp-anmeldung-voll', false, null, 0, ''],
+      ['?anmeldung=geschlossen allein', '?anmeldung=geschlossen#anmeldung', null, null, true, 'Noch 12 von 30 Plätzen frei', 1, '?anmeldung=geschlossen#anmeldung'],
+      ['grund allein', '?grund=geschlossen#anmeldung', null, null, true, 'Noch 12 von 30 Plätzen frei', 1, '?grund=geschlossen#anmeldung'],
+      ['Seite ohne den Absatz', '?anmeldung=fehler&grund=geschlossen#anmeldung', ohneAbsatz, 'lp-anmeldung-fehler', true, 'Noch 12 von 30 Plätzen frei', 1, ''],
+    ];
+    for (const [fall, suche, umbau, klasse, felder, anzeige, anzahl, adresse] of frist) {
+      const { page, abfragen, kontext } = await oeffnen(browser, 'anmeldung--karte', 390, { suche, umschreiben: umbau || undefined, hoehe: 300, reducedMotion: 'reduce', plaetze: { status: 200, daten: { frei: 12, gesamt: 30, voll: false } } });
+      await page.waitForLoadState('networkidle');
+      const ist = await page.evaluate((klassen) => {
+        const a = document.querySelector('.lp-anmeldung-plaetze');
+        return {
+          sichtbar: klassen.filter((k) => (document.querySelector(`.${k}`)?.getClientRects().length ?? 0) > 0),
+          fokus: document.activeElement.className,
+          felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0,
+          anzeige: a.getClientRects().length > 0 ? a.textContent.trim() : null,
+          adresse: location.search + location.hash,
+        };
+      }, MELDUNGEN);
+      const name = `Frist ${fall} (${suche})`;
+      pruefe(JSON.stringify(ist.sichtbar) === JSON.stringify(klasse ? [klasse] : []) && (klasse === null || ist.fokus === klasse), `${name}: sichtbar ${JSON.stringify(ist.sichtbar)}, Fokus ${ist.fokus}`);
+      pruefe(ist.felder === felder, `${name}: Felder ${ist.felder ? 'sichtbar' : 'ausgeblendet'}`);
+      pruefe(ist.anzeige === anzeige, `${name}: Plätze-Anzeige „${ist.anzeige}“ (erwartet ${anzeige === null ? 'keine' : `„${anzeige}“`})`);
+      pruefe(abfragen.length === anzahl, `${name}: ${abfragen.length} Abfrage(n) (erwartet ${anzahl})`);
+      pruefe(ist.adresse === adresse, `${name}: Adresse danach „${ist.adresse}“ (erwartet „${adresse}“)`);
+      await kontext.close();
+    }
+    {
+      // Optik wie „voll“ (eine CSS-Regel) und lesbar: Wortlaut, Kontrast, Umbruch bei Handybreite ohne waagrechtes Scrollen.
+      const { page, kontext } = await oeffnen(browser, 'anmeldung--karte', 320, { suche: '?anmeldung=fehler&grund=geschlossen#anmeldung', hoehe: 300, reducedMotion: 'reduce' });
+      const ist = await page.evaluate(() => {
+        const stil = (el) => { const c = getComputedStyle(el); return ['borderTopWidth', 'borderTopColor', 'borderTopLeftRadius', 'paddingTop', 'paddingLeft', 'fontWeight', 'fontSize', 'color', 'marginTop'].map((k) => c[k]).join('|'); };
+        const zu = document.querySelector('.lp-anmeldung-geschlossen'), voll = document.querySelector('.lp-anmeldung-voll');
+        voll.hidden = false;
+        const gleich = stil(zu) === stil(voll);
+        voll.hidden = true;
+        return { gleich, text: zu.textContent.trim(), breit: document.documentElement.scrollWidth > document.documentElement.clientWidth };
+      });
+      pruefe(ist.gleich, 'Frist geschlossen: gleiche Optik wie „voll“ (Rahmen, Abstand, Schrift, Farbe)');
+      pruefe(ist.text === 'Die Anmeldung ist im Moment geschlossen. Das liegt nicht an deinen Angaben. Bitte melde dich direkt bei uns.', `Frist geschlossen: Wortlaut „${ist.text}“`);
+      pruefe(!ist.breit, 'Frist geschlossen: bei 320 px kein waagrechtes Scrollen');
+      const schwach = await page.evaluate(kontrastImBrowser, '.lp-anmeldung-geschlossen');
+      pruefe(schwach.length === 0, `Frist geschlossen: Kontrast der Meldung: ${schwach.join(' | ')}`);
+      await kontext.close();
+    }
   }
 
   // Häufige Fragen per Tastatur
@@ -612,6 +667,40 @@ function kontrastImBrowser(nur) {
       await gehen(page);
       await warten(page);
       pruefe(beacons.length === 0, `Statistik: Rückkehr nach der Anmeldung zählt keinen zweiten aufruf und kein verlassen (${beacons.length})`);
+      await kontext.close();
+    }
+
+    // Zusammenspiel (3.58.0): „geschlossen“ (3.54.5), zweites Häkchen (3.55.0) und Beacon (3.56.0/3.57.0) auf derselben Seite. anmeldung--karte trägt beide Häkchen.
+    // Rückkehr mit grund=geschlossen: bleibt bei „geschlossen“, die Felder mit dem zweiten Häkchen sind weg, kein Beacon (die Seite ist schon gezählt), keine Plätze-Abfrage.
+    // Seite mit Formular: aufruf, formular, beim Verlassen verlassen — aber kein absenden, solange nichts abgesendet wurde (auch nicht beim Versuch mit leeren Pflichtfeldern).
+    {
+      const { page, kontext, beacons, abfragen, fremd } = await oeffnen(browser, 'anmeldung--karte', 390, { suche: '?anmeldung=fehler&grund=geschlossen#anmeldung', hoehe: 300, reducedMotion: 'reduce' });
+      await warten(page);
+      await gehen(page);
+      await warten(page);
+      const ist = await page.evaluate(() => ({
+        sichtbar: ['lp-anmeldung-geschlossen', 'lp-anmeldung-fehler', 'lp-anmeldung-danke', 'lp-anmeldung-voll'].filter((k) => document.querySelector(`.${k}`).getClientRects().length > 0),
+        fokus: document.activeElement.className,
+        haken: document.querySelectorAll('#lp-f-newsletter').length,
+        hakenSichtbar: document.querySelector('#lp-f-newsletter').getClientRects().length > 0,
+        felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0,
+      }));
+      pruefe(JSON.stringify(ist.sichtbar) === '["lp-anmeldung-geschlossen"]' && ist.fokus === 'lp-anmeldung-geschlossen', `Zusammenspiel: mit zweitem Häkchen im Bauplan bleibt es bei „geschlossen“ (${ist.sichtbar}, Fokus ${ist.fokus})`);
+      pruefe(ist.haken === 1 && !ist.hakenSichtbar && !ist.felder, `Zusammenspiel: das zweite Häkchen steht im Formular, ist aber mit den Feldern ausgeblendet (${ist.haken}, sichtbar ${ist.hakenSichtbar})`);
+      pruefe(beacons.length === 0, `Zusammenspiel: Rückkehrseite „geschlossen“ sendet nichts, auch kein verlassen (${art(beacons)})`);
+      pruefe(abfragen.length === 0 && fremd.length === 0, `Zusammenspiel: „geschlossen“ ohne Plätze-Abfrage und ohne Fremdanfrage (${abfragen.length}, ${fremd.join(', ')})`);
+      await kontext.close();
+    }
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, {});
+      await warten(page);
+      const vorher = await page.evaluate(() => ({ geschlossen: document.querySelector('.lp-anmeldung-geschlossen').getClientRects().length > 0, felder: document.querySelector('.lp-formular fieldset').getClientRects().length > 0 }));
+      await page.check('#lp-f-newsletter');
+      await page.click('.lp-formular button[type="submit"]');
+      await gehen(page);
+      await warten(page);
+      pruefe(!vorher.geschlossen && vorher.felder, 'Zusammenspiel: ohne Rückmeldung zeigt die Seite das Formular, „geschlossen“ bleibt versteckt');
+      pruefe(art(beacons).join() === 'aufruf,formular,verlassen', `Zusammenspiel: zweites Häkchen angehakt, Absenden an leeren Pflichtfeldern gescheitert → aufruf, formular, verlassen, kein absenden (${art(beacons)})`);
       await kontext.close();
     }
 

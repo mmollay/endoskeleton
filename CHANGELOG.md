@@ -4,6 +4,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.58.0] — 2026-10-28
+
+### Changed
+- **Zusammenführung der Marken 3.54.5 und 3.55.0–3.57.0** (kein neues Verhalten, keine neue `lp-`-Klasse; Anlass: beide Zweige gingen von 3.54.4 aus und änderten dieselben Dateien, `lp-fabrik` konnte nur eine Seite übernehmen). Diese Marke enthält: aus 3.54.5 den Zustand „geschlossen“ der Anmeldung (`?anmeldung=fehler&grund=geschlossen` zeigt „Die Anmeldung ist im Moment geschlossen …“ statt des Fehlertexts, ohne Felder und ohne Plätze-Zahl; Klasse `lp-anmeldung-geschlossen`; der längere Fehlertext); aus 3.55.0 die zwei Häkchen (freiwilliges Newsletter-Häkchen nur mit `"newsletter": true` im Bauplan; Klassen `lp-einwilligung--freiwillig`, `lp-freiwillig`); aus 3.56.0 und 3.57.0 den anonymen Statistik-Beacon in `lp/lp.js` (`aufruf`, `formular`, `absenden`, `verlassen`). Das Zusammenspiel: Auf der Rückkehrseite mit „geschlossen“ bleibt es bei „geschlossen“ (auch mit dem zweiten Häkchen im Bauplan, dessen Feld in den ausgeblendeten Feldern steht), und der Beacon sendet dort nichts, weil die Rückkehrseite schon gezählt ist; auf der Seite mit Formular sendet er `aufruf` und beim Verlassen `verlassen`, aber kein `absenden`, wenn nichts abgesendet wurde. In `ci/browser.js` blieb der Hilfsparameter `umschreiben` (3.56.0); der gleichwertige `umbau` aus 3.54.5 entfällt. Neuer Test `zusammenspiel` (Quelltext von `lp.js` und `anmeldung.php`) und neue Browserfälle für „geschlossen“ mit zweitem Häkchen und Beacon. Das Musterbuch und `lp/SKILL.md`/`lp/werkstatt.md` sind neu gebaut, nicht von Hand gemischt.
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`), bis sie neu gebaut werden; Seiten der Marken 3.54.5 bis 3.57.0 sind einzeln unverändert gültig.
+
 ## [3.57.0] — 2026-10-27
 
 ### Added
@@ -32,6 +38,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 - Neue Klassen: `lp-einwilligung--freiwillig` (Hülle des freiwilligen Häkchens), `lp-freiwillig` (das Wort „(freiwillig)“, gedämpft, ohne Umbruch). Vertrag an die Weiterleitungsstelle: zusätzlich zu den bisherigen Feldern `newsletter=ja` (nur wenn angehakt) und `newsletter_kurz` (immer, wenn das Häkchen da ist).
 - Musterbuch `anmeldung--karte` zeigt beide Häkchen (Testprofil mit `einwilligung_newsletter`), `anmeldung--breit` weiter nur eines; `lp/SKILL.md` und `lp/werkstatt.md` neu erzeugt. Tests: `bausteine` (Markup, Reihenfolge, Kurzsummen, Standardwortlaut, Sie-Form, `false`), `pruefen` (vier Sperren), `profil` (Feldregeln, `newsletterText`), `schema` (`newsletter` nur ja/nein); Browsertest `ci/browser.js`: beide Häkchen bei 360/390/1280 px sichtbar und bedienbar, Absenden nur mit Häkchen 1 (Newsletter allein genügt nicht), Newsletter nie `aria-invalid`, per Tab und Leertaste erreichbar, Kontrast hell und dunkel, ohne `newsletter` nur ein Häkchen.
 - Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit das alte Formular mit einem Häkchen, bis sie neu gebaut werden. Der Wortlaut der Pflicht-Einwilligung steht im Profil des Kunden (`einwilligung`) — dort muss „und Neuigkeiten“ heraus, damit das Pflicht-Häkchen wirklich nur Zugangslink und Erinnerung deckt.
+
+## [3.54.5] — 2026-10-27
+
+### Changed
+- **Anmeldung: nach dem Anmeldeschluss steht „geschlossen“ statt „prüfe deine Angaben“** (`lp/bausteine/anmeldung.php`, `lp/lp.js`, `lp/lp.css`; Anlass: Martin, 27.10.2026 — eine Seite meldete nach Ablauf der Anmeldefrist „Das hat leider nicht geklappt. Bitte prüfe deine Angaben …“, obwohl die Angaben stimmten). Die Weiterleitungsstelle hängt bei abgelaufener Frist `&grund=geschlossen` an den Rücksprung (`?anmeldung=fehler&grund=geschlossen#anmeldung`; `anmeldung=fehler` bleibt, damit ältere Seiten weiter den Fehlertext zeigen). Neu ist ein versteckter Absatz neben „ausgebucht“: „Die Anmeldung ist im Moment geschlossen. Das liegt nicht an deinen Angaben. Bitte melde dich direkt bei uns.“ (Sie-Form über die Anrede des Profils). `lp.js` zeigt ihn und fokussiert ihn, blendet die Felder aus (wie bei „voll“), blendet keine Plätze-Zahl ein und entfernt `anmeldung` und `grund` aus der Adresse. Nur der eine Wert `geschlossen` wirkt; jeder andere `grund`-Wert, und `?anmeldung=geschlossen` allein, ändert nichts. Fehlt der Absatz (Seite aus einer älteren Marke), bleibt es beim bisherigen Fehlertext.
+- Neue Klasse: `lp-anmeldung-geschlossen` (gleiche Optik wie `lp-anmeldung-voll`: dieselbe CSS-Regel, kein neuer Stil, Farben aus `--primary`/`--heading` wie bisher — Paar schon in der Kontrast-Matrix).
+- Der Fehlertext „Das hat leider nicht geklappt …“ bekommt den Zusatz „Klappt es wieder nicht, melde dich bitte direkt bei uns.“ (Sie: „… melden Sie sich bitte direkt bei uns.“) — für alle anderen Fehler, bei denen es der Besucher noch einmal versuchen soll.
+- Dazu im Panel: Rücksprung mit `grund=geschlossen` ab rc1276 (Zweig `lp/geschlossen`). Das Musterbuch ist neu gebaut; Tests `bausteine`/`angebot` prüfen Wortlaut und Markup, `ci/browser.js` das Verhalten (geschlossen, anderer `grund`-Wert, Seite ohne den Absatz).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`) und damit den alten Fehlertext, bis sie neu gebaut werden.
 
 ## [3.54.4] — 2026-10-19
 

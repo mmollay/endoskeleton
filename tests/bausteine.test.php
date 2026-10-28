@@ -207,6 +207,13 @@ return [
         T::eq($text($x, 'lp-anmeldung-danke'), 'Danke! Bitte bestätige deine Anmeldung in der E-Mail. Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'ok: Dankestext aus dem Bauplan, danach der feste Zusatzsatz (du)');
         T::contains($text($x, 'lp-anmeldung-fehler'), 'Bitte prüfe deine Angaben und versuche es noch einmal.', 'fehler: du');
         T::eq($x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-fehler")]/following-sibling::fieldset')->length, 1, 'fehler: Meldung steht vor den Feldern');
+        // 3.54.5: Nach dem Anmeldeschluss bringt das Panel ?anmeldung=fehler&grund=geschlossen zurück — dafür liegt eine eigene Meldung bereit (lp.js schaltet um).
+        T::contains($text($x, 'lp-anmeldung-fehler'), 'Klappt es wieder nicht, melde dich bitte direkt bei uns.', 'fehler: Zusatz „direkt melden“ (du)');
+        $zu = $x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-geschlossen")]');
+        T::eq($zu->length, 1, 'geschlossen: genau eine Meldung im Formular');
+        T::ok($zu->length === 1 && $zu->item(0)->hasAttribute('hidden') && $zu->item(0)->getAttribute('role') === 'status' && $zu->item(0)->getAttribute('tabindex') === '-1', 'geschlossen: versteckt bereit, role=status, fokussierbar');
+        T::eq($text($x, 'lp-anmeldung-geschlossen'), 'Die Anmeldung ist im Moment geschlossen. Das liegt nicht an deinen Angaben. Bitte melde dich direkt bei uns.', 'geschlossen: Wortlaut (du)');
+        T::eq($x->query('//form[contains(@class,"lp-formular")]/p[contains(@class,"lp-anmeldung-geschlossen")]/following-sibling::fieldset')->length, 1, 'geschlossen: Meldung steht vor den Feldern');
         // Datenschutz (Entscheidung 27.09.2026): Die Seite verrät nicht, ob eine Adresse schon auf der Liste steht —
         // keine eigene Meldung dafür; die Dankesmeldung deckt beide Fälle ab.
         T::eq($x->query('//*[contains(@class,"lp-anmeldung-bereits")]')->length, 0, 'keine eigene Meldung „bereits angemeldet“');
@@ -216,6 +223,10 @@ return [
         T::contains($h, 'Bitte prüfen Sie Ihre Angaben und versuchen Sie es noch einmal.', 'fehler: Sie');
         T::notContains($h, 'Falls du schon', 'ok: kein du');
         T::notContains($h, 'Bitte prüfe deine', 'fehler: kein du');
+        T::contains($text($x, 'lp-anmeldung-fehler'), 'Klappt es wieder nicht, melden Sie sich bitte direkt bei uns.', 'fehler: Zusatz „direkt melden“ (Sie)');
+        T::eq($text($x, 'lp-anmeldung-geschlossen'), 'Die Anmeldung ist im Moment geschlossen. Das liegt nicht an Ihren Angaben. Bitte melden Sie sich direkt bei uns.', 'geschlossen: Wortlaut (Sie)');
+        T::notContains($h, 'Klappt es wieder nicht, melde dich', 'geschlossen/fehler: kein du');
+        T::notContains($h, 'nicht an deinen Angaben', 'geschlossen: kein du');
         T::notContains($h, 'bereits angemeldet', 'Sie: kein Text „bereits angemeldet“');
     },
     'anmeldung ohne JavaScript: Hinweis im <noscript> erklärt den Ablauf, du/Sie; ohne Formularziel keiner' => static function () use ($bau, $profilMit): void {
