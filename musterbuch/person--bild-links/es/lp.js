@@ -81,6 +81,8 @@
   // Sprung zum Formular (3.59.0): Wer auf einen Knopf oder Link zum Formular (#anmeldung) klickt, bekommt den Cursor gleich ins erste Feld
   // und spart sich einen Klick. Nur nach diesem Klick — nie beim Laden und nie nach einer Rückmeldung (dort fokussiert die Meldung). Der Fokus
   // kommt erst, wenn der Sprung steht (das sanfte Scrollen läuft noch; bei „weniger Bewegung“ gleich) und scrollt nicht selbst (preventScroll).
+  // Ziel muss der Anmeldeabschnitt selbst sein (.lp-anmeldung): Der Link „Zum Inhalt springen“ zeigt auf <main id="inhalt">, das das Formular
+  // nur enthält — dorthin darf der Cursor nicht (WCAG 2.4.1).
   // Erstes Feld = erstes sichtbares, bedienbares Eingabefeld, nie der Honigtopf; ohne ein solches (Fieldset gesperrt oder nach der
   // Rückmeldung ausgeblendet) passiert nichts. Ein Klick, den das Panel im Bearbeiten-Modus abfängt (defaultPrevented), tut nichts.
   // selbstFokus: Die Statistik unten zählt diesen Fokus nicht als Formularbeginn.
@@ -94,7 +96,7 @@
     var link = ereignis.target.closest && ereignis.target.closest('a[href^="#"]');
     if (!link || ereignis.defaultPrevented || ereignis.button !== 0 || ereignis.metaKey || ereignis.ctrlKey || ereignis.shiftKey || ereignis.altKey) { return; }
     var ziel = document.getElementById(link.getAttribute('href').slice(1));
-    var form = ziel && (ziel.closest('form.lp-formular') || ziel.querySelector('form.lp-formular'));
+    var form = ziel && ziel.matches('.lp-anmeldung') && ziel.querySelector('form.lp-formular'); // nur der Anmeldeabschnitt, nicht <main id="inhalt"> des Skip-Links
     if (!form) { return; }
     var fokussieren = function () {
       var feld = ersteFeld(form), aktiv = document.activeElement;

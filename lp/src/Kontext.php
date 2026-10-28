@@ -51,10 +51,11 @@ final class Kontext
         return sprintf('<section class="lp-block lp-%s lp-%s--%s"%s aria-labelledby="%s">', $typ, $typ, $this->e($b['variante']), $anker, $this->id($nr, 'titel'));
     }
 
-    /** Stufe der Titelgröße nach Zeichenzahl (nicht Bytes), Leerraum am Rand abgezogen. */
+    /** Stufe der Titelgröße nach Zeichenzahl (nicht Bytes), Leerraum am Rand abgezogen — wie String.trim in lp.js (auch NBSP, U+3000, BOM). */
     public static function schriftStufe(string $text): int
     {
-        $n = mb_strlen(trim($text));
+        $rand = '[\p{Zs}\t-\r\x{2028}\x{2029}\x{FEFF}]+'; // genau der Leerraum, den JS trim() abzieht (nicht auch U+0085 und U+200B)
+        $n = mb_strlen(preg_replace("/^$rand|$rand$/u", '', $text) ?? $text);
         return count(array_filter(self::TITEL_STUFEN, static fn (int $grenze): bool => $n > $grenze));
     }
 

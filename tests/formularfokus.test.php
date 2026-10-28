@@ -20,6 +20,8 @@ return [
         T::contains($s, "matches(':disabled')", 'gesperrte Felder (auch im gesperrten Fieldset) zählen nicht');
         T::contains($s, 'getClientRects().length', 'ausgeblendete Felder (type="hidden", hidden, display: none) zählen nicht');
         T::contains($s, 'scrollBehavior', 'sanftes Scrollen wird abgewartet, bei „weniger Bewegung“ nicht');
+        T::contains($s, "ziel.matches('.lp-anmeldung')", 'Formularziel ist nur der Anmeldeabschnitt selbst (nicht <main id="inhalt">, den der Skip-Link anspringt)');
+        T::notContains($s, "ziel.closest('form", 'kein Aufstieg aus dem Formular heraus');
     },
     'FF02 lp.js: der automatische Fokus ist keine Statistik-Meldung „formular“' => static function () use ($js): void {
         $s = $js();

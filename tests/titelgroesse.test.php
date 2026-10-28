@@ -44,6 +44,15 @@ return [
         T::eq(Kontext::schriftStufe(str_repeat('ß', $g + 1)), 1, ($g + 1) . ' ß = Stufe 1');
         T::eq(Kontext::schriftStufe(str_repeat("\u{1F600}", $g)), 0, "$g Emoji (vier Bytes je Zeichen) = Stufe 0");
         T::eq(Kontext::schriftStufe("  \t" . str_repeat('ö', $g) . " \n "), 0, 'Leerraum am Rand wird abgezogen');
+        // Dieselbe Randregel wie String.prototype.trim in lp.js (sonst springt die Stufe, sobald dort getippt wird): auch geschütztes Leerzeichen,
+        // ideographisches Leerzeichen, Geviert und Byte-Order-Mark am Rand zählen nicht
+        foreach (["\u{00A0}" => 'geschütztes Leerzeichen', "\u{3000}" => 'ideographisches Leerzeichen', "\u{2003}" => 'Geviert', "\u{FEFF}" => 'Byte-Order-Mark'] as $rand => $name) {
+            T::eq(Kontext::schriftStufe($rand . str_repeat('ö', $g) . $rand), 0, "$g Zeichen mit $name an beiden Rändern = Stufe 0");
+            T::eq(Kontext::schriftStufe($rand . str_repeat('ö', $g + 1) . $rand), 1, ($g + 1) . " Zeichen mit $name an beiden Rändern = Stufe 1");
+        }
+        T::eq(Kontext::schriftStufe(str_repeat('ö', $g) . "\u{00A0}x"), 1, 'Leerraum in der Mitte zählt mit');
+        T::eq(Kontext::schriftStufe("\u{0085}\u{200B}" . str_repeat('ö', $g)), 1, 'was JS trim() nicht abzieht (NEL, Nullbreiten-Leerzeichen), zählt auch hier mit');
+        T::eq(Kontext::schriftStufe("\xC3\x28" . str_repeat('ö', $g)), 1, 'ungültiges UTF-8 bricht die Zählung nicht ab (Rückfall auf den Originaltext)');
     },
     'TG03 gebaute Seite trägt Stufe und Schwellen im HTML (ohne Skript richtig, keine Inline-Styles)' => static function () use ($h1, $text): void {
         $erwartet = [20 => 0, 45 => 1, 80 => 3];

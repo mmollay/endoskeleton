@@ -1036,6 +1036,33 @@ function kontrastImBrowser(nur) {
       await ohne.kontext.close();
     }
 
+    // Nur der Anmeldeabschnitt selbst ist ein Formularziel: <main id="inhalt"> enthält das Formular, ist aber keins (WCAG 2.4.1: der Skip-Link
+    // „Zum Inhalt springen“ darf den Cursor nicht ins Formular schicken); der Kopfabschnitt und ein Anker mitten im Formular ebenso nicht
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1440);
+      const SKIP = 'a.skip-link[href="#inhalt"]';
+      pruefe(await page.locator(SKIP).count() === 1, 'Fokus/Skip-Link: der Seitenrahmen hat den Link „Zum Inhalt springen“');
+      await page.focus(SKIP);
+      await page.keyboard.press('Enter');
+      await ruhe(page);
+      pruefe(!(await aktiv(page)).startsWith('input'), `Fokus/Skip-Link: Enter auf „Zum Inhalt springen“ setzt keinen Cursor ins Formular (${await aktiv(page)})`);
+      await page.evaluate(() => { document.activeElement.blur(); window.scrollTo(0, 0); });
+      await page.evaluate(() => document.querySelector('a.skip-link').click());
+      await ruhe(page);
+      pruefe(!(await aktiv(page)).startsWith('input'), `Fokus/Skip-Link: auch ein Klick darauf setzt keinen Cursor ins Formular (${await aktiv(page)})`);
+      await page.evaluate(() => { document.body.insertAdjacentHTML('beforeend', '<a id="t-start" href="#start">Zum Kopf</a><a id="t-feld" href="#lp-f-email">Zum E-Mail-Feld</a>'); });
+      for (const [id, was] of [['#t-start', 'der Kopfabschnitt'], ['#t-feld', 'ein Anker auf ein Feld im Formular']]) {
+        await page.evaluate(() => { document.activeElement.blur(); window.scrollTo(0, 0); });
+        await page.click(id);
+        await ruhe(page);
+        pruefe(!(await aktiv(page)).startsWith('input#lp-f-vorname'), `Fokus: ${was} ist kein Formularziel, der Cursor springt nicht ins erste Feld (${await aktiv(page)})`);
+      }
+      await page.evaluate(() => { document.activeElement.blur(); window.scrollTo(0, 0); });
+      await page.click(KNOPF);
+      pruefe(await fokusIm(page, 3000), `Fokus: der Knopf zur Anmeldung wirkt weiter, auch nach den anderen Sprüngen (${await aktiv(page)})`);
+      await kontext.close();
+    }
+
     // Statistik: erst das erste echte Anklicken, Tippen oder Weiterspringen zählt als formular — genau einmal; auch hier fremd = 0
     for (const [wie, tun] of [['Tippen', (p) => p.keyboard.type('Anna')], ['Anklicken des Felds', (p) => p.click('#lp-f-vorname')], ['Tab ins nächste Feld', (p) => p.keyboard.press('Tab')]]) {
       const { page, kontext, beacons, fremd } = await oeffnen(browser, 'hero--bild-rechts', 1440);
