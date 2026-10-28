@@ -78,6 +78,39 @@
     });
   });
 
+  // Sprung zum Formular (3.59.0): Wer auf einen Knopf oder Link zum Formular (#anmeldung) klickt, bekommt den Cursor gleich ins erste Feld
+  // und spart sich einen Klick. Nur nach diesem Klick — nie beim Laden und nie nach einer Rückmeldung (dort fokussiert die Meldung). Der Fokus
+  // kommt erst, wenn der Sprung steht (das sanfte Scrollen läuft noch; bei „weniger Bewegung“ gleich) und scrollt nicht selbst (preventScroll).
+  // Erstes Feld = erstes sichtbares, bedienbares Eingabefeld, nie der Honigtopf; ohne ein solches (Fieldset gesperrt oder nach der
+  // Rückmeldung ausgeblendet) passiert nichts. Ein Klick, den das Panel im Bearbeiten-Modus abfängt (defaultPrevented), tut nichts.
+  // selbstFokus: Die Statistik unten zählt diesen Fokus nicht als Formularbeginn.
+  var selbstFokus = false;
+  var ersteFeld = function (form) {
+    return Array.from(form.elements).find(function (feld) {
+      return /^(INPUT|SELECT|TEXTAREA)$/.test(feld.tagName) && !feld.matches(':disabled') && !feld.closest('.form-hp') && feld.getClientRects().length > 0;
+    });
+  };
+  document.addEventListener('click', function (ereignis) {
+    var link = ereignis.target.closest && ereignis.target.closest('a[href^="#"]');
+    if (!link || ereignis.defaultPrevented || ereignis.button !== 0 || ereignis.metaKey || ereignis.ctrlKey || ereignis.shiftKey || ereignis.altKey) { return; }
+    var ziel = document.getElementById(link.getAttribute('href').slice(1));
+    var form = ziel && (ziel.closest('form.lp-formular') || ziel.querySelector('form.lp-formular'));
+    if (!form) { return; }
+    var fokussieren = function () {
+      var feld = ersteFeld(form), aktiv = document.activeElement;
+      if (!feld || (aktiv && aktiv !== document.body && aktiv !== link)) { return; } // Wer schon selbst ein Feld gewählt hat, behält es.
+      selbstFokus = true;
+      try { feld.focus({ preventScroll: true }); } finally { selbstFokus = false; }
+    };
+    var stabil = 0, zuletzt = -1, spaetestens = performance.now() + 1500;
+    var abwarten = function () {
+      stabil = window.scrollY === zuletzt ? stabil + 1 : 0;
+      zuletzt = window.scrollY;
+      if (stabil >= 6 || performance.now() > spaetestens) { fokussieren(); } else { requestAnimationFrame(abwarten); }
+    };
+    if (getComputedStyle(document.documentElement).scrollBehavior === 'smooth') { requestAnimationFrame(abwarten); } else { setTimeout(fokussieren, 0); }
+  });
+
   // Plätze (3.52.0): Ist die Anmeldung begrenzt, fragt die Seite den Stand beim Panel ab — nur Zahlen, ohne Cookies. Der Host
   // kommt aus dem Formularziel (data-lp-plaetze-quelle), nie fest aus diesem Skript. Bei „voll“ verschwinden die Felder;
   // scheitert die Abfrage (Netz, Drosselung, Sperre), bleibt der feste Text „Begrenzt auf N Plätze.“ stehen. Nach einer
@@ -142,7 +175,10 @@
         if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', sichtbar); seit = performance.now(); melden('aufruf'); }
       };
       if (!rueckmeldung) { document.addEventListener('visibilitychange', sichtbar); sichtbar(); }
-      form.addEventListener('focusin', function (ereignis) { if (ereignis.target.closest && !ereignis.target.closest('.form-hp')) { melden('formular'); } });
+      // Formularbeginn: erster Fokus, erstes Tippen oder Anklicken durch den Besucher (auch im schon aktiven Feld); der Fokus nach dem Sprung (selbstFokus) zählt nicht.
+      ['focusin', 'input', 'click'].forEach(function (name) {
+        form.addEventListener(name, function (ereignis) { if (!selbstFokus && ereignis.target.closest && !ereignis.target.closest('.form-hp')) { melden('formular'); } });
+      });
       form.addEventListener('submit', function (ereignis) { if (!ereignis.defaultPrevented) { melden('absenden'); } });
       // Scroll-Ereignisse kommen höchstens einmal je Bildwechsel; gelesen wird nur die Position, die Seitenhöhe erst beim Verlassen.
       var tiefer = function () { unten = Math.max(unten, window.scrollY + window.innerHeight); };

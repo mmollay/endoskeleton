@@ -836,8 +836,220 @@ function kontrastImBrowser(nur) {
       const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, {});
       await warten(page);
       await page.goto('http://lp.test/faq--standard/');
+      for (let i = 0; i < 10 && !art(beacons).includes('verlassen'); i++) { await warten(page); } // unter Last kommt der Beacon später als 300 ms
       await warten(page);
       pruefe(art(beacons).join() === 'aufruf,verlassen', `Verlassen: Navigation weg von der Seite sendet genau ein verlassen (${art(beacons)})`);
+      await kontext.close();
+    }
+  }
+
+  // Titelgröße (3.59.0): Der Titel des Kopfbereichs wird mit der Textmenge kleiner — beim Tippen ohne Neuladen, aus den Schwellen im
+  // Quelltext (nicht aus einer zweiten Liste im Skript), und ohne Skript aus der Stufe im HTML. Die Dachzeile darf zwei Zeilen füllen.
+  {
+    const wort = 'Gesünder leben ';
+    const titelMit = (n) => wort.repeat(12).slice(0, n - 1) + 'x';
+    const dachMit = (n) => 'Tier und Mensch: gesunde Ernährung = gesundes Leben – ein Blick hinter die Kulissen der Lebensmittelindustrie und ihrer Werbung'.slice(0, n).trimEnd();
+    const messen = () => {
+      const h = document.querySelector('.lp-hero-titel');
+      const probe = document.createElement('div');
+      probe.style.fontSize = 'var(--fs-xl)'; probe.style.position = 'absolute'; probe.style.visibility = 'hidden';
+      document.body.append(probe);
+      const unten = parseFloat(getComputedStyle(probe).fontSize);
+      probe.remove();
+      const st = getComputedStyle(h);
+      return { px: parseFloat(st.fontSize), unten, stufe: h.dataset.lpGroesse, zeilen: Math.round(h.getBoundingClientRect().height / parseFloat(st.lineHeight)),
+        ueberlauf: h.scrollWidth - h.clientWidth, seite: document.documentElement.scrollWidth - window.innerWidth };
+    };
+    for (const schema of ['light', 'dark']) {
+      for (const breite of [1440, 1024, 390]) {
+        const wo = `Titelgröße @${breite} ${schema}`;
+        const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', breite);
+        await page.evaluate((s) => { if (s === 'dark') { document.documentElement.dataset.theme = 'dark'; } }, schema); // dunkel ist data-theme="dark", nicht prefers-color-scheme
+        const gemessen = {};
+        for (const n of [20, 45, 80, 140]) {
+          await page.evaluate((t) => { document.querySelector('.lp-hero-titel').textContent = t; }, titelMit(n));
+          gemessen[n] = await page.evaluate(messen);
+          pruefe(gemessen[n].ueberlauf <= 0 && gemessen[n].seite <= 0, `${wo}, ${n} Zeichen: Titel sprengt die Spalte oder die Seite (${gemessen[n].ueberlauf}/${gemessen[n].seite}px)`);
+          pruefe(gemessen[n].px >= gemessen[n].unten - 0.01, `${wo}, ${n} Zeichen: ${gemessen[n].px}px unter der Untergrenze --fs-xl (${gemessen[n].unten}px)`);
+          pruefe(gemessen[n].zeilen <= 3 || n === 140, `${wo}, ${n} Zeichen: ${gemessen[n].zeilen} Zeilen`);
+        }
+        pruefe(gemessen[20].stufe === '0' && gemessen[45].stufe === '1' && gemessen[80].stufe === '3' && gemessen[140].stufe === '3',
+          `${wo}: Stufen beim Tippen ${[20, 45, 80, 140].map((n) => gemessen[n].stufe)} statt 0,1,3,3 (ohne Neuladen)`);
+        pruefe(gemessen[20].px > gemessen[45].px && gemessen[45].px > gemessen[80].px, `${wo}: Schrift wird mit mehr Text kleiner (${[20, 45, 80].map((n) => gemessen[n].px.toFixed(1))})`);
+        pruefe(gemessen[140].px === gemessen[80].px, `${wo}: nach der letzten Stufe nicht weiter kleiner`);
+        const hell = await page.evaluate(kontrastImBrowser, '.lp-hero-titel');
+        pruefe(hell.length === 0, `${wo}: Kontrast des Titels ${hell.join(' | ')}`);
+        await kontext.close();
+      }
+    }
+    // Echtes Tippen (Tastatur) statt Textwechsel: contenteditable wie im Bild bearbeiten; Escape-Weg: Text zurücksetzen zieht die Stufe zurück
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1280);
+      const titel = page.locator('.lp-hero-titel');
+      const vorher = await titel.textContent();
+      await titel.evaluate((e) => { e.setAttribute('contenteditable', 'plaintext-only'); });
+      await titel.click();
+      await page.keyboard.press('Control+A');
+      await page.keyboard.type(titelMit(60));
+      pruefe(await titel.getAttribute('data-lp-groesse') === '2', 'Tippen: 60 Zeichen ergeben Stufe 2');
+      await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace'); await page.keyboard.type('Kurz');
+      pruefe(await titel.getAttribute('data-lp-groesse') === '0', 'Tippen: nach dem Löschen wieder Stufe 0');
+      await titel.evaluate((e, t) => { e.textContent = t; }, vorher);
+      pruefe(await titel.getAttribute('data-lp-groesse') === '0', 'Zurücksetzen des Textes (Escape im Bild) hält die Stufe richtig');
+      await kontext.close();
+    }
+    // Schwellen aus dem Quelltext: andere Schwellen im HTML ergeben andere Stufen — im Skript steht keine zweite Liste
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1280, { umschreiben: (h) => h.replace(/data-lp-stufen="[^"]*"/, 'data-lp-stufen="5 10 15"') });
+      await page.evaluate((t) => { document.querySelector('.lp-hero-titel').textContent = t; }, titelMit(12));
+      pruefe(await page.locator('.lp-hero-titel').getAttribute('data-lp-groesse') === '2', 'Schwellen "5 10 15" im Quelltext: 12 Zeichen ergeben Stufe 2');
+      await kontext.close();
+    }
+    // Ohne Skript gilt die Stufe aus dem HTML (kein Flackern, keine Neuberechnung)
+    {
+      const lang = titelMit(80);
+      const rechne = (h) => h.replace(/(<h1 class="lp-hero-titel"[^>]*?) data-lp-groesse="\d"([^>]*>)[^<]*/, `$1 data-lp-groesse="3"$2${lang}`);
+      const mit = await oeffnen(browser, 'hero--bild-rechts', 1280, { umschreiben: rechne });
+      const ohne = await oeffnen(browser, 'hero--bild-rechts', 1280, { umschreiben: rechne, ohneJs: true });
+      const a = await mit.page.evaluate(messen);
+      const b = await ohne.page.evaluate(messen);
+      pruefe(a.stufe === '3' && b.stufe === '3' && a.px === b.px && b.px < 56, `ohne Skript steht Stufe 3 schon im Bild (${b.px}px, mit Skript ${a.px}px)`);
+      await mit.kontext.close(); await ohne.kontext.close();
+    }
+    // Dachzeile: 30 Zeichen eine Zeile, 60 und 100 zwei (1440 px); schmaler mehr, aber ohne Überlauf; ausgewogener Umbruch
+    for (const [breite, erwartet] of [[1440, { 30: [1, 1], 60: [2, 2], 100: [2, 2] }], [1024, { 30: [1, 1], 60: [2, 2], 100: [2, 3] }], [390, { 30: [1, 1], 60: [2, 3], 100: [3, 4] }]]) {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', breite);
+      for (const n of [30, 60, 100]) {
+        await page.evaluate((t) => { document.querySelector('.lp-hero-dachzeile').textContent = t; }, dachMit(n));
+        const m = await page.evaluate(() => {
+          const d = document.querySelector('.lp-hero-dachzeile');
+          const st = getComputedStyle(d);
+          return { zeilen: Math.round(d.getBoundingClientRect().height / parseFloat(st.lineHeight)), umbruch: st.textWrapStyle || st.textWrap, seite: document.documentElement.scrollWidth - window.innerWidth, ueber: d.scrollWidth - d.clientWidth };
+        });
+        const [von, bis] = erwartet[n];
+        pruefe(m.zeilen >= von && m.zeilen <= bis, `Dachzeile ${n} Zeichen @${breite}: ${m.zeilen} Zeilen statt ${von}–${bis}`);
+        pruefe(m.seite <= 0 && m.ueber <= 0, `Dachzeile ${n} Zeichen @${breite}: Überlauf ${m.seite}/${m.ueber}px`);
+        pruefe(m.umbruch === 'balance', `Dachzeile @${breite}: Umbruch ist ${m.umbruch}, nicht balance`);
+      }
+      await kontext.close();
+    }
+  }
+
+  // Fokus nach dem Sprung zum Formular (3.59.0): Ein Klick auf einen Knopf zur Anmeldung setzt den Cursor ins erste Feld — nur dieser Klick,
+  // nie beim Laden und nie nach einer Rückmeldung; der Honigtopf ist nie das erste Feld; die Statistik zählt den automatischen Fokus nicht.
+  {
+    const KNOPF = 'a.lp-knopf[href="#anmeldung"]';
+    const fokusIm = (page, ms) => page.waitForFunction(() => document.activeElement && document.activeElement.id === 'lp-f-vorname', null, { timeout: ms }).then(() => true, () => false);
+    const aktiv = (page) => page.evaluate(() => { const a = document.activeElement; return a ? `${a.tagName.toLowerCase()}#${a.id}.${a.className}` : ''; });
+    const art = (b) => b.map((x) => JSON.parse(x.text).art).join();
+    const ruhe = (page) => page.waitForTimeout(1500);
+    const sichtbar = (page) => page.evaluate(() => { const r = document.getElementById('lp-f-vorname').getBoundingClientRect(); return { oben: Math.round(r.top), unten: Math.round(r.bottom), hoehe: window.innerHeight, y: Math.round(window.scrollY) }; });
+
+    // Der Normalfall auf drei Kopfbereichen, mit Maus: Cursor im ersten Feld, Feld im Bild, Fokusring da, noch nichts gezählt
+    for (const name of ['hero--bild-rechts', 'hero--bild-hinten', 'hero--schlicht']) {
+      for (const breite of [1440, 390]) {
+        const { page, kontext, beacons } = await oeffnen(browser, name, breite);
+        await page.waitForTimeout(300);
+        pruefe(!(await aktiv(page)).startsWith('input'), `Fokus ${name} @${breite}: beim Laden steht der Cursor noch in keinem Feld (${await aktiv(page)})`);
+        await page.evaluate(() => { document.getElementById('lp-f-vorname').addEventListener('focus', () => { window.__fokusY = Math.round(window.scrollY); }); });
+        await page.click(KNOPF);
+        pruefe(await fokusIm(page, 3000), `Fokus ${name} @${breite}: nach dem Klick auf den Knopf steht der Cursor im ersten Feld (${await aktiv(page)})`);
+        const s = await sichtbar(page);
+        pruefe(s.y > 0 && s.oben >= 0 && s.unten <= s.hoehe, `Fokus ${name} @${breite}: das Feld liegt nach dem Sprung im Bild (${JSON.stringify(s)})`);
+        const fokusY = await page.evaluate(() => window.__fokusY);
+        pruefe(Math.abs(fokusY - s.y) <= 1, `Fokus ${name} @${breite}: der Fokus kommt erst, wenn der Sprung steht (beim Fokus ${fokusY}px, am Ende ${s.y}px)`);
+        const ring = await page.evaluate(() => { const f = document.getElementById('lp-f-vorname'); return { an: f.matches(':focus-visible'), breite: parseFloat(getComputedStyle(f).outlineWidth), art: getComputedStyle(f).outlineStyle }; });
+        pruefe(ring.an && ring.breite > 0 && ring.art !== 'none', `Fokus ${name} @${breite}: Fokusring sichtbar (${JSON.stringify(ring)})`);
+        pruefe(await page.evaluate(() => document.querySelector('label[for="lp-f-vorname"]').textContent.trim().length > 0 && document.getElementById('lp-f-vorname').required), `Fokus ${name} @${breite}: das Feld hat seine Beschriftung`);
+        await ruhe(page);
+        pruefe(art(beacons) === 'aufruf', `Fokus ${name} @${breite}: der automatische Fokus zählt nicht als formular (${art(beacons)})`);
+        await kontext.close();
+      }
+    }
+
+    // Weniger Bewegung: kein sanftes Scrollen, der Fokus kommt sofort
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 390, { reducedMotion: 'reduce' });
+      await page.click(KNOPF);
+      pruefe(await fokusIm(page, 400), 'Fokus bei „weniger Bewegung“: sofort im ersten Feld');
+      const s = await sichtbar(page);
+      pruefe(s.y > 0 && s.oben >= 0 && s.unten <= s.hoehe, `Fokus bei „weniger Bewegung“: Feld im Bild (${JSON.stringify(s)})`);
+      await kontext.close();
+    }
+
+    // Tastatur: Enter auf dem Knopf wirkt wie ein Klick
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1440);
+      await page.focus(KNOPF);
+      await page.keyboard.press('Enter');
+      pruefe(await fokusIm(page, 3000), 'Fokus: Enter auf dem Knopf setzt den Cursor ins erste Feld');
+      await kontext.close();
+    }
+
+    // Nicht beim Laden mit Sprungmarke, nicht nach einer Rückmeldung; ohne Felder (ok) passiert auch beim Klick nichts
+    for (const [suche, wasSteht] of [['#anmeldung', 'Adresse mit #anmeldung'], ['?anmeldung=fehler', 'Rückmeldung fehler'], ['?anmeldung=ok', 'Rückmeldung ok']]) {
+      const { page, kontext, beacons } = await oeffnen(browser, 'hero--bild-rechts', 390, { suche });
+      await ruhe(page);
+      pruefe(!(await aktiv(page)).startsWith('input'), `Fokus ${wasSteht}: beim Laden kein Cursor in einem Feld (${await aktiv(page)})`);
+      if (suche.startsWith('?anmeldung=')) {
+        const meldungFokus = await page.evaluate(() => document.activeElement.matches('.lp-anmeldung-fehler, .lp-anmeldung-danke'));
+        pruefe(meldungFokus, `Fokus ${wasSteht}: die Meldung behält den Fokus, wie bisher (${await aktiv(page)})`);
+      }
+      if (suche === '?anmeldung=ok') {
+        await page.click(KNOPF);
+        await ruhe(page);
+        pruefe(!(await aktiv(page)).startsWith('input'), `Fokus ${wasSteht}: ohne Felder bleibt der Fokus auch nach dem Klick draußen (${await aktiv(page)})`);
+      }
+      pruefe(art(beacons).split(',').filter((a) => a === 'formular').length === 0, `Fokus ${wasSteht}: nichts als formular gezählt (${art(beacons)})`);
+      await kontext.close();
+    }
+
+    // Der Honigtopf ist nie das erste Feld, auch wenn er im Quelltext vorn steht; ist kein Feld bedienbar (Fieldset gesperrt), passiert nichts
+    {
+      // Der Honigtopf und drei Attrappen (versteckt, gesperrt, ausgeblendet) stehen vor dem echten ersten Feld
+      const ATTRAPPEN = '<input type="hidden" name="a1"><input name="a2" disabled><input name="a3" hidden>';
+      const vorn = (h) => { const m = h.match(/<div class="form-hp"[\s\S]*?<\/div>\s*/); return h.replace(m[0], '').replace('<fieldset', ATTRAPPEN + m[0] + '<fieldset'); };
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1440, { umschreiben: vorn });
+      await page.click(KNOPF);
+      pruefe(await fokusIm(page, 3000), `Fokus: Honigtopf, verstecktes, gesperrtes und ausgeblendetes Feld vor dem echten ersten Feld werden übersprungen (${await aktiv(page)})`);
+      await kontext.close();
+      const gesperrt = await oeffnen(browser, 'hero--bild-rechts', 1440, { umschreiben: (h) => vorn(h).replace('<fieldset ', '<fieldset disabled ') });
+      await gesperrt.page.click(KNOPF);
+      await ruhe(gesperrt.page);
+      pruefe(!(await aktiv(gesperrt.page)).startsWith('input'), `Fokus: bei gesperrtem Fieldset nirgends hinein, auch nicht in den Honigtopf (${await aktiv(gesperrt.page)})`);
+      await gesperrt.kontext.close();
+    }
+
+    // Andere Ziele und der Bearbeiten-Modus des Panels: ein abgefangener Klick (preventDefault in der Fangphase) und ein Link ohne Formularziel tun nichts
+    {
+      const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 1440);
+      await page.evaluate(() => { document.addEventListener('click', (e) => { if (e.target.closest('a[href]')) { e.preventDefault(); } }, true); });
+      await page.click(KNOPF);
+      await ruhe(page);
+      pruefe(!(await aktiv(page)).startsWith('input'), `Fokus: abgefangener Klick (Bearbeiten-Modus) setzt keinen Cursor (${await aktiv(page)})`);
+      await kontext.close();
+      const ohne = await oeffnen(browser, 'hero--bild-rechts', 1440);
+      await ohne.page.evaluate(() => { document.body.insertAdjacentHTML('beforeend', '<a id="t-anders" href="#lp-a2-titel">Zur Überschrift</a>'); });
+      await ohne.page.click('#t-anders');
+      await ruhe(ohne.page);
+      pruefe(!(await aktiv(ohne.page)).startsWith('input'), `Fokus: ein Link zu einer Überschrift (kein Formularziel) setzt keinen Cursor (${await aktiv(ohne.page)})`);
+      await ohne.kontext.close();
+    }
+
+    // Statistik: erst das erste echte Anklicken, Tippen oder Weiterspringen zählt als formular — genau einmal; auch hier fremd = 0
+    for (const [wie, tun] of [['Tippen', (p) => p.keyboard.type('Anna')], ['Anklicken des Felds', (p) => p.click('#lp-f-vorname')], ['Tab ins nächste Feld', (p) => p.keyboard.press('Tab')]]) {
+      const { page, kontext, beacons, fremd } = await oeffnen(browser, 'hero--bild-rechts', 1440);
+      await page.click(KNOPF);
+      await fokusIm(page, 3000);
+      await ruhe(page);
+      pruefe(art(beacons) === 'aufruf', `Fokus/Statistik (${wie}): vorher nur aufruf (${art(beacons)})`);
+      await tun(page);
+      await ruhe(page);
+      pruefe(art(beacons) === 'aufruf,formular', `Fokus/Statistik (${wie}): danach ein formular (${art(beacons)})`);
+      await page.keyboard.type('x'); await page.keyboard.press('Tab'); await page.click('#lp-f-vorname');
+      await ruhe(page);
+      pruefe(art(beacons) === 'aufruf,formular', `Fokus/Statistik (${wie}): weiteres Tippen, Springen und Anklicken zählt nicht noch einmal (${art(beacons)})`);
+      pruefe(fremd.length === 0, `Fokus/Statistik (${wie}): keine Fremdanfrage (${fremd.join(', ')})`);
       await kontext.close();
     }
   }
