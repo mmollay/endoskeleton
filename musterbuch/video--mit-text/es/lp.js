@@ -28,6 +28,17 @@
     }
   });
 
+  // Titel: Schriftstufe nach Textmenge (3.59.0). Die Schwellen setzt der Bau in data-lp-stufen (Kontext::TITEL_STUFEN, die einzige Liste), die Stufe
+  // von Anfang an data-lp-groesse; hier läuft dieselbe Regel nur nach, wenn sich der Text ändert (Tippen im Bild, Escape). Gezählt wird in Zeichen
+  // (Array.from, wie mb_strlen), Leerraum am Rand zählt nicht.
+  document.querySelectorAll('[data-lp-stufen]').forEach(function (titel) {
+    var grenzen = titel.dataset.lpStufen.split(' ').map(Number);
+    new MutationObserver(function () {
+      var n = Array.from(titel.textContent.trim()).length;
+      titel.dataset.lpGroesse = grenzen.filter(function (g) { return n > g; }).length;
+    }).observe(titel, { childList: true, characterData: true, subtree: true });
+  });
+
   // Rückmeldung der Weiterleitungsstelle (?anmeldung=ok|fehler|voll#anmeldung): Meldung zeigen und fokussieren, bei ok und voll ohne
   // Felder; andere Werte wirken nicht. „geschlossen“ (3.54.5): Ist die Anmeldefrist der Liste abgelaufen, kommt ?anmeldung=fehler&grund=geschlossen;
   // dann steht statt des Fehlertexts „Die Anmeldung ist im Moment geschlossen“ da, ohne Felder — die Angaben des Besuchers waren ja in Ordnung.

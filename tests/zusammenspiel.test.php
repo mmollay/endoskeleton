@@ -77,7 +77,7 @@ return [
         T::ok(isset($katalog['bausteine']['anmeldung']['felder']['newsletter']), 'Feld newsletter im Baustein anmeldung');
         $log = (string) file_get_contents(H::wurzel() . '/CHANGELOG.md');
         preg_match_all('/^## \[(\d+\.\d+\.\d+)\]/m', $log, $m);
-        $oben = array_slice($m[1], 0, 6);
+        $oben = array_slice($m[1], (int) array_search('3.58.0', $m[1], true), 6);
         T::eq($oben, ['3.58.0', '3.57.0', '3.56.0', '3.55.0', '3.54.5', '3.54.4'], 'CHANGELOG: die Einträge beider Zweige stehen in Versionsfolge unter 3.58.0');
     },
 ];

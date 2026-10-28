@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.58.0)
+# Landingpage bearbeiten (Endoskeleton 3.59.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -20,7 +20,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · genau einmal, als erster 
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
-| `dachzeile` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `dachzeile` | zeile | – | eine Zeile, ≤ 100 Zeichen |
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |

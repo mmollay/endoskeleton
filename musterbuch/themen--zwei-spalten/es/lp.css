@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.58.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.59.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3105,17 +3105,37 @@ section.lp-block {
   max-width: 38rem;
 }
 
+/* Die Dachzeile darf zwei Zeilen füllen (3.59.0): ausgewogen umbrechen, damit kein einzelnes Wort allein in der zweiten steht. */
 .lp-hero-dachzeile {
   font-size: var(--fs-sm);
   font-weight: 700;
+  line-height: 1.4;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--primary);
 }
 
 .lp-hero-titel {
   font-size: var(--fs-hero);
   line-height: 1.1;
+}
+
+/* Titel folgt der Textmenge (3.59.0): Stufe 0 = Normalgröße; die Stufe steht im HTML (Kontext::schriftStufe) und wird beim Tippen im Bild
+   von lp.js nachgezogen. Nie unter --fs-xl; je kleiner die Schrift, desto etwas mehr Zeilenhöhe. */
+.lp-hero-titel[data-lp-groesse="1"] {
+  font-size: max(var(--fs-xl), calc(var(--fs-hero) * 0.86));
+  line-height: 1.12;
+}
+
+.lp-hero-titel[data-lp-groesse="2"] {
+  font-size: max(var(--fs-xl), calc(var(--fs-hero) * 0.73));
+  line-height: 1.15;
+}
+
+.lp-hero-titel[data-lp-groesse="3"] {
+  font-size: max(var(--fs-xl), calc(var(--fs-hero) * 0.62));
+  line-height: 1.2;
 }
 
 .lp-hero-text p:not(.lp-hero-dachzeile) {

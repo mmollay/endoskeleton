@@ -7,6 +7,9 @@ namespace Endo\Lp;
 
 final class Kontext
 {
+    /** Schwellen der Titelgröße in Zeichen: Stufe = Anzahl der Schwellen, die der Titel überschreitet (0 = Normalgröße). Einzige Liste — hero.php schreibt sie ins HTML, lp.js liest sie dort. */
+    public const TITEL_STUFEN = [36, 52, 68];
+
     /** @var array<string, string> Zielpfad im Seitenordner (es/bilder/…) => Quelldatei */
     public array $kopien = [];
 
@@ -46,6 +49,19 @@ final class Kontext
         $typ = $b['typ'];
         $anker = isset($b['anker']) ? ' id="' . $this->e($b['anker']) . '"' : '';
         return sprintf('<section class="lp-block lp-%s lp-%s--%s"%s aria-labelledby="%s">', $typ, $typ, $this->e($b['variante']), $anker, $this->id($nr, 'titel'));
+    }
+
+    /** Stufe der Titelgröße nach Zeichenzahl (nicht Bytes), Leerraum am Rand abgezogen. */
+    public static function schriftStufe(string $text): int
+    {
+        $n = mb_strlen(trim($text));
+        return count(array_filter(self::TITEL_STUFEN, static fn (int $grenze): bool => $n > $grenze));
+    }
+
+    /** Attribute für einen Titel, dessen Größe der Textmenge folgt: die Stufe jetzt, die Schwellen für lp.js. */
+    public function groesse(string $text): string
+    {
+        return sprintf(' data-lp-groesse="%d" data-lp-stufen="%s"', self::schriftStufe($text), implode(' ', self::TITEL_STUFEN));
     }
 
     public function titel(int $nr, string $text): string

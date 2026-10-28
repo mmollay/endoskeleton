@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.59.0] — 2026-10-28
+
+### Added
+- **Der Titel des Kopfbereichs passt seine Schriftgröße der Textmenge an** (Anlass: Martin, 28.10.2026, „Wenn der User in den Titel mehr reinschreibt, dann soll die Textgröße automatisch etwas kleiner werden, damit der Text sich ausgeht. Dynamische Textgrößenveränderung je nach Textmenge“). Vier Stufen nach Zeichenzahl (Zeichen, nicht Bytes; Leerraum am Rand zählt nicht): bis 36 Zeichen Stufe 0 (Normalgröße, genau wie bisher), 37–52 Stufe 1, 53–68 Stufe 2, ab 69 Stufe 3. Die Regeln stehen in `lp/lp.css` (`.lp-hero-titel[data-lp-groesse="1"]` bis `"3"`): `max(var(--fs-xl), calc(var(--fs-hero) * 0.86 | 0.73 | 0.62))`, dazu eine Zeilenhöhe von 1,12 | 1,15 | 1,2 — nur Tokens, deshalb gilt es in jeder Schriftvorgabe und auf dem Handy mit (die Untergrenze `--fs-xl` ist dort 25 px). Gemessen (Testprofil, Titel mit 80 Zeichen): 3 statt 5 Zeilen bei 1440 px, 3 statt 5 bei 390 px.
+- **Ohne Skript sofort richtig:** `lp/bausteine/hero.php` schreibt die Stufe beim Bau ins HTML (`data-lp-groesse` am `<h1>`, berechnet von `Kontext::schriftStufe()` mit `mb_strlen`) — die Seite stimmt auch ohne JavaScript und ohne Flackern. Dazu `data-lp-stufen="36 52 68"`: `Kontext::TITEL_STUFEN` ist die einzige Liste der Schwellen.
+- **Live beim Tippen im Bild:** `lp/lp.js` zieht dieselbe Regel nach, wenn sich der Text eines Titels ändert (`MutationObserver` auf `[data-lp-stufen]`; sieht Tippen, Einfügen und das Zurücksetzen mit Escape gleichermaßen). Es liest die Schwellen aus `data-lp-stufen`, hat also keine zweite Liste. Das Panel braucht dafür keine Änderung: Das Skript im Rahmen macht den `<h1>` selbst bearbeitbar, und `lp.js` läuft in der Vorschau ohnehin mit.
+- Keine neue `lp-`-Klasse (die Stufen hängen an Attributen), kein Eingriff in `base.css`, Presets, `pages/`, `api/`. Tests: `titelgroesse` (Stufen bei 20/45/80/140 Zeichen, Umlaute und Emoji als ein Zeichen, HTML ohne Inline-Style, CSS nur mit Tokens, keine zweite Schwellenliste in `lp.js`) und `ci/browser.js` (gemessene Schriftgröße nimmt ab, bleibt über `--fs-xl`, kein waagrechter Überlauf bei 1440/1024/390 px, hell und dunkel; Größe ändert sich beim Tippen ohne Neuladen).
+
+### Changed
+- **Die Dachzeile darf zwei Zeilen füllen** (Anlass: Martin, 28.10.2026, „… auch zweizeilig möglich sein. Wenn der User mehr schreibt, kann es auch zu einem Zeilenumbruch kommen“ und „Grenzung etwas anheben, dass eine zweite Zeile volllaufen kann“; „Achte Zeile“ ist als Dachzeile gedeutet). Die Grenze steigt von 60 auf **100 Zeichen** (`lp/bausteine.json`, Feld `dachzeile`). Messung bei 1440 px in der Textspalte des Kopfbereichs mit Bild (587 px): Eine Zeile fasst Ø 54,5 Großbuchstaben-Zeichen, zwei Zeilen Ø 108,8 (vier Beispieltexte, 104–112); im schmalsten Kopfbereich (Bild dahinter, 560 px) Ø 103,5. 100 ist die glatte Zahl, mit der auch dort zwei Zeilen reichen; mit 110 liefen zwei der vier Beispiele in eine dritte. Auf dem Handy (390 px) fasst eine Zeile nur etwa 29–34 Zeichen: 100 Zeichen brauchen dort drei bis vier Zeilen.
+- `.lp-hero-dachzeile`: `text-wrap: balance` (kein einzelnes Wort allein in der zweiten Zeile) und `line-height: 1.4` (vorher geerbt) — auch eine einzeilige Dachzeile ist dadurch ein paar Pixel niedriger. Schriftgröße, Buchstabenabstand und Abstand zum Titel bleiben.
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`), bis sie neu gebaut werden; erst dann wirken Stufen und die neue Dachzeilen-Grenze. Das Panel liest die Grenze aus dem Katalog der Marke einer Seite (`config/landingpage-vorlagen.php` nennt keine eigene): Es zieht mit, sobald eine Seite auf diese Marke gehoben ist.
+
 ## [3.58.0] — 2026-10-28
 
 ### Changed

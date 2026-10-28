@@ -94,7 +94,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.58.0)
+## Bausteine (Katalog 3.59.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -102,11 +102,11 @@ Jeder Baustein kennt zusätzlich `typ` (Pflicht), `variante` (ohne Angabe die er
 
 ### `hero` — Kopfbereich
 
-Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.51.0 · genau einmal, als erster Abschnitt
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.59.0 · genau einmal, als erster Abschnitt
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
-| `dachzeile` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `dachzeile` | zeile | – | eine Zeile, ≤ 100 Zeichen |
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |

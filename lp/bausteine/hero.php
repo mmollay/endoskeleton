@@ -10,7 +10,7 @@ $titelId = $k->id($nr, 'titel');
 <?php if (($b['dachzeile'] ?? '') !== ''): ?>
 <p class="lp-hero-dachzeile"><?= $k->e($b['dachzeile']) ?></p>
 <?php endif ?>
-<h1 class="lp-hero-titel" id="<?= $titelId ?>"><?= $k->e($b['titel']) ?></h1>
+<h1 class="lp-hero-titel" id="<?= $titelId ?>"<?= $k->groesse($b['titel']) ?>><?= $k->e($b['titel']) ?></h1>
 <?= $k->absaetze($b['text'] ?? '') ?>
 
 <?= isset($b['knopf']) ? $k->knopf($b['knopf']) : '' ?>
