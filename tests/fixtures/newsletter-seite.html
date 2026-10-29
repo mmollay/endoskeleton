@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beispiel — Newsletter-Baustein (Testseite)</title>
+  <link rel="stylesheet" href="../../base.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <section id="main-content">
+    <div class="container">
+      <h1 class="section-title">Beispiel-Seite</h1>
+      <p>Testseite für ci/browser-newsletter.js: lädt shared.js und den Baustein newsletter wie jede Seite der Vorlage.</p>
+    </div>
+  </section>
+  <div id="site-footer"></div>
+  <script>
+    window.SITE_CONFIG = {
+      name: "Beispiel",
+      logo: "",
+      nav: [{label: "Start", href: "newsletter-seite.html"}],
+      contact: {name: "Beispiel", email: "office@example.test", phone: "", address: "Musterweg 1, 1000 Musterstadt"},
+      social: {},
+      footer: {tagline: "", credit: false},
+      modules: ["newsletter"],
+      newsletter: {
+        liste: "beispiel-newsletter",
+        titel: "Neuigkeiten & Angebote",
+        einleitung: "Ein Test mit Sonderzeichen: <b>fett</b> & \"Anführungszeichen\".",
+        einwilligung: "Ich möchte den Newsletter von Beispiel erhalten und kann mich jederzeit abmelden."
+      },
+      languages: ["de"]
+    };
+  </script>
+  <script src="../../shared.js"></script>
+</body>
+</html>

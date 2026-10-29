@@ -1,0 +1,56 @@
+<!-- ═════════════════════════════════════════════
+     SSI Endoskeleton — _newsletter.html (Referenz: Newsletter-Anmeldung)
+     Beschreibt den Baustein modules/newsletter.js. Wer ihn einbaut (Werkstatt, WebGenerator), liest zuerst dies.
+     ═════════════════════════════════════════════
+
+WAS ER TUT
+  Ein Abschnitt „Newsletter“ direkt über dem Fuß der Seite, mit der Sprungmarke id="anmeldung":
+  Vorname (Pflicht), Nachname (freiwillig), E-Mail-Adresse und das Einwilligungs-Häkchen (nie vorangehakt).
+  Abgeschickt wird als normaler Formular-POST an das Panel. Das Panel prüft, schickt die Bestätigungsmail
+  (doppelte Bestätigung) und leitet auf <Seite>?anmeldung=ok#anmeldung oder <Seite>?anmeldung=fehler#anmeldung
+  zurück. Der Baustein zeigt dort die Meldung (ok: Danke, die Felder verschwinden; fehler: Hinweis, die Felder bleiben).
+  Beide Meldungen tragen den festen Satz „Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.“ —
+  die Seite verrät nie, ob eine Adresse schon auf der Liste steht. Der Baustein spricht mit Sie an.
+
+EINBAU
+  1. Im Skript der Seite (window.SITE_CONFIG) „newsletter“ in modules eintragen und den Schlüssel newsletter anlegen (Beispiel unten).
+     Nur auf der Seite eintragen, auf der das Formular stehen soll. Genau diese Seite trägt das Panel bei der Liste als Rücksprung ein.
+  2. Nichts ins HTML schreiben: Der Baustein setzt den Abschnitt selbst vor den Fuß und lädt modules/newsletter.css selbst.
+     Keine eigenen Formulare, keine Inline-Stile, keine Adresse einer API — alles Weitere steht im Baustein.
+  3. Setzt die Seite eine Content-Security-Policy (.htaccess), muss form-action https://panel.ssi.at erlauben
+     (z. B. form-action 'self' https://panel.ssi.at) — sonst blockt der Browser das Absenden, ohne dass die Seite es merkt.
+
+SCHLÜSSEL in SITE_CONFIG.newsletter
+  liste         Pflicht. Kennung der Liste im Panel (Kleinbuchstaben, Ziffern, Bindestriche). Ohne sie bleibt der Baustein aus.
+  titel         Überschrift. Vorgabe: „Bleiben Sie informiert“.
+  einleitung    Satz unter der Überschrift. Vorgabe: „Neuigkeiten und Angebote direkt in Ihr Postfach.“
+  tag           Kleine Zeile über der Überschrift. Vorgabe: „Newsletter“; leer lassen blendet sie aus.
+  einwilligung  Text neben dem Häkchen. Vorgabe: „Ich möchte den Newsletter erhalten und kann mich jederzeit abmelden.“
+  knopf         Beschriftung des Knopfs. Vorgabe: „Anmelden“.
+  danke         Text der ok-Meldung. fehler: Text der fehler-Meldung. (Der feste Zusatzsatz kommt immer dazu.)
+  datenschutz   Ziel des Links „Mehr dazu in der Datenschutzerklärung.“ Vorgabe: datenschutz.html#newsletter.
+
+DAS PANEL (nicht in der Seite)
+  Gruppe und Absender stehen im Panel bei der Liste, nie in der Seite — die Seite kennt nur die Kennung (liste).
+  Die Liste muss im Panel angelegt sein, bevor die Seite live geht: Gruppe, Absender und die erlaubten Herkünfte
+  für den Rücksprung (alle Adressen der Seite: Vorschau und live, mit und ohne www). Sonst endet jede Anmeldung mit „fehler“.
+  Mit dem Text der Einwilligung wird eine Kurzsumme mitgeschickt (die ersten 12 Hex-Zeichen von SHA-256). Das Panel kennt
+  sie je Liste: Wer den Text ändert, muss die Liste im Panel neu eintragen lassen, sonst endet jede Anmeldung mit „fehler“.
+
+DATENSCHUTZ
+  Die Datenschutzseite braucht einen Abschnitt <h2 id="newsletter">: Zweck, Rechtsgrundlage Einwilligung
+  (Art. 6 Abs. 1 lit. a DSGVO), doppelte Bestätigung, Abmeldung jederzeit über den Link in jeder Mail,
+  Verarbeitung über das Mailsystem von SSI, Speicherdauer bis zum Widerruf. Der Link im Häkchen-Text führt dorthin.
+-->
+<script>
+  window.SITE_CONFIG = {
+    /* … Name, Navigation, Kontakt wie bei jeder Seite … */
+    modules: ["newsletter"],
+    newsletter: {
+      liste: "beispiel-newsletter",
+      titel: "Neuigkeiten per E-Mail",
+      einleitung: "Neue Angebote und Neuigkeiten aus unserem Haus – bequem in Ihr Postfach.",
+      einwilligung: "Ich möchte den Newsletter von Beispiel erhalten und kann mich jederzeit abmelden."
+    }
+  };
+</script>

@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.60.0] — 2026-10-29
+
+### Added
+- **Newsletter-Anmeldung als fester Baustein für Webseiten** (Anlass: Martin, 29.10.2026, „… soll das entsprechend als fester Bestandteil über Sprache eingebunden werden können“). `modules/newsletter.js` ist ein echter Anmelde-Baustein statt des Platzhalters: Eine Seite trägt `modules: ["newsletter"]` und `newsletter: { liste: "…" }` in `SITE_CONFIG` ein, der Baustein setzt den Abschnitt (Sprungmarke `#anmeldung`) selbst direkt über den Fuß. Optional: `titel`, `einleitung`, `tag`, `einwilligung`, `knopf`, `danke`, `fehler`, `datenschutz`.
+- **Gleicher Weg wie die Landingpage:** normaler Formular-POST an `https://panel.ssi.at/lp/anmelden` (Vorname Pflicht, Nachname freiwillig, E-Mail, Einwilligungs-Häkchen nie vorangehakt, Honigtopf, verstecktes `liste` und `einwilligung_kurz` = erste 12 Hex-Zeichen von SHA-256 des Einwilligungstexts). Kein `fetch`, keine eigene API-Adresse, keine Nummern von Gruppe oder Absender — die stehen im Panel bei der Liste.
+- **Rückkehr vom Panel:** `?anmeldung=ok|fehler` zeigt eine Meldung (Live-Region, Fokus darauf); `ok` blendet die Felder aus, `fehler` lässt sie stehen; Parameter und Sprungmarke verschwinden aus der Adresse. Beide Meldungen tragen „Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.“ — der Vertrag nach außen kennt nur ok und fehler.
+- **Barrierefrei:** Labels zu jedem Feld, Fehlertexte am Feld (`aria-invalid`, `aria-describedby`), Fokus auf das erste Fehlerfeld, sichtbarer Fokusring, Kontrast mindestens 4,5:1 hell und dunkel, ab 390 px einspaltig.
+- **`modules/newsletter.css`** (neu, vom Baustein selbst geladen): nur Tokens, keine Inline-Stile. Neue Klassen, alle mit Präfix `newsletter-`: `newsletter`, `newsletter-karte`, `newsletter-felder`, `newsletter-einwilligung`, `newsletter-meldung` (`--ok`, `--fehler`), `newsletter-nachsatz`. Es gibt keine neue `lp-`-Klasse.
+- **`pages/_newsletter.html`** (neu): Referenz für die Webseiten-Werkstatt (Einbau, Schlüssel, Panel-Hinweis, Datenschutz-Abschnitt, Content-Security-Policy: `form-action` muss `https://panel.ssi.at` erlauben).
+- Tests: `newsletter` (Quelltext-Verträge, 58 Prüfungen), `ci/browser-newsletter.js` (Verhalten im Browser auf `tests/fixtures/newsletter-seite.html`, 81 Prüfungen, kein echter Aufruf des Panels), `neutral` erlaubt die eigene Adresse `panel.ssi.at`.
+- Grenzen: Der Baustein braucht JavaScript und https (WebCrypto für die Kurzsumme; sonst bleibt er aus, statt ein totes Formular zu zeigen). Das Panel nimmt Namen nur mit Buchstaben, Leerzeichen, Bindestrich und Punkt an — ein Apostroph führt zu „fehler“. Ändert sich der Einwilligungstext, muss die Liste im Panel neu eingetragen werden. Kein Eingriff in `base.css`, `shared.js`, Presets, `api/`.
+
 ## [3.59.0] — 2026-10-28
 
 ### Added

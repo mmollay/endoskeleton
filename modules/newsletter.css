@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SSI Endoskeleton Module — newsletter.css
+   Stile des Newsletter-Bausteins (modules/newsletter.js). Das Modul lädt diese Datei selbst.
+   Aufbau und Felder kommen aus base.css (.form-row, .form-group, .form-checkbox, .form-error, .form-hp, .btn);
+   hier steht nur, was dort fehlt. Farben ausschließlich aus den Tokens — hell und dunkel folgen dem Preset.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.newsletter {
+  border-top: 0.0625rem solid var(--border);
+}
+
+.newsletter-karte {
+  max-width: 36rem;
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-xl);
+  background: var(--card-bg);
+  border: 0.0625rem solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* Beschriftungen in Textfarbe: die gedämpfte Farbe der Vorlage erreicht auf getönten Flächen keinen AA-Kontrast. */
+.newsletter .form-group label,
+.newsletter .form-checkbox label {
+  color: var(--text);
+}
+
+/* Einleitung in Textfarbe (die gedämpfte Farbe der Vorlage erreicht auf hellem Grund knapp keinen AA-Kontrast),
+   der Link zur Datenschutzerklärung erbt sie und ist unterstrichen — die Linkfarbe der Vorlage ist im dunklen Preset zu schwach. */
+.newsletter .section-lead {
+  color: var(--text);
+}
+
+.newsletter .form-checkbox a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.newsletter .form-checkbox a:hover {
+  text-decoration-thickness: 0.125rem;
+}
+
+/* Sichtbarer Fokus: base.css nimmt ihn den Feldern (outline: none) und lässt nur einen blassen Schatten. */
+.newsletter .form-group input:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.125rem;
+}
+
+.newsletter [aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+/* Fehlertext: ein Stück zur Textfarbe hin, damit er auch auf dunklem Grund lesbar bleibt. */
+.newsletter .form-error {
+  color: color-mix(in srgb, var(--error) 65%, var(--text));
+}
+
+.newsletter-einwilligung .form-checkbox {
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.newsletter-einwilligung .form-checkbox input {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.newsletter-einwilligung .form-error {
+  margin: 0 0 var(--space-md);
+}
+
+.newsletter-felder .btn {
+  margin-top: var(--space-md);
+}
+
+/* Meldung nach der Rückleitung des Panels (ok / fehler). Die Bedeutung steht im Text, die Farbe unterstreicht sie nur. */
+.newsletter-meldung {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-alt, var(--bg));
+  border: 0.0625rem solid var(--border);
+  border-left-width: 0.3125rem;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  scroll-margin-top: calc(var(--space-3xl) + var(--space-xl));
+}
+
+.newsletter-meldung p {
+  margin: 0;
+}
+
+.newsletter-nachsatz {
+  margin-top: var(--space-sm);
+  color: var(--text-light);
+  font-size: var(--fs-sm);
+}
+
+.newsletter-meldung--ok {
+  border-left-color: var(--success);
+}
+
+.newsletter-meldung--fehler {
+  border-left-color: var(--error);
+}
+
+@media (max-width: 30rem) {
+  .newsletter-karte {
+    padding: var(--space-lg);
+  }
+
+  .newsletter-felder .btn {
+    width: 100%;
+  }
+}
