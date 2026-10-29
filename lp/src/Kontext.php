@@ -101,6 +101,21 @@ final class Kontext
         return '<a class="btn btn-primary lp-knopf" href="' . $this->e((string) $knopf['ziel']) . '">' . $this->e((string) $knopf['text']) . '</a>';
     }
 
+    /**
+     * Video mit zwei Klicks: Rahmen (16:9) mit dem Startbild in einem Knopf, dazu der Ersatzlink — der Baustein „video“ und der Kopfbereich
+     * mit Video (3.61.0) schreiben ihn hier. Bis zum Klick gibt es keine Anfrage an YouTube; lp.js setzt das iframe erst danach ein.
+     */
+    public function videoStart(string $kennung, string $titel, array $bild, bool $wichtig = false): string
+    {
+        $beschriftung = 'Video abspielen: ' . $titel . ' (lädt Inhalte von YouTube)';
+        return '<div class="lp-video-rahmen">' . "\n"
+            . sprintf('<button type="button" class="lp-video-start" data-lp-kennung="%s" data-lp-titel="%s" aria-label="%s">', $this->e($kennung), $this->e($titel), $this->e($beschriftung)) . "\n"
+            . $this->bild($bild, 'lp-video-bild', $wichtig, true) . "\n"
+            . "</button>\n</div>\n"
+            . '<p class="lp-video-link">' . $this->du('Mit dem Klick auf das Bild lädst du das Video von YouTube. Du kannst es auch', 'Mit dem Klick auf das Bild laden Sie das Video von YouTube. Sie können es auch')
+            . ' <a href="https://www.youtube.com/watch?v=' . $this->e($kennung) . '">auf YouTube ansehen</a>.</p>';
+    }
+
     /** JSON-LD, sicher gegen </script> und & im Text. */
     public function jsonLd(array $daten): string
     {

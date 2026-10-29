@@ -207,6 +207,14 @@ section.lp-block {
   border-radius: var(--radius-lg);
 }
 
+/* Kopfbereich mit Video (3.61.0): Startbild im 16:9-Rahmen des Videos (.lp-video-rahmen) mit dem Hinweis darunter. min-width: 0, damit
+   das Video in der Rasterspalte schrumpfen darf. */
+.lp-hero-medien {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
 @media (min-width: 60rem) {
   .lp-hero--bild-rechts .lp-block-innen {
     grid-template-columns: 1.1fr 1fr;

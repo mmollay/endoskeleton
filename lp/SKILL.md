@@ -94,7 +94,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.60.0)
+## Bausteine (Katalog 3.61.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -102,7 +102,7 @@ Jeder Baustein kennt zusätzlich `typ` (Pflicht), `variante` (ohne Angabe die er
 
 ### `hero` — Kopfbereich
 
-Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.59.0 · genau einmal, als erster Abschnitt
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.61.0 · genau einmal, als erster Abschnitt
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -110,6 +110,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `video_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur bei bild-rechts; seit 3.61.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie) |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json

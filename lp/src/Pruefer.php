@@ -218,7 +218,7 @@ final class Pruefer
                 $felder[$pfad] = $w;
             } elseif (is_array($w)) {
                 foreach ($w as $s => $x) {
-                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'anbieter', 'liste', 'art', 'beginn'], true)) {
+                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'video_kennung', 'anbieter', 'liste', 'art', 'beginn'], true)) {
                         $sammeln($x, $pfad === '' ? (string) $s : "$pfad.$s");
                     }
                 }

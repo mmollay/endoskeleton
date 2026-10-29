@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.60.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.61.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3151,6 +3151,14 @@ section.lp-block {
   aspect-ratio: 3 / 2;
   object-fit: cover;
   border-radius: var(--radius-lg);
+}
+
+/* Kopfbereich mit Video (3.61.0): Startbild im 16:9-Rahmen des Videos (.lp-video-rahmen) mit dem Hinweis darunter. min-width: 0, damit
+   das Video in der Rasterspalte schrumpfen darf. */
+.lp-hero-medien {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
 }
 
 @media (min-width: 60rem) {

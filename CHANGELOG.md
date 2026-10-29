@@ -4,6 +4,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.61.0] — 2026-10-29
+
+### Added
+- **Der Kopfbereich kann ein YouTube-Video zeigen** (Anlass: Martin, 29.10.2026, „ich möchte alternativ zum Bild in der Landingpage auch ein Video wählen können“ — „Ja, YouTube“). Neues freiwilliges Feld `video_kennung` („YouTube-Video (Kennung)“, die 11 Zeichen aus der Adresse, Muster `^[A-Za-z0-9_-]{11}\z`) im Baustein `hero`, nur bei der Variante `bild-rechts` und nur zusammen mit dem Bild. Das Bild bleibt als **Startbild mit Play-Knopf** stehen; erst der Klick lädt das Video von `youtube-nocookie.com` — derselbe Zwei-Klick-Weg wie beim Baustein `video`: vorher kein iframe und keine Anfrage an YouTube, ohne JavaScript bleibt der Link „auf YouTube ansehen“ mit dem Hinweis darüber.
+- **Startbild im 16:9-Rahmen:** Das Video sitzt in dem Rahmen des Bausteins `video` (`.lp-video-rahmen`, 16:9, nie abgeschnitten, auch bei 390 px); das Startbild füllt ihn aus der Mitte (ein 3:2-Bild verliert oben und unten etwas). Neue Klasse `lp-hero-medien` (seit 3.61.0): ordnet Rahmen und Hinweis untereinander und lässt die Rasterspalte schrumpfen (`min-width: 0`). Sonst nur Klassen, Tokens und der Handler, die es schon gibt (`lp-video-start`, `lp-video-bild`, `lp-video-link`, `lp.js`) — keine zweite Kopie.
+- **Prüfer:** `Schema` kennt für Felder die Einschränkung `nur_bei` (Varianten): `video_kennung` bei `bild-hinten` oder `schlicht` ist sperrend („… gibt es nur bei der Darstellung „bild-rechts““), ebenso ein falsches Format (auch eine ganze Adresse oder ein Zeilenumbruch am Ende — `\z` statt `$`) und ein Video ohne Bild (das Bild ist bei `bild-rechts` Pflicht). Die Kennung gilt für die Sperrliste nicht als Text. Katalog-Felder tragen außerdem ein `seit`; `lp/SKILL.md` zeigt `nur bei …` und `seit …` in der Feldtabelle.
+- Tests: `herovideo` (97 Prüfungen: Katalog, Format, Variantenregel (auch im Baustein allein, am Prüfer vorbei), HTML mit und ohne Video, du/Sie, Sperrliste, CSS nur Tokens, kein Inline-Style, ein einziger Handler), `ci/browser.js` (Kopfbereich-Video bei 1440 und 390 px: vor dem Klick keine Anfrage, 16:9, Play-Zeichen, per Tastatur, nach dem Klick nur `youtube-nocookie`, ohne JavaScript bleibt der Link). Das Musterbuch `hero--bild-rechts` zeigt das Video.
+
+### Changed
+- `Kontext::videoStart()` (neu) schreibt Rahmen, Startbild-Knopf und Ersatzlink für den Baustein `video` und den Kopfbereich gemeinsam; der Baustein `video` bleibt Byte für Byte gleich (Musterbuch unverändert bis auf den Stempel von `lp.css`).
+- Bestehende Seiten behalten ihre Marke (Datei `ENDOSKELETON`), bis sie neu gebaut werden. Das Feld gibt es erst ab Marke 3.61.0; Seiten ohne `video_kennung` bauen unverändert.
+- **Offen (nicht geändert):** Die `.htaccess` des Hauptordners erlaubt als `frame-src` nur `www.google.com` und `maps.google.com`, nicht `www.youtube-nocookie.com` (gilt für den Baustein `video` genauso). Die `.htaccess` des Sammelordners (`lp/src/Sammelordner.php`) setzt keine Content-Security-Policy; ob die ausgelieferten Seiten eine aus anderer Quelle bekommen, ist hier nicht geprüft.
+- Der Baustein `video` prüft seine Kennung weiter mit `$` (ein angehängter Zeilenumbruch fiele durch); das neue Feld nutzt `\z`.
+
 ## [3.60.0] — 2026-10-29
 
 ### Added

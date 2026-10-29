@@ -126,6 +126,11 @@ final class Schema
                 }
                 continue;
             }
+            if ($variante !== null && isset($def['nur_bei']) && !in_array($variante, $def['nur_bei'], true)) {
+                $this->fehler("$pfad.$name", "$pfad.$name: nur bei " . implode('|', $def['nur_bei']) . ", nicht bei $variante",
+                    "$wo: „{$def['label']}“ gibt es nur bei der Darstellung „" . implode('“ oder „', $def['nur_bei']) . "“, nicht bei „{$variante}“.");
+                continue;
+            }
             $this->feld($werte[$name], $def, "$pfad.$name", $wo, $pflicht);
         }
     }

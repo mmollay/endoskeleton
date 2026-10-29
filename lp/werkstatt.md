@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.60.0)
+# Landingpage bearbeiten (Endoskeleton 3.61.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -24,6 +24,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · genau einmal, als erster 
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `video_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur bei bild-rechts; seit 3.61.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie) |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json

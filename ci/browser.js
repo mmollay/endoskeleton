@@ -523,6 +523,43 @@ function kontrastImBrowser(nur) {
     await kontext.close();
   }
 
+  // Kopfbereich mit Video (3.61.0): Startbild mit Play-Knopf, erst der Klick lädt youtube-nocookie, das Video sitzt 16:9 im Rahmen
+  for (const breite of [1440, 390]) {
+    const { page, fremd, kontext } = await oeffnen(browser, 'hero--bild-rechts', breite);
+    pruefe(fremd.length === 0 && await page.$('iframe') === null, `Kopfbereich-Video (${breite}): vor dem Klick kein iframe und keine Anfrage`);
+    const vor = await page.evaluate(() => {
+      const r = document.querySelector('.lp-hero-medien .lp-video-rahmen').getBoundingClientRect();
+      const k = document.querySelector('.lp-hero-medien .lp-video-start');
+      return { b: r.width, h: r.height, rechts: r.right, links: r.left, breiteSeite: document.documentElement.scrollWidth, play: getComputedStyle(k, '::before').width, rund: getComputedStyle(k, '::before').borderTopLeftRadius,
+        bild: document.querySelectorAll('img.lp-hero-bild').length, hinweis: document.querySelector('.lp-hero-medien .lp-video-link a').href };
+    });
+    pruefe(Math.abs(vor.b / vor.h - 16 / 9) < 0.02, `Kopfbereich-Video (${breite}): Rahmen 16:9 (${Math.round(vor.b)} × ${Math.round(vor.h)})`);
+    pruefe(vor.links >= 0 && vor.rechts <= breite + 0.5 && vor.breiteSeite <= breite, `Kopfbereich-Video (${breite}): Rahmen im Fenster, kein Seitwärts-Scrollen (${Math.round(vor.links)}–${Math.round(vor.rechts)}, Seite ${vor.breiteSeite})`);
+    pruefe(parseFloat(vor.play) >= 48 && parseFloat(vor.rund) > 0, `Kopfbereich-Video (${breite}): Play-Zeichen steht auf dem Startbild (${vor.play})`);
+    pruefe(vor.bild === 0 && vor.hinweis === 'https://www.youtube.com/watch?v=AbCdEfGhIjk', 'Kopfbereich-Video: kein loses Bild daneben, Ersatzlink zu YouTube');
+    await page.focus('.lp-hero-medien .lp-video-start');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.lp-hero-medien .lp-video-rahmen iframe');
+    const f = await page.evaluate(() => {
+      const i = document.querySelector('.lp-hero-medien .lp-video-rahmen iframe');
+      const r = document.querySelector('.lp-hero-medien .lp-video-rahmen').getBoundingClientRect();
+      const q = i.getBoundingClientRect();
+      return { src: i.src, titel: i.title, fokus: document.activeElement === i, b: q.width, h: q.height, dx: Math.abs(q.left - r.left) + Math.abs(q.right - r.right), dy: Math.abs(q.top - r.top) + Math.abs(q.bottom - r.bottom), knopf: document.querySelectorAll('.lp-video-start').length };
+    });
+    pruefe(f.src.startsWith('https://www.youtube-nocookie.com/embed/AbCdEfGhIjk'), `Kopfbereich-Video (${breite}): iframe lädt youtube-nocookie (${f.src})`);
+    pruefe(f.titel === 'Gesund durch den Winter' && f.fokus && f.knopf === 0, `Kopfbereich-Video (${breite}): iframe mit Titel, Fokus im Video, Startknopf ersetzt`);
+    pruefe(f.dx < 1 && f.dy < 1 && Math.abs(f.b / f.h - 16 / 9) < 0.02, `Kopfbereich-Video (${breite}): Video füllt den 16:9-Rahmen (${Math.round(f.b)} × ${Math.round(f.h)})`);
+    await page.waitForTimeout(300);
+    pruefe(fremd.length > 0 && fremd.every((u) => u.startsWith('https://www.youtube-nocookie.com/')), `Kopfbereich-Video (${breite}): nach dem Klick nur youtube-nocookie`);
+    await kontext.close();
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 390, { ohneJs: true });
+    const o = await page.evaluate(() => ({ knopf: document.querySelectorAll('.lp-video-start').length, link: document.querySelector('.lp-hero-medien .lp-video-link a').href, sichtbar: document.querySelector('.lp-hero-medien .lp-video-link a').getBoundingClientRect().height > 0 }));
+    pruefe(o.knopf === 1 && o.link === 'https://www.youtube.com/watch?v=AbCdEfGhIjk' && o.sichtbar, 'Kopfbereich-Video ohne JavaScript: Link zu YouTube bleibt sichtbar');
+    await kontext.close();
+  }
+
   // Termine mit gestellter Uhr: vergangene ausgeblendet, ohne Termin der Ersatztext
   {
     let { page, kontext } = await oeffnen(browser, 'termin--karte', 1280, { uhr: '2099-11-01T12:00:00+01:00' });

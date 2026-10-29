@@ -65,7 +65,8 @@ final class Skill
     private static function zeile(string $name, array $f): string
     {
         $pflicht = ($f['pflicht'] ?? false) ? 'ja' : (isset($f['pflicht_bei']) ? 'bei ' . implode(', ', $f['pflicht_bei']) : '–');
-        return "| $name | {$f['typ']} | $pflicht | " . self::grenzen($f) . (isset($f['fehlt']) ? "; fehlt: {$f['fehlt']}" : '') . " |\n";
+        return "| $name | {$f['typ']} | $pflicht | " . self::grenzen($f) . (isset($f['nur_bei']) ? '; nur bei ' . implode(', ', $f['nur_bei']) : '') . (isset($f['seit']) ? "; seit {$f['seit']}" : '')
+            . (isset($f['fehlt']) ? "; fehlt: {$f['fehlt']}" : '') . " |\n";
     }
 
     private static function grenzen(array $f): string

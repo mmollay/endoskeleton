@@ -14,6 +14,7 @@
             "bild": {
                 "datei": "bestand/beispiel-vortrag.webp"
             },
+            "video_kennung": "AbCdEfGhIjk",
             "knopf": {
                 "text": "Kostenlos anmelden",
                 "ziel": "#anmeldung"
