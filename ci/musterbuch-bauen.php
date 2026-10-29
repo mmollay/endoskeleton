@@ -1,6 +1,6 @@
 <?php
 /**
- * Baut das Musterbuch: je Fixture lp/musterbuch/<typ>--<variante>.json eine Seite unter musterbuch/<name>/ mit dem
+ * Baut das Musterbuch: je Fixture lp/musterbuch/<typ>--<variante>[--<zusatz>].json eine Seite unter musterbuch/<name>/ mit dem
  * neutralen Testprofil, dazu musterbuch/index.html und musterbuch/.htaccess.
  *
  *   php ci/musterbuch-bauen.php                                   → musterbuch/ im Repo (Golddateien, Testprofil)
@@ -24,6 +24,7 @@ use Endo\Lp\Katalog;
 use Endo\Lp\ProfilKopie;
 use Endo\Lp\Sammelordner;
 use Endo\Lp\Text;
+use Endo\Lp\Videodatei;
 
 $w = dirname(__DIR__);
 $args = array_slice($argv, 1);
@@ -45,6 +46,9 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
     $name = basename($fixture, '.json');
     $o = "$ziel/$name";
     Dateien::kopieren($fixture, "$o/seite.json");
+    foreach (Videodatei::imPlan(json_decode((string) file_get_contents($fixture), true) ?: []) as $video) {
+        Dateien::kopieren("$w/lp/musterbuch/$video", "$o/$video");   // Probedateien der Fixtures mit eigenem Video (3.62.0)
+    }
     Dateien::schreiben("$o/ENDOSKELETON", "$version\n");
     $pb = ProfilKopie::uebernehmen($o, $profil);
     if (Befund::sperrt($pb)) {
@@ -74,6 +78,7 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
         exit(1);
     }
     [$typ, $variante] = explode('--', $name, 2);
+    $variante = str_replace('--', ' · ', $variante);   // <typ>--<variante>--<zusatz>: weitere Beispiele derselben Variante
     $b = $k->baustein($typ);
     $liste[] = sprintf('<li><a href="%s/">%s – %s</a> <span>(seit %s, geändert %s)</span></li>', $name, Text::e($b['name']), Text::e($variante), $b['seit'], $b['geaendert']);
 }

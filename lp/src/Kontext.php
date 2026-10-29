@@ -76,6 +76,21 @@ final class Kontext
      */
     public function bild(array $bild, string $klasse, bool $wichtig = false, bool $stumm = false): string
     {
+        [$src, $alt, $mass] = $this->bildDaten($bild);
+        if ($stumm || ($bild['dekorativ'] ?? false) === true) {
+            $alt = '';
+        }
+        $laden = $wichtig ? ' fetchpriority="high" decoding="async"' : ' loading="lazy" decoding="async"';
+        return sprintf('<img class="%s" src="%s" alt="%s" width="%d" height="%d"%s>', $klasse, $this->e($src), $this->e($alt), $mass[0], $mass[1], $laden);
+    }
+
+    /**
+     * Adresse im Seitenordner, Alt-Text und Maße eines Bildes des Bauplans; bestand/<name> wird dabei zum Kopieren nach es/bilder/ vorgemerkt.
+     *
+     * @return array{0: string, 1: string, 2: array} [src, alt, getimagesize]
+     */
+    private function bildDaten(array $bild): array
+    {
         $datei = (string) $bild['datei'];
         $name = substr($datei, strpos($datei, '/') + 1);
         if (str_starts_with($datei, 'bestand/')) {
@@ -88,12 +103,8 @@ final class Kontext
             $src = "img/$name";
             $alt = (string) ($bild['alt'] ?? '');
         }
-        if ($stumm || ($bild['dekorativ'] ?? false) === true) {
-            $alt = '';
-        }
         $mass = @getimagesize($quelle) ?: throw new BauFehler("Bildmaße nicht lesbar: $datei");
-        $laden = $wichtig ? ' fetchpriority="high" decoding="async"' : ' loading="lazy" decoding="async"';
-        return sprintf('<img class="%s" src="%s" alt="%s" width="%d" height="%d"%s>', $klasse, $this->e($src), $this->e($alt), $mass[0], $mass[1], $laden);
+        return [$src, $alt, $mass];
     }
 
     public function knopf(array $knopf): string
@@ -114,6 +125,25 @@ final class Kontext
             . "</button>\n</div>\n"
             . '<p class="lp-video-link">' . $this->du('Mit dem Klick auf das Bild lädst du das Video von YouTube. Du kannst es auch', 'Mit dem Klick auf das Bild laden Sie das Video von YouTube. Sie können es auch')
             . ' <a href="https://www.youtube.com/watch?v=' . $this->e($kennung) . '">auf YouTube ansehen</a>.</p>';
+    }
+
+    /**
+     * Eigenes Video (3.62.0): <video> mit Bedienleiste im 16:9-Rahmen, das Bild ist das Startbild (poster). preload="none": nichts lädt, bis der
+     * Besucher startet; nichts startet von selbst (kein autoplay, kein muted, kein loop). Kein Drittanbieter — die Datei liegt im Seitenordner.
+     * Die Datei wird hier noch einmal geprüft (Videodatei): ein Bauplan am Prüfer vorbei bekommt nie ein Video, das es nicht geben darf.
+     */
+    public function videoDatei(string $datei, string $titel, array $poster): string
+    {
+        if (($f = Videodatei::fehler($this->seite, $datei)) !== null) {
+            throw new BauFehler("Videodatei $datei: $f[0]");
+        }
+        [$start] = $this->bildDaten($poster);
+        return '<div class="lp-video-rahmen">' . "\n"
+            . sprintf('<video class="lp-video-datei" controls preload="none" playsinline poster="%s" aria-label="%s">', $this->e($start), $this->e('Video: ' . $titel)) . "\n"
+            . sprintf('<source src="%s" type="video/mp4">', $this->e($datei)) . "\n"
+            . "</video>\n</div>\n"
+            . '<p class="lp-video-link">' . $this->du('Lässt sich das Video nicht abspielen? Du kannst es auch', 'Lässt sich das Video nicht abspielen? Sie können es auch')
+            . ' <a href="' . $this->e($datei) . '">als Datei öffnen</a>.</p>';
     }
 
     /** JSON-LD, sicher gegen </script> und & im Text. */

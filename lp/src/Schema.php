@@ -119,7 +119,8 @@ final class Schema
             $this->fehler("$pfad.$s", "unbekanntes Feld $s", "$wo: Das Feld „{$s}“ gibt es hier nicht.");
         }
         foreach ($felder as $name => $def) {
-            $pflicht = ($def['pflicht'] ?? false) || ($variante !== null && in_array($variante, $def['pflicht_bei'] ?? [], true));
+            $pflicht = ($def['pflicht'] ?? false) || ($variante !== null && in_array($variante, $def['pflicht_bei'] ?? [], true))
+                || self::gilt($def['pflicht_wenn'] ?? null, $werte, $felder);
             if (!array_key_exists($name, $werte)) {
                 if ($pflicht) {
                     $this->fehler("$pfad.$name", "Pflichtfeld $name fehlt", "$wo: „{$def['label']}“ fehlt.");
@@ -131,8 +132,32 @@ final class Schema
                     "$wo: „{$def['label']}“ gibt es nur bei der Darstellung „" . implode('“ oder „', $def['nur_bei']) . "“, nicht bei „{$variante}“.");
                 continue;
             }
+            if (isset($def['nur_wenn']) && !self::gilt($def['nur_wenn'], $werte, $felder)) {
+                $wann = implode(' und ', array_map(static fn ($f, $w) => "„{$felder[$f]['label']}“ auf „{$w}“", array_keys($def['nur_wenn']), $def['nur_wenn']));
+                $this->fehler("$pfad.$name", "$pfad.$name: nur wenn " . json_encode($def['nur_wenn'], JSON_UNESCAPED_UNICODE), "$wo: „{$def['label']}“ gibt es nur, wenn $wann steht.");
+                continue;
+            }
+            foreach ($def['nicht_mit'] ?? [] as $anderes) {
+                if (array_key_exists($anderes, $werte)) {
+                    $this->fehler("$pfad.$name", "$pfad.$name: nicht zusammen mit $anderes", "$wo: „{$def['label']}“ und „{$felder[$anderes]['label']}“ gibt es nur entweder-oder — bitte eines davon entfernen.");
+                }
+            }
             $this->feld($werte[$name], $def, "$pfad.$name", $wo, $pflicht);
         }
+    }
+
+    /** Gilt die Bedingung {feld: wert}? Fehlt ein Feld, zählt sein „standard“. Keine Bedingung: nein. */
+    private static function gilt(?array $bedingung, array $werte, array $felder): bool
+    {
+        if ($bedingung === null) {
+            return false;
+        }
+        foreach ($bedingung as $f => $soll) {
+            if (($werte[$f] ?? $felder[$f]['standard'] ?? null) !== $soll) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function feld(mixed $w, array $def, string $pfad, string $wo, bool $pflicht): void
@@ -208,6 +233,15 @@ final class Schema
             case 'kennung':
                 if (!is_string($w) || !preg_match('~' . $def['muster'] . '~', $w)) {
                     $this->fehler($pfad, "$pfad: passt nicht zu {$def['muster']}", "$wo: $label hat die falsche Form.");
+                }
+                return;
+            case 'videodatei':
+                if (!is_string($w)) {
+                    $form('Pfad der Videodatei');
+                    return;
+                }
+                if (($f = Videodatei::fehler($this->ordner, $w)) !== null) {
+                    $this->fehler($pfad, "$pfad: $f[0]", "$wo: $f[1]");
                 }
                 return;
             case 'bilddatei':

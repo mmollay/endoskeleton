@@ -1,9 +1,15 @@
 <?php
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
- * Kopfbereich: einzige H1 der Seite, optional Bild (rechts oder dahinter) und Knopf. Bei bild-rechts mit video_kennung (3.61.0) wird das Bild
- * zum Startbild eines YouTube-Videos mit zwei Klicks (Kontext::videoStart). @var array $b @var Endo\Lp\Kontext $k @var int $nr */
+ * Kopfbereich: einzige H1 der Seite, optional Bild (rechts oder dahinter) und Knopf. Bei bild-rechts wird das Bild zum Startbild eines Videos:
+ * mit video_kennung (3.61.0) ein YouTube-Video mit zwei Klicks (Kontext::videoStart), mit video_datei (3.62.0) ein eigenes Video (Kontext::videoDatei).
+ * @var array $b @var Endo\Lp\Kontext $k @var int $nr */
 $titelId = $k->id($nr, 'titel');
+$video = null;
+if ($b['variante'] === 'bild-rechts' && isset($b['bild'])) {
+    $video = isset($b['video_kennung']) ? $k->videoStart($b['video_kennung'], $b['titel'], $b['bild'], true)
+        : (isset($b['video_datei']) ? $k->videoDatei($b['video_datei'], $b['titel'], $b['bild']) : null);
+}
 ?>
 <?= $k->oeffnen($b, $nr) ?>
 
@@ -18,9 +24,9 @@ $titelId = $k->id($nr, 'titel');
 <?= isset($b['knopf']) ? $k->knopf($b['knopf']) : '' ?>
 
 </div>
-<?php if ($b['variante'] === 'bild-rechts' && isset($b['bild'], $b['video_kennung'])): ?>
+<?php if ($video !== null): ?>
 <div class="lp-hero-medien">
-<?= $k->videoStart($b['video_kennung'], $b['titel'], $b['bild'], true) ?>
+<?= $video ?>
 
 </div>
 <?php elseif ($b['variante'] !== 'schlicht' && isset($b['bild'])): ?>

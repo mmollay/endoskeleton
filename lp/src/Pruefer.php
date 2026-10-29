@@ -87,29 +87,28 @@ final class Pruefer
 
     /**
      * Im Seitenordner liegt nur, was dorthin gehört: Bauplan, Marke, Profilkopie, das Gebaute, Git und die Dateien des
-     * Livegangs; in img/ nur Bilder, auf die der Bauplan verweist. Alles andere würde mit ausgeliefert.
+     * Livegangs; in img/ nur Bilder und in vid/ nur Videos, auf die der Bauplan verweist. Alles andere würde mit ausgeliefert.
      */
     private function ordner(array $dateien): void
     {
-        $erlaubt = ['seite.json', 'ENDOSKELETON', 'profil', 'es', 'img', '.git', '.gitignore', 'VERSION', 'CHANGELOG.md'];
+        $erlaubt = ['seite.json', 'ENDOSKELETON', 'profil', 'es', 'img', 'vid', '.git', '.gitignore', 'VERSION', 'CHANGELOG.md'];
         foreach (array_diff(scandir($this->seite) ?: [], ['.', '..']) as $e) {
             if (!in_array($e, $erlaubt, true) && !isset($dateien[$e])) {
                 $this->sperrend($e, "$e gehört nicht in den Seitenordner (würde ausgeliefert)", 'Im Ordner der Seite liegt eine fremde Datei — bitte entfernen.');
             }
         }
-        if (!is_dir("$this->seite/img")) {
-            return;
-        }
         $genutzt = [];
         $plan = $this->plan;
         array_walk_recursive($plan, static function ($w) use (&$genutzt): void {
-            if (is_string($w) && str_starts_with($w, 'img/')) {
+            if (is_string($w) && (str_starts_with($w, 'img/') || str_starts_with($w, 'vid/'))) {
                 $genutzt[$w] = true;
             }
         });
-        foreach (array_diff(scandir("$this->seite/img") ?: [], ['.', '..']) as $e) {
-            if (!isset($genutzt["img/$e"])) {
-                $this->sperrend("img/$e", "img/$e wird im Bauplan nicht verwendet", 'Im Bilderordner der Seite liegt eine Datei, die die Seite nicht verwendet — bitte entfernen.');
+        foreach (['img' => 'Bilderordner', 'vid' => 'Videoordner'] as $ordner => $name) {
+            foreach (array_diff(@scandir("$this->seite/$ordner") ?: [], ['.', '..']) as $e) {
+                if (!isset($genutzt["$ordner/$e"])) {
+                    $this->sperrend("$ordner/$e", "$ordner/$e wird im Bauplan nicht verwendet", "Im $name der Seite liegt eine Datei, die die Seite nicht verwendet — bitte entfernen.");
+                }
             }
         }
     }
@@ -218,7 +217,7 @@ final class Pruefer
                 $felder[$pfad] = $w;
             } elseif (is_array($w)) {
                 foreach ($w as $s => $x) {
-                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'video_kennung', 'anbieter', 'liste', 'art', 'beginn'], true)) {
+                    if (!in_array($s, ['typ', 'variante', 'anker', 'datei', 'ziel', 'quelle', 'kennung', 'video_kennung', 'video_datei', 'anbieter', 'liste', 'art', 'beginn'], true)) {
                         $sammeln($x, $pfad === '' ? (string) $s : "$pfad.$s");
                     }
                 }
@@ -335,12 +334,14 @@ final class Pruefer
                 if (!Text::https($h, $hosts)) {
                     $this->sperrend($datei, "$datei: Link auf nicht erlaubtes Ziel $h", 'Ein Link führt auf eine nicht freigegebene Website.');
                 }
+            } elseif (Videodatei::fehler($this->seite, $h) === null) {
+                continue;   // Ersatzlink zur eigenen Videodatei (3.62.0)
             } elseif (!in_array(strtok($h, '?#'), self::SEITEN, true) || !is_file("$this->seite/" . strtok($h, '?#'))) {
                 $this->sperrend($datei, "$datei: interner Link $h führt ins Leere", 'Ein Link auf der Seite führt ins Leere.');
             }
         }
-        foreach ($x->query('//*[@src]|//*[@srcset]|//link[@href]') as $e) {
-            foreach (['src', 'srcset', 'href'] as $attr) {
+        foreach ($x->query('//*[@src]|//*[@srcset]|//*[@poster]|//link[@href]') as $e) {
+            foreach (['src', 'srcset', 'poster', 'href'] as $attr) {
                 $w = $e->getAttribute($attr);
                 if ($w !== '' && (str_contains($w, '//') || preg_match('/^[a-z]+:/i', $w))) {
                     $this->sperrend($datei, "$datei: fremde Quelle $w", 'Die Seite lädt Inhalte von fremden Servern (Datenschutz).');
@@ -349,6 +350,21 @@ final class Pruefer
         }
         foreach ($x->query('//img') as $img) {
             $this->bild($datei, $img);
+        }
+        $this->videos($datei, $x);
+    }
+
+    /** Eigene Videos (3.62.0) starten nie von selbst und haben immer eine Bedienleiste; das Startbild (poster) gilt wie ein Bild. */
+    private function videos(string $datei, \DOMXPath $x): void
+    {
+        if ($x->query('//video[@autoplay or @loop or @muted]')->length > 0) {
+            $this->sperrend($datei, "$datei: <video> startet von selbst (Autoplay, loop oder muted)", 'Ein Video startet von selbst — Videos starten nur, wenn der Besucher sie startet.');
+        }
+        if ($x->query('//video[not(@controls)]')->length > 0) {
+            $this->sperrend($datei, "$datei: <video> ohne controls", 'Einem Video fehlt die Bedienleiste.');
+        }
+        foreach ($x->query('//video[@poster]') as $v) {
+            $this->bildDatei($datei, $v->getAttribute('poster'));
         }
     }
 
@@ -406,6 +422,12 @@ final class Pruefer
                 $this->sperrend($datei, "$datei: <img src=\"$src\"> ohne $a", 'Einem Bild fehlen Angaben (Maße oder Beschreibung).');
             }
         }
+        $this->bildDatei($datei, $src);
+    }
+
+    /** Ein Bild (oder Startbild eines Videos) im Seitenordner: WebP und höchstens 400 KB. */
+    private function bildDatei(string $datei, string $src): void
+    {
         $pfad = "$this->seite/" . strtok($src, '?');
         if (str_contains($src, '//') || str_contains($src, '/../') || str_starts_with($src, '../') || !is_file($pfad)) {
             return;   // Fremdquelle oder fehlend: melden Quellenprüfung bzw. Nachbau-Vergleich

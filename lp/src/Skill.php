@@ -64,9 +64,18 @@ final class Skill
 
     private static function zeile(string $name, array $f): string
     {
-        $pflicht = ($f['pflicht'] ?? false) ? 'ja' : (isset($f['pflicht_bei']) ? 'bei ' . implode(', ', $f['pflicht_bei']) : '–');
-        return "| $name | {$f['typ']} | $pflicht | " . self::grenzen($f) . (isset($f['nur_bei']) ? '; nur bei ' . implode(', ', $f['nur_bei']) : '') . (isset($f['seit']) ? "; seit {$f['seit']}" : '')
+        $pflicht = ($f['pflicht'] ?? false) ? 'ja' : (isset($f['pflicht_bei']) ? 'bei ' . implode(', ', $f['pflicht_bei']) : (isset($f['pflicht_wenn']) ? 'wenn ' . self::bedingung($f['pflicht_wenn']) : '–'));
+        return "| $name | {$f['typ']} | $pflicht | " . self::grenzen($f) . (isset($f['nur_bei']) ? '; nur bei ' . implode(', ', $f['nur_bei']) : '')
+            . (isset($f['nur_wenn']) ? '; nur wenn ' . self::bedingung($f['nur_wenn']) : '')
+            . (isset($f['nicht_mit']) ? '; nicht zusammen mit ' . implode(', ', array_map(static fn ($n) => "`$n`", $f['nicht_mit'])) : '')
+            . (isset($f['standard']) ? "; Standard `{$f['standard']}`" : '') . (isset($f['seit']) ? "; seit {$f['seit']}" : '')
             . (isset($f['fehlt']) ? "; fehlt: {$f['fehlt']}" : '') . " |\n";
+    }
+
+    /** {"anbieter": "datei"} als `anbieter` = `datei`. */
+    private static function bedingung(array $b): string
+    {
+        return implode(' und ', array_map(static fn ($feld, $wert) => "`$feld` = `$wert`", array_keys($b), $b));
     }
 
     private static function grenzen(array $f): string
@@ -83,6 +92,7 @@ final class Skill
             'kennung' => '`' . $f['muster'] . '`',
             'bild' => '`{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}`',
             'bilddatei' => '`bestand/…` oder `img/…`',
+            'videodatei' => '`vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB',
             'knopf' => ($f['nur_anker'] ?? false) ? '`{"text": ≤ 40 Zeichen, "ziel": "#anker"}` (nur Sprungmarken der Seite)' : '`{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}`',
             'liste' => "{$f['min']}–{$f['max']} Einträge" . (is_string($f['eintrag']['typ'] ?? null) ? ' (' . self::grenzen($f['eintrag']) . ')' : ''),
             'janein' => '`true` / `false`',

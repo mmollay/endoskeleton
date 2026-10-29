@@ -42,6 +42,11 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 - Bilder: `bestand/<datei>` aus `profil/bilder/` (Alt-Text aus `bilder.json`) oder `img/<datei>` im Seitenordner
   (dann `alt` Pflicht, leer nur mit `"dekorativ": true`). WebP, höchstens 400 KB. Bestandsbilder brauchen in
   `bilder.json` `"freigegeben": true`; im Seitenordner liegen nur Bilder, die der Bauplan verwendet.
+- Eigenes Video (seit 3.62.0): `video_datei` im Kopfbereich (`bild-rechts`) oder `anbieter` `datei` mit `datei` im Baustein `video`.
+  Der Pfad ist immer `vid/eigen-<16 Hexzeichen>.mp4` (nur MP4, höchstens 40 MB, die Datei liegt im Seitenordner und wird vom
+  Betreiber angelegt — nie einen Pfad erfinden). Das Bild des Abschnitts ist das Startbild; das Video lädt und startet nie von selbst,
+  es gibt keinen Drittanbieter. `video_datei` und `video_kennung` (YouTube) schließen sich aus; im Seitenordner liegen nur Videos,
+  auf die der Bauplan verweist.
 - Sprungmarken (`anker`): `inhalt` und alles mit `lp-` sind vergeben. Der Abschluss-Knopf führt nur auf eine
   Sprungmarke der Seite.
 - Teilen des Seitenlinks (WhatsApp, Telegram, Facebook, LinkedIn, Slack, X): Mit `meta.adresse` (die absolute Adresse
@@ -94,7 +99,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.61.0)
+## Bausteine (Katalog 3.62.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -102,7 +107,7 @@ Jeder Baustein kennt zusätzlich `typ` (Pflicht), `variante` (ohne Angabe die er
 
 ### `hero` — Kopfbereich
 
-Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.61.0 · genau einmal, als erster Abschnitt
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.62.0 · genau einmal, als erster Abschnitt
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -111,6 +116,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
 | `video_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur bei bild-rechts; seit 3.61.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie) |
+| `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json
@@ -188,14 +194,15 @@ Varianten: `haken`, `zwei-spalten` · seit 3.51.0, geändert 3.51.0
 
 ### `video` — Video
 
-Varianten: `breit`, `mit-text` · seit 3.51.0, geändert 3.51.0
+Varianten: `breit`, `mit-text` · seit 3.51.0, geändert 3.62.0
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
 | `text` | absatz | bei mit-text | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
-| `anbieter` | auswahl | ja | eines von `youtube` |
-| `kennung` | kennung | ja | `^[A-Za-z0-9_-]{11}$` |
+| `anbieter` | auswahl | – | eines von `youtube`, `datei`; Standard `youtube`; fehlt: youtube; „datei“ (eigenes Video aus dem Seitenordner, kein Drittanbieter) gibt es seit 3.62.0 |
+| `kennung` | kennung | wenn `anbieter` = `youtube` | `^[A-Za-z0-9_-]{11}$`; nur wenn `anbieter` = `youtube` |
+| `datei` | videodatei | wenn `anbieter` = `datei` | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB; nur wenn `anbieter` = `datei`; seit 3.62.0 |
 | `vorschau` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
 
 ```json

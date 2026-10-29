@@ -2,6 +2,7 @@
 /**
  * Das Musterbuch: je Variante jedes Bausteins eine Fixture (lp/musterbuch/<typ>--<variante>.json) und ihre gebaute
  * Seite unter musterbuch/<typ>--<variante>/ — zugleich die Golddateien: jeder Neubau muss Byte für Byte gleich sein.
+ * Weitere Beispiele derselben Variante heißen <typ>--<variante>--<zusatz> (3.62.0: eigenes Video); ihre Probedateien liegen in lp/musterbuch/vid/.
  */
 
 declare(strict_types=1);
@@ -12,6 +13,7 @@ use Endo\Lp\Bauer;
 use Endo\Lp\Katalog;
 use Endo\Lp\Pruefer;
 use Endo\Lp\Sammelordner;
+use Endo\Lp\Videodatei;
 
 $k = Katalog::laden();
 $w = H::wurzel();
@@ -22,9 +24,12 @@ foreach ($k->bausteine as $typ => $e) {
 sort($soll);
 $ist = array_map(static fn ($f) => basename($f, '.json'), glob("$w/lp/musterbuch/*.json") ?: []);
 sort($ist);
+/** Je Variante genau eine Grundfixture; die übrigen (drei Namensteile) sind weitere Beispiele einer Variante. */
+$grund = array_values(array_filter($ist, static fn ($n) => substr_count($n, '--') === 1));
+$zusatz = array_values(array_filter($ist, static fn ($n) => substr_count($n, '--') === 2));
 
 $tests = [
-    'Musterbuch in Kunden-Optik: fremdes Profil ohne die Beispielbilder' => static function () use ($w, $soll): void {
+    'Musterbuch in Kunden-Optik: fremdes Profil ohne die Beispielbilder' => static function () use ($w, $ist): void {
         $p = H::profilKopie();
         file_put_contents("$p/profil.css", str_replace(['--primary: #1d5c8c;', '--card-bg: #fbfcfe;'], ['--primary: #7a1d5c;', '--card-bg: #ffffff;'], (string) file_get_contents("$p/profil.css")));
         foreach (glob("$p/bilder/*.webp") ?: [] as $f) { unlink($f); }
@@ -38,7 +43,7 @@ $tests = [
         T::eq($rc, 0, 'gebaut: ' . implode(' ', $aus));
         $dirs = array_map('basename', glob("$ziel/*", GLOB_ONLYDIR) ?: []);
         sort($dirs);
-        T::eq($dirs, $soll, 'alle Seiten');
+        T::eq($dirs, $ist, 'alle Seiten');
         T::contains((string) @file_get_contents("$ziel/hero--bild-rechts/es/lp.css"), '--primary: #7a1d5c;', 'mit den Farben des Kundenprofils');
         T::ok(is_file("$ziel/hero--bild-rechts/es/bilder/beispiel-vortrag.webp"), 'neutrale Beispielbilder mitgebracht');
         T::eq(hash_file('sha256', "$w/musterbuch/hero--schlicht/index.html"), $repoVorher, 'Repo-Musterbuch unberührt');
@@ -55,20 +60,26 @@ $tests = [
         exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg("$w/ci/musterbuch-bauen.php") . ' --profil ' . escapeshellarg($p) . ' --ziel ' . escapeshellarg($fremd) . ' 2>&1', $aus, $rc);
         T::ok($rc === 2 && file_get_contents("$fremd/index.html") === 'Kundenseite', 'ein fremder Ordner wird nie gelöscht');
     },
-    'je Variante genau eine Fixture' => static fn () => T::eq($ist, $soll, 'Fixtures = Varianten des Katalogs'),
-    'Übersicht und Sperren des Musterbuchs' => static function () use ($w, $soll): void {
+    'je Variante genau eine Fixture' => static fn () => T::eq($grund, $soll, 'Fixtures = Varianten des Katalogs'),
+    'weitere Beispiele gehören zu einer Variante des Katalogs' => static function () use ($zusatz, $soll): void {
+        foreach ($zusatz as $name) { T::ok(in_array(implode('--', array_slice(explode('--', $name), 0, 2)), $soll, true), "$name gehört zu einer Variante"); }
+    },
+    'Übersicht und Sperren des Musterbuchs' => static function () use ($w, $ist): void {
         $index = (string) @file_get_contents("$w/musterbuch/index.html");
-        foreach ($soll as $name) { T::contains($index, "href=\"$name/\"", "Übersicht verlinkt $name"); }
+        foreach ($ist as $name) { T::contains($index, "href=\"$name/\"", "Übersicht verlinkt $name"); }
         T::eq((string) @file_get_contents("$w/musterbuch/.htaccess"), Sammelordner::HTACCESS, 'musterbuch/.htaccess = Sammelordner');
         $dirs = array_map('basename', glob("$w/musterbuch/*", GLOB_ONLYDIR) ?: []);
         sort($dirs);
-        T::eq($dirs, $soll, 'keine veralteten Ordner im Musterbuch');
+        T::eq($dirs, $ist, 'keine veralteten Ordner im Musterbuch');
     },
 ];
-foreach ($soll as $name) {
+foreach ($ist as $name) {
     $tests["$name: baut ohne Befund und gleicht dem Musterbuch"] = static function () use ($w, $name): void {
         $seite = json_decode((string) file_get_contents("$w/lp/musterbuch/$name.json"), true);
         $o = H::ordner($seite);
+        $videos = Videodatei::imPlan($seite);
+        if ($videos) { mkdir("$o/vid", 0700, true); }
+        foreach ($videos as $video) { copy("$w/lp/musterbuch/$video", "$o/$video") || throw new RuntimeException("Probedatei fehlt: $video"); }
         $e = Bauer::bauen($o, false);
         T::eq(H::texte($e->befunde), '', 'keine Befunde');
         foreach ($e->dateien as $pfad => $inhalt) {
@@ -80,7 +91,7 @@ foreach ($soll as $name) {
             $r = substr($f->getPathname(), strlen("$w/musterbuch/$name") + 1);
             if (!str_starts_with($r, 'profil/')) { $ist[] = $r; }
         }
-        $soll = array_merge(array_keys($e->dateien), ['seite.json', 'ENDOSKELETON']);
+        $soll = array_merge(array_keys($e->dateien), ['seite.json', 'ENDOSKELETON'], $videos);
         sort($ist); sort($soll);
         T::eq($ist, $soll, 'keine veralteten Dateien');
         T::ok(!file_exists("$w/musterbuch/$name/profil/VERSION"), 'keine VERSION-Datei unter dem DocumentRoot (die Haupt-.htaccess sperrt sie mit „denied“ → fail2ban)');

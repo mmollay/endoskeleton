@@ -59,7 +59,7 @@ return [
         T::eq($f['seit'] ?? null, '3.61.0', 'seit 3.61.0');
         T::ok(!($f['pflicht'] ?? false) && !isset($f['pflicht_bei']), 'freiwillig');
         T::eq($hero['klassen']['lp-hero-medien'] ?? null, '3.61.0', 'Klasse lp-hero-medien seit 3.61.0');
-        T::eq($hero['geaendert'], '3.61.0', 'Kopfbereich geändert 3.61.0');
+        T::ok(version_compare((string) $hero['geaendert'], '3.61.0', '>='), 'Kopfbereich zuletzt geändert ab 3.61.0 (3.62.0: video_datei)');
         T::ok(!isset($hero['beispiel']['video_kennung']), 'das Katalog-Beispiel bleibt ohne Video (sonst kopiert es jeder mit)');
     },
     'HV02 Prüfer: Format ^[A-Za-z0-9_-]{11}$ — gültig ohne Befund, ungültig sperrend' => static function () use ($schema, $mitVideo, $seite): void {

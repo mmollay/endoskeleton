@@ -1,5 +1,5 @@
 {
-  "version": "3.61.0",
+  "version": "3.62.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -31,7 +31,7 @@
   },
   "bausteine": {
     "hero": {
-      "name": "Kopfbereich", "seit": "3.51.0", "geaendert": "3.61.0",
+      "name": "Kopfbereich", "seit": "3.51.0", "geaendert": "3.62.0",
       "klassen": {
         "lp-hero": "3.51.0", "lp-hero--bild-rechts": "3.51.0", "lp-hero--bild-hinten": "3.51.0", "lp-hero--schlicht": "3.51.0",
         "lp-hero-text": "3.51.0", "lp-hero-dachzeile": "3.51.0", "lp-hero-titel": "3.51.0", "lp-hero-bild": "3.51.0", "lp-hero-medien": "3.61.0"
@@ -44,6 +44,8 @@
         "bild":      { "typ": "bild", "label": "Bild", "pflicht_bei": ["bild-rechts", "bild-hinten"] },
         "video_kennung": { "typ": "kennung", "label": "YouTube-Video (Kennung)", "muster": "^[A-Za-z0-9_-]{11}\\z", "nur_bei": ["bild-rechts"], "seit": "3.61.0",
                        "fehlt": "das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie)" },
+        "video_datei": { "typ": "videodatei", "label": "Eigenes Video (Datei)", "nur_bei": ["bild-rechts"], "nicht_mit": ["video_kennung"], "seit": "3.62.0",
+                       "fehlt": "das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst)" },
         "knopf":     { "typ": "knopf", "label": "Knopf" }
       },
       "regeln": { "zuerst": true, "genau_einmal": true },
@@ -99,17 +101,19 @@
       }
     },
     "video": {
-      "name": "Video", "seit": "3.51.0", "geaendert": "3.51.0",
+      "name": "Video", "seit": "3.51.0", "geaendert": "3.62.0",
       "klassen": {
         "lp-video": "3.51.0", "lp-video--breit": "3.51.0", "lp-video--mit-text": "3.51.0", "lp-video-rahmen": "3.51.0",
-        "lp-video-start": "3.51.0", "lp-video-bild": "3.51.0", "lp-video-link": "3.51.0", "lp-video-text": "3.51.0"
+        "lp-video-start": "3.51.0", "lp-video-bild": "3.51.0", "lp-video-link": "3.51.0", "lp-video-text": "3.51.0", "lp-video-datei": "3.62.0"
       },
       "varianten": ["breit", "mit-text"],
       "felder": {
         "titel":    { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
         "text":     { "typ": "absatz", "label": "Text", "max": 400, "pflicht_bei": ["mit-text"] },
-        "anbieter": { "typ": "auswahl", "label": "Anbieter", "werte": ["youtube"], "pflicht": true },
-        "kennung":  { "typ": "kennung", "label": "Video-Kennung", "muster": "^[A-Za-z0-9_-]{11}$", "pflicht": true },
+        "anbieter": { "typ": "auswahl", "label": "Anbieter", "werte": ["youtube", "datei"], "standard": "youtube",
+                      "fehlt": "youtube; „datei“ (eigenes Video aus dem Seitenordner, kein Drittanbieter) gibt es seit 3.62.0" },
+        "kennung":  { "typ": "kennung", "label": "Video-Kennung", "muster": "^[A-Za-z0-9_-]{11}$", "pflicht_wenn": { "anbieter": "youtube" }, "nur_wenn": { "anbieter": "youtube" } },
+        "datei":    { "typ": "videodatei", "label": "Eigenes Video (Datei)", "pflicht_wenn": { "anbieter": "datei" }, "nur_wenn": { "anbieter": "datei" }, "seit": "3.62.0" },
         "vorschau": { "typ": "bild", "label": "Vorschaubild", "pflicht": true }
       },
       "regeln": {},

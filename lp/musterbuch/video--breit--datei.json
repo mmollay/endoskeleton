@@ -1,0 +1,28 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Video – breit mit eigener Datei",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Video“ in der Variante „breit“ mit eigener Videodatei."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Video – breit",
+            "text": "Baustein „video“ in der Variante „breit“ mit eigener Videodatei (seit 3.62.0)."
+        },
+        {
+            "typ": "video",
+            "variante": "breit",
+            "titel": "Kurz erklärt: Worum geht es?",
+            "anbieter": "datei",
+            "datei": "vid/eigen-0a1b2c3d4e5f6071.mp4",
+            "vorschau": {
+                "datei": "bestand/beispiel-video.webp"
+            },
+            "text": "In drei Minuten erklärt: worum es an diesem Abend geht und für wen er gedacht ist.\n\nDas Video startet erst, wenn du auf Abspielen drückst."
+        }
+    ]
+}

@@ -11,7 +11,7 @@ use Endo\Lp\Schema;
 
 $k = Katalog::laden();
 $version = trim((string) file_get_contents(H::wurzel() . '/VERSION'));
-$typen = ['zeile', 'absatz', 'zahl', 'zeitpunkt', 'auswahl', 'url', 'anker', 'kennung', 'bild', 'bilddatei', 'knopf', 'liste', 'janein'];
+$typen = ['zeile', 'absatz', 'zahl', 'zeitpunkt', 'auswahl', 'url', 'anker', 'kennung', 'bild', 'bilddatei', 'videodatei', 'knopf', 'liste', 'janein'];
 
 return [
     'Katalogversion = VERSION' => static fn () => T::eq($k->version, $version, 'version in bausteine.json'),

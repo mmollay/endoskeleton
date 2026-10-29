@@ -1,8 +1,9 @@
 <?php
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
- * Video mit zwei Klicks: bis zum Klick nur ein lokales Vorschaubild, keine Anfrage an den Anbieter (Kontext::videoStart).
- * lp.js setzt das iframe erst nach dem Klick ein; ohne JavaScript bleibt der Link. @var array $b @var Endo\Lp\Kontext $k @var int $nr
+ * Video: YouTube mit zwei Klicks — bis zum Klick nur ein lokales Vorschaubild, keine Anfrage an den Anbieter (Kontext::videoStart);
+ * lp.js setzt das iframe erst nach dem Klick ein, ohne JavaScript bleibt der Link. Mit anbieter „datei“ (3.62.0) ein eigenes Video aus dem
+ * Seitenordner (Kontext::videoDatei), das Vorschaubild ist sein Startbild. @var array $b @var Endo\Lp\Kontext $k @var int $nr
  */
 $titel = (string) $b['titel'];
 ?>
@@ -17,7 +18,7 @@ $titel = (string) $b['titel'];
 
 </div>
 <?php endif ?>
-<?= $k->videoStart($b['kennung'], $titel, $b['vorschau']) ?>
+<?= ($b['anbieter'] ?? 'youtube') === 'datei' ? $k->videoDatei($b['datei'], $titel, $b['vorschau']) : $k->videoStart($b['kennung'], $titel, $b['vorschau']) ?>
 
 </div>
 </section>

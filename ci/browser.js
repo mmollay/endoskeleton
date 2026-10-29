@@ -59,7 +59,7 @@ const SCROLLSPION = `(() => {
   const d = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollHeight');
   Object.defineProperty(Element.prototype, 'scrollHeight', { ...d, get() { window.__hoehenLesen++; return d.get.call(this); } });
 })();`;
-const TYPEN = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
+const TYPEN = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.mp4': 'video/mp4' };
 
 let bestanden = 0;
 const fehler = [];
@@ -82,6 +82,7 @@ async function oeffnen(browser, name, breite, optionen = {}) {
   const abfragen = [];
   const beacons = [];
   const anmeldungen = [];
+  const angefragt = [];
   for (const skript of optionen.init || []) { await kontext.addInitScript(skript); }
   await page.route('**/*', (r) => {
     const u = new URL(r.request().url());
@@ -100,6 +101,7 @@ async function oeffnen(browser, name, breite, optionen = {}) {
       return r.fulfill({ status: p.status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': 'http://lp.test' }, body: JSON.stringify(p.daten) });
     }
     if (u.host !== 'lp.test') { fremd.push(u.href); return r.abort(); }
+    angefragt.push(decodeURIComponent(u.pathname));
     let f = path.join(MUSTERBUCH, decodeURIComponent(u.pathname));
     if (f.endsWith(path.sep)) { f = path.join(f, 'index.html'); }
     if (!f.startsWith(MUSTERBUCH) || !fs.existsSync(f)) { return r.fulfill({ status: 404, body: 'fehlt' }); }
@@ -108,7 +110,7 @@ async function oeffnen(browser, name, breite, optionen = {}) {
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
   await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
-  return { page, fremd, kontext, abfragen, beacons, anmeldungen };
+  return { page, fremd, kontext, abfragen, beacons, anmeldungen, angefragt };
 }
 
 /**
@@ -557,6 +559,36 @@ function kontrastImBrowser(nur) {
     const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts', 390, { ohneJs: true });
     const o = await page.evaluate(() => ({ knopf: document.querySelectorAll('.lp-video-start').length, link: document.querySelector('.lp-hero-medien .lp-video-link a').href, sichtbar: document.querySelector('.lp-hero-medien .lp-video-link a').getBoundingClientRect().height > 0 }));
     pruefe(o.knopf === 1 && o.link === 'https://www.youtube.com/watch?v=AbCdEfGhIjk' && o.sichtbar, 'Kopfbereich-Video ohne JavaScript: Link zu YouTube bleibt sichtbar');
+    await kontext.close();
+  }
+
+  // Eigene Videodatei (3.62.0): Startbild und Bedienleiste, kein Autoplay, vor dem Start keine Anfrage an die Datei, 16:9 im Rahmen, kein Seitwärts-Scrollen
+  // (Playwrights Chromium spielt kein H.264 ab — geprüft wird deshalb der Aufbau, nicht das Abspielen)
+  for (const [name, breite] of [['hero--bild-rechts--video-datei', 1440], ['hero--bild-rechts--video-datei', 390], ['video--breit--datei', 1440], ['video--breit--datei', 390]]) {
+    const { page, fremd, kontext, angefragt } = await oeffnen(browser, name, breite);
+    const id = `Videodatei ${name} (${breite})`;
+    await page.waitForLoadState('load');
+    const v = await page.evaluate(() => {
+      const e = document.querySelector('video.lp-video-datei');
+      const r = e.getBoundingClientRect();
+      const rahmen = e.parentElement.getBoundingClientRect();
+      const link = document.querySelector('.lp-video-link a');
+      return { controls: e.controls, autoplay: e.autoplay, muted: e.defaultMuted, loop: e.loop, paused: e.paused, preload: e.getAttribute('preload'), poster: e.getAttribute('poster'), aria: e.getAttribute('aria-label'), quelle: e.querySelector('source').getAttribute('src'),
+        b: r.width, h: r.height, dx: Math.abs(r.left - rahmen.left) + Math.abs(r.right - rahmen.right), links: r.left, rechts: r.right, seite: document.documentElement.scrollWidth, fit: getComputedStyle(e).objectFit,
+        iframes: document.querySelectorAll('iframe').length, startknoepfe: document.querySelectorAll('.lp-video-start').length, link: link ? link.getAttribute('href') : '', linkH: link ? link.getBoundingClientRect().height : 0 };
+    });
+    pruefe(v.controls && !v.autoplay && !v.muted && !v.loop && v.paused && v.preload === 'none', `${id}: Bedienleiste da, kein Autoplay, kein muted, kein loop, pausiert, preload none (${JSON.stringify([v.controls, v.autoplay, v.muted, v.loop, v.paused, v.preload])})`);
+    pruefe(angefragt.some((p) => p.endsWith(v.poster)) && !angefragt.some((p) => p.endsWith('.mp4')), `${id}: Startbild geladen, vor dem Start keine Anfrage an die Videodatei (${angefragt.filter((p) => /\.(mp4|webp)$/.test(p))})`);
+    pruefe(Math.abs(v.b / v.h - 16 / 9) < 0.02 && v.dx < 1 && v.fit === 'contain', `${id}: füllt den 16:9-Rahmen, object-fit contain (${Math.round(v.b)} × ${Math.round(v.h)}, ${v.fit})`);
+    pruefe(v.links >= 0 && v.rechts <= breite + 0.5 && v.seite <= breite, `${id}: im Fenster, kein Seitwärts-Scrollen (${Math.round(v.links)}–${Math.round(v.rechts)}, Seite ${v.seite})`);
+    pruefe(/^vid\/eigen-[0-9a-f]{16}\.mp4$/.test(v.quelle) && v.link === v.quelle && v.linkH > 0 && v.aria.startsWith('Video: '), `${id}: Quelle = Ersatzlink, sichtbar, Textalternative (${v.quelle}, ${v.aria})`);
+    pruefe(v.iframes === 0 && v.startknoepfe === 0 && fremd.length === 0, `${id}: kein iframe, kein Startknopf, keine Fremdanfrage (${fremd})`);
+    await page.keyboard.press('Tab');
+    await page.focus('video.lp-video-datei');
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    const fokus = await page.evaluate(() => { const e = document.querySelector('video.lp-video-datei'); const s = getComputedStyle(e); return { auf: document.activeElement === e, breite: parseFloat(s.outlineWidth), art: s.outlineStyle }; });
+    pruefe(fokus.auf && fokus.breite >= 2 && fokus.art !== 'none', `${id}: per Tastatur erreichbar, sichtbarer Fokusring (${JSON.stringify(fokus)})`);
     await kontext.close();
   }
 
