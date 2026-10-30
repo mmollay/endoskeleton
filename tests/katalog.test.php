@@ -46,8 +46,9 @@ return [
             T::eq($e['beispiel']['typ'] ?? '', $typ, "$typ: Beispiel hat den Typ");
             $mitte = in_array($typ, ['hero', 'anmeldung'], true) ? [] : [$e['beispiel']];
             $ordner = T::tmp();
-            H::bewegungen($ordner, $mitte);
-            T::eq(H::texte(Schema::pruefen(H::seite($mitte), $k, $p, $ordner)), '', "$typ: Beispiel gültig");
+            $seite = H::seite($mitte);
+            H::bewegungen($ordner, $seite);
+            T::eq(H::texte(Schema::pruefen($seite, $k, $p, $ordner)), '', "$typ: Beispiel gültig");
         }
     },
     'jede Klasse kommt im Musterbuch vor, jede lp-Klasse steht im Katalog' => static function () use ($k): void {

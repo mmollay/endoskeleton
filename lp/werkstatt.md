@@ -10,6 +10,7 @@ _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand
 - Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.
 - Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `"dekorativ": true`).
 - Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.
+- Die Kamera-Vorführung (`bewegung`, Variante `live`) gibt es höchstens einmal; ihr Knopftext soll das Wort „Kamera“ enthalten, damit der Besucher weiß, was der Klick auslöst.
 - Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.
 
 ## Abschnitte
@@ -259,7 +260,7 @@ Varianten: `akzent`, `schlicht`
 
 ### Bewegung (`bewegung`)
 
-Varianten: `wiedergabe`, `live`
+Varianten: `wiedergabe`, `live` · Variante `live` höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -268,7 +269,7 @@ Varianten: `wiedergabe`, `live`
 | `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
 | `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
 | `stil` | auswahl | – | eines von `strich`, `punkte`; Standard `strich`; fehlt: strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte |
-| `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen; nur bei live; fehlt: Kamera starten |
+| `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen, nicht leer; nur bei live; fehlt: Kamera starten |
 
 ```json
 {

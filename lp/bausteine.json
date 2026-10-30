@@ -240,9 +240,9 @@
         "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
         "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
         "stil":       { "typ": "auswahl", "label": "Darstellung", "werte": ["strich", "punkte"], "standard": "strich", "fehlt": "strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte" },
-        "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nur_bei": ["live"], "fehlt": "Kamera starten" }
+        "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nicht_leer": true, "nur_bei": ["live"], "fehlt": "Kamera starten" }
       },
-      "regeln": {},
+      "regeln": { "hoechstens_variante": { "live": 1 } },
       "beispiel": {
         "typ": "bewegung", "variante": "wiedergabe", "titel": "So sieht eine aufgezeichnete Bewegung aus", "bewegung": "bew/beispiel-winken.bewegung",
         "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."

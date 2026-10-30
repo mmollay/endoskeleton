@@ -13,6 +13,8 @@
  *   BW08 Gesamtprüfer: bew/ gehört dem Bauplan, modell/ nur mit den bekannten Prüfsummen, nur das eigene Skript erlaubt
  *   BW09 Beispieldatei: aus dem Erzeuger reproduzierbar, synthetisch, ohne Gesicht; Vorlage „motion-capture“ baut
  *   BW10 Player und Live-Skript: klein, keine Fremdadresse, kein Speicher im Browser, kein Cookie; CSS nur Tokens
+ *   BW11 Bewegung::modell(), fehlt() und pruefenText() mit eigener Summenliste (richtige Summe, Link, kein Ordner, nicht lesbar)
+ *   BW12 scripts/modell-holen.sh offline (curl-Attrappe): falsche Summe lässt das Ziel unberührt, Ziel im Kit wird vor dem Anlegen abgelehnt
  */
 
 declare(strict_types=1);
@@ -52,7 +54,10 @@ $sperrend = static fn (string $o): string => H::texte(H::sperrend(Pruefer::pruef
 /**
  * Fälle für den Vergleich PHP ↔ JS: [Name => [Text, Bytes, erwartete Kennung]]. Dieselben Fälle prüfen beide Prüfer.
  *
- * @return array<string, array{0: string, 1: int, 2: ?string}>
+ * Der vierte Wert (nur wo PHP und JS verschieden antworten) ist die Kennung des JS-Prüfers; JS nimmt nie weniger an als PHP, ist also nur
+ * Komfort — maßgeblich ist der PHP-Prüfer (docs/bewegung-format.md, „Zwei Prüfer“).
+ *
+ * @return array<string, array{0: string, 1: int, 2: ?string, 3?: ?string}>
  */
 $faelle = static function () use ($roh): array {
     $ok = $roh();
@@ -130,6 +135,38 @@ $faelle = static function () use ($roh): array {
         $d['rahmen'] = array_merge($d['rahmen'], $d['rahmen'], $d['rahmen'], array_slice($d['rahmen'], 0, 30));
         $d['dauer_ms'] = 10000;
     }), 1000, null];
+    // Grenzwerte, die genau noch gelten
+    foreach ([10, 60] as $fps) {
+        $f["fps $fps genau"] = [$mit(static function (&$d) use ($fps) { $d['fps'] = $fps; $d['dauer_ms'] = (int) round(count($d['rahmen']) * 1000 / $fps); }), 1000, null];
+    }
+    foreach (['0.25' => 0.25, '4' => 4.0] as $was => $v) {
+        $f["verhaeltnis $was genau"] = [$mit(static function (&$d) use ($v) { $d['verhaeltnis'] = $v; }), 1000, null];
+    }
+    $f['2 Bilder genau'] = [$mit(static function (&$d) { $d['rahmen'] = [$d['rahmen'][0], $d['rahmen'][1]]; $d['dauer_ms'] = (int) round(2000 / $d['fps']); }), 1000, null];
+    $f['600 Bilder genau (fps 60 = 10 s)'] = [$mit(static function (&$d) { $d['rahmen'] = array_fill(0, 600, array_fill(0, 99, 0)); $d['fps'] = 60; $d['dauer_ms'] = 10000; }), 1000, null];
+    // Randfälle des JSON-Textes (rohe Bytes): wo JS anders antwortet als PHP, steht die JS-Kennung als vierter Wert
+    $imName = static function (string $roh) use ($ok, $json): string {
+        $d = $ok;
+        $d['name'] = 'aPLATZb';
+        return str_replace('PLATZ', $roh, $json($d));
+    };
+    $alsZahl = static function (string $zahl) use ($ok, $json): string {
+        $d = $ok;
+        $d['rahmen'][2][33] = 'PLATZ';
+        return str_replace('"PLATZ"', $zahl, $json($d));
+    };
+    $text = $json($ok);
+    $f['Name mit ungültigem UTF-8'] = [$imName("\xFF\xFE"), 1000, 'json', 'name'];
+    $f['Name mit einzelnem Surrogat'] = [$imName('\\ud800'), 1000, 'json', 'name'];
+    $f['UTF-8-BOM vor dem Text'] = ["\xEF\xBB\xBF" . $text, 1000, 'json', null];
+    $f['Tiefe über 8'] = ['{"tief":' . str_repeat('[', 9) . '1' . str_repeat(']', 9) . ',' . substr($text, 1), 1000, 'json', 'schluessel'];
+    $f['NUL im Schlüssel'] = ['{"\\u0000x":1,' . substr($text, 1), 1000, 'json', 'schluessel'];
+    $f['doppelter Schlüssel: der letzte gilt (gültig)'] = ['{"v":2,' . substr($text, 1), 1000, null];
+    $f['doppelter Schlüssel: der letzte gilt (v = 2)'] = [substr($text, 0, -1) . ',"v":2}', 1000, 'v'];
+    $f['Wert 1e999 (unendlich)'] = [$alsZahl('1e999'), 1000, 'wert'];
+    $f['Wert −0'] = [$alsZahl('-0'), 1000, null];
+    $f['Wert mit 10 Nachkommastellen (Toleranz 1e-6)'] = [$alsZahl('0.5000000001'), 1000, null];
+    $f['Wert mit 8 Nachkommastellen'] = [$alsZahl('0.12345678'), 1000, 'stellen'];
     // drei Achsen: x, y, z (−1…1), Sichtbarkeit
     $drei = static function (callable $g) use ($roh, $json): string {
         $d = $roh();
@@ -214,9 +251,12 @@ return [
                 $ist = 'json';
             }
             T::eq($ist, $soll, "Fall „{$was}“");
+            if ($soll !== 'groesse') {   // dort ist $bytes erfunden; der Einstieg „Text rein, Kennung raus“ zählt die Bytes selbst
+                T::eq(Bewegung::pruefenText($text), $soll, "pruefenText, Fall „{$was}“");
+            }
             $n++;
         }
-        T::ok($n >= 70, "mindestens 70 Fälle ($n)");
+        T::ok($n >= 90, "mindestens 90 Fälle ($n)");
         foreach (Bewegung::TEXTE as $kennung => $text) {
             T::ok(str_ends_with($text, '.') && mb_strlen($text) > 20, "Kundentext zu $kennung ist ein Satz");
         }
@@ -225,14 +265,15 @@ return [
         $datei = T::tmp() . '/faelle.json';
         $liste = [];
         foreach ($faelle() as $was => [$text, $bytes]) {
-            $liste[] = ['name' => $was, 'text' => $text, 'bytes' => $bytes];
+            $liste[] = ['name' => $was, 'b64' => base64_encode($text), 'bytes' => $bytes];   // rohe Bytes (auch ungültiges UTF-8) überstehen JSON nur so
         }
         file_put_contents($datei, json_encode($liste, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
         $aus = [];
         exec('node ' . escapeshellarg(H::wurzel() . '/tests/bewegung-paritaet.js') . ' ' . escapeshellarg($datei) . ' 2>&1', $aus, $rc);
         $js = json_decode(implode("\n", $aus), true);
         T::ok(is_array($js), 'node liefert JSON (Rückgabe ' . $rc . '): ' . substr(implode(' ', $aus), 0, 200));
-        foreach ($faelle() as $was => [, , $soll]) {
+        foreach ($faelle() as $was => $fall) {
+            $soll = array_key_exists(3, $fall) ? $fall[3] : $fall[2];
             T::eq(array_key_exists($was, $js) ? $js[$was] : 'fehlt', $soll, "JS-Prüfer, Fall „{$was}“");
         }
     },
@@ -249,6 +290,16 @@ return [
         T::contains($schema($seite(['knopf_text' => 'Kamera an']), $o), 'knopf_text', 'knopf_text bei wiedergabe: sperrend');
         T::eq($schema($seite(['knopf_text' => 'Kamera an'], 'live'), $o), '', 'knopf_text bei live: erlaubt');
         T::contains($schema($seite(['knopf_text' => str_repeat('x', 41)], 'live'), $o), 'knopf_text', 'knopf_text über 40 Zeichen: sperrend');
+        T::contains($schema($seite(['knopf_text' => ''], 'live'), $o), '[sperrend] bausteine.1.knopf_text', 'knopf_text leer: sperrend (Knopf ohne Namen)');
+        T::contains($schema($seite(['knopf_text' => '  '], 'live'), $o), '[sperrend] bausteine.1.knopf_text', 'knopf_text nur Leerzeichen: sperrend');
+        T::eq($schema($seite([], 'live'), $o), '', 'knopf_text ganz weggelassen: erlaubt (Standard „Kamera starten“)');
+        $zwei = $seite([], 'live');
+        $zwei['bausteine'][] = $zwei['bausteine'][1];
+        T::contains($schema($zwei, $o), 'bewegung/live höchstens 1, 2 gefunden', 'zwei live-Bausteine auf einer Seite: sperrend (Katalogregel)');
+        $gemischt = $seite([], 'live');
+        $gemischt['bausteine'][] = $seite([], 'wiedergabe')['bausteine'][1];
+        $gemischt['bausteine'][] = $seite([], 'wiedergabe')['bausteine'][1];
+        T::eq($schema($gemischt, $o), '', 'ein live und zwei wiedergabe: erlaubt');
         T::contains($schema($seite(['video' => 'x']), $o), 'video', 'unbekanntes Feld: sperrend');
         T::contains($schema($seite([], 'kamera'), $o), 'variante', 'unbekannte Variante: sperrend');
     },
@@ -363,6 +414,16 @@ return [
         file_put_contents("$o/bew/andere.bewegung", 'x');
         T::contains($sperrend($o), 'bew/andere.bewegung wird im Bauplan nicht verwendet', 'unbenutzte Bewegungsdatei sperrend');
         unlink("$o/bew/andere.bewegung");
+        // Befund 1: ein Pfad in irgendeinem Textfeld macht eine Datei nicht „benutzt“ — nur Bewegungsfelder mit gültigem Namen zählen
+        foreach (['bew/.htaccess' => 'alt', 'bew/x.php' => 'alt', 'bew/sub' => 'alt', 'bew/andere.bewegung' => 'titel', 'bew/andere.bewegung ' => 'alt'] as $pfad => $feld) {
+            $p = $seite([$feld => rtrim($pfad)]);
+            $o9 = $ordner($p);
+            Bauer::bauen($o9);
+            T::eq($sperrend($o9), '', "Ausgangslage ($feld = $pfad) sauber");
+            $ziel = "$o9/" . rtrim($pfad);
+            str_ends_with($pfad, '/sub') || basename($pfad) === 'sub' ? mkdir($ziel, 0700, true) : file_put_contents($ziel, 'x');
+            T::contains($sperrend($o9), rtrim($pfad) . ' wird im Bauplan nicht verwendet', "$pfad im Textfeld $feld: Datei bleibt unbenutzt (sperrend)");
+        }
         // modell/: nur die Dateien der Liste, jede mit ihrer Prüfsumme
         @mkdir("$o/modell/wasm", 0700, true);
         file_put_contents("$o/modell/fremd.js", 'x');
@@ -372,6 +433,11 @@ return [
         T::contains($sperrend($o), 'modell/pose_landmarker_lite.task hat eine falsche Prüfsumme', 'Modelldatei mit falscher Prüfsumme sperrend');
         unlink("$o/modell/pose_landmarker_lite.task");
         T::eq($sperrend($o), '', 'wieder sauber');
+        // Befund 5: bei „live“ ist ein unvollständiges modell/ ein Hinweis, kein sperrender Befund
+        $hinweis = H::texte(Pruefer::pruefen($o, '2026-10-29T12:00'));
+        T::contains($hinweis, 'modell/ ist unvollständig, es fehlen: vision_bundle.js', 'live mit leerem modell/: Hinweis nennt die fehlenden Dateien');
+        T::contains($hinweis, 'pose_landmarker_lite.task', 'Hinweis nennt auch das Modell');
+        T::notContains($sperrend($o), 'unvollständig', 'unvollständiges modell/ ist nicht sperrend');
         // Skripte: nur es/lp.js und es/bewegung.js mit Stempel
         $h = (string) file_get_contents("$o/index.html");
         foreach (['https://beispiel.invalid/a.js' => 'fremde Adresse', 'es/bewegung.js?v=zzzzzzzzzz' => 'Stempel ungültig', 'es/bewegung-live.js?v=0123456789' => 'Live-Skript im HTML', 'es/bewegung.js' => 'ohne Stempel'] as $src => $was) {
@@ -441,5 +507,169 @@ return [
         $block = implode("\n", $m[0] ?? []);
         T::eq(preg_match('/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/', $block), 0, 'lp-bewegung-CSS: keine festen Farben');
         T::contains($block, 'var(--', 'lp-bewegung-CSS: Tokens');
+    },
+    'BW11 Bewegung::modell() und fehlt() mit eigener Summenliste (richtige Summe, Link, kein Ordner, nicht lesbar); pruefenText() prüft die Länge vor dem Dekodieren' => static function () use ($beispiel): void {
+        $inhalt = ['vision_bundle.js' => 'Bündel', 'wasm/a.wasm' => 'Wasm', 'pose_landmarker_lite.task' => 'Modell'];
+        $endo = T::tmp();
+        @mkdir("$endo/scripts", 0700, true);
+        file_put_contents("$endo/scripts/modell-summen.txt", implode("\n", array_map(static fn ($n, $c) => hash('sha256', $c) . "  $n", array_keys($inhalt), $inhalt)) . "\n");
+        $neu = static function (array $inh = null) use ($inhalt): string {
+            $o = T::tmp();
+            foreach ($inh ?? $inhalt as $n => $c) {
+                @mkdir(dirname("$o/modell/$n"), 0700, true);
+                file_put_contents("$o/modell/$n", $c);
+            }
+            return $o;
+        };
+        $o = $neu();
+        T::eq(Bewegung::modell($o, $endo), [], 'alle Dateien mit richtiger Summe (auch im Unterordner): kein Befund');
+        T::eq(Bewegung::fehlt($o, $endo), [], 'nichts fehlt');
+        file_put_contents("$o/modell/wasm/a.wasm", 'verfälscht');
+        T::contains(Bewegung::modell($o, $endo)[0][0] ?? '', 'modell/wasm/a.wasm hat eine falsche Prüfsumme', 'falsche Summe im Unterordner');
+        $o = $neu(['vision_bundle.js' => 'Bündel']);
+        T::eq(Bewegung::modell($o, $endo), [], 'unvollständig ist für modell() kein Befund');
+        T::eq(Bewegung::fehlt($o, $endo), ['wasm/a.wasm', 'pose_landmarker_lite.task'], 'fehlt() nennt die fehlenden Namen in der Reihenfolge der Liste');
+        $o = $neu();
+        file_put_contents("$o/modell/fremd.js", 'x');
+        T::contains(Bewegung::modell($o, $endo)[0][0] ?? '', 'modell/fremd.js gehört nicht zu den Modelldateien', 'fremde Datei');
+        // Link in modell/ (zeigt auf eine Datei mit richtiger Summe)
+        $o = $neu(['wasm/a.wasm' => 'Wasm', 'pose_landmarker_lite.task' => 'Modell']);
+        file_put_contents("$o/echt.js", 'Bündel');
+        symlink("$o/echt.js", "$o/modell/vision_bundle.js");
+        T::contains(Bewegung::modell($o, $endo)[0][0] ?? '', 'modell/vision_bundle.js gehört nicht zu den Modelldateien', 'Link auf eine Datei mit richtiger Summe zählt nicht');
+        T::eq(Bewegung::fehlt($o, $endo), [], 'fehlt() kennt Dateien (auch über Link) — der Link ist Sache von modell()');
+        // modell selbst: Link, Datei, fehlt
+        $o = $neu();
+        $echt = T::tmp();
+        rename("$o/modell", "$echt/modell");
+        symlink("$echt/modell", "$o/modell");
+        T::eq(Bewegung::modell($o, $endo)[0][0] ?? '', 'modell ist ein Link', 'modell als Link');
+        $o = T::tmp();
+        file_put_contents("$o/modell", 'x');
+        T::eq(Bewegung::modell($o, $endo)[0][0] ?? '', 'modell ist kein Ordner', 'modell als Datei: Befund statt Ausnahme');
+        T::eq(Bewegung::modell(T::tmp(), $endo)[0][0] ?? '', 'modell ist kein Ordner', 'modell fehlt: Befund statt Ausnahme');
+        // fehlende Summenliste: nichts ist bekannt, also ist alles fremd
+        T::contains(Bewegung::modell($neu(), T::tmp())[0][0] ?? '', 'gehört nicht zu den Modelldateien', 'ohne Summenliste ist jede Datei fremd');
+        // nicht lesbarer Unterordner (als Betreiber root gibt es das nicht)
+        $o = $neu();
+        chmod("$o/modell/wasm", 0000);
+        if (!is_readable("$o/modell/wasm")) {
+            T::contains(Bewegung::modell($o, $endo)[0][0] ?? '', 'nicht lesbar', 'nicht lesbarer Unterordner: Befund statt Ausnahme');
+        }
+        chmod("$o/modell/wasm", 0700);
+        // pruefenText: Länge zuerst, dann Tiefe 8, dann die Regeln
+        T::eq(Bewegung::pruefenText(str_repeat(' ', Bewegung::MAX_BYTES + 1)), 'groesse', '300 001 Byte: zu groß, ohne zu dekodieren');
+        T::eq(Bewegung::pruefenText(str_repeat(' ', Bewegung::MAX_BYTES)), 'json', 'genau 300 000 Byte sind noch keine Größenverletzung (hier leerer Text: json)');
+        T::eq(Bewegung::pruefenText(''), 'json', 'leerer Text: json');
+        T::eq(Bewegung::pruefenText(str_repeat('[', 9) . str_repeat(']', 9)), 'json', 'Tiefe 9: json');
+        T::eq(Bewegung::pruefenText($beispiel()), null, 'die Beispieldatei ist gültig');
+    },
+    'BW12 scripts/modell-holen.sh offline (curl-Attrappe): falsche Summe lässt das Ziel unberührt; Ziel im Kit (auch über Link) wird vor dem Anlegen abgelehnt; nur https' => static function (): void {
+        $t = T::tmp();
+        $dateien = ['vision_bundle.mjs' => 'Bündel'] + array_combine(
+            array_map(static fn ($n) => "wasm/vision_wasm_$n", ['internal.js', 'internal.wasm', 'module_internal.js', 'module_internal.wasm', 'nosimd_internal.js', 'nosimd_internal.wasm']),
+            ['js1', 'wasm1', 'js2', 'wasm2', 'js3', 'wasm3']
+        );
+        foreach ($dateien as $n => $c) {
+            @mkdir(dirname("$t/pkg/package/$n"), 0700, true);
+            file_put_contents("$t/pkg/package/$n", $c);
+        }
+        $bau = static function (string $name, string $task, ?string $summen = null) use ($t, $dateien): array {   // [Kit, Paket, Modelldatei] für eine Attrappe
+            $tgz = "$t/$name.tgz";
+            exec('tar -czf ' . escapeshellarg($tgz) . ' -C ' . escapeshellarg("$t/pkg") . ' package 2>&1', $aus, $rc);
+            T::eq($rc, 0, "Attrappen-Paket $name gepackt");
+            file_put_contents("$t/$name.task", $task);
+            $quelle = (string) file_get_contents(H::wurzel() . '/scripts/modell-holen.sh');
+            $quelle = preg_replace('/^PAKET_SHA512=".*"$/m', 'PAKET_SHA512="' . base64_encode(hash_file('sha512', $tgz, true)) . '"', $quelle, -1, $n);
+            T::eq($n, 1, 'PAKET_SHA512 im Skript gefunden');
+            @mkdir("$t/$name-kit/scripts", 0700, true);
+            file_put_contents("$t/$name-kit/scripts/modell-holen.sh", $quelle);
+            $sollten = ['vision_bundle.js' => 'Bündel', 'pose_landmarker_lite.task' => 'Modell'];
+            foreach ($dateien as $n2 => $c) {
+                if (str_starts_with($n2, 'wasm/')) {
+                    $sollten[$n2] = $c;
+                }
+            }
+            file_put_contents("$t/$name-kit/scripts/modell-summen.txt", implode("\n", array_map(static fn ($n3, $c) => hash('sha256', $c) . "  $n3", array_keys($sollten), $sollten)) . "\n" . ($summen ?? ''));
+            return ["$t/$name-kit", $tgz, "$t/$name.task"];
+        };
+        @mkdir("$t/bin", 0700, true);
+        file_put_contents("$t/bin/curl", <<<'SH'
+#!/usr/bin/env bash
+echo "$*" >> "$SHIM_LOG"
+ausgabe=""; url=""
+while [ $# -gt 0 ]; do
+  if [ "$1" = "-o" ]; then ausgabe="$2"; shift 2; continue; fi
+  url="$1"; shift
+done
+case "$url" in
+  *.tgz) cp "$SHIM_TGZ" "$ausgabe" ;;
+  *.task) cp "$SHIM_TASK" "$ausgabe" ;;
+  *) exit 22 ;;
+esac
+SH);
+        chmod("$t/bin/curl", 0700);
+        $lauf = static function (string $kit, string $ziel, string $tgz, string $task, string $log) use ($t): array {
+            exec(sprintf('env PATH=%s SHIM_LOG=%s SHIM_TGZ=%s SHIM_TASK=%s bash %s %s 2>&1', escapeshellarg("$t/bin:" . getenv('PATH')), escapeshellarg($log),
+                escapeshellarg($tgz), escapeshellarg($task), escapeshellarg("$kit/scripts/modell-holen.sh"), escapeshellarg($ziel)), $aus, $rc);
+            return [$rc, implode("\n", $aus)];
+        };
+        $leer = static fn (string $ordner): array => array_values(array_diff(scandir($ordner) ?: ['?'], ['.', '..']));
+
+        // 1. alles stimmt: modell/ liegt vollständig im Ziel, curl wurde nur mit https-Beschränkung und Größengrenze gerufen
+        [$kit, $tgz, $task] = $bau('gut', 'Modell');
+        [$rc, $aus] = $lauf($kit, "$t/ziel-gut", $tgz, $task, "$t/log-gut");
+        T::eq($rc, 0, 'richtige Summen: Ende 0 (' . substr($aus, 0, 200) . ')');
+        T::eq((string) @file_get_contents("$t/ziel-gut/modell/vision_bundle.js"), 'Bündel', 'vision_bundle.js (aus .mjs) liegt im Ziel');
+        T::eq((string) @file_get_contents("$t/ziel-gut/modell/wasm/vision_wasm_internal.wasm"), 'wasm1', 'WASM liegt im Ziel');
+        T::eq((string) @file_get_contents("$t/ziel-gut/modell/pose_landmarker_lite.task"), 'Modell', 'Modell liegt im Ziel');
+        $log = file("$t/log-gut", FILE_IGNORE_NEW_LINES) ?: [];
+        T::eq(count($log), 2, 'zwei Downloads (Paket und Modell)');
+        foreach ($log as $zeile) {
+            T::contains($zeile, '--proto =https', 'curl: nur https');
+            T::contains($zeile, '--proto-redir =https', 'curl: auch Weiterleitungen nur https');
+            T::contains($zeile, '--max-filesize ', 'curl: Größengrenze');
+        }
+        // 2. zweiter Lauf ersetzt einen früheren Stand
+        [$rc] = $lauf($kit, "$t/ziel-gut", $tgz, $task, "$t/log-gut2");
+        T::eq([$rc, $leer("$t/ziel-gut")], [0, ['modell']], 'zweiter Lauf: weiter genau ein Ordner modell');
+        // 3. falsche Modell-Prüfsumme: Abbruch, ein neues Ziel wird nicht einmal angelegt, ein vorhandener Stand bleibt
+        [$kit, $tgz, $task] = $bau('falsch', 'verfälscht');
+        [$rc, $aus] = $lauf($kit, "$t/ziel-neu", $tgz, $task, "$t/log-falsch");
+        T::ok($rc !== 0 && str_contains($aus, 'falsche Prüfsumme'), 'falsche Modell-Summe: Abbruch mit Meldung');
+        T::ok(!file_exists("$t/ziel-neu"), 'falsche Summe: das Ziel wurde nicht angelegt');
+        @mkdir("$t/ziel-alt/modell", 0700, true);
+        file_put_contents("$t/ziel-alt/modell/alt.txt", 'bleibt');
+        [$rc] = $lauf($kit, "$t/ziel-alt", $tgz, $task, "$t/log-falsch2");
+        T::ok($rc !== 0, 'falsche Summe bei vorhandenem Ziel: Abbruch');
+        T::eq([$leer("$t/ziel-alt"), $leer("$t/ziel-alt/modell"), (string) @file_get_contents("$t/ziel-alt/modell/alt.txt")], [['modell'], ['alt.txt'], 'bleibt'], 'der frühere Stand ist unverändert');
+        // 4. falsche Paket-Summe (anderes Archiv als erwartet)
+        [$kit, , $task] = $bau('paket', 'Modell');
+        file_put_contents("$t/pkg/package/extra.txt", 'x');
+        exec('tar -czf ' . escapeshellarg("$t/fremd.tgz") . ' -C ' . escapeshellarg("$t/pkg") . ' package 2>&1');
+        unlink("$t/pkg/package/extra.txt");
+        [$rc, $aus] = $lauf($kit, "$t/ziel-paket", "$t/fremd.tgz", $task, "$t/log-paket");
+        T::ok($rc !== 0 && str_contains($aus, 'Paket: Prüfsumme'), 'falsche Paket-Summe: Abbruch');
+        T::ok(!file_exists("$t/ziel-paket"), 'falsche Paket-Summe: nichts im Ziel');
+        // 5. kaputte Zeile in der Summenliste (--strict)
+        [$kit, $tgz, $task] = $bau('strikt', 'Modell', "das ist keine Summenzeile\n");
+        [$rc, $aus] = $lauf($kit, "$t/ziel-strikt", $tgz, $task, "$t/log-strikt");
+        T::ok($rc !== 0 && !file_exists("$t/ziel-strikt"), 'falsch formatierte Summenzeile bricht ab, nichts im Ziel (sha256sum --strict)');
+        // 6. Download scheitert
+        [$kit, , $task] = $bau('netz', 'Modell');
+        [$rc] = $lauf($kit, "$t/ziel-netz", "$t/gibt-es-nicht.tgz", $task, "$t/log-netz");
+        T::ok($rc !== 0 && !file_exists("$t/ziel-netz"), 'Download scheitert: Abbruch, nichts im Ziel');
+        // 7. Ziel im Kit, auch über Links, und zwar VOR dem Anlegen und vor jedem Download
+        [$kit, $tgz, $task] = $bau('kit', 'Modell');
+        [$rc, $aus] = $lauf($kit, "$kit/modelle", $tgz, $task, "$t/log-kit");
+        T::ok($rc !== 0 && str_contains($aus, 'nicht im Kit') && !file_exists("$kit/modelle") && !file_exists("$t/log-kit"), 'Ziel im Kit: abgelehnt, nichts angelegt, nichts geladen');
+        symlink($kit, "$t/kitlink");
+        [$rc] = $lauf($kit, "$t/kitlink/modelle2", $tgz, $task, "$t/log-kit2");
+        T::ok($rc !== 0 && !file_exists("$kit/modelle2") && !file_exists("$t/log-kit2"), 'Ziel über einen Link ins Kit: abgelehnt, nichts angelegt');
+        @mkdir("$t/ziel-link", 0700, true);
+        symlink("$kit/scripts", "$t/ziel-link/modell");
+        $vorher = $leer("$kit/scripts");
+        [$rc] = $lauf($kit, "$t/ziel-link", $tgz, $task, "$t/log-kit3");
+        T::ok($rc !== 0 && $leer("$kit/scripts") === $vorher && !file_exists("$t/log-kit3"), 'modell/ als Link ins Kit: abgelehnt, das Kit bleibt unverändert');
     },
 ];

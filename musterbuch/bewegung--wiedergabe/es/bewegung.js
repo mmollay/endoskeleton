@@ -155,6 +155,7 @@
     el('tempo').addEventListener('change', function (e) { sp.tempo(parseFloat(e.currentTarget.value) || 1); });
     cv.addEventListener('keydown', function (e) {
       var t = e.key;
+      if (el('steuerung').hidden) return;   // läuft die Kamera (Steuerung verborgen), gehört die Leinwand ihr
       if (t === ' ' || t === 'Enter') sp.umschalten();
       else if (t === 'ArrowRight') sp.zu(sp.nr() + 1);
       else if (t === 'ArrowLeft') sp.zu(sp.nr() - 1);
@@ -166,7 +167,9 @@
     fetch(fig.getAttribute('data-lp-bewegung'), { credentials: 'omit' })
       .then(function (r) { if (!r.ok) throw 0; return r.text(); })
       .then(function (t) {
-        var d = JSON.parse(t);
+        var d;
+        if (t.length > MAX_BYTES) throw 0;   // zu groß: gar nicht erst parsen
+        d = JSON.parse(t);
         if (pruefen(d, new Blob([t]).size)) throw 0;
         format(cv, d.verhaeltnis);
         sp.setze(d, still);

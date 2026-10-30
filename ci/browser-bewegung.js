@@ -54,11 +54,21 @@ const SPION = (kamera) => `(() => {
 const OHNE_WASM = 'delete window.WebAssembly;';
 
 // Ein Stand-in für das Erkennungsmodell: liefert bei jedem Kamerabild 33 Punkte. Prüft Aufnehmen, Vorschau und Speichern — nicht die Erkennung.
-const ATTRAPPE = `export const FilesetResolver = { forVisionTasks: async () => ({}) };
-export const PoseLandmarker = { createFromOptions: async () => ({ detectForVideo: (v, ts) => ({ landmarks: [Array.from({ length: 33 }, (_, i) => ({ x: 0.5 + 0.2 * Math.sin(ts / 400 + i / 5), y: 0.1 + i * 0.025, z: 0, visibility: 0.9 }))] }) }) };
+// art: ok | wirft (die Erkennung wirft, etwa weil der Grafikkontext verloren ging) | nan (Punkte ohne Zahl). window.__erkannt zählt die Aufrufe.
+const ATTRAPPE = (art = 'ok') => `export const FilesetResolver = { forVisionTasks: async () => ({}) };
+export const PoseLandmarker = { createFromOptions: async () => ({ detectForVideo: (v, ts) => {
+  window.__erkannt = (window.__erkannt || 0) + 1;
+  ${art === 'wirft' ? "throw new Error('Grafikkontext verloren');" : ''}
+  return { landmarks: [Array.from({ length: 33 }, (_, i) => ({ x: ${art === 'nan' ? 'NaN' : '0.5 + 0.2 * Math.sin(ts / 400 + i / 5)'}, y: 0.1 + i * 0.025, z: 0, visibility: 0.9 }))] };
+} }) };
 `;
+const ATTRAPPEN = ['attrappe', 'wirft', 'nan'];
+// Verzögerungen, die den Tab-Wechsel mitten im Start möglich machen: Kamera-Erlaubnis und video.play() brauchen je 0,8 s
+const LANGSAM_ERLAUBNIS = `(() => { const md = navigator.mediaDevices, g = md.getUserMedia; md.getUserMedia = function (cfg) { return g.call(md, cfg).then((s) => new Promise((r) => setTimeout(() => r(s), 800))); }; })();`;
+const LANGSAM_PLAY = `(() => { const p = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function (...a) { return p.apply(this, a).then((r) => new Promise((res) => setTimeout(() => res(r), 800))); }; })();`;
+const VERSTECKEN = () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); };
 
-/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|fehlt), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei). */
+/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei). */
 async function oeffnen(browser, name, optionen = {}) {
   const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
   const page = await kontext.newPage();
@@ -67,7 +77,7 @@ async function oeffnen(browser, name, optionen = {}) {
   if (process.env.ES_DEBUG) { page.on('console', (m) => console.log(`  [Konsole ${name}] ${m.text().slice(0, 200)}`)); page.on('requestfailed', (r) => console.log(`  [Anfrage fehlgeschlagen] ${r.url()} ${r.failure()?.errorText}`)); }
   await page.addInitScript(SPION(optionen.kamera || 'echt'));
   if (optionen.vorher) { await page.addInitScript(optionen.vorher); }
-  await page.route('**/*', (r) => {
+  await page.route('**/*', async (r) => {
     const u = new URL(r.request().url());
     if (u.host !== 'lp.test') { aus.fremd.push(u.href); return r.abort(); }
     aus.anfragen.push(u.pathname);
@@ -75,7 +85,10 @@ async function oeffnen(browser, name, optionen = {}) {
     const unter = rel.slice(name.length + 1);
     if (unter.startsWith('modell/')) {
       if (optionen.modell === 'fehlt') { return r.fulfill({ status: 404, body: '' }); }
-      if (optionen.modell === 'attrappe' && unter === 'modell/vision_bundle.js') { return r.fulfill({ status: 200, contentType: 'text/javascript', body: ATTRAPPE }); }
+      if (ATTRAPPEN.includes(optionen.modell) && unter === 'modell/vision_bundle.js') {
+        if (optionen.verzoegern) { await warte(optionen.verzoegern); }
+        return r.fulfill({ status: 200, contentType: 'text/javascript', body: ATTRAPPE(optionen.modell === 'attrappe' ? 'ok' : optionen.modell) });
+      }
       const datei = path.join(MODELL, unter.slice(7));
       return SUMMEN.includes(unter.slice(7)) && fs.existsSync(datei) ? r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) }) : r.fulfill({ status: 404, body: '' });
     }
@@ -113,6 +126,9 @@ async function bis(page, bedingungen, ms = 60000) {
   }
   return 'zeit';
 }
+/** Die Kamera läuft wirklich (nicht erst im Ladehinweis): der Knopf heißt „ausschalten“ und „Aufnehmen“ ist da. */
+const kameraAn = async (page) => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' && await sichtbar(page, '[data-lp-b="aufnehmen"]');
+const kameraAus = (page) => page.evaluate(() => window.__spuren.every((s) => s.readyState === 'ended'));
 const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), s: sessionStorage.length, l: localStorage.length }));
 
 (async () => {
@@ -188,6 +204,16 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     }
   }
 
+  // Zu große Datei: Hinweis, und der Player parst sie gar nicht erst (JSON.parse sieht nie mehr als 300 000 Zeichen)
+  {
+    const echt = fs.readFileSync(path.join(KIT, 'lp', 'musterbuch', 'bew', 'beispiel-winken.bewegung'), 'utf8');
+    const zaehler = `(() => { const p = JSON.parse; JSON.parse = function (t, ...a) { if (typeof t === 'string' && t.length > 300000) { window.__grossGeparst = true; } return p.call(this, t, ...a); }; })();`;
+    const w = await oeffnen(browser, 'bewegung--wiedergabe', { datei: echt + ' '.repeat(300001), vorher: zaehler });
+    pruefe(await meldung(w.page, 'fehler'), 'Zu große Bewegungsdatei: Hinweis „konnte nicht geladen werden“');
+    pruefe(!(await w.page.evaluate(() => window.__grossGeparst)) && w.seitenfehler.length === 0, `Zu große Bewegungsdatei: nicht mit JSON.parse gelesen, kein Browserfehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
   // ===== Live: Einwilligung zuerst =====
   {
     const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: MODELL_DA ? 'echt' : 'attrappe' });
@@ -198,7 +224,7 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     pruefe(!w.anfragen.some((p) => p.includes('bewegung-live') || p.includes('/modell/')), `Live: vor dem Klick weder Live-Skript noch Modell angefordert (${w.anfragen.filter((p) => p.includes('modell') || p.includes('live')).join(', ')})`);
     pruefe(await sichtbar(page, '[data-lp-b="steuerung"]') && (await leinwand(page)).n > 200, 'Live: vor dem Klick läuft der Player mit der Beispielbewegung');
     await page.click('[data-lp-b="kamera"]');
-    const ergebnis = await bis(page, { an: async () => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten', hinweis: () => meldung(page, 'keinkamera') }, 90000);
+    const ergebnis = await bis(page, { an: () => kameraAn(page), hinweis: () => meldung(page, 'keinkamera') }, 90000);
     pruefe(ergebnis === 'an', `Live (Prüfkamera${MODELL_DA ? ', echtes Modell' : ', Attrappe — ES_MODELL fehlt'}): Kamera läuft nach dem Klick (${ergebnis})`);
     const aufrufe = await page.evaluate(() => ({ kamera: window.__kamera.slice(), klick: window.__klick }));
     pruefe(aufrufe.kamera.length === 1 && aufrufe.klick > 0 && aufrufe.kamera[0].nach > aufrufe.klick && aufrufe.kamera[0].video && !aufrufe.kamera[0].audio, `Live: Kamera erst NACH dem echten Klick, einmal, nur Bild (${JSON.stringify(aufrufe)})`);
@@ -236,10 +262,93 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
   {
     const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe' });
     await w.page.click('[data-lp-b="kamera"]');
-    await bis(w.page, { an: async () => await text(w.page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' }, 20000);
+    await bis(w.page, { an: () => kameraAn(w.page) }, 20000);
     await w.page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); });
     await warte(300);
     pruefe(await w.page.evaluate(() => window.__spuren.length > 0 && window.__spuren.every((s) => s.readyState === 'ended')) && await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten', 'Live: beim Wechsel des Tabs geht die Kamera aus');
+    await w.kontext.close();
+  }
+
+  // Tab wechseln, noch bevor die Kamera läuft (Laden / Kamera-Erlaubnis / Start des Kamerabilds): sie darf im versteckten Tab nie laufen
+  for (const [phase, opt, bereit] of [
+    ['während des Ladens', { modell: 'attrappe', verzoegern: 1500 }, null],
+    ['während der Kamera-Erlaubnis', { modell: 'attrappe', vorher: LANGSAM_ERLAUBNIS }, () => window.__kamera.length === 1],
+    ['während das Kamerabild startet', { modell: 'attrappe', vorher: LANGSAM_PLAY }, () => window.__spuren.length === 1],
+  ]) {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', ...opt });
+    await w.page.click('[data-lp-b="kamera"]');
+    if (bereit) { await bis(w.page, { da: () => w.page.evaluate(bereit) }, 20000); await warte(150); }
+    await w.page.evaluate(VERSTECKEN);
+    await warte(2600);
+    const angefragt = await w.page.evaluate(() => window.__kamera.length);
+    pruefe(await kameraAus(w.page) && (phase !== 'während des Ladens' || angefragt === 0), `Tab-Wechsel ${phase}: keine Kameraspur läuft weiter${phase === 'während des Ladens' ? ', die Kamera wird gar nicht erst angefragt' : ''} (angefragt: ${angefragt})`);
+    pruefe(await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten' && !(await sichtbar(w.page, '[data-lp-b="aufnehmen"]')) && !(await meldung(w.page, 'laedt')), `Tab-Wechsel ${phase}: Bedienung zurück im Ausgang`);
+    pruefe(!(await meldung(w.page, 'keinkamera')) && w.seitenfehler.length === 0, `Tab-Wechsel ${phase}: leiser Abbruch, kein Fehlerhinweis, kein Browserfehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Klick während des Ladens = Abbrechen; danach geht ein neuer Start
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', verzoegern: 1500 });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { laedt: () => meldung(page, 'laedt') }, 5000);   // das Live-Skript wird beim Klick nachgeladen
+    pruefe(await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' && await meldung(page, 'laedt'), 'Laden: der Knopf heißt schon „Kamera ausschalten“, der Ladehinweis steht da');
+    await page.click('[data-lp-b="kamera"]');
+    pruefe(await text(page, '[data-lp-b="kamera"]') === 'Kamera starten' && !(await meldung(page, 'laedt')) && await sichtbar(page, '[data-lp-b="steuerung"]'), 'Laden: ein Klick bricht ab — Knopf wieder „Kamera starten“, Hinweis weg, Beispielbewegung zurück');
+    await warte(2200);
+    pruefe((await page.evaluate(() => window.__kamera.length)) === 0 && await kameraAus(page), 'Laden: nach dem Abbruch wird die Kamera nie angefragt');
+    await page.click('[data-lp-b="kamera"]');
+    const e = await bis(page, { an: () => kameraAn(page) }, 20000);
+    pruefe(e === 'an' && (await page.evaluate(() => window.__kamera.length)) === 1, `Laden: nach dem Abbruch startet ein neuer Klick die Kamera (${e})`);
+    pruefe(w.seitenfehler.length === 0, `Laden/Abbrechen: kein Browserfehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Die Erkennung wirft: Kamera aus, freundlicher Hinweis, keine Fehlerschleife
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'wirft' });
+    await w.page.click('[data-lp-b="kamera"]');
+    const e = await bis(w.page, { hinweis: () => meldung(w.page, 'keinkamera') }, 20000);
+    await warte(800);
+    pruefe(e === 'hinweis' && await kameraAus(w.page) && await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten', `Erkennung wirft: Hinweis, Kamera aus, Knopf im Ausgang (${e})`);
+    pruefe((await w.page.evaluate(() => window.__erkannt)) === 1, 'Erkennung wirft: keine Fehlerschleife — genau ein Aufruf der Erkennung');
+    const a = await leinwand(w.page); await warte(400);
+    pruefe(a.n > 200 && (await leinwand(w.page)).url !== a.url && w.seitenfehler.length === 0, `Erkennung wirft: die Beispielbewegung läuft wieder, kein Browserfehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Punkte ohne Zahl (NaN) beim Beenden der Aufnahme: Kamera aus, freundlicher Hinweis statt stiller Ausnahme
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'nan' });
+    await w.page.click('[data-lp-b="kamera"]');
+    await bis(w.page, { an: () => kameraAn(w.page) }, 20000);
+    await warte(400);
+    await w.page.click('[data-lp-b="aufnehmen"]');
+    await warte(1200);
+    await w.page.click('[data-lp-b="aufnehmen"]');
+    const e = await bis(w.page, { hinweis: () => meldung(w.page, 'keinkamera') }, 5000);
+    pruefe(e === 'hinweis' && await kameraAus(w.page) && await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten' && !(await sichtbar(w.page, '[data-lp-b="speichern"]')), `Aufnahme mit NaN: Hinweis, Kamera aus, nichts zum Speichern (${e})`);
+    pruefe(w.seitenfehler.length === 0, `Aufnahme mit NaN: kein Browserfehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Tastatur auf der Leinwand: wirkt nicht, solange die Kamera läuft (sonst zeichnet der Beispiel-Player in dieselbe Leinwand)
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe' });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { an: () => kameraAn(page) }, 20000);
+    const vorher = await text(page, '[data-lp-b="pause"]');
+    await page.focus('.lp-bewegung-figur canvas');
+    for (const t of ['Space', 'Enter', 'ArrowRight', 'Home']) { await page.keyboard.press(t); }
+    pruefe(await text(page, '[data-lp-b="pause"]') === vorher, `Kamera läuft: Leertaste, Enter, Pfeil und Home auf der Leinwand tun nichts (Knopf bleibt „${vorher}“)`);
+    await page.click('[data-lp-b="kamera"]');
+    await warte(300);
+    const nachher = await text(page, '[data-lp-b="pause"]');
+    await page.focus('.lp-bewegung-figur canvas');
+    await page.keyboard.press('Space');
+    pruefe(await text(page, '[data-lp-b="pause"]') !== nachher, 'Kamera aus: die Leertaste steuert den Beispiel-Player wieder');
     await w.kontext.close();
   }
 
@@ -248,7 +357,7 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe' });
     const { page } = w;
     await page.click('[data-lp-b="kamera"]');
-    await bis(page, { an: async () => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' }, 20000);
+    await bis(page, { an: () => kameraAn(page) }, 20000);
     await warte(500);
     await page.click('[data-lp-b="aufnehmen"]');
     await warte(2200);

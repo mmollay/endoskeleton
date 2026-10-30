@@ -9,7 +9,7 @@ const aus = {};
 for (const f of JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))) {
   let d;
   try {
-    d = JSON.parse(f.text);
+    d = JSON.parse(new TextDecoder('utf-8').decode(Buffer.from(f.b64, 'base64')));   // wie fetch().text(): Ersatzzeichen statt Fehler, BOM weg
   } catch (e) {
     aus[f.name] = 'json';
     continue;

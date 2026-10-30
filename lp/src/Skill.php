@@ -39,6 +39,7 @@ final class Skill
             . "- Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.\n"
             . "- Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `\"dekorativ\": true`).\n"
             . "- Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.\n"
+            . "- Die Kamera-Vorführung (`bewegung`, Variante `live`) gibt es höchstens einmal; ihr Knopftext soll das Wort „Kamera“ enthalten, damit der Besucher weiß, was der Klick auslöst.\n"
             . "- Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.\n\n## Abschnitte\n";
         foreach ($k->bausteine as $typ => $e) {
             $s .= "\n### {$e['name']} (`$typ`)\n\nVarianten: " . implode(', ', array_map(static fn ($v) => "`$v`", $e['varianten']))
@@ -81,7 +82,7 @@ final class Skill
     private static function grenzen(array $f): string
     {
         return match ($f['typ']) {
-            'zeile' => "eine Zeile, ≤ {$f['max']} Zeichen",
+            'zeile' => "eine Zeile, ≤ {$f['max']} Zeichen" . (($f['nicht_leer'] ?? false) ? ', nicht leer' : ''),
             'absatz' => "≤ {$f['max']} Zeichen, Leerzeile = Absatz, `**fett**`",
             'zahl' => "{$f['min']}–{$f['max']}",
             'zeitpunkt' => '`JJJJ-MM-TTTHH:MM`, Wiener Zeit',
@@ -106,6 +107,7 @@ final class Skill
         if ($r['genau_einmal'] ?? false) { $t[] = 'genau einmal'; }
         if ($r['zuerst'] ?? false) { $t[] = 'als erster Abschnitt'; }
         if (isset($r['hoechstens'])) { $t[] = "höchstens {$r['hoechstens']}-mal"; }
+        foreach ($r['hoechstens_variante'] ?? [] as $v => $m) { $t[] = "Variante `$v` höchstens $m-mal"; }
         return implode(', ', $t);
     }
 }

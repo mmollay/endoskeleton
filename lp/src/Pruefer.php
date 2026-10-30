@@ -89,7 +89,8 @@ final class Pruefer
 
     /**
      * Im Seitenordner liegt nur, was dorthin gehört: Bauplan, Marke, Profilkopie, das Gebaute, Git und die Dateien des
-     * Livegangs; in img/ nur Bilder und in vid/ nur Videos, auf die der Bauplan verweist. Alles andere würde mit ausgeliefert.
+     * Livegangs; in img/ nur Bilder und in vid/ nur Videos, auf die der Bauplan verweist, in bew/ nur Bewegungsdateien, die ein Bewegungsfeld
+     * mit gültigem Namen nennt (ein Pfad in einem anderen Textfeld zählt nicht). Alles andere würde mit ausgeliefert.
      */
     private function ordner(array $dateien): void
     {
@@ -99,10 +100,10 @@ final class Pruefer
                 $this->sperrend($e, "$e gehört nicht in den Seitenordner (würde ausgeliefert)", 'Im Ordner der Seite liegt eine fremde Datei — bitte entfernen.');
             }
         }
-        $genutzt = [];
+        $genutzt = array_fill_keys(Bewegung::imPlan($this->plan), true);   // bew/: nur, was ein Bewegungsfeld mit gültigem Namen nennt
         $plan = $this->plan;
         array_walk_recursive($plan, static function ($w) use (&$genutzt): void {
-            if (is_string($w) && (str_starts_with($w, 'img/') || str_starts_with($w, 'vid/') || str_starts_with($w, 'bew/'))) {
+            if (is_string($w) && (str_starts_with($w, 'img/') || str_starts_with($w, 'vid/'))) {
                 $genutzt[$w] = true;
             }
         });
@@ -118,7 +119,8 @@ final class Pruefer
 
     /**
      * Modelldateien der Kamera-Vorführung (3.64.0): modell/ kommt erst beim Veröffentlichen dazu (docs/bewegung-format.md). Was dort liegt, muss
-     * zur Prüfsummenliste gehören; fehlt der Ordner bei einem Baustein „live“, gibt es einen Hinweis (die Seite fällt dann auf die Beispielbewegung zurück).
+     * zur Prüfsummenliste gehören (sperrend); fehlt der Ordner oder sind nicht alle Dateien da, gibt es bei einem Baustein „live“ einen Hinweis
+     * (die Seite fällt dann auf die Beispielbewegung zurück). Ein Link oder eine Datei namens modell wird wie ein falscher Ordner behandelt.
      */
     private function modell(): void
     {
@@ -126,12 +128,17 @@ final class Pruefer
         foreach ($this->plan['bausteine'] ?? [] as $b) {
             $live = $live || (($b['typ'] ?? '') === 'bewegung' && ($b['variante'] ?? '') === 'live');
         }
-        if (is_dir("$this->seite/modell")) {
-            foreach (Bewegung::modell($this->seite, $this->endo) as [$technik, $kunde]) {
-                $this->sperrend('modell', $technik, $kunde);
+        $kunde = 'Die Kamera-Vorführung braucht beim Veröffentlichen die Modelldateien (modell/, scripts/modell-holen.sh) — bis dahin zeigt sie nur die Beispielbewegung.';
+        if (file_exists("$this->seite/modell") || is_link("$this->seite/modell")) {
+            $befunde = Bewegung::modell($this->seite, $this->endo);
+            foreach ($befunde as [$technik, $text]) {
+                $this->sperrend('modell', $technik, $text);
+            }
+            if ($live && !$befunde && ($fehlt = Bewegung::fehlt($this->seite, $this->endo)) !== []) {
+                $this->hinweis('modell', 'modell/ ist unvollständig, es fehlen: ' . implode(', ', $fehlt), $kunde);
             }
         } elseif ($live) {
-            $this->hinweis('modell', 'modell/ fehlt (Kamera-Vorführung)', 'Die Kamera-Vorführung braucht beim Veröffentlichen die Modelldateien (modell/, scripts/modell-holen.sh) — bis dahin zeigt sie nur die Beispielbewegung.');
+            $this->hinweis('modell', 'modell/ fehlt (Kamera-Vorführung)', $kunde);
         }
     }
 

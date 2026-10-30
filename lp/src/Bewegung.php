@@ -47,18 +47,24 @@ final class Bewegung
     public const SUMMEN = 'scripts/modell-summen.txt';
 
     /**
-     * Die gültig benannten Bewegungspfade eines Bauplans (ohne Doppelte) — damit kopiert das Musterbuch die Probedateien zu den Fixtures.
+     * Die gültig benannten Bewegungspfade eines Bauplans (ohne Doppelte) — nur aus Feldern vom Typ „bewegungsdatei“, nicht aus irgendeinem Text
+     * (sonst hielte ein Pfad in `alt` eine fremde Datei in bew/ für benutzt). Das Musterbuch kopiert damit die Probedateien zu den Fixtures.
      *
      * @return list<string>
      */
-    public static function imPlan(array $plan): array
+    public static function imPlan(array $plan, ?Katalog $k = null): array
     {
+        $k ??= Katalog::laden();
         $pfade = [];
-        array_walk_recursive($plan, static function ($w) use (&$pfade): void {
-            if (is_string($w) && preg_match(self::MUSTER, $w)) {
-                $pfade[$w] = true;
+        foreach ($plan['bausteine'] ?? [] as $b) {
+            $felder = is_array($b) && is_string($b['typ'] ?? null) ? ($k->baustein($b['typ'])['felder'] ?? []) : [];
+            foreach ($felder as $name => $def) {
+                $w = $b[$name] ?? null;
+                if (($def['typ'] ?? '') === 'bewegungsdatei' && is_string($w) && preg_match(self::MUSTER, $w)) {
+                    $pfade[$w] = true;
+                }
             }
-        });
+        }
         return array_keys($pfade);
     }
 
@@ -76,23 +82,36 @@ final class Bewegung
         if (!is_file($datei)) {
             return ["$pfad nicht gefunden", 'Die Bewegungsdatei wurde nicht gefunden.'];
         }
-        $groesse = (int) filesize($datei);
-        $code = $groesse > self::MAX_BYTES ? 'groesse' : null;
-        if ($code === null) {
-            try {
-                $code = self::pruefen(json_decode((string) file_get_contents($datei), false, 8, JSON_THROW_ON_ERROR), $groesse);
-            } catch (\JsonException) {
-                $code = 'json';
-            }
+        $text = @file_get_contents($datei, false, null, 0, self::MAX_BYTES + 1);
+        if ($text === false) {
+            return ["$pfad nicht lesbar", 'Die Bewegungsdatei konnte nicht gelesen werden.'];
         }
+        $code = self::pruefenText($text);
         return $code === null ? null : ["$pfad: $code", self::TEXTE[$code]];
+    }
+
+    /**
+     * Einstieg „Text rein, Kennung raus“ (für Upload und Bibliothek): Länge vor dem Dekodieren, Tiefe höchstens 8, dann pruefen(). Wer nur
+     * einen Ausschnitt gelesen hat (MAX_BYTES + 1 Byte genügen), bekommt trotzdem die richtige Antwort „groesse“.
+     */
+    public static function pruefenText(string $text): ?string
+    {
+        $bytes = strlen($text);
+        if ($bytes > self::MAX_BYTES) {
+            return 'groesse';
+        }
+        try {
+            return self::pruefen(json_decode($text, false, 8, JSON_THROW_ON_ERROR), $bytes);
+        } catch (\JsonException) {
+            return 'json';
+        }
     }
 
     /**
      * Prüft den Inhalt einer Bewegungsdatei; gibt die Kennung des ersten Fehlers zurück (self::TEXTE) oder null. Die Reihenfolge der Prüfungen ist
      * dieselbe wie in lp/bewegung.js.
      *
-     * @param int $bytes Größe der Datei als Text
+     * @param int $bytes Größe der Datei als Text (vertraut, nicht nachgemessen — pruefenText() misst selbst)
      */
     public static function pruefen(mixed $d, int $bytes): ?string
     {
@@ -189,32 +208,58 @@ final class Bewegung
         return abs(round($v * $m) - $v * $m) < 1e-6;
     }
 
+    /** Name → SHA-256 aus scripts/modell-summen.txt (sha256sum-Format, Zeilen in anderer Form zählen nicht). */
+    private static function soll(string $endo): array
+    {
+        $soll = [];
+        foreach (explode("\n", trim((string) @file_get_contents("$endo/" . self::SUMMEN))) as $zeile) {
+            if (preg_match('/^([0-9a-f]{64})  (\S+)$/', $zeile, $m)) {
+                $soll[$m[2]] = $m[1];
+            }
+        }
+        return $soll;
+    }
+
     /**
      * Die Modelldateien des Bausteins „live“ im Seitenordner modell/ (kommen erst beim Veröffentlichen dazu, docs/bewegung-format.md): nur
-     * Dateien aus scripts/modell-summen.txt, jede mit ihrer Prüfsumme. Gibt die Befunde als [technik, kunde] zurück.
+     * Dateien aus scripts/modell-summen.txt, jede mit ihrer Prüfsumme. modell selbst darf kein Link sein; ein fehlender oder nicht lesbarer
+     * Ordner ist ein Befund, keine Ausnahme. Gibt die Befunde als [technik, kunde] zurück.
      *
      * @return list<array{0: string, 1: string}>
      */
     public static function modell(string $ordner, string $endo): array
     {
-        $soll = [];
-        foreach (explode("\n", trim((string) file_get_contents("$endo/" . self::SUMMEN))) as $zeile) {
-            if (preg_match('/^([0-9a-f]{64})  (\S+)$/', $zeile, $m)) {
-                $soll[$m[2]] = $m[1];
-            }
-        }
         $kunde = 'Die Modelldateien der Kamera-Vorführung sind nicht in Ordnung — bitte mit scripts/modell-holen.sh neu holen.';
+        $wurzel = "$ordner/modell";
+        if (is_link($wurzel) || !is_dir($wurzel)) {
+            return [[is_link($wurzel) ? 'modell ist ein Link' : 'modell ist kein Ordner', $kunde]];
+        }
+        $soll = self::soll($endo);
         $f = [];
-        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator("$ordner/modell", \FilesystemIterator::SKIP_DOTS));
-        foreach ($it as $datei) {
-            $pfad = substr($datei->getPathname(), strlen($ordner) + 1);
-            $name = substr($pfad, 7);
-            if (!isset($soll[$name]) || is_link($datei->getPathname()) || !$datei->isFile()) {
-                $f[] = ["$pfad gehört nicht zu den Modelldateien (scripts/modell-summen.txt)", $kunde];
-            } elseif (hash_file('sha256', $datei->getPathname()) !== $soll[$name]) {
-                $f[] = ["$pfad hat eine falsche Prüfsumme", $kunde];
+        try {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($wurzel, \FilesystemIterator::SKIP_DOTS)) as $datei) {
+                $pfad = substr($datei->getPathname(), strlen($ordner) + 1);
+                $name = substr($pfad, 7);
+                if (!isset($soll[$name]) || is_link($datei->getPathname()) || !$datei->isFile()) {
+                    $f[] = ["$pfad gehört nicht zu den Modelldateien (scripts/modell-summen.txt)", $kunde];
+                } elseif (hash_file('sha256', $datei->getPathname()) !== $soll[$name]) {
+                    $f[] = ["$pfad hat eine falsche Prüfsumme", $kunde];
+                }
             }
+        } catch (\UnexpectedValueException) {
+            $f[] = ['modell/ ist nicht lesbar (ein Unterordner lässt sich nicht öffnen)', $kunde];
         }
         return $f;
+    }
+
+    /**
+     * Die Namen aus der Summenliste, die in modell/ fehlen — für den Hinweis bei „live“ (die Seite fällt dann zur Laufzeit auf die
+     * Beispielbewegung zurück). Nur sinnvoll, wenn modell() nichts zu beanstanden hat.
+     *
+     * @return list<string>
+     */
+    public static function fehlt(string $ordner, string $endo): array
+    {
+        return array_values(array_filter(array_keys(self::soll($endo)), static fn (string $n): bool => !is_file("$ordner/modell/$n")));
     }
 }
