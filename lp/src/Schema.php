@@ -244,6 +244,15 @@ final class Schema
                     $this->fehler($pfad, "$pfad: $f[0]", "$wo: $f[1]");
                 }
                 return;
+            case 'bewegungsdatei':
+                if (!is_string($w)) {
+                    $form('Pfad der Bewegungsdatei');
+                    return;
+                }
+                if (($f = Bewegung::fehler($this->ordner, $w)) !== null) {
+                    $this->fehler($pfad, "$pfad: $f[0]", "$wo: $f[1]");
+                }
+                return;
             case 'bilddatei':
                 if (!is_string($w)) {
                     $form('Bilddatei');

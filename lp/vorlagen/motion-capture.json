@@ -1,0 +1,66 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "{{Titel der Seite, höchstens 60 Zeichen}}",
+        "beschreibung": "{{Ein Satz für Suchmaschinen: Thema der Bewegungsvorführung}}"
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "dachzeile": "Bewegung erleben",
+            "titel": "{{Wofür die Bewegungserkennung gedacht ist}}",
+            "text": "{{Worum es geht, in ein bis zwei Sätzen}}",
+            "knopf": {
+                "text": "Jetzt ausprobieren",
+                "ziel": "#vorfuehrung"
+            }
+        },
+        {
+            "typ": "bewegung",
+            "variante": "live",
+            "anker": "vorfuehrung",
+            "titel": "Probier es mit deiner Kamera aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
+            "stil": "strich",
+            "knopf_text": "Kamera starten",
+            "text": "{{Ein bis zwei Sätze: was man tun kann}}"
+        },
+        {
+            "typ": "bewegung",
+            "variante": "wiedergabe",
+            "titel": "So sieht eine aufgezeichnete Bewegung aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+        },
+        {
+            "typ": "themen",
+            "variante": "haken",
+            "titel": "So funktioniert es",
+            "punkte": [
+                "Die Kamera schaltet sich erst nach deinem Klick ein.",
+                "Das Kamerabild bleibt auf deinem Gerät und wird nicht gespeichert oder übertragen.",
+                "Aus deiner Bewegung entsteht eine kleine Datei mit Körperpunkten – ohne Gesicht."
+            ]
+        },
+        {
+            "typ": "faq",
+            "titel": "Häufige Fragen",
+            "fragen": [
+                {
+                    "frage": "Wird mein Kamerabild gespeichert oder hochgeladen?",
+                    "antwort": "Nein. Das Bild bleibt auf deinem Gerät. Es entstehen nur Körperpunkte, und die bleiben im Arbeitsspeicher, bis du sie selbst als Datei sicherst."
+                },
+                {
+                    "frage": "Was ist in der Datei drin?",
+                    "antwort": "Die Lage von 25 Körperpunkten: Nase und Ohren für die Kopfhaltung, dazu Schultern, Arme, Hände, Hüften, Beine und Füße. Kein Bild, keine Augen, kein Mund."
+                },
+                {
+                    "frage": "Was, wenn ich keine Kamera habe?",
+                    "antwort": "Dann siehst du eine Beispielbewegung. Die Seite funktioniert auch ohne Kamera."
+                }
+            ]
+        }
+    ]
+}

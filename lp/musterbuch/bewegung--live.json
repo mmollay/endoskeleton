@@ -1,0 +1,27 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Bewegung – live",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Bewegung“ in der Variante „live“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Bewegung – live",
+            "text": "Baustein „bewegung“ in der Variante „live“ (seit 3.64.0)."
+        },
+        {
+            "typ": "bewegung",
+            "variante": "live",
+            "titel": "Probier es mit deiner Kamera aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
+            "stil": "strich",
+            "knopf_text": "Kamera starten",
+            "text": "Die Kamera bleibt aus, bis du auf den Knopf drückst. Das Kamerabild verlässt dein Gerät nicht."
+        }
+    ]
+}

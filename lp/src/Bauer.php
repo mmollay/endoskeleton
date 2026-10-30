@@ -75,7 +75,10 @@ final class Bauer
             'js' => 'es/lp.js?v=' . substr(hash('sha256', $dateien['es/lp.js']), 0, 10),
         ];
         $indexieren = ($meta['indexieren'] ?? false) === true;
-        $dateien['index.html'] = self::vorlage("$endo/lp/rahmen.php", $rahmen + [
+        // Bewegung (3.64.0): der Player nur auf der Seite selbst; sein Stempel deckt das Live-Skript mit ab, das er nach dem Klick nachlädt
+        $bewegung = isset($dateien['es/bewegung.js'])
+            ? 'es/bewegung.js?v=' . substr(hash('sha256', $dateien['es/bewegung.js'] . ($dateien['es/bewegung-live.js'] ?? '')), 0, 10) : null;
+        $dateien['index.html'] = self::vorlage("$endo/lp/rahmen.php", $rahmen + ['bewegung' => $bewegung,
             'titel' => $meta['titel'], 'beschreibung' => $meta['beschreibung'], 'noindex' => !$indexieren, 'og' => $vorschau['og'],
             'inhalt' => implode("\n", $bloecke),
         ]);

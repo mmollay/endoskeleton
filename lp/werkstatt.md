@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.62.0)
+# Landingpage bearbeiten (Endoskeleton 3.64.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -254,5 +254,28 @@ Varianten: `akzent`, `schlicht`
         "text": "Platz sichern",
         "ziel": "#anmeldung"
     }
+}
+```
+
+### Bewegung (`bewegung`)
+
+Varianten: `wiedergabe`, `live`
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
+| `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+| `stil` | auswahl | – | eines von `strich`, `punkte`; Standard `strich`; fehlt: strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte |
+| `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen; nur bei live; fehlt: Kamera starten |
+
+```json
+{
+    "typ": "bewegung",
+    "variante": "wiedergabe",
+    "titel": "So sieht eine aufgezeichnete Bewegung aus",
+    "bewegung": "bew/beispiel-winken.bewegung",
+    "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
 }
 ```

@@ -93,6 +93,7 @@ final class Skill
             'bild' => '`{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}`',
             'bilddatei' => '`bestand/…` oder `img/…`',
             'videodatei' => '`vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB',
+            'bewegungsdatei' => '`bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB',
             'knopf' => ($f['nur_anker'] ?? false) ? '`{"text": ≤ 40 Zeichen, "ziel": "#anker"}` (nur Sprungmarken der Seite)' : '`{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}`',
             'liste' => "{$f['min']}–{$f['max']} Einträge" . (is_string($f['eintrag']['typ'] ?? null) ? ' (' . self::grenzen($f['eintrag']) . ')' : ''),
             'janein' => '`true` / `false`',

@@ -11,6 +11,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require __DIR__ . '/autoload.php';
 
 use Endo\Lp\Befund;
+use Endo\Lp\Bewegung;
 use Endo\Lp\Cli;
 use Endo\Lp\Dateien;
 
@@ -30,6 +31,9 @@ Cli::lauf($argv, 'php lp/neu.php <sammelordner> <slug> <vorlage>   (Vorlagen: ' 
             throw new InvalidArgumentException("$ziel gibt es schon");
         }
         Dateien::kopieren($quelle, "$ziel/seite.json");
+        foreach (Bewegung::imPlan(json_decode((string) file_get_contents($quelle), true) ?: []) as $datei) {
+            Dateien::kopieren(__DIR__ . "/musterbuch/$datei", "$ziel/$datei");   // die Beispielbewegung der Vorlage (3.64.0)
+        }
         Dateien::schreiben("$ziel/ENDOSKELETON", trim((string) file_get_contents(dirname(__DIR__) . '/VERSION')) . "\n");
         exec('git -C ' . escapeshellarg($ziel) . ' init -q 2>&1', $aus, $rc);
         if ($rc !== 0) {

@@ -1,5 +1,5 @@
 {
-  "version": "3.62.0",
+  "version": "3.64.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -224,6 +224,28 @@
       "regeln": {},
       "beispiel": {
         "typ": "abschluss", "variante": "akzent", "titel": "Sei dabei", "knopf": { "text": "Platz sichern", "ziel": "#anmeldung" }
+      }
+    },
+    "bewegung": {
+      "name": "Bewegung", "seit": "3.64.0", "geaendert": "3.64.0",
+      "klassen": {
+        "lp-bewegung": "3.64.0", "lp-bewegung--wiedergabe": "3.64.0", "lp-bewegung--live": "3.64.0", "lp-bewegung-text": "3.64.0",
+        "lp-bewegung-figur": "3.64.0", "lp-bewegung-beschriftung": "3.64.0", "lp-bewegung-leiste": "3.64.0", "lp-bewegung-wahl": "3.64.0",
+        "lp-bewegung-kamera": "3.64.0", "lp-bewegung-hinweis": "3.64.0", "lp-bewegung-meldung": "3.64.0"
+      },
+      "varianten": ["wiedergabe", "live"],
+      "felder": {
+        "titel":      { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+        "text":       { "typ": "absatz", "label": "Text", "max": 400 },
+        "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
+        "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
+        "stil":       { "typ": "auswahl", "label": "Darstellung", "werte": ["strich", "punkte"], "standard": "strich", "fehlt": "strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte" },
+        "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nur_bei": ["live"], "fehlt": "Kamera starten" }
+      },
+      "regeln": {},
+      "beispiel": {
+        "typ": "bewegung", "variante": "wiedergabe", "titel": "So sieht eine aufgezeichnete Bewegung aus", "bewegung": "bew/beispiel-winken.bewegung",
+        "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
       }
     }
   }

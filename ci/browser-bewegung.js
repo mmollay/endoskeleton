@@ -1,0 +1,312 @@
+#!/usr/bin/env node
+/*
+ * Browsertests des Bausteins „bewegung“ (3.64.0) gegen das gebaute Musterbuch (musterbuch/bewegung--wiedergabe, musterbuch/bewegung--live).
+ * Die Seiten kommen über die Scheinadresse https://lp.test/ aus dem Ordner (https: ohne sicheren Kontext gibt der Browser keine Kamera frei); jede andere Adresse wird abgebrochen und gezählt (Soll: 0).
+ * Die Kamera ist die Prüfkamera von Chromium (grünes Muster, keine Person, kein echtes Bild).
+ *
+ *   ES_PLAYWRIGHT=/home/pawbot/projects/panel/node_modules/playwright [ES_MODELL=<Ordner modell/>] node ci/browser-bewegung.js
+ *
+ * ES_MODELL: der Ordner modell/ von scripts/modell-holen.sh (Standard: ../endoskeleton-modelle/modell neben dem Kit). Fehlt er, laufen nur
+ * die Prüfungen ohne die echte Erkennung — und das wird laut gemeldet. Kein npm install im Endoskeleton (Schadcode-Commit eb8a34d).
+ */
+'use strict';
+
+const pw = require(process.env.ES_PLAYWRIGHT || '/home/pawbot/projects/panel/node_modules/playwright');
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
+const { pruefen } = require('../lp/bewegung.js');
+
+const KIT = path.join(__dirname, '..');
+const MUSTERBUCH = path.join(KIT, 'musterbuch');
+const MODELL = process.env.ES_MODELL || path.join(KIT, '..', 'endoskeleton-modelle', 'modell');
+const SUMMEN = fs.readFileSync(path.join(KIT, 'scripts', 'modell-summen.txt'), 'utf8').split('\n').map((z) => z.split('  ')[1]).filter(Boolean);
+const MODELL_DA = SUMMEN.every((n) => fs.existsSync(path.join(MODELL, n)));
+const TYPEN = { html: 'text/html', css: 'text/css', js: 'text/javascript', wasm: 'application/wasm', task: 'application/octet-stream', bewegung: 'application/octet-stream', svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png', txt: 'text/plain' };
+const PRUEFKAMERA = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'];
+
+let bestanden = 0;
+const fehler = [];
+const pruefe = (ok, was) => { if (ok) { bestanden++; } else { fehler.push(was); } };
+const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Spione: jeder Zugriff auf Cookies, Web-Speicher und IndexedDB; jeder Aufruf von getUserMedia (mit Zeit des letzten echten Klicks davor).
+const SPION = (kamera) => `(() => {
+  window.__zugriffe = []; window.__kamera = []; window.__spuren = []; window.__klick = 0;
+  const merke = (w) => window.__zugriffe.push(w);
+  for (const m of ['getItem', 'setItem', 'removeItem', 'clear', 'key']) {
+    const alt = Storage.prototype[m];
+    Storage.prototype[m] = function (...a) { merke('Storage.' + m); return alt.apply(this, a); };
+  }
+  const c = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+  Object.defineProperty(Document.prototype, 'cookie', { configurable: true, get() { merke('cookie lesen'); return c.get.call(this); }, set(v) { merke('cookie schreiben'); c.set.call(this, v); } });
+  const auf = IDBFactory.prototype.open;
+  IDBFactory.prototype.open = function (...a) { merke('indexedDB'); return auf.apply(this, a); };
+  document.addEventListener('click', (e) => { if (e.isTrusted) { window.__klick = performance.now(); } }, true);
+  const md = navigator.mediaDevices;
+  ${kamera === 'ohne' ? "Object.defineProperty(Navigator.prototype, 'mediaDevices', { configurable: true, get: () => undefined });" : `
+  const echt = md.getUserMedia.bind(md);
+  md.getUserMedia = function (cfg) {
+    window.__kamera.push({ nach: performance.now(), video: !!cfg.video, audio: !!cfg.audio });
+    ${kamera === 'verweigert' ? "return Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));" : 'return echt(cfg).then((s) => { window.__spuren.push(...s.getTracks()); return s; });'}
+  };`}
+})();`;
+const OHNE_WASM = 'delete window.WebAssembly;';
+
+// Ein Stand-in für das Erkennungsmodell: liefert bei jedem Kamerabild 33 Punkte. Prüft Aufnehmen, Vorschau und Speichern — nicht die Erkennung.
+const ATTRAPPE = `export const FilesetResolver = { forVisionTasks: async () => ({}) };
+export const PoseLandmarker = { createFromOptions: async () => ({ detectForVideo: (v, ts) => ({ landmarks: [Array.from({ length: 33 }, (_, i) => ({ x: 0.5 + 0.2 * Math.sin(ts / 400 + i / 5), y: 0.1 + i * 0.025, z: 0, visibility: 0.9 }))] }) }) };
+`;
+
+/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|fehlt), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei). */
+async function oeffnen(browser, name, optionen = {}) {
+  const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
+  const page = await kontext.newPage();
+  const aus = { kontext, page, fremd: [], anfragen: [], seitenfehler: [] };
+  page.on('pageerror', (e) => aus.seitenfehler.push(e.message));
+  if (process.env.ES_DEBUG) { page.on('console', (m) => console.log(`  [Konsole ${name}] ${m.text().slice(0, 200)}`)); page.on('requestfailed', (r) => console.log(`  [Anfrage fehlgeschlagen] ${r.url()} ${r.failure()?.errorText}`)); }
+  await page.addInitScript(SPION(optionen.kamera || 'echt'));
+  if (optionen.vorher) { await page.addInitScript(optionen.vorher); }
+  await page.route('**/*', (r) => {
+    const u = new URL(r.request().url());
+    if (u.host !== 'lp.test') { aus.fremd.push(u.href); return r.abort(); }
+    aus.anfragen.push(u.pathname);
+    const rel = decodeURIComponent(u.pathname).replace(/^\/+/, '');
+    const unter = rel.slice(name.length + 1);
+    if (unter.startsWith('modell/')) {
+      if (optionen.modell === 'fehlt') { return r.fulfill({ status: 404, body: '' }); }
+      if (optionen.modell === 'attrappe' && unter === 'modell/vision_bundle.js') { return r.fulfill({ status: 200, contentType: 'text/javascript', body: ATTRAPPE }); }
+      const datei = path.join(MODELL, unter.slice(7));
+      return SUMMEN.includes(unter.slice(7)) && fs.existsSync(datei) ? r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) }) : r.fulfill({ status: 404, body: '' });
+    }
+    if (optionen.datei !== undefined && unter.startsWith('bew/')) {
+      return optionen.datei === null ? r.fulfill({ status: 404, body: '' }) : r.fulfill({ status: 200, contentType: 'application/octet-stream', body: optionen.datei });
+    }
+    const datei = path.join(MUSTERBUCH, rel.endsWith('/') || rel === name ? rel.replace(/\/?$/, '/') + 'index.html' : rel);
+    if (!datei.startsWith(MUSTERBUCH) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) { return r.fulfill({ status: 404, body: '' }); }
+    return r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) });
+  });
+  await page.goto(`https://lp.test/${name}/`);
+  await page.waitForLoadState('load');
+  await warte(500);
+  return aus;
+}
+
+/** Zustand der Leinwand: Zahl der Pixel, die vom Grund abweichen, ihr Schwerpunkt in x, die Breite und das Bild als Text. */
+const leinwand = (page) => page.evaluate(() => {
+  const c = document.querySelector('.lp-bewegung-figur canvas'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+  let n = 0, sx = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    if (Math.abs(d[i] - d[0]) + Math.abs(d[i + 1] - d[1]) + Math.abs(d[i + 2] - d[2]) > 60) { n++; sx += (i / 4) % c.width; }
+  }
+  return { n, mx: n ? sx / n : 0, breite: c.width, url: c.toDataURL() };
+});
+const text = (page, wahl) => page.locator(wahl).first().textContent().then((t) => t.trim());
+const sichtbar = (page, wahl) => page.locator(wahl).first().isVisible();
+const meldung = (page, was) => sichtbar(page, `[data-lp-t="${was}"]`);
+/** Wartet, bis eine der Bedingungen eintritt; liefert deren Namen oder 'zeit'. */
+async function bis(page, bedingungen, ms = 60000) {
+  const ende = Date.now() + ms;
+  while (Date.now() < ende) {
+    for (const [name, fn] of Object.entries(bedingungen)) { if (await fn()) { return name; } }
+    await warte(200);
+  }
+  return 'zeit';
+}
+const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), s: sessionStorage.length, l: localStorage.length }));
+
+(async () => {
+  const browser = await pw.chromium.launch({ args: PRUEFKAMERA });
+
+  // ===== Wiedergabe =====
+  {
+    const w = await oeffnen(browser, 'bewegung--wiedergabe');
+    const { page } = w;
+    const a = await leinwand(page);
+    pruefe(a.n > 200, `Wiedergabe: die Figur ist gezeichnet (${a.n} Pixel)`);
+    pruefe(await sichtbar(page, '[data-lp-b="steuerung"]'), 'Wiedergabe: die Steuerung ist mit JavaScript sichtbar');
+    pruefe(await page.locator('[data-lp-b="kamera"]').count() === 0, 'Wiedergabe: kein Kamera-Knopf');
+    pruefe(await text(page, '.lp-bewegung-beschriftung') !== '' && (await page.getAttribute('.lp-bewegung-figur canvas', 'aria-labelledby')) !== null, 'Wiedergabe: die Leinwand hat eine Beschriftung (alt)');
+    pruefe(!w.anfragen.some((p) => p.includes('bewegung-live') || p.includes('/modell/')), `Wiedergabe: weder Live-Skript noch Modell angefordert (${w.anfragen.join(', ')})`);
+    pruefe(w.anfragen.some((p) => p.endsWith('/es/bewegung.js')) && w.anfragen.some((p) => p.endsWith('.bewegung')), 'Wiedergabe: Player und Bewegungsdatei kommen von der Seite');
+    pruefe(w.fremd.length === 0, `Wiedergabe: keine Fremdanfrage (${w.fremd.join(', ')})`);
+    const z = await zugriffe(page);
+    pruefe(z.z.length === 0 && z.s === 0 && z.l === 0, `Wiedergabe: kein Cookie, kein Web-Speicher, keine IndexedDB (${z.z.join(', ')})`);
+    const st = await w.kontext.storageState();
+    pruefe(st.cookies.length === 0 && st.origins.every((o) => o.localStorage.length === 0), 'Wiedergabe: der Browser hält nach dem Laden weder Cookie noch localStorage');
+
+    // läuft, Pause, weiter
+    await warte(300);
+    pruefe((await leinwand(page)).url !== a.url, 'Wiedergabe: die Figur bewegt sich');
+    await page.click('[data-lp-b="pause"]');
+    const p1 = await leinwand(page); await warte(400); const p2 = await leinwand(page);
+    pruefe(p1.url === p2.url && await text(page, '[data-lp-b="pause"]') === 'Abspielen', 'Wiedergabe: Pause hält das Bild an, der Knopf heißt „Abspielen“');
+    // Spiegeln: der Schwerpunkt wandert auf die andere Seite der Mitte
+    await page.click('[data-lp-b="spiegeln"]');
+    const sp = await leinwand(page);
+    pruefe(await page.getAttribute('[data-lp-b="spiegeln"]', 'aria-pressed') === 'true' && Math.abs(sp.mx - (sp.breite - p2.mx)) < 4, `Wiedergabe: Spiegeln spiegelt das Bild (${p2.mx.toFixed(1)} → ${sp.mx.toFixed(1)} von ${sp.breite})`);
+    await page.click('[data-lp-b="spiegeln"]');
+    await page.click('[data-lp-b="pause"]');
+    await warte(400);
+    pruefe((await leinwand(page)).url !== p2.url && await text(page, '[data-lp-b="pause"]') === 'Pause', 'Wiedergabe: „Abspielen“ läuft weiter');
+    // Tastatur
+    await page.focus('.lp-bewegung-figur canvas');
+    await page.keyboard.press('Space');
+    const k1 = await leinwand(page); await warte(300);
+    pruefe((await leinwand(page)).url === k1.url, 'Wiedergabe/Tastatur: Leertaste hält an');
+    await page.keyboard.press('Home'); const h1 = await leinwand(page);
+    await page.keyboard.press('ArrowRight'); const h2 = await leinwand(page);
+    await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowLeft'); const h3 = await leinwand(page);
+    await page.keyboard.press('Home'); const h4 = await leinwand(page);
+    pruefe(h1.url !== h2.url && h2.url === h3.url && h1.url === h4.url, 'Wiedergabe/Tastatur: Pfeil rechts/links schaltet Bild für Bild, Home springt zum Anfang');
+    await page.selectOption('[data-lp-b="tempo"]', '2');
+    pruefe(w.seitenfehler.length === 0, `Wiedergabe: keine Fehler im Browser (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Weniger Bewegung: Standbild und „Abspielen“
+  {
+    const w = await oeffnen(browser, 'bewegung--wiedergabe', { still: true });
+    const a = await leinwand(w.page); await warte(500); const b = await leinwand(w.page);
+    pruefe(a.n > 200 && a.url === b.url, `Weniger Bewegung: Standbild mit Figur (${a.n} Pixel), nichts bewegt sich`);
+    pruefe(await text(w.page, '[data-lp-b="pause"]') === 'Abspielen', 'Weniger Bewegung: der Knopf heißt „Abspielen“');
+    await w.page.click('[data-lp-b="pause"]'); await warte(500);
+    pruefe((await leinwand(w.page)).url !== b.url && await text(w.page, '[data-lp-b="pause"]') === 'Pause', 'Weniger Bewegung: „Abspielen“ startet die Bewegung erst auf Wunsch');
+    await w.kontext.close();
+  }
+
+  // Die Bewegungsdatei fehlt, ist kaputt oder verletzt das Format: freundlicher Hinweis, kein Fehler im Browser
+  {
+    const echt = JSON.parse(fs.readFileSync(path.join(KIT, 'lp', 'musterbuch', 'bew', 'beispiel-winken.bewegung'), 'utf8'));
+    const mitGesicht = JSON.parse(JSON.stringify(echt)); mitGesicht.rahmen[0][3 + 2] = 1; mitGesicht.rahmen[0][3] = 0.5; mitGesicht.rahmen[0][4] = 0.5; // Punkt 1 (Auge) sichtbar
+    const zuLang = JSON.parse(JSON.stringify(echt)); zuLang.dauer_ms = 20000;
+    for (const [was, datei] of [['fehlende Datei', null], ['kein JSON', 'nichts{'], ['sichtbares Gesichtsmerkmal', JSON.stringify(mitGesicht)], ['falsche Dauer', JSON.stringify(zuLang)]]) {
+      const w = await oeffnen(browser, 'bewegung--wiedergabe', { datei });
+      pruefe(await meldung(w.page, 'fehler'), `Bewegungsdatei (${was}): Hinweis „konnte nicht geladen werden“`);
+      pruefe(w.seitenfehler.length === 0 && w.fremd.length === 0, `Bewegungsdatei (${was}): kein Browserfehler, keine Fremdanfrage (${w.seitenfehler.join('; ')})`);
+      await w.kontext.close();
+    }
+  }
+
+  // ===== Live: Einwilligung zuerst =====
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: MODELL_DA ? 'echt' : 'attrappe' });
+    const { page } = w;
+    pruefe(await sichtbar(page, '[data-lp-b="kamera"]') && /Gerät/.test(await text(page, '.lp-bewegung-hinweis')), 'Live: Kamera-Knopf und Datenschutzhinweis („bleibt auf deinem Gerät“) stehen vor dem Klick da');
+    await warte(1500);
+    pruefe((await page.evaluate(() => window.__kamera.length)) === 0, 'Live: vor dem Klick wird die Kamera nicht angefragt');
+    pruefe(!w.anfragen.some((p) => p.includes('bewegung-live') || p.includes('/modell/')), `Live: vor dem Klick weder Live-Skript noch Modell angefordert (${w.anfragen.filter((p) => p.includes('modell') || p.includes('live')).join(', ')})`);
+    pruefe(await sichtbar(page, '[data-lp-b="steuerung"]') && (await leinwand(page)).n > 200, 'Live: vor dem Klick läuft der Player mit der Beispielbewegung');
+    await page.click('[data-lp-b="kamera"]');
+    const ergebnis = await bis(page, { an: async () => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten', hinweis: () => meldung(page, 'keinkamera') }, 90000);
+    pruefe(ergebnis === 'an', `Live (Prüfkamera${MODELL_DA ? ', echtes Modell' : ', Attrappe — ES_MODELL fehlt'}): Kamera läuft nach dem Klick (${ergebnis})`);
+    const aufrufe = await page.evaluate(() => ({ kamera: window.__kamera.slice(), klick: window.__klick }));
+    pruefe(aufrufe.kamera.length === 1 && aufrufe.klick > 0 && aufrufe.kamera[0].nach > aufrufe.klick && aufrufe.kamera[0].video && !aufrufe.kamera[0].audio, `Live: Kamera erst NACH dem echten Klick, einmal, nur Bild (${JSON.stringify(aufrufe)})`);
+    if (MODELL_DA) {
+      const geholt = w.anfragen.filter((p) => p.includes('/modell/')).map((p) => p.split('/modell/')[1]);
+      pruefe(geholt.includes('vision_bundle.js') && geholt.includes('pose_landmarker_lite.task') && geholt.some((n) => n.endsWith('.wasm')), `Live: Skript, Modell und WASM kommen von der eigenen Seite (${geholt.join(', ')})`);
+      console.log(`  Info: angeforderte Modelldateien: ${geholt.join(', ')}`);
+    }
+    await warte(1500);
+    const bild = await leinwand(w.page);
+    pruefe(bild.n > 200, `Live: die Leinwand zeigt das Kamerabild (${bild.n} abweichende Pixel)`);
+    pruefe(await sichtbar(page, '[data-lp-b="aufnehmen"]'), 'Live: „Aufnehmen“ erscheint');
+    await page.click('[data-lp-b="aufnehmen"]');
+    pruefe(await meldung(page, 'aufnahme') && await text(page, '[data-lp-b="aufnehmen"]') === 'Stopp', 'Live: Aufnahme läuft, Knopf heißt „Stopp“');
+    await warte(1500);
+    await page.click('[data-lp-b="aufnehmen"]');
+    if (MODELL_DA) {
+      pruefe(await meldung(page, 'leer'), 'Live (Prüfkamera ohne Person): ehrlicher Hinweis „keine Person erkannt“, nichts zum Speichern');
+      pruefe(!(await sichtbar(page, '[data-lp-b="speichern"]')), 'Live (ohne Person): „Als Datei speichern“ bleibt verborgen');
+    } else {
+      pruefe(await meldung(page, 'fertig') && await sichtbar(page, '[data-lp-b="speichern"]'), 'Live (Attrappe): Aufnahme fertig, „Als Datei speichern“ erscheint');
+    }
+    pruefe(await page.evaluate(() => window.__spuren.length > 0 && window.__spuren.every((s) => s.readyState === 'ended')), 'Live: nach dem Aufnehmen sind alle Kameraspuren beendet (Kamera aus)');
+    pruefe(await text(page, '[data-lp-b="kamera"]') === 'Kamera starten', 'Live: der Kamera-Knopf heißt wieder „Kamera starten“');
+    pruefe(w.fremd.length === 0, `Live: keine Fremdanfrage (${w.fremd.join(', ')})`);
+    const z = await zugriffe(page);
+    pruefe(z.z.length === 0 && z.s === 0 && z.l === 0, `Live: kein Cookie, kein Web-Speicher, keine IndexedDB (${z.z.join(', ')})`);
+    const st = await w.kontext.storageState();
+    pruefe(st.cookies.length === 0 && st.origins.every((o) => o.localStorage.length === 0), 'Live: der Browser hält am Ende weder Cookie noch localStorage');
+    pruefe(w.seitenfehler.length === 0, `Live: keine Fehler im Browser (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Tab wechseln → Kamera aus
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe' });
+    await w.page.click('[data-lp-b="kamera"]');
+    await bis(w.page, { an: async () => await text(w.page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' }, 20000);
+    await w.page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); });
+    await warte(300);
+    pruefe(await w.page.evaluate(() => window.__spuren.length > 0 && window.__spuren.every((s) => s.readyState === 'ended')) && await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten', 'Live: beim Wechsel des Tabs geht die Kamera aus');
+    await w.kontext.close();
+  }
+
+  // Attrappe: Aufnehmen → Vorschau → Speichern; die Datei besteht beide Prüfer
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe' });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { an: async () => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' }, 20000);
+    await warte(500);
+    await page.click('[data-lp-b="aufnehmen"]');
+    await warte(2200);
+    await page.click('[data-lp-b="aufnehmen"]');
+    pruefe(await meldung(page, 'fertig') && await sichtbar(page, '[data-lp-b="speichern"]'), 'Aufnahme (Attrappe): fertig, Speichern-Knopf da');
+    const v1 = await leinwand(page); await warte(300);
+    pruefe((await leinwand(page)).url !== v1.url, 'Aufnahme (Attrappe): die Vorschau spielt im Player');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-lp-b="speichern"]')]);
+    const datei = await dl.path();
+    const inhalt = fs.readFileSync(datei, 'utf8');
+    const d = JSON.parse(inhalt);
+    pruefe(/^aufnahme-\d{8}-\d{4}\.bewegung$/.test(dl.suggestedFilename()), `Aufnahme: Dateiname aufnahme-JJJJMMTT-HHMM.bewegung (${dl.suggestedFilename()})`);
+    pruefe(pruefen(d, Buffer.byteLength(inhalt)) === null, `Aufnahme: die Datei besteht den JS-Prüfer (${pruefen(d, Buffer.byteLength(inhalt))})`);
+    const php = execFileSync('php8.2', ['-r', 'require "lp/autoload.php"; $t = file_get_contents(getenv("BEW")); echo Endo\\Lp\\Bewegung::pruefen(json_decode($t, false, 8, JSON_THROW_ON_ERROR), strlen($t)) ?? "ok";'], { cwd: KIT, env: { ...process.env, BEW: datei } }).toString();
+    pruefe(php === 'ok', `Aufnahme: die Datei besteht den PHP-Prüfer (${php})`);
+    pruefe(d.quelle === 'eigene-aufnahme' && d.rahmen.length >= 40 && d.rahmen.length <= 300 && inhalt.length < 300000, `Aufnahme: eigene-aufnahme, ${d.rahmen.length} Bilder, ${inhalt.length} Byte`);
+    const gesicht = [1, 2, 3, 4, 5, 6, 9, 10];
+    pruefe(d.rahmen.every((r) => gesicht.every((i) => r[i * 3] === 0 && r[i * 3 + 1] === 0 && r[i * 3 + 2] === 0)), 'Aufnahme: Augen und Mund sind in jedem Bild 0,0,0');
+    pruefe(!/data:image|base64/.test(inhalt), 'Aufnahme: kein Bild in der Datei');
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `Aufnahme: keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
+    const zs = await zugriffe(page);
+    pruefe(zs.z.length === 0 && zs.s === 0 && zs.l === 0, `Aufnahme: auch nach „Als Datei speichern“ kein Cookie, kein Web-Speicher, keine IndexedDB (${zs.z.join(', ')})`);
+    await w.kontext.close();
+  }
+
+  // Ohne Kamera, ohne Erlaubnis, ohne Modell, ohne WASM: Hinweis, die Beispielbewegung läuft weiter
+  for (const [was, opt, kameraAngefragt] of [
+    ['Erlaubnis verweigert', { kamera: 'verweigert', modell: 'attrappe' }, 1],
+    ['kein Kameragerät (mediaDevices fehlt)', { kamera: 'ohne', modell: 'attrappe' }, 0],
+    ['Modelldateien fehlen', { kamera: 'echt', modell: 'fehlt' }, 0],
+    ...(MODELL_DA ? [['WebAssembly nicht vorhanden', { kamera: 'echt', modell: 'echt', vorher: OHNE_WASM }, 0]] : []),
+  ]) {
+    const w = await oeffnen(browser, 'bewegung--live', opt);
+    await w.page.click('[data-lp-b="kamera"]');
+    const e = await bis(w.page, { hinweis: () => meldung(w.page, 'keinkamera') }, 30000);
+    pruefe(e === 'hinweis', `Ohne Kamera (${was}): freundlicher Hinweis (${e})`);
+    const a = await leinwand(w.page); await warte(400); const b = await leinwand(w.page);
+    pruefe(a.n > 200 && a.url !== b.url, `Ohne Kamera (${was}): die Beispielbewegung läuft weiter`);
+    pruefe(await text(w.page, '[data-lp-b="kamera"]') === 'Kamera starten' && !(await sichtbar(w.page, '[data-lp-b="aufnehmen"]')), `Ohne Kamera (${was}): Knöpfe wieder im Ausgang`);
+    const n = await w.page.evaluate(() => window.__kamera.length);
+    pruefe(n === kameraAngefragt, `Ohne Kamera (${was}): Kamera ${kameraAngefragt}-mal angefragt (${n}) — ohne Modell wird sie gar nicht erst angefragt`);
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `Ohne Kamera (${was}): keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+  if (!MODELL_DA) { console.log(`  Hinweis: ${MODELL} unvollständig — die echte Erkennung wurde NICHT geprüft (scripts/modell-holen.sh).`); }
+
+  await browser.close();
+  console.log('');
+  if (fehler.length) {
+    console.log(`FEHLER — ${fehler.length} Problem(e), ${bestanden} Prüfung(en) bestanden\n`);
+    for (const f of fehler) { console.log(`  ✗ ${f}`); }
+    console.log('');
+    process.exit(1);
+  }
+  console.log(`ok — ${bestanden} Browserprüfungen (Bewegung) bestanden\n`);
+})().catch((e) => {
+  // Ein Abbruch (z. B. ein Knopf, der nie erscheint) zählt als Fehler und nennt zuerst die Prüfungen, die vorher schon rot waren.
+  for (const f of fehler) { console.log(`  ✗ ${f}`); }
+  console.log(`  ✗ Abbruch des Tests: ${String((e && e.message) || e).split('\n')[0]}`);
+  process.exit(1);
+});

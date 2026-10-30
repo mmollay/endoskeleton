@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
+use Endo\Lp\Bewegung;
 use Endo\Lp\Dateien;
 use Endo\Lp\Katalog;
 
@@ -41,6 +42,18 @@ final class H
         Dateien::kopieren($profil ?? self::testprofil(), "$d/profil");
         file_put_contents("$d/profil/VERSION", "1.0.0\n");
         return $d;
+    }
+
+    /** Legt die Bewegungsdateien, die der Bauplan nennt, aus den Probedateien des Musterbuchs in $ordner/bew/ (wie lp/neu.php sie aus einer Vorlage holt). */
+    public static function bewegungen(string $ordner, array $plan): void
+    {
+        $pfade = Bewegung::imPlan($plan);
+        if ($pfade && !is_dir("$ordner/bew")) {
+            mkdir("$ordner/bew", 0700, true);
+        }
+        foreach ($pfade as $pfad) {
+            copy(self::wurzel() . '/lp/musterbuch/' . $pfad, "$ordner/$pfad") || throw new RuntimeException("Probedatei fehlt: $pfad");
+        }
     }
 
     /** Kopie des Testprofils, die ein Test verändern darf. */
