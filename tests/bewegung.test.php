@@ -563,6 +563,20 @@ return [
         T::eq(Bewegung::pruefenText(''), 'json', 'leerer Text: json');
         T::eq(Bewegung::pruefenText(str_repeat('[', 9) . str_repeat(']', 9)), 'json', 'Tiefe 9: json');
         T::eq(Bewegung::pruefenText($beispiel()), null, 'die Beispieldatei ist gültig');
+        // imPlan: nur Namen des Musters aus Feldern vom Typ bewegungsdatei (neu.php und das Musterbuch kopieren genau diese Pfade)
+        $plan = ['bausteine' => [
+            ['typ' => 'bewegung', 'bewegung' => 'bew/gut.bewegung', 'alt' => 'bew/im-alt.bewegung', 'titel' => 'bew/im-titel.bewegung'],
+            ['typ' => 'bewegung', 'bewegung' => '../../etc/passwd'],
+            ['typ' => 'bewegung', 'bewegung' => 'bew/x.php'],
+            ['typ' => 'bewegung', 'bewegung' => 'bew/.htaccess'],
+            ['typ' => 'bewegung', 'bewegung' => "bew/zeilenende.bewegung\n"],
+            ['typ' => 'bewegung', 'bewegung' => 'bew/unter/ordner.bewegung'],
+            ['typ' => 'bewegung', 'bewegung' => ['bew/liste.bewegung']],
+            ['typ' => 'hero', 'titel' => 'bew/im-hero.bewegung'],
+            ['typ' => 'gibtesnicht', 'bewegung' => 'bew/fremd.bewegung'],
+        ]];
+        T::eq(Bewegung::imPlan($plan), ['bew/gut.bewegung'], 'imPlan: nur gültige Namen aus Bewegungsfeldern (nicht aus alt, titel, hero, unbekannten Bausteinen)');
+        T::eq(Bewegung::imPlan([]), [], 'imPlan: leerer Bauplan');
     },
     'BW12 scripts/modell-holen.sh offline (curl-Attrappe): falsche Summe lässt das Ziel unberührt; Ziel im Kit (auch über Link) wird vor dem Anlegen abgelehnt; nur https' => static function (): void {
         $t = T::tmp();

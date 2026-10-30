@@ -295,6 +295,7 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     await bis(page, { laedt: () => meldung(page, 'laedt') }, 5000);   // das Live-Skript wird beim Klick nachgeladen
     pruefe(await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' && await meldung(page, 'laedt'), 'Laden: der Knopf heißt schon „Kamera ausschalten“, der Ladehinweis steht da');
     await page.click('[data-lp-b="kamera"]');
+    await bis(page, { zurueck: async () => await text(page, '[data-lp-b="kamera"]') === 'Kamera starten' }, 5000);   // der Klick geht über import(): erst im nächsten Augenblick
     pruefe(await text(page, '[data-lp-b="kamera"]') === 'Kamera starten' && !(await meldung(page, 'laedt')) && await sichtbar(page, '[data-lp-b="steuerung"]'), 'Laden: ein Klick bricht ab — Knopf wieder „Kamera starten“, Hinweis weg, Beispielbewegung zurück');
     await warte(2200);
     pruefe((await page.evaluate(() => window.__kamera.length)) === 0 && await kameraAus(page), 'Laden: nach dem Abbruch wird die Kamera nie angefragt');
@@ -341,8 +342,9 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     await bis(page, { an: () => kameraAn(page) }, 20000);
     const vorher = await text(page, '[data-lp-b="pause"]');
     await page.focus('.lp-bewegung-figur canvas');
-    for (const t of ['Space', 'Enter', 'ArrowRight', 'Home']) { await page.keyboard.press(t); }
-    pruefe(await text(page, '[data-lp-b="pause"]') === vorher, `Kamera läuft: Leertaste, Enter, Pfeil und Home auf der Leinwand tun nichts (Knopf bleibt „${vorher}“)`);
+    const unveraendert = [];   // nach jeder Taste einzeln: Leertaste und Enter würden sich sonst gegenseitig aufheben
+    for (const t of ['Space', 'Enter', 'ArrowRight', 'Home']) { await page.keyboard.press(t); unveraendert.push(await text(page, '[data-lp-b="pause"]') === vorher); }
+    pruefe(unveraendert.every(Boolean), `Kamera läuft: Leertaste, Enter, Pfeil und Home auf der Leinwand tun nichts (Knopf bleibt „${vorher}“; Taste für Taste: ${unveraendert})`);
     await page.click('[data-lp-b="kamera"]');
     await warte(300);
     const nachher = await text(page, '[data-lp-b="pause"]');
@@ -416,6 +418,7 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
 })().catch((e) => {
   // Ein Abbruch (z. B. ein Knopf, der nie erscheint) zählt als Fehler und nennt zuerst die Prüfungen, die vorher schon rot waren.
   for (const f of fehler) { console.log(`  ✗ ${f}`); }
-  console.log(`  ✗ Abbruch des Tests: ${String((e && e.message) || e).split('\n')[0]}`);
+  const stelle = String((e && e.stack) || '').split('\n').find((z) => z.includes('browser-bewegung.js')) || '';
+  console.log(`  ✗ Abbruch des Tests: ${String((e && e.message) || e).split('\n')[0]} ${stelle.trim()}`);
   process.exit(1);
 });
