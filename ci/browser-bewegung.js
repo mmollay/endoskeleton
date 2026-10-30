@@ -52,11 +52,18 @@ const SPION = (kamera) => `(() => {
   };`}
 })();`;
 const OHNE_WASM = 'delete window.WebAssembly;';
+// Fänger für lp-bewegung:aufnahme am document (kommt nur an, wenn das Ereignis aufsteigt); optional einer davor, der wirft
+const FAENGER = (wirft = false) => `(() => {
+  window.__aufnahmen = [];
+  ${wirft ? "document.addEventListener('lp-bewegung:aufnahme', () => { throw new Error('Fänger kaputt'); });" : ''}
+  document.addEventListener('lp-bewegung:aufnahme', (e) => window.__aufnahmen.push({ ziel: e.target.tagName.toLowerCase() + '.' + e.target.className, steigt: e.bubbles, text: e.detail && e.detail.text }));
+})();`;
 
 // Ein Stand-in für das Erkennungsmodell: liefert bei jedem Kamerabild 33 Punkte. Prüft Aufnehmen, Vorschau und Speichern — nicht die Erkennung.
-// art: ok | wirft (die Erkennung wirft, etwa weil der Grafikkontext verloren ging) | nan (Punkte ohne Zahl). window.__erkannt zählt die Aufrufe.
-const ATTRAPPE = (art = 'ok') => `export const FilesetResolver = { forVisionTasks: async () => ({}) };
-export const PoseLandmarker = { createFromOptions: async () => ({ detectForVideo: (v, ts) => {
+// art: ok | wirft (die Erkennung wirft, etwa weil der Grafikkontext verloren ging) | nan (Punkte ohne Zahl). window.__erkannt zählt die Aufrufe,
+// window.__modellpfade merkt sich, wohin das Live-Skript WASM und Modell schickt (3.64.1: data-lp-modell).
+const ATTRAPPE = (art = 'ok') => `export const FilesetResolver = { forVisionTasks: async (p) => { (window.__modellpfade ||= []).push(p); return {}; } };
+export const PoseLandmarker = { createFromOptions: async (f, o) => (window.__modellpfade.push(o.baseOptions.modelAssetPath), { detectForVideo: (v, ts) => {
   window.__erkannt = (window.__erkannt || 0) + 1;
   ${art === 'wirft' ? "throw new Error('Grafikkontext verloren');" : ''}
   return { landmarks: [Array.from({ length: 33 }, (_, i) => ({ x: ${art === 'nan' ? 'NaN' : '0.5 + 0.2 * Math.sin(ts / 400 + i / 5)'}, y: 0.1 + i * 0.025, z: 0, visibility: 0.9 }))] };
@@ -68,7 +75,7 @@ const LANGSAM_ERLAUBNIS = `(() => { const md = navigator.mediaDevices, g = md.ge
 const LANGSAM_PLAY = `(() => { const p = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function (...a) { return p.apply(this, a).then((r) => new Promise((res) => setTimeout(() => res(r), 800))); }; })();`;
 const VERSTECKEN = () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); };
 
-/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei). */
+/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei), modellOrdner (zweiter Ordner, aus dem Modelldateien kommen: Ziel von data-lp-modell, relativ zur Seite). */
 async function oeffnen(browser, name, optionen = {}) {
   const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
   const page = await kontext.newPage();
@@ -83,14 +90,16 @@ async function oeffnen(browser, name, optionen = {}) {
     aus.anfragen.push(u.pathname);
     const rel = decodeURIComponent(u.pathname).replace(/^\/+/, '');
     const unter = rel.slice(name.length + 1);
-    if (unter.startsWith('modell/')) {
+    const ordner = ['modell/', optionen.modellOrdner].find((o) => o && unter.startsWith(o));
+    if (ordner) {
+      const datei0 = unter.slice(ordner.length);
       if (optionen.modell === 'fehlt') { return r.fulfill({ status: 404, body: '' }); }
-      if (ATTRAPPEN.includes(optionen.modell) && unter === 'modell/vision_bundle.js') {
+      if (ATTRAPPEN.includes(optionen.modell) && datei0 === 'vision_bundle.js') {
         if (optionen.verzoegern) { await warte(optionen.verzoegern); }
         return r.fulfill({ status: 200, contentType: 'text/javascript', body: ATTRAPPE(optionen.modell === 'attrappe' ? 'ok' : optionen.modell) });
       }
-      const datei = path.join(MODELL, unter.slice(7));
-      return SUMMEN.includes(unter.slice(7)) && fs.existsSync(datei) ? r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) }) : r.fulfill({ status: 404, body: '' });
+      const datei = path.join(MODELL, datei0);
+      return SUMMEN.includes(datei0) && fs.existsSync(datei) ? r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) }) : r.fulfill({ status: 404, body: '' });
     }
     if (optionen.datei !== undefined && unter.startsWith('bew/')) {
       return optionen.datei === null ? r.fulfill({ status: 404, body: '' }) : r.fulfill({ status: 200, contentType: 'application/octet-stream', body: optionen.datei });
@@ -130,6 +139,19 @@ async function bis(page, bedingungen, ms = 60000) {
 const kameraAn = async (page) => await text(page, '[data-lp-b="kamera"]') === 'Kamera ausschalten' && await sichtbar(page, '[data-lp-b="aufnehmen"]');
 const kameraAus = (page) => page.evaluate(() => window.__spuren.every((s) => s.readyState === 'ended'));
 const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), s: sessionStorage.length, l: localStorage.length }));
+const SEITE = 'https://lp.test/bewegung--live/';
+const modellpfade = (page) => page.evaluate(() => (window.__modellpfade || []).slice());
+const modellAttribut = (page, wert) => page.evaluate((v) => document.querySelector('.lp-bewegung-figur').setAttribute('data-lp-modell', v), wert);
+/** Prüft Aufnahme-Text mit beiden Kit-Prüfern (JS: lp/bewegung.js, PHP: Bewegung::pruefenText); liefert 'ok' oder die Kennung. */
+function pruefeText(t) {
+  const js = pruefen(JSON.parse(t), Buffer.byteLength(t));
+  const ordner = fs.mkdtempSync(path.join(require('os').tmpdir(), 'bewegung-'));
+  try {
+    fs.writeFileSync(path.join(ordner, 'a.bewegung'), t);
+    const php = execFileSync('php8.2', ['-r', 'require "lp/autoload.php"; echo Endo\\Lp\\Bewegung::pruefenText(file_get_contents(getenv("BEW"))) ?? "ok";'], { cwd: KIT, env: { ...process.env, BEW: path.join(ordner, 'a.bewegung') } }).toString();
+    return js === null && php === 'ok' ? 'ok' : `js=${js} php=${php}`;
+  } finally { fs.rmSync(ordner, { recursive: true, force: true }); }
+}
 
 (async () => {
   const browser = await pw.chromium.launch({ args: PRUEFKAMERA });
@@ -382,6 +404,107 @@ const zugriffe = (page) => page.evaluate(() => ({ z: window.__zugriffe.slice(), 
     pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `Aufnahme: keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
     const zs = await zugriffe(page);
     pruefe(zs.z.length === 0 && zs.s === 0 && zs.l === 0, `Aufnahme: auch nach „Als Datei speichern“ kein Cookie, kein Web-Speicher, keine IndexedDB (${zs.z.join(', ')})`);
+    await w.kontext.close();
+  }
+
+  // Ereignis lp-bewegung:aufnahme (3.64.1): am Ende der Aufnahme, am <figure>, steigt auf, trägt den Text des Downloads; der Download bleibt
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', vorher: FAENGER() });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { an: () => kameraAn(page) }, 20000);
+    pruefe((await page.evaluate(() => window.__aufnahmen.length)) === 0, 'Ereignis: vor und während der Aufnahme kommt keins');
+    await warte(500);
+    await page.click('[data-lp-b="aufnehmen"]');
+    await warte(1500);
+    pruefe((await page.evaluate(() => window.__aufnahmen.length)) === 0, 'Ereignis: mitten in der Aufnahme kommt keins');
+    await page.click('[data-lp-b="aufnehmen"]');
+    const e = await bis(page, { da: () => page.evaluate(() => window.__aufnahmen.length > 0) }, 10000);
+    await warte(600);
+    const ev = await page.evaluate(() => window.__aufnahmen.slice());
+    pruefe(e === 'da' && ev.length === 1, `Ereignis: nach „Stopp“ genau einmal (${e}, ${ev.length})`);
+    pruefe(ev[0] && ev[0].ziel === 'figure.lp-bewegung-figur' && ev[0].steigt === true, `Ereignis: am <figure>, steigt zum document auf (${ev[0] && ev[0].ziel})`);
+    pruefe(ev[0] && typeof ev[0].text === 'string' && pruefeText(ev[0].text) === 'ok', `Ereignis: der Text besteht JS- und PHP-Prüfer (${ev[0] && typeof ev[0].text === 'string' ? pruefeText(ev[0].text) : 'kein Text'})`);
+    pruefe(await meldung(page, 'fertig') && await sichtbar(page, '[data-lp-b="speichern"]') && await kameraAus(page), 'Ereignis: die Seite verhält sich wie bisher (fertig, „Als Datei speichern“ da, Kamera aus)');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-lp-b="speichern"]')]);
+    pruefe(ev[0] && fs.readFileSync(await dl.path(), 'utf8') === ev[0].text, 'Ereignis: der Text ist genau der, den „Als Datei speichern“ enthält');
+    pruefe(JSON.stringify(await modellpfade(page)) === JSON.stringify([SEITE + 'modell/wasm', SEITE + 'modell/pose_landmarker_lite.task']), `Modell ohne data-lp-modell: weiter ../modell/ neben dem Skript (${JSON.stringify(await modellpfade(page))})`);
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `Ereignis: keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Ein Fänger, der wirft, stört weder den zweiten Fänger noch die Seite
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', vorher: FAENGER(true) });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { an: () => kameraAn(page) }, 20000);
+    await warte(400);
+    await page.click('[data-lp-b="aufnehmen"]');
+    await warte(1500);
+    await page.click('[data-lp-b="aufnehmen"]');
+    const e = await bis(page, { da: () => page.evaluate(() => window.__aufnahmen.length > 0) }, 10000);
+    await warte(300);
+    pruefe(e === 'da' && await meldung(page, 'fertig') && await sichtbar(page, '[data-lp-b="speichern"]') && await kameraAus(page), `Werfender Fänger: der zweite Fänger bekommt das Ereignis, die Seite zeigt „fertig“ und den Speichern-Knopf (${e})`);
+    pruefe(w.seitenfehler.length === 1 && w.seitenfehler[0].includes('Fänger kaputt'), `Werfender Fänger: nur sein eigener Fehler (${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+
+  // Höchstdauer: ohne „Stopp“ endet die Aufnahme nach 300 Bildern, und auch dann kommt das Ereignis
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', vorher: FAENGER() });
+    const { page } = w;
+    await page.click('[data-lp-b="kamera"]');
+    await bis(page, { an: () => kameraAn(page) }, 20000);
+    await warte(400);
+    await page.click('[data-lp-b="aufnehmen"]');
+    const e = await bis(page, { da: () => page.evaluate(() => window.__aufnahmen.length > 0) }, 20000);
+    await warte(400);
+    const ev = await page.evaluate(() => window.__aufnahmen.slice());
+    pruefe(e === 'da' && ev.length === 1 && pruefeText(ev[0].text) === 'ok' && JSON.parse(ev[0].text).rahmen.length === 300, `Höchstdauer: ohne Stopp genau ein Ereignis mit 300 Bildern und gültigem Text (${e}, ${ev.length})`);
+    pruefe(await meldung(page, 'fertig') && await kameraAus(page) && await text(page, '[data-lp-b="kamera"]') === 'Kamera starten', 'Höchstdauer: Kamera aus, „fertig“ gezeigt');
+    await w.kontext.close();
+  }
+
+  // Keine Person erkannt / leere Aufnahme: kein Ereignis (es gibt nichts zu übergeben) — nur mit echtem Modell prüfbar, sonst über die Attrappe 'nan'
+  {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'nan', vorher: FAENGER() });
+    await w.page.click('[data-lp-b="kamera"]');
+    await bis(w.page, { an: () => kameraAn(w.page) }, 20000);
+    await warte(400);
+    await w.page.click('[data-lp-b="aufnehmen"]');
+    await warte(1200);
+    await w.page.click('[data-lp-b="aufnehmen"]');
+    await bis(w.page, { hinweis: () => meldung(w.page, 'keinkamera') }, 5000);
+    await warte(300);
+    pruefe((await w.page.evaluate(() => window.__aufnahmen.length)) === 0, 'Ungültige Aufnahme (Punkte ohne Zahl): kein Ereignis');
+    await w.kontext.close();
+  }
+
+  // data-lp-modell (3.64.1): Modellordner der Seite; relativ zur Seite oder absolut, gleiche Herkunft
+  for (const [was, wert, erwartet] of [
+    ['relativ zur Seite', 'eigen/modell/', SEITE + 'eigen/modell/'],
+    ['absoluter Pfad ohne Schrägstrich am Ende', '/bewegung--live/eigen/modell', SEITE + 'eigen/modell/'],
+    ['mit ../ (Standardordner über den Umweg)', 'eigen/../modell/', SEITE + 'modell/'],
+  ]) {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', modellOrdner: 'eigen/modell/' });
+    await modellAttribut(w.page, wert);
+    await w.page.click('[data-lp-b="kamera"]');
+    const e = await bis(w.page, { an: () => kameraAn(w.page), hinweis: () => meldung(w.page, 'keinkamera') }, 20000);
+    const pfade = await modellpfade(w.page);
+    pruefe(e === 'an' && JSON.stringify(pfade) === JSON.stringify([erwartet + 'wasm', erwartet + 'pose_landmarker_lite.task']), `data-lp-modell (${was}): Skript, WASM und Modell kommen aus ${erwartet} (${e}, ${pfade.join(' ')})`);
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `data-lp-modell (${was}): keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+  // unsichere Werte werden verworfen: der Standard gilt, nichts geht an einen fremden Host (auch nicht ein gleicher Pfad mit Anfrageteil)
+  for (const wert of ['javascript:alert(1)', 'data:text/javascript,export const FilesetResolver = {}', 'https://fremd.test/modell/', '//fremd.test/modell/', '/\\fremd.test/modell/', 'eigen/modell/?x=1', 'eigen/modell/#a', 'eigen/%2e%2e/modell/', 'eigen/mo dell/']) {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'echt', modell: 'attrappe', modellOrdner: 'eigen/modell/' });
+    await modellAttribut(w.page, wert);
+    await w.page.click('[data-lp-b="kamera"]');
+    const e = await bis(w.page, { an: () => kameraAn(w.page), hinweis: () => meldung(w.page, 'keinkamera') }, 20000);
+    const pfade = await modellpfade(w.page);
+    pruefe(e === 'an' && JSON.stringify(pfade) === JSON.stringify([SEITE + 'modell/wasm', SEITE + 'modell/pose_landmarker_lite.task']), `data-lp-modell="${wert}": verworfen, der Standard ../modell/ gilt (${e}, ${pfade.join(' ')})`);
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0, `data-lp-modell="${wert}": keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
     await w.kontext.close();
   }
 

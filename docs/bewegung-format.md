@@ -121,6 +121,32 @@ Kamera aus und es erscheint der Hinweis, dass die Kamera hier nicht verfügbar i
 `nicht_leer`). Der Knopftext soll das Wort „Kamera“ enthalten, damit der Besucher weiß, was der Klick auslöst — das steht als Hinweis in
 `lp/werkstatt.md`, nicht als Zwang.
 
+### Aufnahme an die eigene Seite übergeben (seit 3.64.1)
+
+Eine Seite, die die Aufnahme selbst weiterverwendet (etwa ein Verwaltungsbereich, der sie auf dem eigenen Server ablegt), braucht den Umweg über den
+Download nicht. Zwei Hilfen, beide optional — **ohne sie ändert sich nichts**, der Knopf „Als Datei speichern“ bleibt:
+
+- **Ereignis `lp-bewegung:aufnahme`:** Am Ende einer Aufnahme (nach „Stopp“ oder nach der Höchstdauer von 300 Bildern), wenn sie den Formatprüfer besteht
+  und die Vorschau läuft, sendet der Baustein am `<figure class="lp-bewegung-figur">` ein `CustomEvent` mit `bubbles: true` und
+  `detail: { text }`. `text` ist **genau** die Datei, die „Als Datei speichern“ schreiben würde (Format „bewegung v1“, höchstens 300 000 Byte). Bei
+  „keine Person erkannt“, bei einem Fehler und beim Abbruch kommt **kein** Ereignis. Ein Fänger, der wirft, stört die Seite nicht. Der Server darf dem Text
+  nicht vertrauen: `Endo\Lp\Bewegung::pruefenText($text)` prüft ihn dort noch einmal.
+- **Attribut `data-lp-modell="<Ordner>"`** am selben `<figure>`: der Ordner mit den Modelldateien (Tabelle unten), wenn er nicht `../modell/` neben dem Skript
+  ist. Erlaubt sind nur gewöhnliche Pfade derselben Herkunft aus `A–Z a–z 0–9 . _ ~ / -`, relativ zur Seite (`modell/`, `../modell/`) oder absolut
+  (`/js/modell/`); ein fehlender Schrägstrich am Ende wird ergänzt. Alles andere (Schema wie `javascript:`, `data:`, `https:`, `//host/…`, `\`, Anfrageteil `?`,
+  `#`, `%`-Codes, Leerraum) wird **still verworfen** und der Standard gilt. Der Baukasten schreibt das Attribut nicht selbst; es ist für eigene Seiten gedacht.
+
+Ein Fänger in sechs Zeilen (die Seite trägt dazu einen `<figure data-lp-bewegung=… data-lp-modus="live" data-lp-modell="/js/modell/">` im Aufbau des Bausteins):
+
+```js
+// Die Aufnahme geht an den eigenen Server – nicht an Dritte, nicht in den Web-Speicher
+document.addEventListener('lp-bewegung:aufnahme', (e) => {
+  const formular = new FormData();
+  formular.append('datei', new Blob([e.detail.text], { type: 'application/json' }), 'aufnahme.bewegung');
+  fetch('/aufnahmen/annehmen', { method: 'POST', body: formular });
+});
+```
+
 ### Modelldateien (`modell/`)
 
 `scripts/modell-holen.sh [Zielordner]` lädt das npm-Archiv (Prüfsumme sha512) und das Modell mit fester Version, packt genau sieben Dateien aus

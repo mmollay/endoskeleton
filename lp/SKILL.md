@@ -99,7 +99,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.64.0)
+## Bausteine (Katalog 3.64.1)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -350,7 +350,7 @@ Varianten: `akzent`, `schlicht` · seit 3.51.0, geändert 3.51.0
 
 ### `bewegung` — Bewegung
 
-Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.0 · Variante `live` höchstens 1-mal
+Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.1 · Variante `live` höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|

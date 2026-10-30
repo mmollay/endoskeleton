@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.64.1] — 2026-10-30
+
+### Added
+- **Kamera-Vorführung („bewegung“, Variante `live`): die fertige Aufnahme geht als Ereignis an die Seite** (Anlass: ein Verwaltungsbereich soll die Aufnahme ohne Umweg über den Download-Ordner ablegen; Bahn S0). Am Ende einer Aufnahme (nach „Stopp“ oder nach der Höchstdauer von 300 Bildern), wenn sie den Formatprüfer besteht, sendet `lp/bewegung-live.js` am `<figure class="lp-bewegung-figur">` ein `CustomEvent` **`lp-bewegung:aufnahme`** (`bubbles: true`, `detail: { text }`). `text` ist genau die Datei, die „Als Datei speichern“ schreibt. Bei „keine Person erkannt“, bei einem Fehler und beim Abbruch kommt kein Ereignis. **Ohne Fänger ändert sich nichts**: der Knopf „Als Datei speichern“ bleibt, das Kit sendet weiterhin nichts selbst.
+- **Optionales Attribut `data-lp-modell="<Ordner>"` am `<figure>`:** Ordner der Modelldateien (MediaPipe-Modell und WASM), wenn er nicht `../modell/` neben dem Skript ist. Erlaubt sind nur gewöhnliche Pfade derselben Herkunft aus `A–Z a–z 0–9 . _ ~ / -`, relativ zur Seite oder absolut; alles andere (`javascript:`, `data:`, `https:`, `//host/…`, `\`, `?`, `#`, `%`-Codes, Leerraum) wird still verworfen, und es gilt der Standard. Ohne das Attribut bleibt alles wie in 3.64.0. Der Baukasten schreibt es nicht selbst (kein Katalogfeld); es ist für eigene Seiten gedacht.
+- **Neue Funktion `modellordner(wert, seite, standard)`** (Export von `lp/bewegung-live.js`, rein, ohne Browserzugriff) für die Pfadregeln; das Modell wird je Ordner einmal geladen (vorher: einmal je Seitenaufruf).
+- **Doku:** `docs/bewegung-format.md`, Abschnitt „Aufnahme an die eigene Seite übergeben“ mit einem Fänger in sechs Zeilen. Keine neue `lp-`-Klasse, keine neue Abhängigkeit.
+
+### Changed
+- **Baustein „bewegung“ ist als „geändert 3.64.1“ vermerkt** (nur das Live-Skript; Katalogfelder, Aufbau und CSS sind unverändert). `lp/SKILL.md`, `lp/werkstatt.md` und das Musterbuch sind neu gebaut (Versionsmarke, `es/bewegung-live.js`).
+- **Tests:** neu `BW13` in `tests/bewegung.test.php` (Quelltext, Pfadregeln von `modellordner()` mit 27 Werten über node, Doku); `ci/browser-bewegung.js` prüft im Browser: Ereignis nach „Stopp“ (genau einmal, am `<figure>`, steigt auf, Text besteht JS- und PHP-Prüfer und ist gleich dem Download), nach der Höchstdauer, nicht bei ungültiger Aufnahme, ein werfender Fänger stört nicht, `data-lp-modell` (relativ, absolut, ohne Schrägstrich am Ende) bestimmt die Pfade für Skript, WASM und Modell, neun unsichere Werte werden verworfen, ohne Attribut gilt `../modell/`.
+
 ## [3.64.0] — 2026-10-30
 
 ### Added

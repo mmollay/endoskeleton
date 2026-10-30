@@ -1,31 +1,47 @@
-/* SSI Endoskeleton 3.64.0 — Kamera-Vorführung des Bausteins „bewegung“ (Variante live). Wird erst nach dem Klick auf „Kamera starten“ geladen
+/* SSI Endoskeleton 3.64.1 — Kamera-Vorführung des Bausteins „bewegung“ (Variante live). Wird erst nach dem Klick auf „Kamera starten“ geladen
    (lp/bewegung.js importiert es). Erkennt den Körper mit MediaPipe Pose Landmarker (Apache-2.0), Modell und WASM liegen im Seitenordner unter
    modell/ (scripts/modell-holen.sh) — kein CDN. Das Kamerabild wird nur auf eine Leinwand gezeichnet: nichts wird hochgeladen, nichts im
    Browser gespeichert (kein Cookie, kein Web-Speicher), das <video> hängt nie im Dokument. Aufgenommen werden nur Körperpunkte (Format
-   „bewegung v1“, docs/bewegung-format.md), Augen und Mund nie. Ohne Kamera, Erlaubnis, WebGL oder WASM: Hinweis, die Beispielbewegung läuft weiter. */
-const WURZEL = new URL('../modell/', import.meta.url).href;
+   „bewegung v1“, docs/bewegung-format.md), Augen und Mund nie. Ohne Kamera, Erlaubnis, WebGL oder WASM: Hinweis, die Beispielbewegung läuft weiter.
+   Seit 3.64.1 für Seiten, die die Aufnahme selbst weiterverwenden: am Ende einer Aufnahme geht am <figure> das Ereignis lp-bewegung:aufnahme
+   (detail.text = die fertige .bewegung-Datei), und das Attribut data-lp-modell nennt einen anderen Modellordner. Das Kit selbst sendet nichts. */
+const STANDARD = new URL('../modell/', import.meta.url).href;
 const FPS = 30;
 const MAX_BILDER = 300;                                    // 10 s bei 30 Bildern je Sekunde
 const ABBRUCH = new Error('abgebrochen');                  // Klick oder Tab-Wechsel, während noch geladen wird: leise zurück zum Ausgang
 const zustaende = new WeakMap();
-let erkenner = null;
+const erkenner = new Map();                                 // je Modellordner einmal geladen
 
 const runden = (v, n) => Math.round(v * 10 ** n) / 10 ** n;
 const klemme = (v) => Math.min(1, Math.max(0, v));
 
-/** Modell und WASM vom eigenen Server laden (einmal je Seitenaufruf); Grafikkarte zuerst, sonst Prozessor. */
-function laden() {
-  erkenner ||= (async () => {
-    const { FilesetResolver, PoseLandmarker } = await import(WURZEL + 'vision_bundle.js');
-    const dateien = await FilesetResolver.forVisionTasks(WURZEL + 'wasm');
-    const optionen = (delegate) => ({ baseOptions: { modelAssetPath: WURZEL + 'pose_landmarker_lite.task', delegate }, runningMode: 'VIDEO', numPoses: 1 });
-    try {
-      return await PoseLandmarker.createFromOptions(dateien, optionen('GPU'));
-    } catch (e) {
-      return await PoseLandmarker.createFromOptions(dateien, optionen('CPU'));
-    }
-  })().catch((e) => { erkenner = null; throw e; });
-  return erkenner;
+/** Modellordner: der Wert von data-lp-modell, wenn er ein gewöhnlicher Pfad derselben Herkunft ist (relativ zur Seite oder absolut, nur A–Z a–z 0–9 . _ ~ / -),
+    sonst der Standard. Kein Schema (javascript:, data:, https:), kein Anfrageteil, kein %-Code, kein Leerraum; „//host/…“ wird wegen der Herkunft verworfen. */
+export function modellordner(wert, seite, standard) {
+  if (!wert || !/^[A-Za-z0-9._~\/-]+$/.test(wert)) return standard;
+  try {
+    const u = new URL(wert, seite);
+    return u.origin === new URL(seite).origin ? u.href.replace(/\/?$/, '/') : standard;
+  } catch (e) {
+    return standard;
+  }
+}
+
+/** Modell und WASM vom eigenen Server laden (einmal je Seitenaufruf und Ordner); Grafikkarte zuerst, sonst Prozessor. */
+function laden(wurzel) {
+  if (!erkenner.has(wurzel)) {
+    erkenner.set(wurzel, (async () => {
+      const { FilesetResolver, PoseLandmarker } = await import(wurzel + 'vision_bundle.js');
+      const dateien = await FilesetResolver.forVisionTasks(wurzel + 'wasm');
+      const optionen = (delegate) => ({ baseOptions: { modelAssetPath: wurzel + 'pose_landmarker_lite.task', delegate }, runningMode: 'VIDEO', numPoses: 1 });
+      try {
+        return await PoseLandmarker.createFromOptions(dateien, optionen('GPU'));
+      } catch (e) {
+        return await PoseLandmarker.createFromOptions(dateien, optionen('CPU'));
+      }
+    })().catch((e) => { erkenner.delete(wurzel); throw e; }));
+  }
+  return erkenner.get(wurzel);
 }
 
 /** Ein Bild des Formats: x, y, Sichtbarkeit je Punkt; Gesichtspunkte und unsichtbare Punkte sind 0, 0, 0. */
@@ -113,6 +129,7 @@ function bauen(c) {
       c.sp.setze(JSON.parse(text), c.still);
       sichern.hidden = false;
       c.melde('fertig');
+      c.fig.dispatchEvent(new CustomEvent('lp-bewegung:aufnahme', { bubbles: true, detail: { text } }));   // für Seiten, die die Aufnahme selbst übernehmen; ohne Fänger geschieht nichts
     } catch (e) {
       zurueck('keinkamera');
     }
@@ -162,7 +179,7 @@ function bauen(c) {
       steuerung.hidden = sichern.hidden = true;
       umText(knopf, true);                                 // „Kamera ausschalten“ gilt auch während des Ladens: ein Klick bricht ab
       c.melde('laedt');
-      lm = await laden();
+      lm = await laden(modellordner(c.fig.getAttribute('data-lp-modell'), document.baseURI, STANDARD));
       weiter();
       if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) throw new Error('keine Kamera');
       strom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });

@@ -15,6 +15,7 @@
  *   BW10 Player und Live-Skript: klein, keine Fremdadresse, kein Speicher im Browser, kein Cookie; CSS nur Tokens
  *   BW11 Bewegung::modell(), fehlt() und pruefenText() mit eigener Summenliste (richtige Summe, Link, kein Ordner, nicht lesbar)
  *   BW12 scripts/modell-holen.sh offline (curl-Attrappe): falsche Summe lässt das Ziel unberührt, Ziel im Kit wird vor dem Anlegen abgelehnt
+ *   BW13 (3.64.1) Ereignis lp-bewegung:aufnahme und Attribut data-lp-modell: Quelltext, Pfadregeln von modellordner() (node), Doku
  */
 
 declare(strict_types=1);
@@ -685,5 +686,43 @@ SH);
         $vorher = $leer("$kit/scripts");
         [$rc] = $lauf($kit, "$t/ziel-link", $tgz, $task, "$t/log-kit3");
         T::ok($rc !== 0 && $leer("$kit/scripts") === $vorher && !file_exists("$t/log-kit3"), 'modell/ als Link ins Kit: abgelehnt, das Kit bleibt unverändert');
+    },
+    'BW13 Ereignis lp-bewegung:aufnahme und Attribut data-lp-modell (3.64.1): Quelltext, Pfadregeln von modellordner() in node, Doku' => static function (): void {
+        $w = H::wurzel();
+        $live = (string) file_get_contents("$w/lp/bewegung-live.js");
+        T::contains($live, "'lp-bewegung:aufnahme'", 'Live-Skript sendet das Ereignis lp-bewegung:aufnahme');
+        T::contains($live, 'bubbles: true', 'Ereignis steigt auf (ein Fänger weiter oben genügt)');
+        T::contains($live, 'detail: { text }', 'detail trägt den vollständigen Text, denselben wie der Download');
+        T::contains($live, "getAttribute('data-lp-modell')", 'Modellordner kommt aus data-lp-modell am <figure>');
+        T::contains($live, "'../modell/'", 'Standard bleibt ../modell/ neben dem Skript');
+        // Pfadregeln: nur gewöhnliche relative oder absolute Pfade derselben Herkunft; alles andere verwirft den Wert und der Standard gilt
+        $std = 'https://seite.test/standard/modell/';
+        $faelle = [
+            [null, $std], ['', $std],
+            ['modell/', 'https://seite.test/lp/a/modell/'], ['modell', 'https://seite.test/lp/a/modell/'], ['./eigen/modell/', 'https://seite.test/lp/a/eigen/modell/'],
+            ['../x/modell/', 'https://seite.test/lp/x/modell/'], ['/js/bewegungen-modell/', 'https://seite.test/js/bewegungen-modell/'], ['/js/bewegungen-modell', 'https://seite.test/js/bewegungen-modell/'],
+            ['/', 'https://seite.test/'], ['//', $std], ['///fremd.test/modell/', $std],
+            ['javascript:alert(1)//', $std], ['data:text/javascript,1', $std], ['https://fremd.test/modell/', $std], ['http://seite.test/modell/', $std],
+            ['//fremd.test/modell/', $std], ['\\\\fremd.test\\modell', $std], ['/\\fremd.test/modell/', $std], ['@fremd.test/', $std], ['blob:https://seite.test/x', $std],
+            ['/modell/?x=1', $std], ['/modell/#a', $std], ['/mo dell/', $std], [' /modell/', $std], ["/modell/\n", $std], ['/modell/%2e%2e/', $std], ["/mo\x00dell/", $std],
+        ];
+        $t = T::tmp();
+        copy("$w/lp/bewegung-live.js", "$t/live.mjs");
+        file_put_contents("$t/lauf.mjs", <<<'JS'
+import { readFileSync } from 'node:fs';
+import { modellordner } from './live.mjs';
+const faelle = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+process.stdout.write(JSON.stringify(faelle.map(([wert]) => modellordner(wert, 'https://seite.test/lp/a/index.html', 'https://seite.test/standard/modell/'))));
+JS);
+        file_put_contents("$t/faelle.json", json_encode($faelle, JSON_THROW_ON_ERROR));
+        exec('node ' . escapeshellarg("$t/lauf.mjs") . ' ' . escapeshellarg("$t/faelle.json") . ' 2>&1', $aus, $rc);
+        $js = json_decode(implode("\n", $aus), true);
+        T::ok(is_array($js), 'node liefert JSON (Rückgabe ' . $rc . '): ' . substr(implode(' ', $aus), 0, 200));
+        foreach ($faelle as $i => [$wert, $soll]) {
+            T::eq($js[$i] ?? null, $soll, 'modellordner(' . json_encode($wert, JSON_UNESCAPED_SLASHES) . ')');
+        }
+        $doku = (string) file_get_contents("$w/docs/bewegung-format.md");
+        T::contains($doku, 'lp-bewegung:aufnahme', 'Doku nennt das Ereignis');
+        T::contains($doku, 'data-lp-modell', 'Doku nennt das Attribut');
     },
 ];

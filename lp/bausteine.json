@@ -1,5 +1,5 @@
 {
-  "version": "3.64.0",
+  "version": "3.64.1",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -227,7 +227,7 @@
       }
     },
     "bewegung": {
-      "name": "Bewegung", "seit": "3.64.0", "geaendert": "3.64.0",
+      "name": "Bewegung", "seit": "3.64.0", "geaendert": "3.64.1",
       "klassen": {
         "lp-bewegung": "3.64.0", "lp-bewegung--wiedergabe": "3.64.0", "lp-bewegung--live": "3.64.0", "lp-bewegung-text": "3.64.0",
         "lp-bewegung-figur": "3.64.0", "lp-bewegung-beschriftung": "3.64.0", "lp-bewegung-leiste": "3.64.0", "lp-bewegung-wahl": "3.64.0",
