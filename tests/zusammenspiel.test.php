@@ -57,7 +57,7 @@ return [
         T::contains($js, "form.querySelector(geschlossen ? '.lp-anmeldung-geschlossen' : meldungen[zustand])", 'geschlossen: die eigene Meldung ersetzt den Fehlertext');
         T::contains($js, "if (zustand !== 'fehler' || geschlossen) { form.querySelector('fieldset').hidden = true; }", 'geschlossen: die Felder (mit dem zweiten Häkchen) verschwinden');
         // 3.56.0 / 3.57.0
-        foreach (['aufruf', 'formular', 'absenden', 'verlassen'] as $art) {
+        foreach (['aufruf', 'formular', 'absenden', 'verlassen', 'da'] as $art) {
             T::contains($js, "melden('$art'", "Beacon: Art „{$art}“ wird gesendet");
         }
         T::contains($js, "if (!rueckmeldung) { document.addEventListener('visibilitychange', sichtbar); sichtbar(); }", 'Beacon: die Rückkehrseite einer Rückmeldung (auch „geschlossen“) zählt keinen aufruf');

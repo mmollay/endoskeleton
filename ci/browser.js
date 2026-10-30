@@ -622,7 +622,7 @@ function kontrastImBrowser(nur) {
       pruefe(art(beacons).join() === 'aufruf', `Statistik: beim Laden genau ein aufruf (${art(beacons)})`);
       const liste = await page.evaluate(() => document.querySelector('input[name="liste"]').value);
       const a = beacons[0] ? JSON.parse(beacons[0].text) : {};
-      pruefe(a.v === 1 && a.liste === liste && a.liste !== '' && a.pfad === '/anmeldung--karte/' && a.ref === '' && a.breite === 390, `Statistik: Felder des aufruf (${beacons[0] && beacons[0].text})`);
+      pruefe(a.v === 2 && a.liste === liste && a.liste !== '' && a.pfad === '/anmeldung--karte/' && a.ref === '' && a.breite === 390, `Statistik: Felder des aufruf (${beacons[0] && beacons[0].text})`);
       pruefe(a.utm && a.utm.quelle === 'Insta gramb' && a.utm.medium === 'social' && a.utm.kampagne === 'a'.repeat(60), `Statistik: UTM bereinigt und auf 60 Zeichen gekürzt (${JSON.stringify(a.utm)})`);
       pruefe(Object.keys(a).sort().join() === 'art,breite,liste,pfad,ref,utm,v' && Object.keys(a.utm || {}).sort().join() === 'kampagne,medium,quelle', 'Statistik: genau die Felder des Vertrags');
       pruefe(beacons[0] && beacons[0].adresse === 'https://beispiel.invalid/treffer', `Statistik: Adresse aus dem Formularziel abgeleitet (${beacons[0] && beacons[0].adresse})`);
@@ -773,7 +773,7 @@ function kontrastImBrowser(nur) {
       await kontext.close();
     }
 
-    // Verlassen (3.57.0): eine Meldung je Seitenaufruf mit sichtbarer Zeit (ganze Sekunden, 0–3600) und weitester Scrolltiefe
+    // Verlassen (3.57.0, mehrfach seit 3.65.0): bei jedem Verstecken eine Meldung mit der sichtbaren Zeit seit dem letzten Senden (ganze Sekunden, mindestens 1, zusammen höchstens 3600) und der weitesten Scrolltiefe
     const verlassene = (b) => b.map((x) => JSON.parse(x.text)).filter((m) => m.art === 'verlassen');
     const TIEFEN = [0, 25, 50, 75, 100];
 
@@ -791,18 +791,20 @@ function kontrastImBrowser(nur) {
       const m = verlassene(beacons)[0] || {};
       const liste = await page.evaluate(() => document.querySelector('input[name="liste"]').value);
       pruefe(Object.keys(m).sort().join() === 'art,breite,dauer,liste,pfad,ref,tiefe,utm,v', `Verlassen: genau die Felder des Vertrags (${Object.keys(m).sort()})`);
-      pruefe(m.v === 1 && m.liste === liste && m.liste !== '' && m.pfad === '/anmeldung--karte/' && m.ref === '' && m.breite === 390 && m.utm && m.utm.quelle === 'mail', `Verlassen: derselbe Rahmen wie aufruf (${beacons[1] && beacons[1].text})`);
+      pruefe(m.v === 2 && m.liste === liste && m.liste !== '' && m.pfad === '/anmeldung--karte/' && m.ref === '' && m.breite === 390 && m.utm && m.utm.quelle === 'mail', `Verlassen: derselbe Rahmen wie aufruf (${beacons[1] && beacons[1].text})`);
       pruefe(Number.isInteger(m.dauer) && m.dauer >= 12 && m.dauer <= 14, `Verlassen: 12 Sekunden sichtbar → dauer 12 (${m.dauer})`);
       pruefe(TIEFEN.includes(m.tiefe), `Verlassen: tiefe aus 0|25|50|75|100 (${m.tiefe})`);
       pruefe(beacons[1] && beacons[1].adresse === 'https://beispiel.invalid/treffer' && beacons[1].methode === 'POST' && beacons[1].typ.startsWith('text/plain'), `Verlassen: POST als text/plain an dieselbe Adresse (${beacons[1] && beacons[1].adresse})`);
       pruefe(beacons.every((b) => b.text.length < 1000 && Object.values(JSON.parse(b.text)).every((w) => JSON.stringify(w).length < 400)), 'Verlassen: Nachricht unter 1 KB, jedes Feld unter 400 Zeichen');
-      // Rückkehr aus dem Zurück-Zwischenspeicher: wie bei aufruf kein neuer Seitenaufruf, also keine zweite Meldung
+      // Rückkehr aus dem Zurück-Zwischenspeicher: kein neuer Seitenaufruf (kein zweiter aufruf), aber die 5 Sekunden danach kommen als zweites verlassen (Delta, nicht 17)
       await page.evaluate(() => { window.__zeigen(); window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })); });
       await page.clock.fastForward(5000);
       await gehen(page);
       await page.evaluate(() => window.__verstecken());
       await warten(page);
-      pruefe(art(beacons).join() === 'aufruf,verlassen', `Verlassen: Rückkehr aus dem Zwischenspeicher zählt nichts Neues (${art(beacons)})`);
+      pruefe(art(beacons).join() === 'aufruf,verlassen,verlassen', `Verlassen: Rückkehr aus dem Zwischenspeicher zählt keinen neuen aufruf, aber ein zweites verlassen (${art(beacons)})`);
+      const zweites = verlassene(beacons)[1] || {};
+      pruefe(zweites.dauer >= 5 && zweites.dauer <= 7 && zweites.v === 2, `Verlassen: das zweite verlassen trägt nur die 5 Sekunden seit dem letzten Senden (${zweites.dauer})`);
       const spur = await page.evaluate(() => ({ zugriffe: window.__zugriffe.slice(), cookie: document.cookie }));
       pruefe(spur.zugriffe.length === 0 && spur.cookie === '' && (await kontext.cookies()).length === 0, `Verlassen: keine Cookies, kein Web-Speicher, kein IndexedDB (${spur.zugriffe})`);
       await page.evaluate(() => { sessionStorage.getItem('probe'); });
@@ -827,7 +829,53 @@ function kontrastImBrowser(nur) {
       await gehen(page);
       await page.evaluate(() => window.__verstecken());
       await warten(page);
-      pruefe(verlassene(beacons).length === 1, `Verlassen: nach dem Zurückkehren kein zweites verlassen (${verlassene(beacons).length})`);
+      pruefe(art(beacons).join() === 'aufruf,verlassen,verlassen', `Verlassen: nach dem Zurückkehren ein zweites verlassen, kein neuer aufruf, kein da (${art(beacons)})`);
+      const d2 = (verlassene(beacons)[1] || {}).dauer;
+      pruefe(d2 >= 5 && d2 <= 7, `Verlassen: das zweite verlassen zählt nur die 5 Sekunden seit dem letzten Senden (${d2})`);
+      await kontext.close();
+    }
+
+    // „da“ (v2): nach über 60 s Abwesenheit meldet sich die zurückgekehrte Seite einmal — ohne Zahlen, ohne neuen aufruf; nach kürzerer Abwesenheit nicht
+    for (const [weg, erwartet] of [[30000, 'aufruf,verlassen,verlassen'], [61000, 'aufruf,verlassen,da,verlassen']]) {
+      const { page, kontext, beacons, fremd } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR], uhr: '2026-10-30T10:00:00', hoehe: 400 });
+      await warten(page);
+      await page.evaluate(() => window.__zeigen());
+      await page.clock.fastForward(4000);
+      await page.evaluate(() => window.__verstecken());
+      await page.clock.fastForward(weg);
+      await page.evaluate(() => { window.__zeigen(); window.__zeigen(); });
+      await page.clock.fastForward(3000);
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      pruefe(art(beacons).join() === erwartet, `Da: ${weg / 1000} s weg → ${erwartet} (${art(beacons)})`);
+      if (weg > 60000) {   // eine zweite lange Abwesenheit meldet sich wieder (da ist nicht „einmal je Seitenaufruf“)
+        await page.clock.fastForward(62000);
+        await page.evaluate(() => window.__zeigen());
+        await warten(page);
+        pruefe(art(beacons).join() === erwartet + ',da', `Da: nach einer zweiten Abwesenheit von 62 s ein zweites da (${art(beacons)})`);
+      }
+      const da = beacons.map((b) => JSON.parse(b.text)).find((m) => m.art === 'da');
+      if (weg > 60000) {
+        pruefe(da && da.v === 2 && !('dauer' in da) && !('tiefe' in da) && da.liste !== '' && da.pfad === '/anmeldung--karte/', `Da: Rahmen wie aufruf, ohne dauer und tiefe (${JSON.stringify(da)})`);
+        const letztes = verlassene(beacons)[1] || {};
+        pruefe(letztes.dauer >= 3 && letztes.dauer <= 5, `Da: das verlassen danach zählt nur die 3 Sekunden seit der Rückkehr (${letztes.dauer})`);
+      }
+      pruefe(beacons.every((b) => b.text.length <= 2048) && fremd.length === 0, 'Da: jede Nachricht höchstens 2 KB, keine Fremdanfrage');
+      await kontext.close();
+    }
+
+    // Die Rückkehrseite einer Anmeldung (?anmeldung=…) zählt nichts: auch kein da, wenn man nach langer Pause zurückkommt
+    {
+      const { page, kontext, beacons } = await oeffnen(browser, 'anmeldung--karte', 390, { init: [UNSICHTBAR], uhr: '2026-10-30T10:00:00', suche: '?anmeldung=ok' });
+      await warten(page);
+      await page.evaluate(() => window.__zeigen());
+      await page.clock.fastForward(5000);
+      await page.evaluate(() => window.__verstecken());
+      await page.clock.fastForward(90000);
+      await page.evaluate(() => window.__zeigen());
+      await page.evaluate(() => window.__verstecken());
+      await warten(page);
+      pruefe(beacons.length === 0, `Da: die Rückkehrseite einer Anmeldung sendet nichts, auch kein da (${art(beacons)})`);
       await kontext.close();
     }
 

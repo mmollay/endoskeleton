@@ -75,8 +75,21 @@ const ergebnis = {
   dauerGrenze: lauf({ ablauf: (s) => { s.zeit(9_000_000); s.feuer('w', 'pagehide'); } }),
   groesstFall: lauf({
     pfad: '/' + 'x'.repeat(2000), referrer: 'https://' + 'h'.repeat(300) + '.example/', suche: '?utm_source=' + 'q'.repeat(500) + '&utm_medium=' + 'm'.repeat(500) + '&utm_campaign=' + 'k'.repeat(500), breite: 20000,
-    ablauf: gehen,
+    ablauf: (s) => { gehen(s); s.sichtbar(false); s.zeit(61000); s.sichtbar(true); s.zeit(2000); s.feuer('w', 'pagehide'); },   // aufruf, verlassen, da, verlassen
   }),
+  // Vertrag v2, Teil 1 (3.65.0): mehrfaches Verlassen (Delta seit dem letzten Senden), „da“ nach über 60 s Abwesenheit
+  mehrfach: lauf({ ablauf: (s) => { s.sichtbar(false); s.sichtbar(true); s.zeit(5000); s.sichtbar(false); } }),                    // aufruf, verlassen 1 (sofort), verlassen 5
+  deltaNichtGesamt: lauf({ ablauf: (s) => { s.zeit(10000); s.sichtbar(false); s.sichtbar(true); s.zeit(3000); s.sichtbar(false); } }),                  // verlassen 10, verlassen 3 (nicht 13)
+  hiddenDannPagehide: lauf({ ablauf: (s) => { s.zeit(3000); s.sichtbar(false); s.feuer('w', 'pagehide'); s.sichtbar(false); } }),  // wie beim Seitenwechsel: ein einziges verlassen
+  daGrenze: lauf({ ablauf: (s) => { s.sichtbar(false); s.zeit(60000); s.sichtbar(true); } }),                                       // genau 60 s sind nicht „über 60 s“: kein da
+  kurzWeg: lauf({ ablauf: (s) => { s.sichtbar(false); s.zeit(30000); s.sichtbar(true); s.zeit(1000); s.sichtbar(false); } }),
+  da: lauf({ ablauf: (s) => { s.sichtbar(false); s.zeit(61000); s.sichtbar(true); s.sichtbar(true); s.zeit(2000); s.sichtbar(false); } }),   // aufruf, verlassen, da (einmal), verlassen 2
+  daNachPagehide: lauf({ ablauf: (s) => { s.feuer('w', 'pagehide'); s.zeit(90000); s.sichtbar(true); } }),                         // Rückkehr aus dem Zwischenspeicher: da, kein neuer aufruf
+  unsichtbarDannSichtbar: lauf({ sichtbar: false, ablauf: (s) => { s.zeit(100000); s.sichtbar(true); s.zeit(2000); s.sichtbar(false); } }),   // der erste Wechsel ist der aufruf, kein da
+  tiefeBleibt: lauf({ hoehe: 4000, ablauf: (s) => { s.scrollen(1800); s.sichtbar(false); s.sichtbar(true); s.scrollen(0); s.sichtbar(false); s.sichtbar(true); s.scrollen(3100); s.sichtbar(false); } }),   // 75, 75, 100
+  summeGrenze: lauf({ ablauf: (s) => { s.zeit(5_000_000); s.sichtbar(false); s.sichtbar(true); s.zeit(2_000_000); s.sichtbar(false); s.sichtbar(true); s.zeit(10000); s.sichtbar(false); } }),   // 3600, danach nichts mehr dazu
+  ohneAufrufKeinDa: lauf({ sichtbar: false, ablauf: (s) => { s.sichtbar(false); s.zeit(90000); s.sichtbar(false); } }),
+  aus2: lauf({ dnt: '1', ablauf: (s) => { s.sichtbar(false); s.zeit(90000); s.sichtbar(true); } }),
   beaconWirft: lauf({ beacon: 'wirft', ablauf: gehen }),
   beaconFehlt: lauf({ beacon: 'fehlt', ablauf: gehen }),
   fremd: Object.fromEntries(['develop.beispiel.test', 'localhost', 'beispiel.test.example', 'xbeispiel.test', 'www.www.beispiel.test', 'beispiel.example', ''].map((host) => [host, lauf({ host, ablauf: gehen })])),

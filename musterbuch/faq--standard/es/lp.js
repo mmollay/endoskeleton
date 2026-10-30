@@ -148,33 +148,39 @@
   // kommt aus dem Formularziel (…/lp/anmelden → …/lp/treffer); eine Seite ohne Anmeldeformular sendet nichts. Do Not Track,
   // Global Privacy Control und data-lp-statistik="aus" am body schalten die Messung ab. Jeder Fehler wird verschluckt. Das
   // Absenden zählt erst, wenn die Prüfung oben es durchgelassen hat (dieser Block steht nach ihr); die Rückkehrseite einer
-  // Anmeldung (?anmeldung=…) ist schon gezählt. Verlassen (3.57.0): Beim ersten pagehide oder Verstecken des Tabs geht einmal
-  // „verlassen“ mit dauer (ganze Sekunden sichtbarer Zeit, 0–3600) und tiefe (weitester unterer Fensterrand in Prozent der
-  // Seitenhöhe, auf 0|25|50|75|100 gerundet) hinaus; ohne gezählten aufruf (nie sichtbar, Rückkehrseite) nichts.
+  // Anmeldung (?anmeldung=…) ist schon gezählt. Vertrag v2 Teil 1 (3.65.0): aufruf, formular und absenden gehen je Seitenaufruf einmal hinaus.
+  // Verlassen (3.57.0, mehrfach seit 3.65.0): Bei jedem pagehide oder Verstecken des Tabs geht „verlassen“ mit dauer (ganze Sekunden sichtbarer
+  // Zeit seit dem letzten Senden, mindestens 1, alle zusammen höchstens 3600) und tiefe (bisher weitester unterer Fensterrand in Prozent der
+  // Seitenhöhe, auf 0|25|50|75|100 gerundet) hinaus, nie zweimal ohne Rückkehr dazwischen; ohne gezählten aufruf (nie sichtbar, Rückkehrseite) nichts.
+  // Ist der Tab nach über 60 Sekunden wieder sichtbar, geht ein „da“ ohne dauer und tiefe hinaus.
   try {
     var form = document.querySelector('form.lp-formular'), liste = form && form.querySelector('input[name="liste"]');
     var aktion = form && form.getAttribute('action'), ziel = aktion && new URL(aktion, location.href);
     if (liste && ziel && /\/anmelden$/.test(ziel.pathname) && navigator.sendBeacon && navigator.doNotTrack !== '1'
       && navigator.globalPrivacyControl !== true && document.body.dataset.lpStatistik !== 'aus') {
       ziel.pathname = ziel.pathname.replace(/anmelden$/, 'treffer'); ziel.search = ''; ziel.hash = '';
-      var suche = new URLSearchParams(location.search), gesendet = {};
+      var suche = new URLSearchParams(location.search), gesendet = {}, aufgerufen = false, seit = null, weg = 0, summe = 0, unten = 0;
       var utm = function (name) { return (suche.get('utm_' + name) || '').replace(/[^A-Za-z0-9 _.-]/g, '').slice(0, 60); };
       var melden = function (art, dauer, tiefe) {
-        if (gesendet[art]) { return; }
-        gesendet[art] = true;
+        if (art !== 'verlassen' && art !== 'da') {
+          if (gesendet[art]) { return; }
+          gesendet[art] = true;
+        }
         try {
           var verweiser = document.referrer ? new URL(document.referrer).hostname : '';
           navigator.sendBeacon(ziel.href, new Blob([JSON.stringify({
-            v: 1, liste: liste.value.slice(0, 60), art: art, pfad: location.pathname.slice(0, 120),
+            v: 2, liste: liste.value.slice(0, 60), art: art, pfad: location.pathname.slice(0, 120),
             ref: verweiser === location.hostname ? '' : verweiser.slice(0, 100),
             utm: { quelle: utm('source'), medium: utm('medium'), kampagne: utm('campaign') }, breite: window.innerWidth,
             dauer: dauer, tiefe: tiefe
           })], { type: 'text/plain;charset=UTF-8' }));
         } catch (e) { /* die Statistik darf die Anmeldung nie stören */ }
       };
-      var seit = null, unten = 0;
+      // Sichtbar: die Uhr läuft. Das erste Mal ist der Aufruf (ein vorab geladener Tab zählt nicht), später nach über 60 s Abwesenheit ein „da“.
       var sichtbar = function () {
-        if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', sichtbar); seit = performance.now(); melden('aufruf'); }
+        if (document.visibilityState !== 'visible' || seit !== null) { return; }
+        seit = performance.now();
+        if (!aufgerufen) { aufgerufen = true; melden('aufruf'); } else if (seit - weg > 60000) { melden('da'); }
       };
       if (!rueckmeldung) { document.addEventListener('visibilitychange', sichtbar); sichtbar(); }
       // Formularbeginn: erster Fokus, erstes Tippen oder Anklicken durch den Besucher (auch im schon aktiven Feld); der Fokus nach dem Sprung (selbstFokus) zählt nicht.
@@ -184,12 +190,15 @@
       form.addEventListener('submit', function (ereignis) { if (!ereignis.defaultPrevented) { melden('absenden'); } });
       // Scroll-Ereignisse kommen höchstens einmal je Bildwechsel; gelesen wird nur die Position, die Seitenhöhe erst beim Verlassen.
       var tiefer = function () { unten = Math.max(unten, window.scrollY + window.innerHeight); };
+      // Danach steht die Uhr bis zur Rückkehr: Verstecken und pagehide hintereinander senden einmal.
       var gehen = function () {
         try {
           if (seit === null) { return; }
           tiefer();
-          melden('verlassen', Math.min(3600, Math.round((performance.now() - seit) / 1000)),
-            Math.round(Math.min(1, unten / Math.max(1, document.documentElement.scrollHeight)) * 4) * 25);
+          var tiefe = Math.round(Math.min(1, unten / Math.max(1, document.documentElement.scrollHeight)) * 4) * 25, jetzt = performance.now();
+          var dauer = Math.min(3600 - summe, Math.max(1, Math.round((jetzt - seit) / 1000)));
+          summe += dauer; seit = null; weg = jetzt;
+          melden('verlassen', dauer, tiefe);
         } catch (e) { /* die Statistik darf das Verlassen nie stören */ }
       };
       window.addEventListener('scroll', tiefer, { passive: true });

@@ -217,7 +217,7 @@ return [
             T::notContains($js, $speicher, "kein Zugriff auf $speicher (auch das wäre ein Zugriff auf das Endgerät)");
         }
     },
-    'lp.js: Verlassen (3.57.0) — eine Meldung mit sichtbarer Zeit und Scrolltiefe, passiver Scroll-Hörer, keine Wanduhr' => static function (): void {
+    'lp.js: Verlassen (3.57.0, mehrfach seit 3.65.0) — Meldungen mit sichtbarer Zeit seit dem letzten Senden und Scrolltiefe, „da“ nach 60 s, passiver Scroll-Hörer, keine Wanduhr' => static function (): void {
         $js = (string) file_get_contents(H::wurzel() . '/lp/lp.js');
         T::contains($js, "melden('verlassen'", 'Art verlassen');
         T::contains($js, "addEventListener('pagehide'", 'beim Verlassen der Seite');
@@ -225,8 +225,12 @@ return [
         T::contains($js, "addEventListener('scroll', tiefer, { passive: true })", 'passiver Scroll-Hörer (bremst die Seite nicht)');
         T::contains($js, 'performance.now()', 'monotone Uhr der Seite statt Wanduhr');
         T::notContains(substr($js, (int) strpos($js, '// Statistik (3.56.0)')), 'Date.', 'keine Wanduhrzeit im Statistik-Block (ein Tab im Hintergrund würde mitzählen)');
-        T::contains($js, 'Math.min(3600,', 'dauer höchstens 3600 Sekunden');
-        T::contains($js, "if (gesendet[art]) { return; }", 'jede Art höchstens einmal je Seitenaufruf');
+        T::contains($js, 'Math.min(3600 - summe,', 'dauer: alle Meldungen zusammen höchstens 3600 Sekunden');
+        T::contains($js, 'v: 2,', 'Vertrag v2');
+        T::notContains($js, 'v: 1,', 'kein Vertrag v1 mehr');
+        T::contains($js, "melden('da')", 'Art da');
+        T::contains($js, '> 60000', 'da erst nach über 60 Sekunden Abwesenheit');
+        T::contains($js, "if (gesendet[art]) { return; }", 'aufruf, formular und absenden höchstens einmal je Seitenaufruf');
     },
     'person: ohne Namen nichts; mit Namen Titel, Name, Rolle, Text; Bild nur bei bild-links' => static function () use ($k, $bau): void {
         [$h] = $bau(H::seite([['typ' => 'person', 'variante' => 'schlicht', 'titel' => 'Wer spricht?']]));

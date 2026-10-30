@@ -1,6 +1,6 @@
 <?php
 /**
- * Besucherzähler für Webseiten (statistik.js, 3.63.0): der Vertrag v1 mit dem Panel (POST panel.ssi.at/lp/treffer), die Hostprüfung, die Abschalter
+ * Besucherzähler für Webseiten (statistik.js, seit 3.63.0, Vertrag v2 Teil 1 seit 3.65.0): der Vertrag mit dem Panel (POST panel.ssi.at/lp/treffer), die Hostprüfung, die Abschalter
  * (Do Not Track, Global Privacy Control, data-statistik="aus"), kein Cookie und kein Web-Speicher, jeder Fehler verschluckt, höchstens 2 KB.
  * Das Verhalten läuft in tests/statistik-lauf.mjs (Node, eine Attrappe der Seite; ohne Node wird nur der Quelltext geprüft), den echten Browser
  * prüft ci/browser-statistik.js. Das Panel nimmt genau diese Nachricht an (App\Services\Statistik\Treffer/Annahme, Webseiten-Spezifikation Abschnitt 1).
@@ -39,6 +39,7 @@ return (static function (): array {
     return [
         'statistik.js liegt neben shared.js, ist klein und nennt die Einbindungszeile' => static function () use ($root, $js): void {
             T::ok(strlen($js) > 1500, 'statistik.js fehlt oder ist leer');
+            T::ok(strlen($js) < 4600, 'statistik.js ist mit ' . strlen($js) . ' Byte zu groß (Ziel von v2 Teil 1: unter 4600)');
             T::ok(substr_count($js, "\n") <= 100, 'statistik.js ist mit ' . substr_count($js, "\n") . ' Zeilen zu groß (höchstens 100)');
             T::ok(is_file("$root/shared.js"), 'shared.js (Nachbar) fehlt');
             T::contains($js, '<script src="statistik.js" data-quelle="web:beispiel.at" defer></script>', 'Einbindungszeile im Kopfkommentar');
@@ -66,7 +67,7 @@ return (static function (): array {
         },
         'Hostprüfung: nur auf der Domain und auf www.<Domain>, nie in Vorschau, Kopie oder Sicherung' => static function () use ($holen, $nachrichten): void {
             if (($l = $holen()) === null) { return; }
-            T::eq(count($l['normal']['gesendet']), 2, 'auf der Domain selbst: aufruf und verlassen');
+            T::eq(count($l['normal']['gesendet']), 2, 'auf der Domain selbst: aufruf und verlassen (pagehide und Verstecken hintereinander senden nur einmal)');
             T::eq(count($l['mitWww']['gesendet']), 1, 'auf www.<Domain>: aufruf');
             T::eq(count($l['fremd']), 7, 'Anzahl fremder Hosts');
             foreach ($l['fremd'] as $host => $ergebnis) { T::eq(count($ergebnis['gesendet']), 0, 'fremder Host „' . $host . '“ sendet nicht'); }
@@ -82,7 +83,7 @@ return (static function (): array {
                 T::eq($g['typ'], 'text/plain;charset=UTF-8', 'Inhaltstyp (einfache Anfrage ohne Vorabfrage)');
             }
         },
-        'Felder des Vertrags v1: aufruf und verlassen, ohne Formular und Absenden' => static function () use ($holen, $nachrichten, $arten): void {
+        'Felder des Vertrags v2: aufruf, verlassen und da, ohne Formular und Absenden' => static function () use ($holen, $nachrichten, $arten): void {
             if (($l = $holen()) === null) { return; }
             $n = $nachrichten($l['normal']);
             T::eq($arten($l['normal']), 'aufruf,verlassen', 'Arten (pagehide und Verstecken zusammen senden genau einmal)');
@@ -90,7 +91,11 @@ return (static function (): array {
             T::eq($felder($n[0]), 'art,breite,liste,pfad,ref,utm,v', 'Felder des aufruf');
             T::eq($felder($n[1]), 'art,breite,dauer,liste,pfad,ref,tiefe,utm,v', 'Felder des verlassen');
             T::eq($felder($n[0]['utm']), 'kampagne,medium,quelle', 'Felder von utm');
-            T::ok($n[0]['v'] === 1 && $n[0]['pfad'] === '/seite/' && $n[0]['breite'] === 390, 'v, pfad und breite');
+            T::ok($n[0]['v'] === 2 && $n[1]['v'] === 2 && $n[0]['pfad'] === '/seite/' && $n[0]['breite'] === 390, 'v (2), pfad und breite');
+            $da = $nachrichten($l['da'])[2];
+            T::eq($arten($l['da']), 'aufruf,verlassen,da,verlassen', 'Arten im Lauf mit Abwesenheit');
+            T::eq($felder($da), 'art,breite,liste,pfad,ref,utm,v', 'Felder des da: wie der aufruf, ohne dauer und tiefe (keine Zahlen)');
+            T::ok($da['v'] === 2 && $da['art'] === 'da' && $da['liste'] === 'web:beispiel.test', 'da: v 2 und die Quelle');
             T::eq($n[0]['utm']['quelle'], 'Insta gramb', 'UTM nur Buchstaben, Ziffern, Leerzeichen und _ . -');
             T::eq($n[0]['utm']['kampagne'], str_repeat('a', 60), 'UTM höchstens 60 Zeichen');
             T::eq($n[0]['utm']['medium'], 'social', 'UTM medium');
@@ -142,13 +147,36 @@ return (static function (): array {
         },
         'Nachricht höchstens 2 KB (Grenze des Panels), auch im größten Fall' => static function () use ($holen): void {
             if (($l = $holen()) === null) { return; }
-            T::eq(count($l['groesstFall']['gesendet']), 2, 'größter Fall sendet');
+            T::eq(count($l['groesstFall']['gesendet']), 4, 'größter Fall sendet aufruf, verlassen, da und ein zweites verlassen');
             foreach ($l['groesstFall']['gesendet'] as $g) { T::ok(strlen($g['text']) <= 2048, 'Nachricht mit ' . strlen($g['text']) . ' Byte (höchstens 2048)'); }
+        },
+        'mehrfaches Verlassen (v2): jedes Verstecken meldet die Zeit seit dem letzten Senden, ohne neuen aufruf' => static function () use ($holen, $nachrichten, $arten): void {
+            if (($l = $holen()) === null) { return; }
+            T::eq($arten($l['mehrfach']), 'aufruf,verlassen,verlassen', 'Verstecken, zeigen, Verstecken: zwei verlassen und genau ein aufruf');
+            $d = array_column($nachrichten($l['mehrfach']), 'dauer');
+            T::eq($d, [1, 5], 'dauer ist das Delta seit dem letzten Senden, mindestens 1 (sofort versteckt: 1; danach 5 s: 5)');
+            T::eq(array_column($nachrichten($l['deltaNichtGesamt']), 'dauer'), [10, 3], 'dauer ist das Delta (10 s, dann 3 s), nicht die Gesamtzeit seit dem Laden (13)');
+            T::eq($arten($l['hiddenDannPagehide']), 'aufruf,verlassen', 'Verstecken und pagehide hintereinander (Seitenwechsel) senden nur ein verlassen');
+            T::eq(array_column($nachrichten($l['hiddenDannPagehide']), 'dauer'), [3], 'und zwar mit der ganzen Zeit');
+            $t = array_values(array_filter(array_column($nachrichten($l['tiefeBleibt']), 'tiefe'), 'is_int'));
+            T::eq($t, [75, 75, 100], 'tiefe ist das Maximum über alle Meldungen (zurück nach oben ändert nichts)');
+            $s = array_values(array_filter(array_column($nachrichten($l['summeGrenze']), 'dauer'), 'is_int'));
+            T::ok(array_sum($s) === 3600 && $s[0] === 3600 && max($s) <= 3600, 'alle dauer zusammen höchstens 3600: ' . json_encode($s));
+            T::eq($arten($l['unsichtbarDannSichtbar']), 'aufruf,verlassen', 'unsichtbar geladen: der erste Wechsel ist der aufruf (kein da), danach verlassen');
+            T::eq($arten($l['ohneAufrufKeinDa']), '', 'ohne gezählten aufruf auch kein verlassen und kein da');
+        },
+        'da (v2): nach über 60 s Abwesenheit einmal bei Rückkehr, nicht früher, nie ohne Aufruf' => static function () use ($holen, $arten): void {
+            if (($l = $holen()) === null) { return; }
+            T::eq($arten($l['da']), 'aufruf,verlassen,da,verlassen', '61 s weg: da (nur einmal, auch bei doppeltem Sichtbar), kein neuer aufruf');
+            T::eq($arten($l['daGrenze']), 'aufruf,verlassen', 'genau 60 s sind nicht „über 60 s“: kein da');
+            T::eq($arten($l['kurzWeg']), 'aufruf,verlassen,verlassen', '30 s weg: kein da, aber ein zweites verlassen');
+            T::eq($arten($l['daNachPagehide']), 'aufruf,verlassen,da', 'Rückkehr aus dem Zwischenspeicher nach pagehide: da, kein zweiter aufruf');
+            T::eq(count($l['aus2']['gesendet']), 0, 'Do Not Track: auch kein da');
         },
         'dieselben Grenzen wie der Zähler der Landingpages (lp/lp.js)' => static function () use ($root, $code): void {
             $lp = (string) @file_get_contents("$root/lp/lp.js");
             T::ok(strlen($lp) > 5000, 'lp/lp.js fehlt');
-            foreach (['.slice(0, 60)', '.slice(0, 120)', '.slice(0, 100)', "/[^A-Za-z0-9 _.-]/g", 'Math.min(3600,', '* 4) * 25', "'text/plain;charset=UTF-8'", 'window.innerWidth', 'navigator.globalPrivacyControl'] as $stelle) {
+            foreach (['.slice(0, 60)', '.slice(0, 120)', '.slice(0, 100)', "/[^A-Za-z0-9 _.-]/g", 'Math.min(3600 - summe,', '* 4) * 25', '> 60000', "'text/plain;charset=UTF-8'", 'window.innerWidth', 'navigator.globalPrivacyControl'] as $stelle) {
                 T::contains($code, $stelle, 'statistik.js');
                 T::contains($lp, $stelle, 'lp/lp.js');
             }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Browsertest des Besucherzählers statistik.js (Webseiten, 3.63.0) in echtem Chromium.
+ * Browsertest des Besucherzählers statistik.js (Webseiten, seit 3.63.0; Vertrag v2 Teil 1 — mehrfaches Verlassen und „da“ — seit 3.65.0) in echtem Chromium.
  * Die Seiten kommen über Scheinadressen (http://beispiel.test/ u. a.) von einer Attrappe, die statistik.js aus dem Kit ausliefert; die Nachricht an
  * https://panel.ssi.at/lp/treffer fängt der Test ab und beantwortet sie selbst mit 204 — es geht NIE etwas hinaus. Jede andere Anfrage wird abgebrochen
  * und als fremd gemeldet. Die Logik im Einzelnen (Quellen-Muster, Grenzen, Fehlerfälle) prüft tests/statistik.test.php; hier geht es um das, was nur ein
@@ -99,7 +99,7 @@ async function haupt() {
     ok(arten(stand) === 'aufruf', `Domain: beim Laden genau ein aufruf (${arten(stand)})`);
     const a = nachrichten(stand)[0] || {};
     ok(Object.keys(a).sort().join() === 'art,breite,liste,pfad,ref,utm,v', `Domain: genau die Felder des Vertrags (${Object.keys(a).sort()})`);
-    ok(a.v === 1 && a.liste === 'web:beispiel.test' && a.pfad === '/seite/' && a.ref === 'www.verweis.test' && a.breite === 390, `Domain: v, liste, pfad, ref (nur der Host), breite (${JSON.stringify(a)})`);
+    ok(a.v === 2 && a.liste === 'web:beispiel.test' && a.pfad === '/seite/' && a.ref === 'www.verweis.test' && a.breite === 390, `Domain: v, liste, pfad, ref (nur der Host), breite (${JSON.stringify(a)})`);
     ok(a.utm && a.utm.quelle === 'mail' && a.utm.medium === 'newsletter' && a.utm.kampagne === 'herbst', 'Domain: UTM aus der Adresse');
     ok((stand.beacons[0] || {}).adresse === PANEL && (stand.beacons[0] || {}).methode === 'POST' && ((stand.beacons[0] || {}).typ || '').startsWith('text/plain'), `Domain: POST als text/plain an das Panel (${(stand.beacons[0] || {}).typ})`);
     await page.evaluate(() => window.scrollTo(0, 1800));
@@ -204,6 +204,64 @@ async function haupt() {
     await page.goto('http://beispiel.test/andere/');
     await page.waitForTimeout(500);
     ok(/^aufruf,(verlassen|\(abgebrochen\)),aufruf$/.test(stand.angefragt.join()), `Seitenwechsel: aufruf, beim Weitergehen eine zweite Anfrage (verlassen), auf der neuen Seite wieder aufruf (${stand.angefragt.join()})`);
+    await kontext.close();
+  }
+
+  // 8. Vertrag v2 Teil 1 (3.65.0): mehrfaches Verlassen und „da“, auf einer Seite mit abgefangenem sendBeacon und vorgespulter Uhr.
+  const zeigen = (page) => page.evaluate(() => window.__zeigen());
+  const verstecken = (page) => page.evaluate(() => window.__verstecken());
+  {
+    // (a) aufruf einmal, auch wenn die Seite mehrfach „sichtbar“ meldet; (b) verstecken → verlassen (Delta, mindestens 1); zeigen, 5 s, verstecken → zweites verlassen (Delta 5), kein zweiter aufruf
+    const { page, kontext, stand } = await laden(browser, { init: [UNSICHTBAR], uhr: '2026-10-30T10:00:00' });
+    await warten(page);
+    ok(stand.beacons.length === 0, 'v2: unsichtbar geladen sendet nichts');
+    await zeigen(page); await zeigen(page);
+    await warten(page);
+    ok(arten(stand) === 'aufruf', `v2 (a): aufruf genau einmal (${arten(stand)})`);
+    await verstecken(page);
+    await zeigen(page);
+    await page.clock.fastForward(5000);
+    await verstecken(page);
+    await verstecken(page);
+    await warten(page);
+    ok(arten(stand) === 'aufruf,verlassen,verlassen', `v2 (b): zwei verlassen, nur ein aufruf (${arten(stand)})`);
+    const [, v1, v2] = nachrichten(stand);
+    ok(v1 && v1.v === 2 && v1.dauer === 1, `v2 (b): sofort versteckt → dauer 1, nicht 0 (${v1 && v1.dauer})`);
+    ok(v2 && v2.v === 2 && v2.dauer >= 5 && v2.dauer <= 6, `v2 (b): das zweite verlassen zählt nur die 5 Sekunden seit dem letzten Senden (${v2 && v2.dauer})`);
+    ok(nachrichten(stand).every((m) => m.v === 2), 'v2: jede Nachricht trägt v 2');
+    // (c) nach über 60 s Abwesenheit meldet sich die Seite bei der Rückkehr mit einem kleinen „da“, ohne neuen aufruf
+    await page.clock.fastForward(61000);
+    await zeigen(page);
+    await zeigen(page);
+    await page.clock.fastForward(2000);
+    await verstecken(page);
+    await warten(page);
+    ok(arten(stand) === 'aufruf,verlassen,verlassen,da,verlassen', `v2 (c): nach 61 s Abwesenheit genau ein da, kein neuer aufruf (${arten(stand)})`);
+    const da = nachrichten(stand)[3] || {};
+    ok(Object.keys(da).sort().join() === 'art,breite,liste,pfad,ref,utm,v' && da.art === 'da' && da.liste === 'web:beispiel.test', `v2 (c): da trägt nur den Rahmen, keine dauer und keine tiefe (${JSON.stringify(da)})`);
+    const letztes = nachrichten(stand)[4] || {};
+    ok(letztes.dauer >= 2 && letztes.dauer <= 3, `v2 (c): das verlassen nach dem da zählt nur die 2 Sekunden seit der Rückkehr (${letztes.dauer})`);
+    // (f) jede Nachricht höchstens 2 KB; keine Fremdanfrage; kein Fehler; kein Speicher
+    ok(stand.beacons.every((b) => b.text.length <= 2048), 'v2 (f): jede Nachricht höchstens 2 KB');
+    ok(stand.fremd.length === 0 && stand.konsole.length === 0 && stand.fehler.length === 0, 'v2: keine Fremdanfrage, kein Fehler');
+    await kontext.close();
+  }
+  {
+    // kürzer als eine Minute weg: kein da
+    const { page, kontext, stand } = await laden(browser, { init: [UNSICHTBAR], uhr: '2026-10-30T10:00:00' });
+    await zeigen(page); await page.clock.fastForward(3000); await verstecken(page);
+    await page.clock.fastForward(30000); await zeigen(page); await page.clock.fastForward(1000); await verstecken(page);
+    await warten(page);
+    ok(arten(stand) === 'aufruf,verlassen,verlassen', `v2: 30 s weg → kein da (${arten(stand)})`);
+    await kontext.close();
+  }
+  // (d) Do Not Track / Global Privacy Control / data-statistik="aus" und (e) Vorschau-Host: auch mit mehrfachem Verlassen und langer Abwesenheit nichts
+  for (const [was, o] of [['Do Not Track', { init: [UNSICHTBAR, DNT] }], ['Global Privacy Control', { init: [UNSICHTBAR, GPC] }], ['data-statistik="aus"', { init: [UNSICHTBAR], body: 'data-statistik="aus"' }], ['Vorschau-Host', { init: [UNSICHTBAR], host: 'develop.beispiel.test' }]]) {
+    const { page, kontext, stand } = await laden(browser, { ...o, uhr: '2026-10-30T10:00:00' });
+    await zeigen(page); await page.clock.fastForward(3000); await verstecken(page);
+    await page.clock.fastForward(90000); await zeigen(page); await verstecken(page);
+    await warten(page);
+    ok(stand.beacons.length === 0 && stand.angefragt.length === 0 && stand.fremd.length === 0, `v2: ${was} → nichts gesendet, auch kein da (${arten(stand)})`);
     await kontext.close();
   }
 

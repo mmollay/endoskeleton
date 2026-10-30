@@ -4,6 +4,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.65.0] — 2026-10-30
+
+### Added
+- **Zähler-Vertrag v2, Teil 1: mehrfaches Verlassen und „da“** in `statistik.js` (Webseiten) und `lp/lp.js` (Landingpages) — Anlass: Martin, 30.10.2026, Statistik-Plan (Konzept SQ, Abschnitt 5, Punkte 1, 3 und 4; Abschnitt 6). Beide Zähler senden jetzt `v: 2`.
+  - **`verlassen` bei jedem Verstecken des Tabs und jedem `pagehide`**, nicht mehr nur das erste Mal. `dauer` ist das Delta: ganze Sekunden sichtbarer Zeit seit dem letzten Senden (mindestens 1, alle Meldungen eines Seitenaufrufs zusammen höchstens 3600; ist die Stunde voll, kommt `dauer` 0 und nur die Tiefe wird weiter gemeldet), `tiefe` ist wie bisher der weiteste untere Fensterrand (Maximum über alle Meldungen). Nach einem `verlassen` steht die Uhr bis zur Rückkehr: Verstecken und `pagehide` hintereinander (jeder Seitenwechsel) senden genau eine Meldung. Bei `visible` läuft die Uhr neu, ohne neuen `aufruf`.
+  - **Neue Art `da`**: Wird der Tab nach über 60 Sekunden Abwesenheit wieder sichtbar (auch aus dem Zurück-Zwischenspeicher), geht ein kleines `da` hinaus — derselbe Rahmen wie `aufruf` (`v`, `liste`, `art`, `pfad`, `ref`, `utm`, `breite`), aber ohne `dauer` und `tiefe`. Genau 60 Sekunden zählen nicht; ohne gezählten `aufruf` (nie sichtbar, Rückkehrseite einer Anmeldung) nie ein `da`. Abwesenheit wird wie die Sichtzeit mit `performance.now()` gemessen (keine Wanduhr); schläft das Gerät dazwischen, kann ein `da` ausbleiben.
+  - `aufruf`, `formular` und `absenden` (Landingpages) bleiben je Seitenaufruf einmal. Seitenpfad (`pfad`) unverändert. **Keine Klicks** — die kommen mit Etappe 3.
+  - Alle Schutzregeln unverändert: nur auf der eigenen Domain senden, Do Not Track, Global Privacy Control und `data-statistik="aus"` schalten ab, jeder Fehler wird verschluckt, kein Cookie, kein Web-Speicher, höchstens 2048 Byte je Nachricht (größter Fall mit Pfad, Verweiser und UTM am Anschlag: gemessen unter 2048 für alle vier Nachrichten).
+- **Größe:** `statistik.js` 3958 → 4556 Byte (59 Zeilen), `lp/lp.js` 14446 → 15322 Byte. Keine neue `lp-`Klasse, kein neues Feld, kein neuer Baustein.
+- Tests: `statistik` (27 Prüfungen mehr, mit `angebot` und `zusammenspiel` 3886 → 3913: Delta-Rechnung (auch gegen die Gesamtzeit abgegrenzt), Summe höchstens 3600, Tiefe als Maximum, Verstecken+pagehide einmal, `da` an der Grenze 60/61 s, `da` nur einmal, kein `da` ohne `aufruf` oder bei Do Not Track; Größe unter 4600 Byte), `angebot` und `zusammenspiel` (Quelltext von `lp.js`: `v: 2`, Art `da`, 60 s, Summe), Browsertests `ci/browser-statistik.js` (Abschnitt 8: Zählerprobe mit abgefangenem `sendBeacon` und vorgespulter Uhr) und `ci/browser.js` (Landingpage: zweites `verlassen` nach der Rückkehr, `da` bei 30 s und 61 s, ein zweites `da` nach der zweiten Abwesenheit, keines auf der Rückkehrseite).
+
+### Changed
+- `statistik.js`: Kopfkommentar auf den Vertrag v2 (Teil 1) gebracht; die Karte `gesendet` entfällt (der `aufruf` hängt an einem Merker). `lp/lp.js`: gleiche Änderung im Statistik-Block; sonst nichts. Musterbuch und `lp/SKILL.md`/`lp/werkstatt.md` neu gebaut.
+- **Abwärtskompatibilität — wichtig:** Das Panel, das heute live läuft (`App\Services\Statistik\Treffer::lesen`), kennt nur `v: 1` und lehnt **jede** Nachricht mit `v: 2` ab (`aufruf` eingeschlossen; die Antwort bleibt 204, es wird nichts gezählt), und `art: 'da'` ist dort auch mit `v: 1` unbekannt. **Dieses Kit darf deshalb erst auf Webseiten und Landingpages, wenn das Panel (Bahn E1) `v: 2` und `da` annimmt** — sonst zählen diese Seiten nichts mehr. Webseiten, die `statistik.js` aus 3.63.0 eingebunden haben, bleiben bei `v: 1` und zählen weiter, bis die Datei ersetzt wird; Landingpages behalten ihre Marke, bis sie neu gebaut und veröffentlicht werden.
+- **Version:** 3.64.0 (Bewegung) liegt auf einem Schwesterzweig (`lp/bewegung`, Tag `v3.64.0`) und enthält 3.63.0 nicht; dieser Zweig baut auf 3.63.0 auf und nimmt darum die nächste freie Nummer 3.65.0. Beim Zusammenführen beider Zweige stehen `VERSION`, `package.json`, `konfigurator.html`, `lp/bausteine.json`, der CHANGELOG-Kopf und das Musterbuch im Streit (3.65.0 gewinnt, Musterbuch neu bauen).
+- **Rückweg:** Zweig `zaehler-v2-teil1` nicht mergen oder den Commit zurücknehmen (`git revert <Commit>`); 3.63.0 (`statistik.js` und `lp/lp.js` mit `v: 1`) bleibt unverändert, solange nichts ausgeliefert wurde.
+
+---
+
 ## [3.63.0] — 2026-10-30
 
 ### Added

@@ -41,10 +41,11 @@ SSI-Core pipeline.sh liest aus diesem Verzeichnis:
 - Kopiert base.css, layouts, heroes, colors, buttons, fonts, softness, shared.js in neue Websites
 - pages/SEITE.html dienen als Referenz-Templates für Claude
 
-## Besucherzähler für Webseiten (statistik.js, seit 3.63.0)
+## Besucherzähler für Webseiten (statistik.js, seit 3.63.0; Vertrag v2 Teil 1 seit 3.65.0)
 
-Zählt die Besuche einer Webseite anonym im Panel („Meine Webseite“ → Statistik): einen Aufruf je Seite, beim Verlassen die sichtbare Zeit und die Scrolltiefe. Kein Cookie, kein Web-Speicher,
-keine Kennung des Besuchers. Einbau: `statistik.js` neben die Seiten legen und **eine Zeile unmittelbar vor `</body>` jeder Seite** setzen — die Domain klein und ohne `www.`, genau wie im Panel eingetragen:
+Zählt die Besuche einer Webseite anonym im Panel („Meine Webseite“ → Statistik): einen Aufruf je Seite, bei jedem Verlassen (Verstecken des Tabs, Seitenwechsel) die sichtbare Zeit seit dem letzten Senden
+und die Scrolltiefe, nach über 60 Sekunden Abwesenheit ein „da“. Kein Cookie, kein Web-Speicher, keine Kennung des Besuchers. Vertrag `v: 2` — das Panel muss `v: 2` und `da` annehmen (ein Panel, das nur `v: 1`
+kennt, verwirft jede v2-Nachricht), bevor `statistik.js` oder eine neu gebaute Landingpage ausgeliefert wird. Einbau: `statistik.js` neben die Seiten legen und **eine Zeile unmittelbar vor `</body>` jeder Seite** setzen — die Domain klein und ohne `www.`, genau wie im Panel eingetragen:
 
     <script src="statistik.js" data-quelle="web:beispiel.at" defer></script>
 
