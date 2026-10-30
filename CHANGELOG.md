@@ -4,6 +4,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.63.0] — 2026-10-30
+
+### Added
+- **`statistik.js`: Besucherzähler für Webseiten** (Anlass: Martin, 29./30.10.2026, Statistik-Plan Weg A — Webseiten wie survivaltraining.at zählen bisher nichts, das Panel kennt seit rc1340 aber den Schalter „Besucher zählen“ je Webseite). Eine Datei im Wurzelordner neben `shared.js` (55 Zeilen, ohne Abhängigkeiten), eingebunden mit einer Zeile unmittelbar vor `</body>`: `<script src="statistik.js" data-quelle="web:beispiel.at" defer></script>`. Sie schickt per `navigator.sendBeacon` (`text/plain`, höchstens 2048 Byte) an `https://panel.ssi.at/lp/treffer` den Vertrag v1 der Landingpages (`lp/lp.js`) ohne Formular: `v`, `liste` (`web:<domain>`), `art` (`aufruf` | `verlassen`), `pfad`, `ref` (nur Host, die eigene Domain bleibt leer), `utm`, `breite` — bei `verlassen` dazu `dauer` (ganze Sekunden sichtbar, 0–3600) und `tiefe` (0|25|50|75|100).
+- **Regeln im Zähler:** Er sendet nur, wenn der Host der Seite genau die Domain der Quelle oder `www.<Domain>` ist — Vorschau (`develop.`/`vorschau.`), lokale Kopien und Sicherungsordner zählen nie. Der Aufruf zählt erst, wenn die Seite sichtbar ist (ein vorab geladener Tab nicht); `aufruf` und `verlassen` je höchstens einmal je Seitenaufruf. `navigator.doNotTrack`, `navigator.globalPrivacyControl` und `<body data-statistik="aus">` schalten ihn ab. Kein Cookie, kein `localStorage`/`sessionStorage`/IndexedDB, keine Kennung; jeder Fehler wird verschluckt, die Seite bleibt ohne das Skript voll nutzbar.
+- Tests: `statistik` (109 Prüfungen: Quelltext und eine Seiten-Attrappe in Node, `tests/statistik-lauf.mjs`; die Quellen-, Host-, Abschalter-, Grenzen- und Fehlerfälle; dieselben Grenzen wie `lp/lp.js`), Browsertest `ci/browser-statistik.js` (49 Prüfungen in Chromium: Scheinadresse `beispiel.test`, die Anfrage an das Panel wird abgefangen — nie geht etwas hinaus). Ohne Node läuft der Test `statistik` nur über den Quelltext und sagt es auf STDERR.
+- `CLAUDE.md`: Architektur-Zeile und ein Absatz „Besucherzähler für Webseiten“ (Einbindungszeile, Hostprüfung, Abschalter, Hinweis auf die Content-Security-Policy `connect-src https://panel.ssi.at`).
+
+### Changed
+- Sonst nichts: `shared.js`, `lp/`, `.htaccess`, Presets und Seiten bleiben unverändert (Test `bestand` grün). Die `.htaccess` dieses Repos erlaubt `https://panel.ssi.at` nicht in `connect-src`; wer den Zähler auf einer Seite mit dieser Richtlinie einsetzt, muss sie ergänzen. Das Skript steht neben `lp/lp.js` in etwa 35 Zeilen doppelt (Vertrag v1 und Grenzen); ein gemeinsamer Baustein wäre ein eigener Anlass.
+- **Rückweg:** Zweig `web/statistik-zaehler` nicht mergen oder den Commit zurücknehmen (`git revert <Commit>`); Webseiten, die `statistik.js` schon einbinden, behalten ihre Kopie und zählen weiter, bis die Zeile vor `</body>` entfernt wird (dann bleibt die Seite ohne Zähler, nichts anderes ändert sich).
+
+---
+
 ## [3.62.0] — 2026-10-29
 
 ### Added

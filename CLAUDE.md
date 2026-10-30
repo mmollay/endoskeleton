@@ -27,6 +27,7 @@ spacing/NAME.css        → compact, normal, spacious
 animation/NAME.css      → none, subtle, dynamic
 widths/NAME.css         → compact, default, wide, full
 shared.js               → Demo-Controller + Nav-Behavior
+statistik.js            → Besucherzähler für Webseiten (anonym, ans Panel; eine Einbindungszeile, siehe unten)
 pages/SEITE.html        → Template-Seiten (index, kontakt, impressum, datenschutz, subpage)
 demo.html               → nur noch Weiterleitung auf konfigurator.html
 konfigurator.html       → Live-Preview aller Kombinationen (Sidebar-Konfigurator)
@@ -39,6 +40,18 @@ SSI-Core pipeline.sh liest aus diesem Verzeichnis:
 - ENDOSKELETON_DIR="/home/pawbot/projects/endoskeleton"
 - Kopiert base.css, layouts, heroes, colors, buttons, fonts, softness, shared.js in neue Websites
 - pages/SEITE.html dienen als Referenz-Templates für Claude
+
+## Besucherzähler für Webseiten (statistik.js, seit 3.63.0)
+
+Zählt die Besuche einer Webseite anonym im Panel („Meine Webseite“ → Statistik): einen Aufruf je Seite, beim Verlassen die sichtbare Zeit und die Scrolltiefe. Kein Cookie, kein Web-Speicher,
+keine Kennung des Besuchers. Einbau: `statistik.js` neben die Seiten legen und **eine Zeile unmittelbar vor `</body>` jeder Seite** setzen — die Domain klein und ohne `www.`, genau wie im Panel eingetragen:
+
+    <script src="statistik.js" data-quelle="web:beispiel.at" defer></script>
+
+Gesendet wird nur auf der Domain selbst (oder `www.<Domain>`); Vorschau und lokale Kopien zählen nie. `<body data-statistik="aus">`, „Nicht verfolgen“ und Global Privacy Control schalten den Zähler ab.
+Das Panel zählt nur, wenn der Schalter „Besucher zählen“ der Webseite an ist. Die Content-Security-Policy der Seite muss `connect-src https://panel.ssi.at` erlauben (die `.htaccess` dieses Repos tut das nicht —
+nur wer den Zähler dort einsetzt, muss sie ergänzen). Ein Google Tag oder Cookie-Banner ersetzt der Zähler nicht; die Datenschutzerklärung der Webseite nennt ihn, sobald er live ist. Tests: `tests/statistik.test.php`,
+Browser: `ci/browser-statistik.js`.
 
 ## Preset hinzufügen (Checkliste)
 
