@@ -350,7 +350,7 @@ Varianten: `akzent`, `schlicht` · seit 3.51.0, geändert 3.51.0
 
 ### `bewegung` — Bewegung
 
-Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.1 · Variante `live` höchstens 1-mal
+Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.2 · Variante `live` höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -358,7 +358,7 @@ Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.1 · Variante `li
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
 | `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
-| `stil` | auswahl | – | eines von `strich`, `punkte`; Standard `strich`; fehlt: strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte |
+| `stil` | auswahl | – | eines von `silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`; Standard `silhouette`; fehlt: silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; koerper ist eine Figur mit Tiefe und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen |
 | `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen, nicht leer; nur bei live; fehlt: Kamera starten |
 
 ```json
@@ -367,6 +367,6 @@ Varianten: `wiedergabe`, `live` · seit 3.64.0, geändert 3.64.1 · Variante `li
     "variante": "wiedergabe",
     "titel": "So sieht eine aufgezeichnete Bewegung aus",
     "bewegung": "bew/beispiel-winken.bewegung",
-    "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+    "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
 }
 ```

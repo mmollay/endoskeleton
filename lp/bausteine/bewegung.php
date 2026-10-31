@@ -1,7 +1,7 @@
 <?php
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
- * Bewegung (3.64.0): eine aufgezeichnete Bewegung als Strichfigur oder Punkte — ohne Kamerabild, ohne Anfrage an Dritte (Kontext::bewegungsDatei,
+ * Bewegung (3.64.2): eine aufgezeichnete Bewegung als Silhouette (Vorgabe), Piktogramm, Körper, Strichfigur oder Punkte — ohne Kamerabild, ohne Anfrage an Dritte (Kontext::bewegungsDatei,
  * lp/bewegung.js). Variante „wiedergabe“ spielt die Datei nur ab; „live“ bietet zusätzlich die eigene Kamera an: erst nach dem Klick, das Bild
  * bleibt auf dem Gerät (lp/bewegung-live.js wird erst dann geladen). Ohne JavaScript bleibt die Beschriftung; Steuerung und Kamera-Block sind
  * bis dahin verborgen (hidden). @var array $b @var Endo\Lp\Kontext $k @var int $nr
@@ -21,7 +21,7 @@ $beschriftung = $k->id($nr, 'beschriftung');
 
 </div>
 <?php endif ?>
-<figure class="lp-bewegung-figur" data-lp-bewegung="<?= $k->e($b['bewegung']) ?>" data-lp-stil="<?= $k->e($b['stil'] ?? 'strich') ?>" data-lp-modus="<?= $k->e($b['variante']) ?>">
+<figure class="lp-bewegung-figur" data-lp-bewegung="<?= $k->e($b['bewegung']) ?>" data-lp-stil="<?= $k->e($b['stil'] ?? 'silhouette') ?>" data-lp-modus="<?= $k->e($b['variante']) ?>">
 <canvas width="<?= $d['breite'] ?>" height="<?= $d['hoehe'] ?>" role="img" tabindex="0" aria-labelledby="<?= $beschriftung ?>"></canvas>
 <figcaption class="lp-bewegung-beschriftung" id="<?= $beschriftung ?>"><?= $k->e($b['alt']) ?></figcaption>
 </figure>

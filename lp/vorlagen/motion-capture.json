@@ -22,7 +22,7 @@
             "anker": "vorfuehrung",
             "titel": "Probier es mit deiner Kamera aus",
             "bewegung": "bew/beispiel-winken.bewegung",
-            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
             "stil": "strich",
             "knopf_text": "Kamera starten",
             "text": "{{Ein bis zwei Sätze: was man tun kann}}"
@@ -32,7 +32,7 @@
             "variante": "wiedergabe",
             "titel": "So sieht eine aufgezeichnete Bewegung aus",
             "bewegung": "bew/beispiel-winken.bewegung",
-            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
         },
         {
             "typ": "themen",

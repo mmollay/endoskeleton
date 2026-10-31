@@ -18,7 +18,7 @@
             "variante": "live",
             "titel": "Probier es mit deiner Kamera aus",
             "bewegung": "bew/beispiel-winken.bewegung",
-            "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm; mit eigener Kamera entsteht daraus deine eigene Bewegung.",
             "stil": "strich",
             "knopf_text": "Kamera starten",
             "text": "Die Kamera bleibt aus, bis du auf den Knopf drückst. Das Kamerabild verlässt dein Gerät nicht."

@@ -227,7 +227,7 @@
       }
     },
     "bewegung": {
-      "name": "Bewegung", "seit": "3.64.0", "geaendert": "3.64.1",
+      "name": "Bewegung", "seit": "3.64.0", "geaendert": "3.64.2",
       "klassen": {
         "lp-bewegung": "3.64.0", "lp-bewegung--wiedergabe": "3.64.0", "lp-bewegung--live": "3.64.0", "lp-bewegung-text": "3.64.0",
         "lp-bewegung-figur": "3.64.0", "lp-bewegung-beschriftung": "3.64.0", "lp-bewegung-leiste": "3.64.0", "lp-bewegung-wahl": "3.64.0",
@@ -239,13 +239,13 @@
         "text":       { "typ": "absatz", "label": "Text", "max": 400 },
         "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
         "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
-        "stil":       { "typ": "auswahl", "label": "Darstellung", "werte": ["strich", "punkte"], "standard": "strich", "fehlt": "strich (Strichfigur); „punkte“ zeigt nur die Körperpunkte" },
+        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; koerper ist eine Figur mit Tiefe und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen" },
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nicht_leer": true, "nur_bei": ["live"], "fehlt": "Kamera starten" }
       },
       "regeln": { "hoechstens_variante": { "live": 1 } },
       "beispiel": {
         "typ": "bewegung", "variante": "wiedergabe", "titel": "So sieht eine aufgezeichnete Bewegung aus", "bewegung": "bew/beispiel-winken.bewegung",
-        "alt": "Eine Strichfigur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+        "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
       }
     }
   }

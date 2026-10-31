@@ -1,0 +1,26 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Bewegung – Wiedergabe, Körper mit Volumen",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Bewegung“ in der Variante „wiedergabe“ mit der Darstellung „koerper“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Bewegung – Wiedergabe, Körper mit Volumen",
+            "text": "Baustein „bewegung“, Variante „wiedergabe“, Darstellung „koerper“ (seit 3.64.2): eine Figur mit Tiefe; sie braucht etwas mehr Rechenzeit."
+        },
+        {
+            "typ": "bewegung",
+            "variante": "wiedergabe",
+            "stil": "koerper",
+            "titel": "So sieht eine aufgezeichnete Bewegung aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder.",
+            "text": "Diese Bewegung wurde nicht gefilmt, sondern berechnet. Sie läuft ohne Kamera und ohne Anfrage an Dritte."
+        }
+    ]
+}

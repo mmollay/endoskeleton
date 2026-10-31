@@ -16,6 +16,8 @@
  *   BW11 Bewegung::modell(), fehlt() und pruefenText() mit eigener Summenliste (richtige Summe, Link, kein Ordner, nicht lesbar)
  *   BW12 scripts/modell-holen.sh offline (curl-Attrappe): falsche Summe lässt das Ziel unberührt, Ziel im Kit wird vor dem Anlegen abgelehnt
  *   BW13 (3.64.1) Ereignis lp-bewegung:aufnahme und Attribut data-lp-modell: Quelltext, Pfadregeln von modellordner() (node), Doku
+ *   BW14 (3.64.2) Figur-Stil wählbar: Katalogfeld stil (Vorgabe silhouette, alte Werte gelten weiter), Bau, Skill/Werkstatt/Musterbuch kennen die Auswahl
+ *   BW15 (3.64.2) Zeichenstile im Player (node, aufzeichnender Kontext): drei Stile zeichnen verschieden, Bestandsschutz strich/punkte, Rückfall auf die Vorgabe, Farbregeln
  */
 
 declare(strict_types=1);
@@ -200,8 +202,8 @@ return [
             T::ok($b['felder'][$f]['pflicht'] ?? false, "Feld $f ist Pflicht");
         }
         T::eq($b['felder']['bewegung']['typ'] ?? null, 'bewegungsdatei', 'bewegung hat den Typ bewegungsdatei');
-        T::eq($b['felder']['stil']['werte'] ?? null, ['strich', 'punkte'], 'stil: strich oder punkte');
-        T::eq($b['felder']['stil']['standard'] ?? null, 'strich', 'Standard strich');
+        T::eq($b['felder']['stil']['werte'] ?? null, ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'], 'stil: drei Figur-Stile, dazu die älteren strich und punkte');
+        T::eq($b['felder']['stil']['standard'] ?? null, 'silhouette', 'Standard silhouette');
         T::eq($b['felder']['knopf_text']['nur_bei'] ?? null, ['live'], 'knopf_text nur bei live');
         T::ok(isset($b['felder']['text']) && !($b['felder']['text']['pflicht'] ?? false), 'text ist freiwillig');
         T::ok(count($b['klassen']) >= 8, 'mindestens acht Klassen');
@@ -278,7 +280,7 @@ return [
             T::eq(array_key_exists($was, $js) ? $js[$was] : 'fehlt', $soll, "JS-Prüfer, Fall „{$was}“");
         }
     },
-    'BW05 Schema: bewegung und alt sind Pflicht; knopf_text nur bei live; stil nur strich oder punkte; unbekannte Felder sperrend' => static function () use ($seite, $ordner, $schema): void {
+    'BW05 Schema: bewegung und alt sind Pflicht; knopf_text nur bei live; stil nur aus der Liste; unbekannte Felder sperrend' => static function () use ($seite, $ordner, $schema): void {
         $o = $ordner($seite());
         T::eq($schema($seite(), $o), '', 'Ausgangslage gültig');
         T::contains($schema($seite(['alt' => null]), $o), 'alt', 'alt fehlt: sperrend');
@@ -287,6 +289,7 @@ return [
         T::contains($schema($seite(['bewegung' => null]), $o), 'bewegung', 'bewegung fehlt: sperrend');
         T::contains($schema($seite(['titel' => null]), $o), 'titel', 'titel fehlt: sperrend');
         T::eq($schema($seite(['stil' => 'punkte']), $o), '', 'stil punkte gilt');
+        T::eq($schema($seite(['stil' => 'koerper']), $o), '', 'stil koerper gilt');
         T::contains($schema($seite(['stil' => 'knochen']), $o), '[sperrend] bausteine.1.stil', 'stil knochen: sperrend');
         T::contains($schema($seite(['knopf_text' => 'Kamera an']), $o), 'knopf_text', 'knopf_text bei wiedergabe: sperrend');
         T::eq($schema($seite(['knopf_text' => 'Kamera an'], 'live'), $o), '', 'knopf_text bei live: erlaubt');
@@ -318,7 +321,7 @@ return [
         T::eq($x->query('//section[contains(@class,"lp-bewegung--wiedergabe")]')->length, 1, 'ein Abschnitt lp-bewegung--wiedergabe');
         $fig = $x->query('//figure[@data-lp-bewegung]')->item(0);
         T::eq($fig?->getAttribute('data-lp-bewegung'), BW_DATEI, 'Figur nennt die Datei');
-        T::eq($fig?->getAttribute('data-lp-stil'), 'strich', 'Standardstil strich');
+        T::eq($fig?->getAttribute('data-lp-stil'), 'silhouette', 'Standardstil silhouette');
         T::eq($fig?->getAttribute('data-lp-modus'), 'wiedergabe', 'Modus wiedergabe');
         $cv = $x->query('.//canvas', $fig)->item(0);
         T::eq([$cv?->getAttribute('width'), $cv?->getAttribute('height')], ['360', '640'], 'Leinwand 360×640 (Verhältnis 9:16 aus der Datei)');
@@ -326,7 +329,7 @@ return [
         T::eq($cv?->getAttribute('tabindex'), '0', 'Leinwand per Tastatur erreichbar');
         $bez = $cv?->getAttribute('aria-labelledby') ?? '';
         $cap = $x->query('//*[@id="' . $bez . '"]')->item(0);
-        T::ok($bez !== '' && $cap !== null && str_contains($cap->textContent, 'Strichfigur'), 'Leinwand ist über die Bildunterschrift (alt) beschriftet');
+        T::ok($bez !== '' && $cap !== null && str_contains($cap->textContent, 'Figur winkt'), 'Leinwand ist über die Bildunterschrift (alt) beschriftet');
         foreach (['pause', 'spiegeln', 'tempo'] as $b) {
             T::eq($x->query('//*[@data-lp-b="' . $b . '"]')->length, 1, "Bedienelement $b");
         }
@@ -487,8 +490,8 @@ return [
         $w = H::wurzel();
         $js = (string) file_get_contents("$w/lp/bewegung.js");
         $live = (string) file_get_contents("$w/lp/bewegung-live.js");
-        T::ok(strlen((string) gzencode($js, 9)) <= 6144, 'Player gzip ≤ 6 KB (' . strlen((string) gzencode($js, 9)) . ' Byte)');
-        T::ok(strlen($js) <= 20000, 'Player roh ≤ 20 KB (' . strlen($js) . ' Byte)');
+        T::ok(strlen((string) gzencode($js, 9)) <= 10240, 'Player gzip ≤ 10 KB (' . strlen((string) gzencode($js, 9)) . ' Byte)');
+        T::ok(strlen($js) <= 28000, 'Player roh ≤ 28 KB (' . strlen($js) . ' Byte)');
         foreach (['bewegung.js' => $js, 'bewegung-live.js' => $live] as $name => $code) {
             T::eq(preg_match('#https?://|//[a-z0-9.-]+\.[a-z]{2,}/#i', $code), 0, "$name: keine Fremdadresse");
             foreach (['localStorage', 'sessionStorage', 'indexedDB', 'document.cookie', 'XMLHttpRequest', 'sendBeacon', 'WebSocket', 'eval(', 'new Function'] as $verboten) {
@@ -724,5 +727,56 @@ JS);
         $doku = (string) file_get_contents("$w/docs/bewegung-format.md");
         T::contains($doku, 'lp-bewegung:aufnahme', 'Doku nennt das Ereignis');
         T::contains($doku, 'data-lp-modell', 'Doku nennt das Attribut');
+    },
+    'BW14 Figur-Stil wählbar (3.64.2): Katalogfeld stil mit Vorgabe silhouette, vierter Wert abgewiesen, Bau schreibt data-lp-stil, Skill/Werkstatt/Musterbuch kennen die Auswahl' => static function () use ($k, $seite, $ordner, $schema): void {
+        $w = H::wurzel();
+        $f = $k->baustein('bewegung')['felder']['stil'];
+        T::eq([$f['typ'], $f['standard']], ['auswahl', 'silhouette'], 'stil ist eine Auswahl, Vorgabe silhouette');
+        T::eq(array_slice($f['werte'], 0, 3), ['silhouette', 'piktogramm', 'koerper'], 'die drei Figur-Stile stehen vorn');
+        T::eq(array_slice($f['werte'], 3), ['strich', 'punkte'], 'strich und punkte bleiben gültig (Bestandsschutz)');
+        $o = $ordner($seite());
+        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'] as $stil) {
+            T::eq($schema($seite(['stil' => $stil]), $o), '', "stil $stil wird vom Prüfer angenommen");
+        }
+        foreach (['knochen', 'Silhouette', 'körper', '', ' silhouette', 'silhouette ', 3, true, ['silhouette']] as $schlecht) {
+            T::contains($schema($seite(['stil' => $schlecht]), $o), '[sperrend] bausteine.1.stil', 'stil ' . json_encode($schlecht, JSON_UNESCAPED_UNICODE) . ': sperrend');
+        }
+        $bau = static function (array $b) use ($seite, $ordner): string {
+            $dir = $ordner($seite($b));
+            T::eq(H::texte(Bauer::bauen($dir)->befunde), '', 'Bau ohne Befunde');
+            return (string) file_get_contents("$dir/index.html");
+        };
+        T::contains($bau([]), 'data-lp-stil="silhouette"', 'ohne Angabe trägt die Figur data-lp-stil="silhouette"');
+        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'] as $stil) {
+            T::contains($bau(['stil' => $stil]), 'data-lp-stil="' . $stil . '"', "gewählter Stil $stil kommt in der Figur an");
+        }
+        T::notContains($bau([]), 'data-lp-stil="strich"', 'ohne Angabe nicht mehr strich');
+        // Skill und Werkstatt-Regeln (erzeugt aus dem Katalog) nennen die Auswahl und sagen, wann man welchen nimmt
+        foreach (['lp/SKILL.md', 'lp/werkstatt.md'] as $datei) {
+            $t = (string) file_get_contents("$w/$datei");
+            T::contains($t, '`silhouette`, `piktogramm`, `koerper`', "$datei nennt die drei Stile");
+            T::contains($t, 'Standard `silhouette`', "$datei nennt die Vorgabe");
+            T::contains($t, 'Notausgang', "$datei: Piktogramm = ruhig, wie ein Notausgang-Schild");
+            T::contains($t, 'Tiefe', "$datei: Körper = Figur mit Tiefe");
+        }
+        // Musterbuch: je ein Beispiel für Piktogramm und Körper; die Grundseite zeigt die Vorgabe
+        foreach (['piktogramm', 'koerper'] as $stil) {
+            $fix = json_decode((string) file_get_contents("$w/lp/musterbuch/bewegung--wiedergabe--$stil.json"), true);
+            T::eq($fix['bausteine'][1]['stil'] ?? null, $stil, "Musterbuch-Beispiel bewegung--wiedergabe--$stil wählt $stil");
+            T::contains((string) file_get_contents("$w/musterbuch/bewegung--wiedergabe--$stil/index.html"), 'data-lp-stil="' . $stil . '"', "gebautes Musterbuch: $stil");
+        }
+        T::contains((string) file_get_contents("$w/musterbuch/bewegung--wiedergabe/index.html"), 'data-lp-stil="silhouette"', 'gebautes Musterbuch: Grundseite = silhouette');
+        // Der Rückfall steht an den zwei Stellen, die das Attribut lesen, nicht mehr bei strich
+        foreach (['bewegung.js', 'bewegung-live.js'] as $datei) {
+            T::notContains((string) file_get_contents("$w/lp/$datei"), "data-lp-stil') || 'strich'", "$datei: ohne Attribut gilt nicht mehr strich");
+        }
+    },
+    'BW15 Zeichenstile im Player (node, aufzeichnender Kontext): drei Stile zeichnen verschieden, strich/punkte wie 3.64.1, unbekannter Stil → Vorgabe, Farbregeln' => static function (): void {
+        exec('node ' . escapeshellarg(H::wurzel() . '/tests/bewegung-zeichnen.js') . ' 2>&1', $aus, $rc);
+        $erg = json_decode(implode("\n", $aus), true);
+        T::ok(is_array($erg) && count($erg) >= 60, 'node liefert die Prüfliste (Rückgabe ' . $rc . '): ' . substr(implode(' ', $aus), 0, 300));
+        foreach ($erg ?: [] as [$ok, $was]) {
+            T::ok($ok === true, $was);
+        }
     },
 ];

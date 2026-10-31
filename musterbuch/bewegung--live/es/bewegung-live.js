@@ -79,7 +79,7 @@ function umText(knopf, an) {
 /** Verdrahtet eine Vorführung einmal. c kommt von lp/bewegung.js (fig, sec, cv, sp, el, melde, api, daten, still). */
 function bauen(c) {
   const knopf = c.el('kamera'), auf = c.el('aufnehmen'), sichern = c.el('speichern'), wahl = c.el('bild'), steuerung = c.el('steuerung');
-  const ctx = c.cv.getContext('2d'), stil = c.fig.getAttribute('data-lp-stil') || 'strich';
+  const ctx = c.cv.getContext('2d'), stil = c.fig.getAttribute('data-lp-stil');
   let strom = null, video = null, lm = null, id = 0, aufnahme = null, text = '', laedt = false, abbruch = false, farbe = '', grund = '', zeit = -1, zts = -1, pose = null;
 
   /** Die Beispielbewegung wieder zeigen (nach Stopp, Fehler oder leerer Aufnahme). */
