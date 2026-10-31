@@ -473,7 +473,7 @@ return [
             }
         }
         $aus = [];
-        exec('php8.2 ' . escapeshellarg(H::wurzel() . '/ci/bewegung-beispiel-bauen.php') . ' --ausgeben 2>&1', $aus, $rc);
+        exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(H::wurzel() . '/ci/bewegung-beispiel-bauen.php') . ' --ausgeben 2>&1', $aus, $rc);
         T::eq($rc, 0, 'Erzeuger läuft');
         T::eq(implode("\n", $aus) . "\n", $beispiel(), 'der Erzeuger liefert genau die Datei im Musterbuch (byte-gleich)');
         // Vorlage
