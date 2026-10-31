@@ -60,6 +60,7 @@ final class Schema
         }
         $anker = [];
         $zahl = [];
+        $zahlV = [];
         foreach ($bausteine as $i => $b) {
             $pfad = "bausteine.$i";
             $nr = $i + 1;
@@ -80,6 +81,9 @@ final class Schema
                 $this->fehler("$pfad.variante", "unbekannte Variante " . json_encode($variante, JSON_UNESCAPED_UNICODE) . " für $typ",
                     "$wo: Diese Variante gibt es nicht (möglich: " . implode(', ', $e['varianten']) . ').');
                 $variante = null;
+            }
+            if ($variante !== null) {
+                $zahlV["$typ/$variante"] = ($zahlV["$typ/$variante"] ?? 0) + 1;
             }
             if (($e['regeln']['zuerst'] ?? false) && $i !== 0) {
                 $this->fehler($pfad, "$typ muss zuerst stehen", "$wo muss der erste Abschnitt der Seite sein.");
@@ -103,6 +107,12 @@ final class Schema
             $max = $e['regeln']['hoechstens'] ?? null;
             if ($max !== null && $n > $max) {
                 $this->fehler('bausteine', "$typ höchstens $max, $n gefunden", "Den Abschnitt „{$e['name']}“ darf es höchstens {$max}-mal geben (gefunden: $n).");
+            }
+            foreach ($e['regeln']['hoechstens_variante'] ?? [] as $v => $grenze) {
+                $nv = $zahlV["$typ/$v"] ?? 0;
+                if ($nv > $grenze) {
+                    $this->fehler('bausteine', "$typ/$v höchstens $grenze, $nv gefunden", "Den Abschnitt „{$e['name']}“ in der Darstellung „{$v}“ darf es höchstens {$grenze}-mal geben (gefunden: $nv).");
+                }
             }
         }
         foreach ($this->ziele as [$ziel, $pfad, $wo]) {
@@ -174,7 +184,7 @@ final class Schema
                 if ($def['typ'] === 'zeile' && preg_match('/[\r\n]/', $w)) {
                     $this->fehler($pfad, "$pfad: Zeilenumbruch in einzeiligem Feld", "$wo: $label muss in eine Zeile passen.");
                 }
-                if ($pflicht && trim($w) === '') {
+                if (($pflicht || ($def['nicht_leer'] ?? false)) && trim($w) === '') {
                     $this->fehler($pfad, "$pfad ist leer", "$wo: $label ist leer.");
                 }
                 $n = mb_strlen($w);
@@ -241,6 +251,15 @@ final class Schema
                     return;
                 }
                 if (($f = Videodatei::fehler($this->ordner, $w)) !== null) {
+                    $this->fehler($pfad, "$pfad: $f[0]", "$wo: $f[1]");
+                }
+                return;
+            case 'bewegungsdatei':
+                if (!is_string($w)) {
+                    $form('Pfad der Bewegungsdatei');
+                    return;
+                }
+                if (($f = Bewegung::fehler($this->ordner, $w)) !== null) {
                     $this->fehler($pfad, "$pfad: $f[0]", "$wo: $f[1]");
                 }
                 return;

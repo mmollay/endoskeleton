@@ -99,7 +99,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.65.0)
+## Bausteine (Katalog 3.66.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -345,5 +345,28 @@ Varianten: `akzent`, `schlicht` · seit 3.51.0, geändert 3.51.0
         "text": "Platz sichern",
         "ziel": "#anmeldung"
     }
+}
+```
+
+### `bewegung` — Bewegung
+
+Varianten: `wiedergabe`, `live` · seit 3.66.0, geändert 3.66.0 · Variante `live` höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
+| `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+| `stil` | auswahl | – | eines von `silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`; Standard `silhouette`; fehlt: silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen |
+| `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen, nicht leer; nur bei live; fehlt: Kamera starten |
+
+```json
+{
+    "typ": "bewegung",
+    "variante": "wiedergabe",
+    "titel": "So sieht eine aufgezeichnete Bewegung aus",
+    "bewegung": "bew/beispiel-winken.bewegung",
+    "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
 }
 ```

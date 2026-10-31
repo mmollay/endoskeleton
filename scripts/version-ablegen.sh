@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Legt einen getaggten Stand schreibgeschützt unter endoskeleton-versionen/<X.Y.Z>/ ab (nur was ein Bau braucht:
-# lp/, VERSION, base.css). Bestehende Landingpages bauen immer mit dem Stand ihrer Marke (Datei ENDOSKELETON):
+# lp/, VERSION, base.css, ab 3.64.0 die Prüfsummenliste scripts/modell-summen.txt). Bestehende Landingpages bauen immer mit dem Stand ihrer Marke (Datei ENDOSKELETON):
 #   /home/pawbot/projects/endoskeleton-versionen/<Marke>/lp/bauen.php <seite>
 # Aufruf nach jedem Tag, als pawbot (nie root):   scripts/version-ablegen.sh 3.51.0
 set -euo pipefail
@@ -15,7 +15,11 @@ ziel="${ENDO_VERSIONEN:-/home/pawbot/projects/endoskeleton-versionen}/$version"
 zwischen="$(dirname "$ziel")/.ablegen-$version-$$"
 trap 'if [[ -e "$zwischen" ]]; then chmod -R u+w "$zwischen"; find "$zwischen" -delete; fi' EXIT
 mkdir -p "$zwischen"
-git archive "v$version" lp VERSION base.css | tar -x -C "$zwischen"
+# Die Prüfsummenliste der Modelldateien (Baustein „bewegung“, Bewegung::modell) gehört zum Stand: Sonst meldet der Prüfer jede Datei in modell/ als fremd.
+# Tags vor 3.64.0 haben sie nicht — dann bleibt sie weg.
+dateien=(lp VERSION base.css)
+if git cat-file -e "v$version:scripts/modell-summen.txt" 2>/dev/null; then dateien+=(scripts/modell-summen.txt); fi
+git archive "v$version" "${dateien[@]}" | tar -x -C "$zwischen"
 [[ "$(cat "$zwischen/VERSION")" == "$version" ]] || { echo "VERSION im Tag passt nicht zu $version." >&2; exit 2; }
 chmod -R a-w "$zwischen"
 mv "$zwischen" "$ziel"

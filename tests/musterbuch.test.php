@@ -10,6 +10,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/hilfe.php';
 
 use Endo\Lp\Bauer;
+use Endo\Lp\Bewegung;
 use Endo\Lp\Katalog;
 use Endo\Lp\Pruefer;
 use Endo\Lp\Sammelordner;
@@ -80,6 +81,7 @@ foreach ($ist as $name) {
         $videos = Videodatei::imPlan($seite);
         if ($videos) { mkdir("$o/vid", 0700, true); }
         foreach ($videos as $video) { copy("$w/lp/musterbuch/$video", "$o/$video") || throw new RuntimeException("Probedatei fehlt: $video"); }
+        H::bewegungen($o, $seite);
         $e = Bauer::bauen($o, false);
         T::eq(H::texte($e->befunde), '', 'keine Befunde');
         foreach ($e->dateien as $pfad => $inhalt) {
@@ -91,7 +93,7 @@ foreach ($ist as $name) {
             $r = substr($f->getPathname(), strlen("$w/musterbuch/$name") + 1);
             if (!str_starts_with($r, 'profil/')) { $ist[] = $r; }
         }
-        $soll = array_merge(array_keys($e->dateien), ['seite.json', 'ENDOSKELETON'], $videos);
+        $soll = array_merge(array_keys($e->dateien), ['seite.json', 'ENDOSKELETON'], $videos, Bewegung::imPlan($seite));
         sort($ist); sort($soll);
         T::eq($ist, $soll, 'keine veralteten Dateien');
         T::ok(!file_exists("$w/musterbuch/$name/profil/VERSION"), 'keine VERSION-Datei unter dem DocumentRoot (die Haupt-.htaccess sperrt sie mit „denied“ → fail2ban)');

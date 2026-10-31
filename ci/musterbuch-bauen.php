@@ -24,6 +24,7 @@ use Endo\Lp\Katalog;
 use Endo\Lp\ProfilKopie;
 use Endo\Lp\Sammelordner;
 use Endo\Lp\Text;
+use Endo\Lp\Bewegung;
 use Endo\Lp\Videodatei;
 
 $w = dirname(__DIR__);
@@ -48,6 +49,9 @@ foreach (glob("$w/lp/musterbuch/*.json") ?: [] as $fixture) {
     Dateien::kopieren($fixture, "$o/seite.json");
     foreach (Videodatei::imPlan(json_decode((string) file_get_contents($fixture), true) ?: []) as $video) {
         Dateien::kopieren("$w/lp/musterbuch/$video", "$o/$video");   // Probedateien der Fixtures mit eigenem Video (3.62.0)
+    }
+    foreach (Bewegung::imPlan(json_decode((string) file_get_contents($fixture), true) ?: []) as $bewegung) {
+        Dateien::kopieren("$w/lp/musterbuch/$bewegung", "$o/$bewegung");   // Probedatei der Fixtures mit Bewegung (3.64.0)
     }
     Dateien::schreiben("$o/ENDOSKELETON", "$version\n");
     $pb = ProfilKopie::uebernehmen($o, $profil);

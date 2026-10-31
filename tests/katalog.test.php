@@ -11,11 +11,11 @@ use Endo\Lp\Schema;
 
 $k = Katalog::laden();
 $version = trim((string) file_get_contents(H::wurzel() . '/VERSION'));
-$typen = ['zeile', 'absatz', 'zahl', 'zeitpunkt', 'auswahl', 'url', 'anker', 'kennung', 'bild', 'bilddatei', 'videodatei', 'knopf', 'liste', 'janein'];
+$typen = ['zeile', 'absatz', 'zahl', 'zeitpunkt', 'auswahl', 'url', 'anker', 'kennung', 'bild', 'bilddatei', 'videodatei', 'bewegungsdatei', 'knopf', 'liste', 'janein'];
 
 return [
     'Katalogversion = VERSION' => static fn () => T::eq($k->version, $version, 'version in bausteine.json'),
-    'die neun Bausteine von 3.55.0' => static fn () => T::eq(array_keys($k->bausteine), ['hero', 'termin', 'themen', 'video', 'erfahrungen', 'faq', 'anmeldung', 'person', 'abschluss'], 'Typen'),
+    'die zehn Bausteine (neun von 3.55.0, dazu „bewegung“ seit 3.66.0)' => static fn () => T::eq(array_keys($k->bausteine), ['hero', 'termin', 'themen', 'video', 'erfahrungen', 'faq', 'anmeldung', 'person', 'abschluss', 'bewegung'], 'Typen'),
     'jeder Eintrag vollständig' => static function () use ($k, $version, $typen): void {
         foreach ($k->bausteine as $typ => $e) {
             foreach (['name', 'seit', 'geaendert', 'klassen', 'varianten', 'felder', 'regeln', 'beispiel'] as $s) {
@@ -45,7 +45,10 @@ return [
         foreach ($k->bausteine as $typ => $e) {
             T::eq($e['beispiel']['typ'] ?? '', $typ, "$typ: Beispiel hat den Typ");
             $mitte = in_array($typ, ['hero', 'anmeldung'], true) ? [] : [$e['beispiel']];
-            T::eq(H::texte(Schema::pruefen(H::seite($mitte), $k, $p, T::tmp())), '', "$typ: Beispiel gültig");
+            $ordner = T::tmp();
+            $seite = H::seite($mitte);
+            H::bewegungen($ordner, $seite);
+            T::eq(H::texte(Schema::pruefen($seite, $k, $p, $ordner)), '', "$typ: Beispiel gültig");
         }
     },
     'jede Klasse kommt im Musterbuch vor, jede lp-Klasse steht im Katalog' => static function () use ($k): void {

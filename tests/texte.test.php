@@ -13,11 +13,20 @@ return [
     'Katalogtexte ohne ASCII-Umlaute und Platzhalter' => static function (): void {
         $texte = [];
         $k = json_decode((string) file_get_contents(H::wurzel() . '/lp/bausteine.json'), true);
-        array_walk_recursive($k, static function ($w, $s) use (&$texte): void {
-            if (is_string($w) && !in_array($s, ['typ', 'seit', 'geaendert', 'version', 'muster', 'kennung', 'datei', 'ziel', 'quelle', 'liste', 'anker', 'anbieter', 'variante', 'art'], true) && !str_starts_with($w, '--') && !str_starts_with($w, 'lp-')) {
-                $texte[] = $w;
+        // Die Wertelisten der Auswahlfelder (`werte`) sind technische Namen wie `vor_ort`, keine Texte: Dateinamen und Attribute bleiben ASCII.
+        $sammeln = static function (array $a) use (&$sammeln, &$texte): void {
+            foreach ($a as $s => $w) {
+                if ($s === 'werte') {
+                    continue;
+                }
+                if (is_array($w)) {
+                    $sammeln($w);
+                } elseif (is_string($w) && !in_array($s, ['typ', 'seit', 'geaendert', 'version', 'muster', 'kennung', 'datei', 'ziel', 'quelle', 'liste', 'anker', 'anbieter', 'variante', 'art'], true) && !str_starts_with($w, '--') && !str_starts_with($w, 'lp-')) {
+                    $texte[] = $w;
+                }
             }
-        });
+        };
+        $sammeln($k);
         T::ok(count($texte) > 80, 'Texte gefunden: ' . count($texte));
         foreach ($texte as $t) {
             T::ok(!preg_match(Pruefer::ASCII, $t, $m), "ASCII-Umlaut „" . ($m[0] ?? '') . "“ in „{$t}“");

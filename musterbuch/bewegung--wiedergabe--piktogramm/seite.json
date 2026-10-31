@@ -1,0 +1,26 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Bewegung – Wiedergabe, Piktogramm",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Bewegung“ in der Variante „wiedergabe“ mit der Darstellung „piktogramm“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Bewegung – Wiedergabe, Piktogramm",
+            "text": "Baustein „bewegung“, Variante „wiedergabe“, Darstellung „piktogramm“ (seit 3.66.0): ruhig, wie ein Notausgang-Schild."
+        },
+        {
+            "typ": "bewegung",
+            "variante": "wiedergabe",
+            "stil": "piktogramm",
+            "titel": "So sieht eine aufgezeichnete Bewegung aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder.",
+            "text": "Diese Bewegung wurde nicht gefilmt, sondern berechnet. Sie läuft ohne Kamera und ohne Anfrage an Dritte."
+        }
+    ]
+}

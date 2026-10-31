@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.65.0)
+# Landingpage bearbeiten (Endoskeleton 3.66.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -10,6 +10,7 @@ _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand
 - Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.
 - Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `"dekorativ": true`).
 - Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.
+- Die Kamera-Vorführung (`bewegung`, Variante `live`) gibt es höchstens einmal; ihr Knopftext soll das Wort „Kamera“ enthalten, damit der Besucher weiß, was der Klick auslöst.
 - Nach jeder Änderung bauen und prüfen; Befunde nennen den Abschnitt mit Nummer und Namen.
 
 ## Abschnitte
@@ -254,5 +255,28 @@ Varianten: `akzent`, `schlicht`
         "text": "Platz sichern",
         "ziel": "#anmeldung"
     }
+}
+```
+
+### Bewegung (`bewegung`)
+
+Varianten: `wiedergabe`, `live` · Variante `live` höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
+| `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
+| `stil` | auswahl | – | eines von `silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`; Standard `silhouette`; fehlt: silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen |
+| `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen, nicht leer; nur bei live; fehlt: Kamera starten |
+
+```json
+{
+    "typ": "bewegung",
+    "variante": "wiedergabe",
+    "titel": "So sieht eine aufgezeichnete Bewegung aus",
+    "bewegung": "bew/beispiel-winken.bewegung",
+    "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
 }
 ```

@@ -426,6 +426,88 @@ section.lp-termin--band {
   }
 }
 
+/* ─── BEWEGUNG ──────────────────────────────────────────────────────────── */
+.lp-bewegung-text {
+  max-width: 40rem;
+  margin-bottom: var(--space-lg);
+}
+
+.lp-bewegung-figur {
+  margin: 0 auto var(--space-md);
+  max-width: 100%;
+  text-align: center;
+}
+
+.lp-bewegung-figur canvas {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 32rem;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  background: var(--heading);
+  color: var(--bg);
+}
+
+.lp-bewegung-figur canvas:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.1875rem;
+}
+
+.lp-bewegung-beschriftung {
+  margin-top: var(--space-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.lp-bewegung-leiste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.lp-bewegung-wahl {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.lp-bewegung-wahl select {
+  min-height: 2.75rem;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.lp-bewegung-kamera {
+  max-width: 40rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.lp-bewegung-hinweis {
+  margin-bottom: var(--space-md);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.lp-bewegung-meldung {
+  max-width: 40rem;
+  margin: var(--space-sm) auto 0;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
 /* ─── ERFAHRUNGEN ───────────────────────────────────────────────────────── */
 section.lp-erfahrungen {
   background: var(--bg-alt);

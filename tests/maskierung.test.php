@@ -15,9 +15,12 @@ const ANGRIFF = '<script>alert(1)</script>"onmouseover=x';
 
 $k = Katalog::laden();
 
-/** Füllt jedes zeile-/absatz-Feld (auch fehlende, optionale) und jeden Knopftext mit ANGRIFF, Listen eintragsweise. */
+/** Füllt jedes zeile-/absatz-Feld (auch fehlende, optionale) und jeden Knopftext mit ANGRIFF, Listen eintragsweise; Felder, die nur eine andere Variante kennt (nur_bei), bleiben leer. */
 $vergiften = static function (array $b, array $felder) use (&$vergiften): array {
     foreach ($felder as $name => $def) {
+        if (isset($def['nur_bei'], $b['variante']) && !in_array($b['variante'], $def['nur_bei'], true)) {
+            continue;
+        }
         if (in_array($def['typ'], ['zeile', 'absatz'], true)) {
             $b[$name] = ANGRIFF;
         } elseif ($def['typ'] === 'knopf') {
@@ -46,6 +49,7 @@ foreach ($k->bausteine as $typ => $e) {
             if ($typ === 'hero') { $s['bausteine'][0] = $gift; }
             if ($typ === 'anmeldung') { $s['bausteine'][1] = $gift; }
             $o = H::ordner($s);
+            H::bewegungen($o, $s);
             $erg = Bauer::bauen($o);
             T::eq(H::texte($erg->befunde), '', 'Bau ohne Befunde');
             $h = (string) @file_get_contents("$o/index.html");

@@ -41,6 +41,9 @@ $f = $p['firma'];
 <?php endif ?>
 <link rel="stylesheet" href="<?= $k->e($css) ?>">
 <script src="<?= $k->e($js) ?>" defer></script>
+<?php if (!empty($bewegung)): ?>
+<script src="<?= $k->e($bewegung) ?>" defer></script>
+<?php endif ?>
 </head>
 <body class="lp-seite">
 <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>

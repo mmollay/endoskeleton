@@ -146,6 +146,26 @@ final class Kontext
             . ' <a href="' . $this->e($datei) . '">als Datei öffnen</a>.</p>';
     }
 
+    /**
+     * Die Bewegungsdatei eines Bausteins (3.64.0): wird hier noch einmal geprüft (Bewegung), ein Bauplan am Prüfer vorbei bekommt nie eine Datei, die
+     * es nicht geben darf. Liefert das Bildverhältnis und die Maße der Leinwand (lange Seite 640 Punkte, so wie lp/bewegung.js sie auch setzt) und
+     * merkt den Player zum Kopieren vor (live: dazu das Live-Skript, das erst nach dem Klick geladen wird).
+     *
+     * @return array{verhaeltnis: float, breite: int, hoehe: int}
+     */
+    public function bewegungsDatei(string $pfad, bool $live): array
+    {
+        if (($f = Bewegung::fehler($this->seite, $pfad)) !== null) {
+            throw new BauFehler("Bewegungsdatei $pfad: $f[0]");
+        }
+        $v = (float) json_decode((string) file_get_contents("$this->seite/$pfad"), false, 8, JSON_THROW_ON_ERROR)->verhaeltnis;
+        $this->kopien['es/bewegung.js'] = dirname(__DIR__) . '/bewegung.js';
+        if ($live) {
+            $this->kopien['es/bewegung-live.js'] = dirname(__DIR__) . '/bewegung-live.js';
+        }
+        return ['verhaeltnis' => $v, 'breite' => (int) round($v >= 1 ? 640 : 640 * $v), 'hoehe' => (int) round($v >= 1 ? 640 / $v : 640)];
+    }
+
     /** JSON-LD, sicher gegen </script> und & im Text. */
     public function jsonLd(array $daten): string
     {
