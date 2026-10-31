@@ -121,6 +121,8 @@ const ps = versuch(() => api.farben('silhouette', 'rgb(255, 255, 255)', 'rgb(27,
 pruefe(!ps.fehler && kr(ps.fuell, ps.kontur) >= 1.2 && JSON.stringify(ps.fuell) !== JSON.stringify(ps.kontur), 'Silhouette: Körper und Kontur sind verschiedene Farben');
 const pk = versuch(() => api.farben('koerper', 'rgb(255, 255, 255)', 'rgb(27, 36, 48)'));
 pruefe(!pk.fehler && lum(pk.hell) > lum(pk.mitte) && lum(pk.mitte) > lum(pk.dunkel), 'Körper: Verlauf von hell über Mitte nach dunkel');
+const pl = versuch(() => api.farben('koerper', 'rgb(15, 15, 26)', 'rgb(255, 255, 255)'));
+pruefe(!pl.fehler && lum(pl.hell) > lum(pl.mitte) && lum(pl.mitte) > lum(pl.dunkel), 'Körper auf hellem Grund: die helle Seite ist auch dort die hellere (Licht von links oben)');
 pruefe(typeof api.farben === 'function' && !versuch(() => api.farben('silhouette', 'kein Wert', undefined)).fehler && !versuch(() => api.farben('koerper', '', '')).fehler, 'unlesbare Farben: Ersatzfarben, kein Fehler');
 const pp = versuch(() => api.farben('piktogramm', 'rgb(255, 255, 255)', 'rgb(27, 36, 48)'));
 pruefe(!pp.fehler && JSON.stringify(pp.luecke) === JSON.stringify([27, 36, 48]), 'Piktogramm: die Lücke hat die Farbe des Grundes');

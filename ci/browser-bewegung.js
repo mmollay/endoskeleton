@@ -75,12 +75,15 @@ const LANGSAM_ERLAUBNIS = `(() => { const md = navigator.mediaDevices, g = md.ge
 const LANGSAM_PLAY = `(() => { const p = HTMLMediaElement.prototype.play; HTMLMediaElement.prototype.play = function (...a) { return p.apply(this, a).then((r) => new Promise((res) => setTimeout(() => res(r), 800))); }; })();`;
 const VERSTECKEN = () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); };
 
-/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei), modellOrdner (zweiter Ordner, aus dem Modelldateien kommen: Ziel von data-lp-modell, relativ zur Seite). */
+/** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei), modellOrdner (zweiter Ordner, aus dem Modelldateien kommen: Ziel von data-lp-modell, relativ zur Seite),
+ *  3.64.2: stil (Ersatz für data-lp-stil der Figur; null = Attribut weg), thema (data-theme am html), farben ({ figur, grund }: Farben der Leinwand, nur im Test), fenster ({ width, height }). */
 async function oeffnen(browser, name, optionen = {}) {
-  const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
+  const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: optionen.fenster || { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
   const page = await kontext.newPage();
-  const aus = { kontext, page, fremd: [], anfragen: [], seitenfehler: [] };
+  const aus = { kontext, page, fremd: [], anfragen: [], seitenfehler: [], konsole: [] };
   page.on('pageerror', (e) => aus.seitenfehler.push(e.message));
+  // nur Fehler, keine Warnungen: getImageData im Test selbst löst eine Chromium-Leistungswarnung aus
+  page.on('console', (m) => { if (m.type() === 'error') { aus.konsole.push(m.text()); } });
   if (process.env.ES_DEBUG) { page.on('console', (m) => console.log(`  [Konsole ${name}] ${m.text().slice(0, 200)}`)); page.on('requestfailed', (r) => console.log(`  [Anfrage fehlgeschlagen] ${r.url()} ${r.failure()?.errorText}`)); }
   await page.addInitScript(SPION(optionen.kamera || 'echt'));
   if (optionen.vorher) { await page.addInitScript(optionen.vorher); }
@@ -106,7 +109,15 @@ async function oeffnen(browser, name, optionen = {}) {
     }
     const datei = path.join(MUSTERBUCH, rel.endsWith('/') || rel === name ? rel.replace(/\/?$/, '/') + 'index.html' : rel);
     if (!datei.startsWith(MUSTERBUCH) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) { return r.fulfill({ status: 404, body: '' }); }
-    return r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: fs.readFileSync(datei) });
+    let inhalt = fs.readFileSync(datei);
+    if (datei.endsWith('index.html') && (optionen.stil !== undefined || optionen.thema || optionen.farben)) {
+      let h = inhalt.toString('utf8');
+      if (optionen.stil !== undefined) { h = h.replace(/ data-lp-stil="[^"]*"/, optionen.stil === null ? '' : ` data-lp-stil="${optionen.stil}"`); }
+      if (optionen.thema) { h = h.replace('<html ', `<html data-theme="${optionen.thema}" `); }
+      if (optionen.farben) { h = h.replace('</head>', `<style>.lp-bewegung-figur canvas{background:${optionen.farben.grund};color:${optionen.farben.figur}}</style></head>`); }
+      inhalt = Buffer.from(h, 'utf8');
+    }
+    return r.fulfill({ status: 200, contentType: TYPEN[datei.split('.').pop()] || 'application/octet-stream', body: inhalt });
   });
   await page.goto(`https://lp.test/${name}/`);
   await page.waitForLoadState('load');
@@ -123,6 +134,23 @@ const leinwand = (page) => page.evaluate(() => {
   }
   return { n, mx: n ? sx / n : 0, breite: c.width, url: c.toDataURL() };
 });
+/** Wie leinwand(), aber nach Deckkraft: Pixel, die etwas zeigen (alpha > 24), ihr Rahmen, ihr Schwerpunkt und die häufigste deckende Farbe (je 16 Stufen gerundet). */
+const masse = (page) => page.evaluate(() => {
+  const c = document.querySelector('.lp-bewegung-figur canvas'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, farben = {};
+  let n = 0, sx = 0, x0 = 1e9, x1 = -1, y0 = 1e9, y1 = -1;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] <= 24) { continue; }
+    const p = i / 4, x = p % c.width, y = (p - x) / c.width;
+    n++; sx += x; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    if (d[i + 3] === 255) { const k = [d[i], d[i + 1], d[i + 2]].map((v) => Math.round(v / 16) * 16).join(','); farben[k] = (farben[k] || 0) + 1; }
+  }
+  const haupt = Object.entries(farben).sort((a, b) => b[1] - a[1])[0];
+  const st = getComputedStyle(c);
+  return { n, mx: n ? sx / n : 0, breite: c.width, hoehe: c.height, x0, x1, y0, y1, haupt: haupt ? haupt[0].split(',').map(Number) : null, grund: st.backgroundColor, url: c.toDataURL(),
+    scrollBreit: document.documentElement.scrollWidth, fensterBreit: window.innerWidth, fig: c.closest('.lp-bewegung-figur').getBoundingClientRect().toJSON(), cv: c.getBoundingClientRect().toJSON() };
+});
+const lum = (c) => { const t = c.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * t[0] + 0.7152 * t[1] + 0.0722 * t[2]; };
+const kontrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 const text = (page, wahl) => page.locator(wahl).first().textContent().then((t) => t.trim());
 const sichtbar = (page, wahl) => page.locator(wahl).first().isVisible();
 const meldung = (page, was) => sichtbar(page, `[data-lp-t="${was}"]`);
@@ -234,6 +262,116 @@ function pruefeText(t) {
     pruefe(await meldung(w.page, 'fehler'), 'Zu große Bewegungsdatei: Hinweis „konnte nicht geladen werden“');
     pruefe(!(await w.page.evaluate(() => window.__grossGeparst)) && w.seitenfehler.length === 0, `Zu große Bewegungsdatei: nicht mit JSON.parse gelesen, kein Browserfehler (${w.seitenfehler.join('; ')})`);
     await w.kontext.close();
+  }
+
+  // ===== Darstellungen der Figur (3.64.2): silhouette (Vorgabe), piktogramm, koerper — und die älteren strich, punkte =====
+  {
+    const SEITEN = { silhouette: 'bewegung--wiedergabe', piktogramm: 'bewegung--wiedergabe--piktogramm', koerper: 'bewegung--wiedergabe--koerper' };
+    const rgbVon = (t) => String(t).match(/\d+/g).slice(0, 3).map(Number);
+    const stand = {};   // Standbild je Stil (Weniger Bewegung = festes Bild in der Mitte der Bewegung)
+
+    // (3) Pixel in jedem Stil, und die Bilder unterscheiden sich; (5) unbekannter Stil und fehlendes Attribut = Vorgabe; (7) keine Fremdanfrage, keine Fehler
+    for (const [stil, name] of Object.entries(SEITEN)) {
+      const w = await oeffnen(browser, name, { still: true });
+      const m = await masse(w.page);
+      stand[stil] = m;
+      pruefe(await w.page.getAttribute('.lp-bewegung-figur', 'data-lp-stil') === stil, `Darstellung ${stil}: die Figur trägt data-lp-stil="${stil}"`);
+      pruefe(m.n > 1500, `Darstellung ${stil}: Standbild mit Figur (${m.n} Pixel)`);
+      pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0 && w.konsole.length === 0, `Darstellung ${stil}: keine Fremdanfrage, keine Konsolen-/Seitenfehler (${w.fremd.join(', ')} ${w.seitenfehler.concat(w.konsole).join('; ')})`);
+      const z = await zugriffe(w.page);
+      pruefe(z.z.length === 0 && z.s === 0 && z.l === 0, `Darstellung ${stil}: kein Cookie, kein Web-Speicher`);
+      await w.kontext.close();
+    }
+    const paare = await (async () => {
+      const w = await oeffnen(browser, 'bewegung--wiedergabe', { still: true });
+      const r = await w.page.evaluate(async () => {
+        const d = await (await fetch(document.querySelector('[data-lp-bewegung]').getAttribute('data-lp-bewegung'))).json();
+        const mal = (stil) => {
+          const cv = document.createElement('canvas'); cv.width = 360; cv.height = Math.round(360 / d.verhaeltnis);
+          const c = cv.getContext('2d');
+          window.LpBewegung.zeichne(c, d, 45, cv.width, cv.height, { stil, farbe: 'rgb(240, 240, 245)', grund: 'rgb(26, 26, 46)' });
+          return c.getImageData(0, 0, cv.width, cv.height).data;
+        };
+        const s = ['silhouette', 'piktogramm', 'koerper'].map(mal), aus = {};
+        for (const [a, b] of [[0, 1], [0, 2], [1, 2]]) {
+          let n = 0;
+          for (let i = 0; i < s[a].length; i += 4) { if (Math.abs(s[a][i] - s[b][i]) + Math.abs(s[a][i + 1] - s[b][i + 1]) + Math.abs(s[a][i + 2] - s[b][i + 2]) + Math.abs(s[a][i + 3] - s[b][i + 3]) > 90) { n++; } }
+          aus[a + '-' + b] = n;
+        }
+        return aus;
+      });
+      await w.kontext.close();
+      return r;
+    })();
+    pruefe(Object.values(paare).every((n) => n > 1500), `Darstellungen: die drei Bilder unterscheiden sich messbar (abweichende Pixel Silhouette/Piktogramm/Körper: ${JSON.stringify(paare)})`);
+    pruefe(new Set(Object.values(stand).map((m) => m.url)).size === 3, 'Darstellungen: auf den Seiten sind die Standbilder der drei Stile verschieden');
+    for (const [was, stil] of [['unbekannter Stil „knochen“', 'knochen'], ['leerer Stil', ''], ['Stil ohne Attribut', null], ['Großschreibung „PIKTOGRAMM“', 'PIKTOGRAMM']]) {
+      const w = await oeffnen(browser, 'bewegung--wiedergabe', { still: true, stil });
+      const m = await masse(w.page);
+      pruefe(m.url === stand.silhouette.url, `Darstellung (${was}): fällt auf die Vorgabe silhouette zurück, Bild wie die Vorgabe`);
+      pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0 && w.konsole.length === 0 && !(await meldung(w.page, 'fehler')), `Darstellung (${was}): kein Fehler im Browser, kein Hinweis „fehler“ (${w.seitenfehler.concat(w.konsole).join('; ')})`);
+      await w.kontext.close();
+    }
+
+    // (4) strich und punkte bleiben erreichbar und zeichnen weiter (Befehle gleich wie vorher: tests/bewegung-zeichnen.js)
+    for (const stil of ['strich', 'punkte']) {
+      const w = await oeffnen(browser, 'bewegung--wiedergabe', { still: true, stil });
+      const m = await masse(w.page);
+      pruefe(m.n > 200 && m.url !== stand.silhouette.url, `Darstellung ${stil}: Bestandsdarstellung zeichnet (${m.n} Pixel) und ist nicht die Vorgabe`);
+      await w.kontext.close();
+    }
+
+    // (6) Spiegeln, Pause, Tempo, Standbild in jedem Stil
+    for (const stil of ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte']) {
+      const w = await oeffnen(browser, 'bewegung--wiedergabe', { stil });
+      const { page } = w;
+      await warte(300);
+      const a = await masse(page);
+      await page.click('[data-lp-b="pause"]');
+      const p1 = await masse(page); await warte(300); const p2 = await masse(page);
+      pruefe(a.url !== p1.url || a.n > 200, `Bedienung ${stil}: läuft`);
+      pruefe(p1.url === p2.url && await text(page, '[data-lp-b="pause"]') === 'Abspielen', `Bedienung ${stil}: Pause hält das Bild an`);
+      await page.click('[data-lp-b="spiegeln"]');
+      const sp = await masse(page);
+      pruefe(Math.abs(sp.mx - (sp.breite - p2.mx)) < 6 && sp.url !== p2.url, `Bedienung ${stil}: Spiegeln spiegelt das Bild (${p2.mx.toFixed(1)} → ${sp.mx.toFixed(1)} von ${sp.breite})`);
+      await page.click('[data-lp-b="spiegeln"]');
+      await page.selectOption('[data-lp-b="tempo"]', '2');
+      await page.click('[data-lp-b="pause"]'); await warte(400);
+      pruefe((await masse(page)).url !== p2.url && await text(page, '[data-lp-b="pause"]') === 'Pause', `Bedienung ${stil}: Abspielen und doppeltes Tempo laufen`);
+      await page.focus('.lp-bewegung-figur canvas');
+      await page.keyboard.press('Home'); const h1 = await masse(page);
+      await page.keyboard.press('ArrowRight'); const h2 = await masse(page);
+      pruefe(h1.url !== h2.url, `Bedienung ${stil}: Pfeil rechts schaltet ein Bild weiter`);
+      pruefe(w.seitenfehler.length === 0 && w.konsole.length === 0 && w.fremd.length === 0, `Bedienung ${stil}: keine Fehler, keine Fremdanfrage (${w.seitenfehler.concat(w.konsole).join('; ')})`);
+      await w.kontext.close();
+      const s = await oeffnen(browser, 'bewegung--wiedergabe', { still: true, stil });
+      const s1 = await masse(s.page); await warte(400); const s2 = await masse(s.page);
+      pruefe(s1.n > 200 && s1.url === s2.url && await text(s.page, '[data-lp-b="pause"]') === 'Abspielen', `Weniger Bewegung ${stil}: Standbild mit Figur, nichts bewegt sich, Knopf „Abspielen“`);
+      await s.page.click('[data-lp-b="pause"]'); await warte(500);
+      pruefe((await masse(s.page)).url !== s1.url, `Weniger Bewegung ${stil}: „Abspielen“ startet die Bewegung erst auf Wunsch`);
+      await s.kontext.close();
+    }
+
+    // (8) hell und dunkel, 1280 und 390 Punkte breit, zwei Markenfarben: die Figur liegt in der Fläche, nichts läuft über, die Hauptfarbe hat 3 : 1 gegen den Grund
+    const VARIANTEN = [
+      ['hell', { thema: 'light' }], ['dunkel', { thema: 'dark' }],
+      ['Marke Grün/Gelb', { farben: { grund: '#1b5e3a', figur: '#ffd84d' } }], ['Marke Rosa/Hellgrau', { farben: { grund: '#f1e4ea', figur: '#c2185b' } }],
+    ];
+    for (const stil of ['silhouette', 'piktogramm', 'koerper']) {
+      for (const [was, opt] of VARIANTEN) {
+        for (const fenster of [{ width: 1280, height: 900 }, { width: 390, height: 800 }]) {
+          const w = await oeffnen(browser, SEITEN[stil], { still: true, fenster, ...opt });
+          const m = await masse(w.page);
+          const lage = `${stil}, ${was}, ${fenster.width} px`;
+          pruefe(m.n > 1500 && m.x0 >= 2 && m.y0 >= 2 && m.x1 <= m.breite - 3 && m.y1 <= m.hoehe - 3, `Lage ${lage}: Figur liegt ganz in der Leinwand (Rahmen ${m.x0}–${m.x1} von ${m.breite}, ${m.y0}–${m.y1} von ${m.hoehe})`);
+          pruefe(m.scrollBreit <= m.fensterBreit && m.cv.left >= m.fig.left - 1 && m.cv.right <= m.fig.right + 1, `Lage ${lage}: nichts läuft über (Seite ${m.scrollBreit} von ${m.fensterBreit} Punkten, Leinwand ${m.cv.width.toFixed(0)} Punkte breit)`);
+          const k = m.haupt ? kontrast(m.haupt, rgbVon(m.grund)) : 0;
+          pruefe(k >= 3, `Farbe ${lage}: die Hauptfarbe der Figur hat gegen den Grund ${k.toFixed(1)} : 1 (Soll ≥ 3)`);
+          pruefe(w.seitenfehler.length === 0 && w.konsole.length === 0 && w.fremd.length === 0, `Lage ${lage}: keine Fehler, keine Fremdanfrage`);
+          await w.kontext.close();
+        }
+      }
+    }
   }
 
   // ===== Live: Einwilligung zuerst =====
