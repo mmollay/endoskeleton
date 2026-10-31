@@ -1,5 +1,5 @@
 {
-  "version": "3.64.1",
+  "version": "3.64.2",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -239,7 +239,7 @@
         "text":       { "typ": "absatz", "label": "Text", "max": 400 },
         "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
         "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
-        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; koerper ist eine Figur mit Tiefe und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen" },
+        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen" },
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nicht_leer": true, "nur_bei": ["live"], "fehlt": "Kamera starten" }
       },
       "regeln": { "hoechstens_variante": { "live": 1 } },

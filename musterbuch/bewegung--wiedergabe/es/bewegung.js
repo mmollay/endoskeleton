@@ -85,21 +85,22 @@
     while (kontrast(r, g) < 3 && n < 10) r = mischen(f, z, ++n / 10);
     return r;
   }
-  /* Mischt f um t zum Grund g hin, so weit, wie der Kontrast 3 : 1 hält (sonst weniger). */
-  function weich(f, g, t) {
-    var r = mischen(f, g, t);
-    while (t > 0.001 && kontrast(r, g) < 3) r = mischen(f, g, t = Math.max(0, t - 0.05));
+  /* Mischt f um t zu z hin (ohne Angabe: zum Grund g), so weit, wie der Kontrast zu g 3 : 1 hält (sonst weniger). */
+  function weich(f, g, t, z) {
+    var r = mischen(f, z || g, t);
+    while (t > 0.001 && kontrast(r, g) < 3) r = mischen(f, z || g, t = Math.max(0, t - 0.05));
     return r;
   }
   /* Die Farben eines Stils. Tragend (gegen den Grund mindestens 3 : 1): Kontur (silhouette), Füllung (piktogramm), Mitte (koerper). */
   function farben(stil, farbe, grund) {
-    var g = rgb(grund, [255, 255, 255]), f = lesbar(rgb(farbe, [255, 255, 255]), g);
+    var g = rgb(grund, [255, 255, 255]), f = lesbar(rgb(farbe, [255, 255, 255]), g), dunkelGrund = hell(g) < 0.18,
+      z = dunkelGrund ? [0, 0, 0] : [255, 255, 255];   // gedämpft wird zu Schwarz (dunkler Grund) oder Weiß (heller Grund): die Farbtöne bleiben, nichts wird schlammig
     if (stil === 'piktogramm') return { fuell: f, luecke: g };
     if (stil === 'koerper') {
-      var dunkel = weich(f, g, 0.5);
-      return { hell: f, mitte: weich(f, g, 0.2), dunkel: dunkel, rand: mischen(dunkel, g, 0.6), schatten: hell(g) < 0.2 ? f : [0, 0, 0], schattenA: hell(g) < 0.2 ? 0.2 : 0.38, grund: g };
+      var matt = weich(f, g, 0.5, z), mitte = weich(f, g, 0.2, z);   // Licht von links oben: die helle Seite ist immer die hellere
+      return { hell: dunkelGrund ? f : matt, mitte: mitte, dunkel: dunkelGrund ? matt : f, rand: mischen(matt, g, 0.6), schatten: dunkelGrund ? f : [0, 0, 0], schattenA: dunkelGrund ? 0.2 : 0.38, grund: g };
     }
-    return { fuell: weich(f, g, 0.3), kontur: f, boden: mischen(g, f, 0.3) };
+    return { fuell: weich(f, g, 0.3, z), kontur: f, boden: mischen(g, f, 0.3) };
   }
 
   /* ---- Figur (silhouette, piktogramm, koerper): dieselben Teile aus den 33 Punkten, nur Maße und Pinsel unterscheiden sich ---- */

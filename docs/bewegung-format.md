@@ -54,7 +54,7 @@ schon beim Aufnehmen als `0,0,0` — sie verlassen den Speicher des Browsers nie
 ### Die Verbindungen der Figur gehören zum Player
 
 Welche Punkte durch Linien verbunden werden (Schulter–Ellbogen–Handgelenk …), steht **nicht** in der Datei, sondern im Player (`LpBewegung`).
-So bleibt die Datei klein und die Darstellung austauschbar (Strichfigur oder Punkte, andere Farben, andere Strichstärken).
+So bleibt die Datei klein und die Darstellung austauschbar (Silhouette, Piktogramm, Körper, Strichfigur oder Punkte, andere Farben, andere Strichstärken).
 
 ### Fehlerkennungen
 
@@ -102,8 +102,25 @@ Fehlermeldung im Browser. Der Player liest nie eine Datei über 300 000 Zeichen 
 Tastatur-Bedienung der Leinwand ruht, solange die Kamera läuft (sonst zeichnete der Beispiel-Player in dieselbe Leinwand).
 
 **Zeichnen und Zeitsteuerung sind getrennt:** `LpBewegung.zeichne(ctx, daten, bild, breite, hoehe, optionen)` ist eine reine Zeichenfunktion
-(Optionen: `farbe`, `stil` = `strich`|`punkte`, `spiegeln`, `linie`, `ueber`, `schatten`). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei)`
+(Optionen: `farbe`, `grund`, `stil` = `silhouette`|`piktogramm`|`koerper`|`strich`|`punkte`, `spiegeln`, `linie`, `ueber`, `schatten`). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei)`
 fügt Zeitsteuerung, Schleife, Pause und Tempo hinzu. Ein Renderer (z. B. für die Shorts) ruft `zeichne` Bild für Bild selbst auf.
+
+## Darstellungen der Figur (seit 3.64.2)
+
+Der Katalog-Baustein `bewegung` hat das Feld `stil`; das Kit schreibt es als `data-lp-stil` an die Figur. Ohne Angabe gilt `silhouette`. Ein unbekannter
+Wert fällt im Player auf die Vorgabe zurück (kein Fehler); der Prüfer des Kits lehnt ihn beim Bauen ab.
+
+| Wert | Aussehen | Wann |
+|------|----------|------|
+| `silhouette` (Vorgabe) | kräftige Figur mit Kontur, Körper etwas gedämpft, Boden-Linie | fast immer: auch klein gut lesbar |
+| `piktogramm` | einfarbige Fläche, Kopf getrennt, dünne Lücke in der Farbe des Hintergrunds, wo sich Teile überdecken | ruhig, wie ein Notausgang-Schild |
+| `koerper` | Figur mit Tiefe: Verlauf von links oben, Schatten unter den Füßen | wenn die Figur Hauptsache ist; braucht etwas mehr Rechenzeit |
+| `strich`, `punkte` | Strichfigur / nur die Körperpunkte (die älteren Darstellungen, unverändert) | Bestand |
+
+**Farben ohne neue Einstellung:** Der Player kennt eine Figurfarbe (`color` der Leinwand) und liest den Hintergrund (`background-color` der Leinwand oder des
+nächsten Elternelements). Daraus entstehen alle Töne: gedämpft wird zu Schwarz (dunkler Grund) oder Weiß (heller Grund), die Lücke und der Schatten kommen vom Grund. Die
+tragende Farbe jedes Stils (Kontur bei der Silhouette, Fläche beim Piktogramm, Mitte des Körpers) hat gegen den Grund mindestens 3 : 1 (WCAG 1.4.11); ist die
+Markenfarbe zu schwach, wird sie dafür abgedunkelt oder aufgehellt. Die Hauptfarbe bleibt, wie sie ist, wenn sie schon genügt. `LpBewegung.farben(stil, farbe, grund)` liefert die Töne.
 
 ## Kamera-Vorführung (`lp/bewegung-live.js`)
 

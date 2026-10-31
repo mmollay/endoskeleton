@@ -4,6 +4,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.64.2] — 2026-10-31
+
+### Added
+- **Bewegung: die Figur gibt es jetzt in drei Darstellungen, wählbar** (Anlass: Martin, nach der Vergleichsseite „noch mal C, aber wählbar“; Bahn BS). `silhouette` (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar), `piktogramm` (ruhig, wie ein Notausgang-Schild) und `koerper` (Figur mit Tiefe, braucht etwas mehr Rechenzeit). `strich` und `punkte` bleiben gültig und zeichnen Befehl für Befehl wie vorher (Prüfsummen im Test). Ein unbekannter Wert fällt auf `silhouette` zurück, nie ein Fehler im Browser.
+- **Katalog: das Feld `stil` des Bausteins `bewegung` ist eine Auswahl** (`silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`; Vorgabe `silhouette`, vorher `strich`); das Kit schreibt es als `data-lp-stil`, der Prüfer lehnt jeden anderen Wert ab. `lp/SKILL.md`, `lp/werkstatt.md` und das Musterbuch sagen, wann man welche Darstellung nimmt; neu im Musterbuch: `bewegung--wiedergabe--piktogramm`, `bewegung--wiedergabe--koerper`.
+- **Farben ohne neue Einstellung:** der Player liest die Figurfarbe (`color` der Leinwand) und den Hintergrund (`background-color` der Leinwand oder des nächsten Elternelements) und mischt daraus Kontur, Verlauf, Schatten und Lücke; die tragende Farbe hat gegen den Grund mindestens 3 : 1. Keine neue CSS-Variable, kein neues Token, keine neue `lp-`-Klasse (kein Eingriff in `lp/lp.css`). Neu: `LpBewegung.farben(stil, farbe, grund)`, `LpBewegung.STILE`, `LpBewegung.VORGABE`; `zeichne` kennt die Option `grund` (ohne Angabe gilt `schatten`). Aufruf und Rückgabe von `zeichne` sind sonst unverändert (ein Short-Renderer kann sie weiter so rufen).
+- **Doku:** `docs/bewegung-format.md`, Abschnitt „Darstellungen der Figur“.
+
+### Changed
+- **Player `lp/bewegung.js` wächst** von 11,2 KB (gzip 4,5 KB) auf 26,6 KB (gzip 9,9 KB): drei Zeichenstile samt Farbrechnung; Grenzen in BW10 auf 28 KB / gzip 10 KB angehoben.
+- **Test `texte`:** die Wertelisten der Auswahlfelder (`werte`) zählen nicht mehr als Text; sie sind technische Namen wie `vor_ort` und jetzt `koerper` (der Wert steht in `data-lp-stil`, nie auf der Seite sichtbar; die Prüfliste für ASCII-Umlaute bleibt unverändert).
+- **Tests:** BW01/BW05/BW06 angepasst (neue Werte, neue Vorgabe), neu BW14 (Katalogfeld, Bau, Skill, Werkstatt, Musterbuch) und BW15 (ruft `tests/bewegung-zeichnen.js`: aufzeichnender Kontext, drei Stile, Bestandsschutz, Rückfall, Farbregeln); `ci/browser-bewegung.js` prüft im Browser alle fünf Darstellungen (Pixel, Unterschied, Rückfall, Spiegeln, Pause, Tempo, Standbild, hell/dunkel, 1280/390 Punkte, zwei Markenfarben, keine Fremdanfrage).
+
 ## [3.64.1] — 2026-10-30
 
 ### Added
