@@ -1,9 +1,9 @@
-/* SSI Endoskeleton 3.64.1 — Kamera-Vorführung des Bausteins „bewegung“ (Variante live). Wird erst nach dem Klick auf „Kamera starten“ geladen
+/* SSI Endoskeleton 3.64.2 — Kamera-Vorführung des Bausteins „bewegung“ (Variante live). Wird erst nach dem Klick auf „Kamera starten“ geladen
    (lp/bewegung.js importiert es). Erkennt den Körper mit MediaPipe Pose Landmarker (Apache-2.0), Modell und WASM liegen im Seitenordner unter
    modell/ (scripts/modell-holen.sh) — kein CDN. Das Kamerabild wird nur auf eine Leinwand gezeichnet: nichts wird hochgeladen, nichts im
    Browser gespeichert (kein Cookie, kein Web-Speicher), das <video> hängt nie im Dokument. Aufgenommen werden nur Körperpunkte (Format
    „bewegung v1“, docs/bewegung-format.md), Augen und Mund nie. Ohne Kamera, Erlaubnis, WebGL oder WASM: Hinweis, die Beispielbewegung läuft weiter.
-   Seit 3.64.1 für Seiten, die die Aufnahme selbst weiterverwenden: am Ende einer Aufnahme geht am <figure> das Ereignis lp-bewegung:aufnahme
+   Seit 3.64.2 für Seiten, die die Aufnahme selbst weiterverwenden: am Ende einer Aufnahme geht am <figure> das Ereignis lp-bewegung:aufnahme
    (detail.text = die fertige .bewegung-Datei), und das Attribut data-lp-modell nennt einen anderen Modellordner. Das Kit selbst sendet nichts. */
 const STANDARD = new URL('../modell/', import.meta.url).href;
 const FPS = 30;
