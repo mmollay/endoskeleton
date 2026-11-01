@@ -227,7 +227,7 @@
       }
     },
     "bewegung": {
-      "name": "Bewegung", "seit": "3.66.0", "geaendert": "3.66.0",
+      "name": "Bewegung", "seit": "3.66.0", "geaendert": "3.67.0",
       "klassen": {
         "lp-bewegung": "3.66.0", "lp-bewegung--wiedergabe": "3.66.0", "lp-bewegung--live": "3.66.0", "lp-bewegung-text": "3.66.0",
         "lp-bewegung-figur": "3.66.0", "lp-bewegung-beschriftung": "3.66.0", "lp-bewegung-leiste": "3.66.0", "lp-bewegung-wahl": "3.66.0",
@@ -239,7 +239,8 @@
         "text":       { "typ": "absatz", "label": "Text", "max": 400 },
         "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
         "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
-        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen" },
+        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte", "figur"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen; figur (seit 3.67.0) ist eine gezeichnete Figur mit dunklem Kopf, Gesicht aus zwei Lidern und einem Mundstrich, Kleidung in der Markenfarbe und heller Randlinie — dazu passt das Feld ausdruck" },
+        "ausdruck":   { "typ": "auswahl", "label": "Ausdruck der Figur (nur bei Darstellung figur)", "werte": ["neutral", "muede", "ueberrascht", "entschlossen"], "standard": "neutral", "nur_wenn": { "stil": "figur" }, "seit": "3.67.0", "fehlt": "neutral (ruhiger Blick, die Figur blinzelt gelegentlich); müde hat schwere Lider; überrascht weite Augen und einen runden Mund; entschlossen einen festen Blick. Der Ausdruck kommt von der Seite, nicht von der Kamera; bei „weniger Bewegung“ blinzelt die Figur nie" },
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nicht_leer": true, "nur_bei": ["live"], "fehlt": "Kamera starten" }
       },
       "regeln": { "hoechstens_variante": { "live": 1 } },

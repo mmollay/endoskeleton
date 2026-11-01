@@ -1,0 +1,27 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Bewegung – Wiedergabe, Figur mit Ausdruck",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Bewegung“ in der Variante „wiedergabe“ mit der Darstellung „figur“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Bewegung – Wiedergabe, Figur mit Ausdruck",
+            "text": "Baustein „bewegung“, Variante „wiedergabe“, Darstellung „figur“ (seit 3.67.0): gezeichnete Figur mit dunklem Kopf und Gesicht aus zwei Lidern; der Ausdruck „neutral“ blinzelt gelegentlich."
+        },
+        {
+            "typ": "bewegung",
+            "variante": "wiedergabe",
+            "stil": "figur",
+            "ausdruck": "neutral",
+            "titel": "So sieht eine aufgezeichnete Bewegung aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder.",
+            "text": "Diese Bewegung wurde nicht gefilmt, sondern berechnet. Sie läuft ohne Kamera und ohne Anfrage an Dritte."
+        }
+    ]
+}

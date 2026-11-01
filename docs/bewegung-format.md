@@ -102,7 +102,7 @@ Fehlermeldung im Browser. Der Player liest nie eine Datei über 300 000 Zeichen 
 Tastatur-Bedienung der Leinwand ruht, solange die Kamera läuft (sonst zeichnete der Beispiel-Player in dieselbe Leinwand).
 
 **Zeichnen und Zeitsteuerung sind getrennt:** `LpBewegung.zeichne(ctx, daten, bild, breite, hoehe, optionen)` ist eine reine Zeichenfunktion
-(Optionen: `farbe`, `grund`, `stil` = `silhouette`|`piktogramm`|`koerper`|`strich`|`punkte`, `spiegeln`, `linie`, `ueber`, `schatten`). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei)`
+(Optionen: `farbe`, `grund`, `stil` = `silhouette`|`piktogramm`|`koerper`|`strich`|`punkte`|`figur`, `spiegeln`, `linie`, `ueber`, `schatten`; nur bei `figur` außerdem `ausdruck`, `zeit`, `ruhe`). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei, opt)`
 fügt Zeitsteuerung, Schleife, Pause und Tempo hinzu. Ein Renderer (z. B. für die Shorts) ruft `zeichne` Bild für Bild selbst auf.
 
 ## Darstellungen der Figur (seit 3.66.0)
@@ -115,7 +115,10 @@ Wert fällt im Player auf die Vorgabe zurück (kein Fehler); der Prüfer des Kit
 | `silhouette` (Vorgabe) | kräftige Figur mit Kontur, Körper etwas gedämpft, Boden-Linie | fast immer: auch klein gut lesbar |
 | `piktogramm` | einfarbige Fläche, Kopf getrennt, dünne Lücke in der Farbe des Hintergrunds, wo sich Teile überdecken | ruhig, wie ein Notausgang-Schild |
 | `koerper` | Figur mit Tiefe: Verlauf von links oben, Schatten unter den Füßen | wenn die Figur Hauptsache ist; braucht etwas mehr Rechenzeit |
+| `figur` (seit 3.67.0) | gezeichnete Figur: dunkler Kopf mit Gesicht aus zwei Lidern und einem Mundstrich, Kleidung in der Markenfarbe, helle Randlinie wie ein Aufkleber, Schatten unter den Füßen | wenn die Figur eine Persönlichkeit haben soll; Feld `ausdruck` |
 | `strich`, `punkte` | Strichfigur / nur die Körperpunkte (die älteren Darstellungen, unverändert) | Bestand |
+
+**Ausdruck (nur bei `figur`, seit 3.67.0):** Das Katalogfeld `ausdruck` (`neutral` Vorgabe | `muede` | `ueberrascht` | `entschlossen`) steht als `data-lp-ausdruck` an der Figur. Es verändert nur die Lider und den Mund; ein unbekannter Wert zeichnet `neutral`. Die Figur blinzelt gelegentlich (eine kleine Zeitfunktion `LpBewegung.blinzeln(ms)`, vier Schläge in 15,4 s); bei „weniger Bewegung“ (`prefers-reduced-motion`) nie. Der Ausdruck kommt von der Seite, nicht aus der Kamera: die Körper-Aufnahme liefert keine Mimik, `lp/bewegung-live.js` kennt kein `ausdruck`. Der Kopf ist fast schwarz; auf hellem Grund trägt er allein, auf dunklem Grund umgibt die ganze Figur eine helle Randlinie (Kontrast mindestens 3 : 1, gemessen und erzwungen). Die Kleidung nimmt die Farbe `color` der Leinwand (Kleid 4,5 : 1, Hose 3,2 : 1 gegen den Grund).
 
 **Farben ohne neue Einstellung:** Der Player kennt eine Figurfarbe (`color` der Leinwand) und liest den Hintergrund (`background-color` der Leinwand oder des
 nächsten Elternelements). Daraus entstehen alle Töne: gedämpft wird zu Schwarz (dunkler Grund) oder Weiß (heller Grund), die Lücke und der Schatten kommen vom Grund. Die

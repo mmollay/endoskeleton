@@ -16,7 +16,7 @@
     VERB = [11, 12, 11, 13, 13, 15, 12, 14, 14, 16, 15, 17, 15, 19, 17, 19, 16, 18, 16, 20, 18, 20, 11, 23, 12, 24, 23, 24, 23, 25, 25, 27, 24, 26, 26, 28,
       27, 29, 29, 31, 27, 31, 28, 30, 30, 32, 28, 32],
     // Darstellungen (data-lp-stil): die drei neuen, dann die älteren. Alles andere fällt auf die Vorgabe zurück.
-    STILE = ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'], VORGABE = 'silhouette';
+    STILE = ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur'], VORGABE = 'silhouette';
 
   function zahl(v) { return typeof v === 'number' && isFinite(v); }
   function ganz(v) { return zahl(v) && Math.floor(v) === v; }
@@ -79,10 +79,11 @@
   function css(c, al) { return al == null ? 'rgb(' + c.join(',') + ')' : 'rgba(' + c.join(',') + ',' + al + ')'; }
   function hell(c) { var t = c.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * t[0] + 0.7152 * t[1] + 0.0722 * t[2]; }
   function kontrast(a, b) { var x = hell(a), y = hell(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
-  /* Zieht die Farbe f vom Grund g weg (zu Weiß oder Schwarz, je nachdem, was mehr Abstand gibt), bis der Kontrast mindestens 3 : 1 ist (WCAG 1.4.11). */
-  function lesbar(f, g) {
+  /* Zieht die Farbe f vom Grund g weg (zu Weiß oder Schwarz, je nachdem, was mehr Abstand gibt), bis der Kontrast mindestens ziel ist (Vorgabe 3 : 1, WCAG 1.4.11). */
+  function lesbar(f, g, ziel) {
     var z = kontrast([255, 255, 255], g) > kontrast([0, 0, 0], g) ? [255, 255, 255] : [0, 0, 0], n = 0, r = f;
-    while (kontrast(r, g) < 3 && n < 10) r = mischen(f, z, ++n / 10);
+    ziel = ziel || 3;
+    while (kontrast(r, g) < ziel && n < 10) r = mischen(f, z, ++n / 10);
     return r;
   }
   /* Mischt f um t zu z hin (ohne Angabe: zum Grund g), so weit, wie der Kontrast zu g 3 : 1 hält (sonst weniger). */
@@ -95,6 +96,7 @@
   function farben(stil, farbe, grund) {
     var g = rgb(grund, [255, 255, 255]), f = lesbar(rgb(farbe, [255, 255, 255]), g), dunkelGrund = hell(g) < 0.18,
       z = dunkelGrund ? [0, 0, 0] : [255, 255, 255];   // gedämpft wird zu Schwarz (dunkler Grund) oder Weiß (heller Grund): die Farbtöne bleiben, nichts wird schlammig
+    if (stil === 'figur') return farbenFigur(farbe, grund);
     if (stil === 'piktogramm') return { fuell: f, luecke: g };
     if (stil === 'koerper') {
       var matt = weich(f, g, 0.5, z), mitte = weich(f, g, 0.2, z);   // Licht von links oben: die helle Seite ist immer die hellere
@@ -257,6 +259,185 @@
     }
   }
 
+  /* ---- Stil figur (3.67.0): großer dunkler Kopf, Gesicht nur aus zwei Lidern und einem Mundstrich, Kleidung in Flächen in der Markenfarbe (color der Leinwand),
+     helle, versetzte Randlinie wie ein Aufkleber. Zeichnet NUR die Figur auf die vorhandene Leinwand: keine Bühne, kein Verlauf, kein Regen — der Grund gehört der Seite.
+     Der Ausdruck ist eine Angabe der Seite (data-lp-ausdruck), nicht aus der Kamera: die Körper-Aufnahme liefert keine Mimik. ---- */
+  /* oben/unten: Höhe der Lid-Form über/unter der Lid-Kante (1 = Normalhöhe), wink: Neigung der Lid-Kante in Grad (+ = außen tiefer, müde; − = innen tiefer, entschlossen),
+     mund: b Länge in Kopfradien, w Neigung in Grad, rund = kleiner Kreis. */
+  var AUSDRUECKE = ['neutral', 'muede', 'ueberrascht', 'entschlossen'],
+    AUSDRUCK = {
+      neutral: { oben: 0, unten: 1, wink: 0, mund: { b: 0.32, w: 0, rund: false } },
+      muede: { oben: 0, unten: 0.55, wink: 13, mund: { b: 0.26, w: 8, rund: false } },
+      ueberrascht: { oben: 0.9, unten: 1.2, wink: 0, mund: { b: 0.1, w: 0, rund: true } },
+      entschlossen: { oben: 0, unten: 0.85, wink: -19, mund: { b: 0.38, w: -7, rund: false } }
+    },
+    // Lidschlag: Zeitpunkte (s) in einem Zyklus von 15,4 s, jeder Schlag dauert 0,16 s
+    BLINK = [2.2, 5.6, 8.3, 12.4], BLINK_ZYKLUS = 15.4,
+    // Maße in Bildhöhen: kräftige Glieder mit runden Enden
+    DM = { arm: 0.028, bein: 0.033, rumpf: 0.05, spine: 0.06, hals: 0.017, hand: 0.028, schuh: 0.017, kragen: 0.026 },
+    KOPF = [12, 14, 17], LID = [247, 243, 234], SCHUH = [238, 243, 234];
+
+  /* Lidschlag als reine Zeitfunktion: 0 = offen, 1 = zu. */
+  function blinzeln(ms) {
+    var t = (ms / 1000) % BLINK_ZYKLUS, k, d;
+    for (k = 0; k < BLINK.length; k++) { d = t - BLINK[k]; if (d >= 0 && d < 0.16) return Math.sin(Math.PI * d / 0.16); }
+    return 0;
+  }
+
+  /* Farben von figur. Kleid (4,5 : 1), Hose (3,2 : 1), Schuhe (4,5 : 1) werden gegen den Grund angehoben. Der Kopf ist fast schwarz: auf hellem Grund trägt er allein
+     (Kontrast ≥ 3 : 1); ist er zu schwach (dunkler Grund), trägt ein heller Rand um die ganze Figur (randNoetig, Kontrast ≥ 4,5 : 1). */
+  function farbenFigur(farbe, grund) {
+    var g = rgb(grund, [255, 255, 255]), kleid = lesbar(rgb(farbe, [255, 255, 255]), g, 4.5), hose = lesbar(mischen(kleid, [0, 0, 0], 0.32), g, 3.2),
+      schuh = lesbar(SCHUH, g, 4.5), noetig = kontrast(KOPF, g) < 3, schwarz = [0, 0, 0];
+    return { kopf: KOPF, gesicht: LID, kleid: kleid, kleidAus: mischen(kleid, schwarz, 0.6), kragen: mischen(kleid, schwarz, 0.3), hose: hose, hoseAus: mischen(hose, schwarz, 0.6),
+      schuh: schuh, schuhAus: mischen(schuh, schwarz, 0.55), randNoetig: noetig, rand: noetig ? lesbar(mischen([255, 255, 255], kleid, 0.1), g, 4.5) : [255, 255, 255],
+      schattenA: hell(g) < 0.18 ? 0.5 : 0.3 };
+  }
+
+  function lerp(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
+  function mp(a, b) { return lerp(a, b, 0.5); }
+  function klemm(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function linienWinkel(a, b, mind) {
+    var dx = a.x - b.x, dy = a.y - b.y;
+    if (Math.hypot(dx, dy) < mind) return null;
+    if (dx < 0) { dx = -dx; dy = -dy; }
+    return Math.atan2(dy, dx);
+  }
+  /* Kopf aus den Gesichtspunkten: Größe aus dem Abstand Ohren-Mitte → Schulter-Mitte, Neigung aus Augen- oder Ohrenlinie (sonst aus der Halsneigung),
+     Drehung aus dem Versatz der Nase gegen die Ohren-Mitte, Nicken aus der Höhe der Nase. */
+  function kopfD(P, u) {
+    var n = P[0], E, sm, dx, dy, len, R, lean, roll, w, yaw = 0, pit = 0, dir;
+    if (P[7] && P[8]) E = mp(P[7], P[8]); else if (n) E = { x: n.x, y: n.y - 0.006 * u }; else return null;
+    sm = P[11] && P[12] ? mp(P[11], P[12]) : { x: E.x, y: E.y + 0.105 * u };
+    dx = E.x - sm.x; dy = E.y - sm.y; len = Math.hypot(dx, dy) || 1e-6; dir = { x: dx / len, y: dy / len };
+    R = klemm(0.84 * len / u, 0.075, 0.1) * u;
+    lean = Math.atan2(dx, -dy);
+    w = P[2] && P[5] ? linienWinkel(P[2], P[5], 0.03 * u) : null;
+    if (w == null && P[7] && P[8]) w = linienWinkel(P[7], P[8], 0.03 * u);
+    roll = w == null ? 0.6 * lean : 0.7 * w + 0.3 * lean;
+    if (n) { yaw = klemm((n.x - E.x) / (0.05 * u), -1, 1); pit = klemm((n.y - E.y - 0.006 * u) / (0.03 * u), -1, 1); }
+    return { c: { x: sm.x + dir.x * (R + 0.05 * u), y: sm.y + dir.y * (R + 0.05 * u) }, r: R, roll: roll, yaw: yaw, pit: pit };
+  }
+
+  /* Gesicht: zwei Lid-Formen (untere Halbellipse unter einer geraden Lid-Kante, bei „ueberrascht“ auch eine obere) und ein Mundstrich. Die Merkmale wandern mit der
+     Kopfdrehung zur Seite und werden an der Gegenseite schmaler (Seitenblick); der Kopfkreis schneidet sie ab. bl: Lidschlag 0…1. */
+  function gesichtD(c, K, f, a, bl) {
+    var R = K.r, yw = K.yaw, ay = Math.abs(yw), fx = yw * 0.5 * R, fy = K.pit * 0.16 * R, ex = 0.37 * R * (1 - 0.3 * ay), ey = -0.02 * R + fy, m = a.mund, mw, mx, my, rot, dx, dy;
+    c.save(); c.translate(K.c.x, K.c.y); c.rotate(K.roll);
+    c.beginPath(); c.arc(0, 0, R * 0.985, 0, 6.2832); c.clip();
+    c.fillStyle = c.strokeStyle = css(f.gesicht);
+    [-1, 1].forEach(function (sg) {
+      var rx = 0.21 * R * (sg * yw < 0 ? 1 - 0.38 * ay : 1 + 0.06 * ay) * (1 - 0.1 * ay), un = Math.max(0.03 * R, 0.2 * R * a.unten * (1 - bl)), ob = 0.2 * R * a.oben * (1 - bl);
+      c.save(); c.translate(sg * ex + fx, ey); c.rotate((sg < 0 ? -a.wink : a.wink) * Math.PI / 180);
+      c.beginPath(); c.ellipse(0, 0, rx, un, 0, 0, Math.PI);
+      if (ob > 0.012 * R) c.ellipse(0, 0, rx, ob, 0, Math.PI, 2 * Math.PI); else c.closePath();
+      c.fill(); c.restore();
+    });
+    mx = fx; my = 0.44 * R + fy * 1.3; mw = m.b * R * (1 - 0.3 * ay);
+    if (m.rund) { c.beginPath(); c.ellipse(mx, my, 0.07 * R * (1 - 0.3 * ay), 0.09 * R, 0, 0, 6.2832); c.fill(); }
+    else {
+      rot = m.w * Math.PI / 180; dx = Math.cos(rot) * (mw - 0.08 * R) / 2; dy = Math.sin(rot) * (mw - 0.08 * R) / 2;
+      c.lineCap = 'round'; c.lineWidth = 0.08 * R; c.beginPath(); c.moveTo(mx - dx, my - dy); c.lineTo(mx + dx, my + dy); c.stroke();
+    }
+    c.restore();
+  }
+
+  /* Formen: str = Linienzug mit runden Enden (mit drei Punkten wird das Gelenk zur runden Kurve, kein Knick), kreis, poly = gerundetes Vieleck. g: Zuschlag für die Ränder. */
+  function primD(c, f, g, farbe) {
+    var p = f.pts, a, b;
+    c.fillStyle = c.strokeStyle = farbe; c.lineCap = c.lineJoin = 'round';
+    c.beginPath();
+    if (f.t === 'kreis') { c.arc(f.c.x, f.c.y, f.r + g, 0, 6.2832); c.fill(); return; }
+    c.lineWidth = 2 * (f.r + g);
+    c.moveTo(p[0].x, p[0].y);
+    if (p.length === 3) { a = lerp(p[1], p[0], 0.3); b = lerp(p[1], p[2], 0.3); c.lineTo(a.x, a.y); c.quadraticCurveTo(p[1].x, p[1].y, b.x, b.y); c.lineTo(p[2].x, p[2].y); }
+    else for (a = 1; a < p.length; a++) c.lineTo(p[a].x, p[a].y);
+    if (f.t === 'str') { c.stroke(); return; }
+    c.closePath(); c.fill(); c.stroke();
+  }
+  function zMittel(P, ks, ws) { var t = 0, n = 0; ks.forEach(function (k, j) { var w = ws ? ws[j] : 1; if (P[k] && P[k].z != null) { t += P[k].z * w; n += w; } }); return n ? t / n : null; }
+
+  /* Teile mit Tiefe: Beine immer zuerst (untereinander nach z), dann Rumpf, Arme und Kopf nach z (mit Spielraum, damit nichts flackert), sonst feste Rangfolge. */
+  function teileD(P, u, f, K) {
+    var T = [];
+    function arm(a, b, e, ix, rang) {
+      var pr = [], d, pe = P[e];
+      if (!P[a] || !P[b]) return;
+      pr.push({ t: 'str', pts: pe ? [P[a], P[b], pe] : [P[a], P[b]], r: DM.arm * u, fc: f.kleid, ac: f.kleidAus });
+      d = pe ? handRichtung(P, b, e, ix) : null;
+      if (d) {   // Manschette und runde Hand (dunkel wie der Kopf)
+        pr.push({ t: 'str', pts: [{ x: pe.x - d[0] * 0.05 * u, y: pe.y - d[1] * 0.05 * u }, pe], r: (DM.arm + 0.004) * u, fc: f.kragen, ac: f.kleidAus });
+        pr.push({ t: 'kreis', c: { x: pe.x + d[0] * 0.028 * u, y: pe.y + d[1] * 0.028 * u }, r: DM.hand * u, fc: f.kopf, ac: null });
+      }
+      T.push({ z: zMittel(P, [a, b, e], [0.2, 0.3, 0.5]), rang: rang, grp: 1, prims: pr });
+    }
+    function bein(h, k, a, he, to, rang) {
+      var pr, ende;
+      if (!P[h] || !P[k]) return;
+      ende = P[a] ? lerp(P[a], P[k], 0.14) : null;   // die Hose endet kurz über dem Knöchel, der Schuh deckt den Rest
+      pr = [{ t: 'str', pts: ende ? [P[h], P[k], ende] : [P[h], P[k]], r: DM.bein * u, fc: f.hose, ac: f.hoseAus }];
+      if (P[a] && P[he] && P[to]) pr.push({ t: 'poly', pts: [P[a], P[he], P[to]], r: DM.schuh * u, fc: f.schuh, ac: f.schuhAus });
+      T.push({ z: zMittel(P, [h, k, a]), rang: rang, grp: 0, prims: pr });
+    }
+    bein(23, 25, 27, 29, 31, 1); bein(24, 26, 28, 30, 32, 2);
+    if (P[11] && P[12] && P[23] && P[24]) {
+      var pr = [], sm = mp(P[11], P[12]), hm = mp(P[23], P[24]), c = mp(sm, hm), sp, dir, nx, ny, l2;
+      pr.push({ t: 'poly', r: DM.rumpf * u, fc: f.kleid, ac: f.kleidAus, pts: [P[11], P[12], P[24], P[23]].map(function (p) {
+        var dx = c.x - p.x, dy = c.y - p.y, l = Math.hypot(dx, dy) || 1, g = 0.5 * DM.rumpf * u;
+        return { x: p.x + dx / l * g, y: p.y + dy / l * g };
+      }) });
+      // Rumpftiefe: von vorn (Schultern weit auseinander) kaum, von der Seite voll
+      sp = klemm(1 - Math.hypot(P[11].x - P[12].x, P[11].y - P[12].y) / (0.28 * u), 0, 1);
+      if (sp > 0.02) pr.push({ t: 'str', pts: [sm, hm], r: DM.spine * u * sp, fc: f.kleid, ac: f.kleidAus });
+      if (K) pr.push({ t: 'str', pts: [sm, K.c], r: DM.hals * u, fc: f.kopf, ac: null });
+      dir = { x: hm.x - sm.x, y: hm.y - sm.y }; l2 = Math.hypot(dir.x, dir.y) || 1; dir.x /= l2; dir.y /= l2;
+      nx = -dir.y; ny = dir.x;
+      pr.push({ t: 'str', pts: [lerp(sm, P[11], 0.5), lerp(sm, P[12], 0.5)].map(function (p) { return { x: p.x - dir.x * 0.012 * u, y: p.y - dir.y * 0.012 * u }; }), r: DM.kragen * u, fc: f.kragen, ac: f.kleidAus });
+      T.push({ z: zMittel(P, [11, 12, 23, 24]), rang: 3, grp: 1, prims: pr, extra: function (cx) {   // zwei Nähte an der Brust
+        var off = (1 - sp) * 0.026 * u, b0 = { x: sm.x + dir.x * 0.04 * u, y: sm.y + dir.y * 0.04 * u };
+        cx.save(); cx.strokeStyle = css(f.gesicht, 0.85); cx.lineWidth = Math.max(1, 0.0065 * u); cx.lineCap = 'round';
+        [-1, 1].forEach(function (s) { cx.beginPath(); cx.moveTo(b0.x + nx * off * s, b0.y + ny * off * s); cx.lineTo(b0.x + nx * off * s + dir.x * 0.1 * u, b0.y + ny * off * s + dir.y * 0.1 * u); cx.stroke(); });
+        cx.restore();
+      } });
+    }
+    arm(11, 13, 15, 19, 4); arm(12, 14, 16, 20, 6);
+    if (K) T.push({ z: zMittel(P, [7, 8, 0]), rang: 5, grp: 1, prims: [{ t: 'kreis', c: K.c, r: K.r, fc: null, ac: null }], kopf: true });
+    T.sort(function (p, q) {
+      if (p.grp !== q.grp) return p.grp - q.grp;
+      if (p.z != null && q.z != null && Math.abs(p.z - q.z) > (p.grp ? 0.03 : 1e-4)) return q.z - p.z;
+      return p.rang - q.rang;
+    });
+    return T;
+  }
+
+  /* Die Figur im Stil figur. u: Bildhöhe in Pixeln, by: Bodenhöhe oder null. */
+  function figurD(c, P, u, o, by) {
+    var f = farbenFigur(o.farbe, o.grund || o.schatten), K = kopfD(P, u), a = AUSDRUCK[AUSDRUECKE.indexOf(o.ausdruck) < 0 ? AUSDRUECKE[0] : o.ausdruck],
+      bl = o.ruhe || !zahl(o.zeit) ? 0 : blinzeln(o.zeit), T = teileD(P, u, f, K), xs = [29, 30, 31, 32].filter(function (k) { return P[k]; }).map(function (k) { return P[k].x; }), mn, mx, rx, gr;
+    if (by != null && xs.length) {   // weicher Schatten unter den Füßen
+      mn = Math.min.apply(null, xs); mx = Math.max.apply(null, xs); rx = Math.max(0.16 * u, (mx - mn) / 2 + 0.1 * u);
+      c.save(); c.translate((mn + mx) / 2, by); c.scale(1, 0.13);
+      gr = c.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, css([0, 0, 0], f.schattenA)); gr.addColorStop(1, css([0, 0, 0], 0));
+      c.fillStyle = gr; c.beginPath(); c.arc(0, 0, rx, 0, 6.2832); c.fill(); c.restore();
+    }
+    // Randlinie wie ein Aufkleber: die ganze Figur einfarbig, einmal nach oben rechts versetzt und etwas dicker, einmal rundum schmal
+    c.save(); c.translate(0.0075 * u, -0.0075 * u);
+    T.forEach(function (t) { t.prims.forEach(function (p) { primD(c, p, 0.009 * u, css(f.rand)); }); });
+    c.restore();
+    T.forEach(function (t) { t.prims.forEach(function (p) { primD(c, p, 0.0045 * u, css(f.rand)); }); });
+    T.forEach(function (t) {
+      t.prims.forEach(function (p) { if (p.ac) primD(c, p, 0.0035 * u, css(p.ac)); });
+      t.prims.forEach(function (p) { if (p.fc) primD(c, p, 0, css(p.fc)); });
+      if (t.extra) t.extra(c);
+      if (t.kopf && K) {
+        gr = c.createRadialGradient(K.c.x - 0.35 * K.r, K.c.y - 0.4 * K.r, 0.1 * K.r, K.c.x, K.c.y, K.r * 1.05);
+        gr.addColorStop(0, css(mischen(f.kopf, [255, 255, 255], 0.16))); gr.addColorStop(0.7, css(f.kopf)); gr.addColorStop(1, css(mischen(f.kopf, [0, 0, 0], 0.2)));
+        c.fillStyle = gr; c.beginPath(); c.arc(K.c.x, K.c.y, K.r, 0, 6.2832); c.fill();
+        gesichtD(c, K, f, a, bl);
+      }
+    });
+  }
+
   /* Die älteren Darstellungen (Bestandsschutz, unverändert): Strichfigur und Punkte. */
   function strichfigur(c, P, rh, punkte, o) {
     var lw = o.linie || Math.max(2, rh / 90), k, a, b, m;
@@ -282,8 +463,9 @@
   }
 
   /* Zeichnet Bild i auf einen 2D-Kontext (Breite w, Höhe h). Rein: dasselbe Bild + dieselbe Größe + dieselben Angaben = dieselben Pixel (keine Zeit, kein Zufall).
-     o: stil ('silhouette' | 'piktogramm' | 'koerper' | 'strich' | 'punkte'; alles andere = Vorgabe silhouette), farbe (die Figurfarbe), grund (Farbe des Hintergrunds:
-     Lücke, Kontrast), spiegeln, linie (nur strich/punkte); ueber: nicht löschen (liegt über einem Bild), schatten: Farbe eines Schattens für Lesbarkeit (gilt
+     o: stil ('silhouette' | 'piktogramm' | 'koerper' | 'strich' | 'punkte' | 'figur'; alles andere = Vorgabe silhouette), farbe (die Figurfarbe), grund (Farbe des Hintergrunds:
+     Lücke, Kontrast), spiegeln, linie (nur strich/punkte), ausdruck/zeit/ruhe (nur figur: 'neutral' | 'muede' | 'ueberrascht' | 'entschlossen', alles andere = neutral; zeit in ms
+     steuert den Lidschlag, ruhe = „weniger Bewegung“: kein Lidschlag); ueber: nicht löschen (liegt über einem Bild), schatten: Farbe eines Schattens für Lesbarkeit (gilt
      auch als grund, wenn keiner genannt ist). Ohne ueber bleibt der Hintergrund durchsichtig. */
   function zeichne(c, d, i, w, h, o) {
     o = o || {};
@@ -296,6 +478,7 @@
     c.save();
     if (!o.ueber) c.clearRect(0, 0, w, h);
     if (stil === 'strich' || stil === 'punkte') strichfigur(c, P, rh, stil === 'punkte', o);
+    else if (stil === 'figur') figurD(c, P, rh, o, boden(d, oy, rh));
     else figur(c, P, w, rh, stil, o, boden(d, oy, rh));
     c.restore();
   }
@@ -310,15 +493,17 @@
     return '';
   }
 
-  /* Zeitsteuerung: Schleife, Pause, Tempo, Spiegeln. bei(laeuft) meldet jeden Wechsel zwischen Lauf und Pause. */
-  function spielen(cv, stil, bei) {
-    var c = cv.getContext('2d'), d, n, ms, pos = 0, last = null, id = 0, lauf = false, sicht = true, tempo = 1, spiegel = false, farbe = '', grund = '', s = {};
+  /* Zeitsteuerung: Schleife, Pause, Tempo, Spiegeln. bei(laeuft) meldet jeden Wechsel zwischen Lauf und Pause. opt (nur figur): ausdruck, ruhe (= „weniger Bewegung“: kein Lidschlag).
+     zeit zählt die echte Laufzeit in ms (unabhängig von Tempo und Schleife) und steuert den Lidschlag. */
+  function spielen(cv, stil, bei, opt) {
+    var c = cv.getContext('2d'), d, n, ms, pos = 0, zeit = 0, last = null, id = 0, lauf = false, sicht = true, tempo = 1, spiegel = false, farbe = '', grund = '', s = {};
+    opt = opt || {};
     function nr() { return Math.min(n - 1, Math.floor(pos * d.fps / 1000 + 1e-6)); }
-    function bild() { zeichne(c, d, nr(), cv.width, cv.height, { farbe: farbe, grund: grund, stil: stil, spiegeln: spiegel }); }
+    function bild() { zeichne(c, d, nr(), cv.width, cv.height, { farbe: farbe, grund: grund, stil: stil, spiegeln: spiegel, ausdruck: opt.ausdruck, ruhe: opt.ruhe, zeit: zeit }); }
     function tick(ts) {
       id = 0;
       if (!lauf || !sicht) return;
-      if (last !== null) pos = (pos + (ts - last) * tempo) % ms;
+      if (last !== null) { pos = (pos + (ts - last) * tempo) % ms; zeit += ts - last; }
       last = ts;
       bild();
       id = requestAnimationFrame(tick);
@@ -356,7 +541,7 @@
       pa = el('pause'), sp, still = !!(g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches);
     sp = spielen(cv, fig.getAttribute('data-lp-stil'), function (l) {
       if (pa) pa.textContent = pa.getAttribute(l ? 'data-an' : 'data-aus');
-    });
+    }, { ausdruck: fig.getAttribute('data-lp-ausdruck'), ruhe: still });
     el('steuerung').hidden = false;
     pa.addEventListener('click', sp.umschalten);
     el('spiegeln').addEventListener('click', function (e) {
@@ -397,7 +582,7 @@
       .catch(function () { melde('fehler'); });
   }
 
-  var api = { pruefen: pruefen, zeichne: zeichne, farben: farben, spielen: spielen, format: format, NAMEN: NAMEN, GESICHT: GESICHT, STILE: STILE, VORGABE: VORGABE, MAX_BYTES: MAX_BYTES };
+  var api = { pruefen: pruefen, zeichne: zeichne, farben: farben, spielen: spielen, format: format, NAMEN: NAMEN, GESICHT: GESICHT, STILE: STILE, VORGABE: VORGABE, AUSDRUECKE: AUSDRUECKE, blinzeln: blinzeln, MAX_BYTES: MAX_BYTES };
   if (typeof module === 'object' && module.exports) module.exports = api;
   g.LpBewegung = api;
   if (g.document && g.document.querySelectorAll) {

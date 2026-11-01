@@ -350,7 +350,7 @@ Varianten: `akzent`, `schlicht` · seit 3.51.0, geändert 3.51.0
 
 ### `bewegung` — Bewegung
 
-Varianten: `wiedergabe`, `live` · seit 3.66.0, geändert 3.66.0 · Variante `live` höchstens 1-mal
+Varianten: `wiedergabe`, `live` · seit 3.66.0, geändert 3.67.0 · Variante `live` höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -358,7 +358,8 @@ Varianten: `wiedergabe`, `live` · seit 3.66.0, geändert 3.66.0 · Variante `li
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bewegung` | bewegungsdatei | ja | `bew/<name>.bewegung`: eine Bewegungsdatei (Format „bewegung v1“) im Seitenordner, ≤ 300 KB |
 | `alt` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
-| `stil` | auswahl | – | eines von `silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`; Standard `silhouette`; fehlt: silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen |
+| `stil` | auswahl | – | eines von `silhouette`, `piktogramm`, `koerper`, `strich`, `punkte`, `figur`; Standard `silhouette`; fehlt: silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen; figur (seit 3.67.0) ist eine gezeichnete Figur mit dunklem Kopf, Gesicht aus zwei Lidern und einem Mundstrich, Kleidung in der Markenfarbe und heller Randlinie — dazu passt das Feld ausdruck |
+| `ausdruck` | auswahl | – | eines von `neutral`, `muede`, `ueberrascht`, `entschlossen`; nur wenn `stil` = `figur`; Standard `neutral`; seit 3.67.0; fehlt: neutral (ruhiger Blick, die Figur blinzelt gelegentlich); müde hat schwere Lider; überrascht weite Augen und einen runden Mund; entschlossen einen festen Blick. Der Ausdruck kommt von der Seite, nicht von der Kamera; bei „weniger Bewegung“ blinzelt die Figur nie |
 | `knopf_text` | zeile | – | eine Zeile, ≤ 40 Zeichen, nicht leer; nur bei live; fehlt: Kamera starten |
 
 ```json
