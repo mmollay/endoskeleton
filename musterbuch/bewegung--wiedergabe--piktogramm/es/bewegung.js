@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.66.0 — Bewegungs-Player: spielt eine Bewegungsdatei „bewegung v1“ (docs/bewegung-format.md) als Silhouette (Vorgabe), Piktogramm, Körper, Strichfigur oder Punkte.
+/* SSI Endoskeleton 3.67.0 — Bewegungs-Player: spielt eine Bewegungsdatei „bewegung v1“ (docs/bewegung-format.md) als Silhouette (Vorgabe), Piktogramm, Körper, Strichfigur oder Punkte.
    Ohne Kamera, ohne Modell, ohne Abhängigkeit. Drei getrennte Teile: pruefen() (dieselben Regeln wie lp/src/Bewegung.php, Test BW04),
    zeichne() (reine Zeichenfunktion: kennt keine Zeit — derselbe Code rendert später Shorts) und spielen() (Zeitsteuerung). Jeder Fehler wird
    verschluckt: die Seite bleibt benutzbar, sie zeigt dann den Hinweis „fehler“. */

@@ -4,6 +4,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.67.0] — 2026-11-01
+
+### Added
+- **Bewegung: vierter Zeichenstil `figur` mit Ausdruck** — Anlass: Martin, 01.11.2026: „so in der Art hätte ich mir das mit der Motion Capture vorgestellt“. Der Stil zeichnet nur die Figur auf die vorhandene Leinwand (keine Bühne, kein Verlauf, kein Regen: den Grund liefert die Seite): großer dunkler Kopf, Gesicht nur aus zwei Lidern und einem Mundstrich, Kleidung in Flächen in der Markenfarbe (`color` der Leinwand), runde Gelenke, Hände als runde Formen, Schuhe, helle versetzte Randlinie wie ein Aufkleber, Schatten unter den Füßen. Die Gesichtspunkte steuern Kopfdrehung und Neigung; die Tiefenreihenfolge folgt `z`.
+  - **Katalog:** Feld `stil` des Bausteins `bewegung` hat jetzt sechs Werte (`figur` am Ende); neues Feld `ausdruck` (`neutral` Vorgabe | `muede` | `ueberrascht` | `entschlossen`), nur bei `stil` = `figur` zulässig (sonst sperrend). Das Kit schreibt es als `data-lp-ausdruck` an die Figur (nur bei `figur`).
+  - **Player `lp/bewegung.js`:** neue Optionen `ausdruck`, `zeit`, `ruhe` für `zeichne`, vierter Parameter `opt` für `spielen`; neu `LpBewegung.AUSDRUECKE` und `LpBewegung.blinzeln(ms)`. Ein unbekannter Ausdruck zeichnet `neutral`. Die Figur blinzelt gelegentlich (vier Schläge in 15,4 s, je 0,16 s; eine reine Zeitfunktion); bei „weniger Bewegung“ (`prefers-reduced-motion`) nie, auch nicht nach „Abspielen“.
+  - **Kontrast** (gemessen und erzwungen): der Kopf ist fast schwarz und trägt auf hellem Grund allein (mindestens 3 : 1); auf dunklem Grund trägt die helle Randlinie um die ganze Figur (die Randfarbe wird auf mindestens 4,5 : 1 gezogen, verlangt sind 3 : 1); Kleid 4,5 : 1, Schuhe 4,5 : 1, Hose 3,2 : 1 gegen den Grund.
+  - **Die Kamera-Vorführung liefert keinen Ausdruck:** `lp/bewegung-live.js` ist unverändert; die Körper-Aufnahme enthält keine Mimik (Gesichtspunkte sind gesperrt). Der Ausdruck kommt von der Seite.
+  - **Die älteren Stile zeichnen Befehl für Befehl wie in 3.66.0:** Silhouette, Piktogramm, Körper, Strich, Punkte (Prüfsummen der Zeichenbefehle im Test, `tests/bewegung-zeichnen.js`).
+  - **Größe des Players und Größenwächter (BW10):** 40 268 Byte, gzip 14 189 Byte (vorher 26 530 / 9 988). Der Stil bringt eine eigene Figur-Zeichnung (Kopf, Gesicht, Körperteile mit Tiefenreihenfolge, Randlinie) mit; deshalb steigt die Grenze von 28 KB auf 41 KB roh und von 10 KB auf 14,5 KB gzip (jeweils etwa 2 % Luft). Der Player wird von der Seite einmal geladen und liegt weiter unter 15 KB gezippt.
+  - **Neue `lp-`-Klassen:** keine (die Figur nutzt `lp-bewegung-figur`; Gestaltung unverändert in `lp/lp.css`).
+  - **Neue Dateien:** `lp/musterbuch/bewegung--wiedergabe--figur.json` und das gebaute `musterbuch/bewegung--wiedergabe--figur/`. Erzeugte Dateien (`lp/SKILL.md`, `lp/werkstatt.md`, Musterbuch) neu gebaut; `docs/bewegung-format.md` beschreibt Stil und Ausdruck.
+  - **Tests:** `tests/bewegung-zeichnen.js` (127 Prüfungen: `figur` erkannt, vier Ausdrücke = vier verschiedene Zeichenfolgen, unbekannter Ausdruck = neutral, Lidschlag, `ruhe`, `spielen()`, Kontrast hell und dunkel, keine Bühne, Reinheit, Bestandsschutz byte-gleich), `BW14`/`BW16` in `tests/bewegung.test.php`, Browserprüfung in `ci/browser-bewegung.js` (887 Browserprüfungen bestanden; im Ausgangsstand 874 bestanden und eine Prüfung „Verlassen“ rot, die im neuen Lauf grün war und mit dem Stil nichts zu tun hat). Acht Gegenproben (Kontrastwächter, Ausdruck, unbekannter Ausdruck, `ruhe`, Rückfall auf die Vorgabe, Lidschlag-Uhr, Feldbedingung, Attribut) bestanden. Bestehende Prüfungen nicht abgeschwächt; nur die Listen der Werte wurden um `figur` ergänzt und die Größengrenzen angehoben.
+
+### Rückweg
+Den Zweig `lp/bewegung-figur` nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten ohne `stil` = `figur` ändern sich nicht (die älteren Stile zeichnen byte-gleich); eine Seite mit `figur` fiele im alten Player auf die Vorgabe `silhouette` zurück, der alte Prüfer des Kits lehnte sie beim Bauen ab.
+
+---
+
 ## [3.66.0] — 2026-10-31
 
 ### Added
