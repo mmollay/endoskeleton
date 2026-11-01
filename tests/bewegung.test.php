@@ -18,6 +18,7 @@
  *   BW13 (3.64.1) Ereignis lp-bewegung:aufnahme und Attribut data-lp-modell: Quelltext, Pfadregeln von modellordner() (node), Doku
  *   BW14 (3.64.2) Figur-Stil wählbar: Katalogfeld stil (Vorgabe silhouette, alte Werte gelten weiter), Bau, Skill/Werkstatt/Musterbuch kennen die Auswahl
  *   BW15 (3.64.2) Zeichenstile im Player (node, aufzeichnender Kontext): drei Stile zeichnen verschieden, Bestandsschutz strich/punkte, Rückfall auf die Vorgabe, Farbregeln
+ *   BW16 (3.67.0) Stil „figur“ und Ausdruck: Katalog (stil mit sechs Werten, ausdruck nur bei figur), Prüfer, Bau, Skill/Werkstatt/Doku/Musterbuch; der Player zeichnet ihn (node: BW15)
  */
 
 declare(strict_types=1);
@@ -202,7 +203,7 @@ return [
             T::ok($b['felder'][$f]['pflicht'] ?? false, "Feld $f ist Pflicht");
         }
         T::eq($b['felder']['bewegung']['typ'] ?? null, 'bewegungsdatei', 'bewegung hat den Typ bewegungsdatei');
-        T::eq($b['felder']['stil']['werte'] ?? null, ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'], 'stil: drei Figur-Stile, dazu die älteren strich und punkte');
+        T::eq($b['felder']['stil']['werte'] ?? null, ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur'], 'stil: drei Figur-Stile, dazu die älteren strich und punkte, seit 3.67.0 am Ende figur');
         T::eq($b['felder']['stil']['standard'] ?? null, 'silhouette', 'Standard silhouette');
         T::eq($b['felder']['knopf_text']['nur_bei'] ?? null, ['live'], 'knopf_text nur bei live');
         T::ok(isset($b['felder']['text']) && !($b['felder']['text']['pflicht'] ?? false), 'text ist freiwillig');
@@ -490,8 +491,8 @@ return [
         $w = H::wurzel();
         $js = (string) file_get_contents("$w/lp/bewegung.js");
         $live = (string) file_get_contents("$w/lp/bewegung-live.js");
-        T::ok(strlen((string) gzencode($js, 9)) <= 10240, 'Player gzip ≤ 10 KB (' . strlen((string) gzencode($js, 9)) . ' Byte)');
-        T::ok(strlen($js) <= 28000, 'Player roh ≤ 28 KB (' . strlen($js) . ' Byte)');
+        T::ok(strlen((string) gzencode($js, 9)) <= 14500, 'Player gzip ≤ 14,5 KB (seit 3.67.0: Stil figur; vorher 10 KB) (' . strlen((string) gzencode($js, 9)) . ' Byte)');
+        T::ok(strlen($js) <= 41000, 'Player roh ≤ 41 KB (seit 3.67.0: Stil figur; vorher 28 KB) (' . strlen($js) . ' Byte)');
         foreach (['bewegung.js' => $js, 'bewegung-live.js' => $live] as $name => $code) {
             T::eq(preg_match('#https?://|//[a-z0-9.-]+\.[a-z]{2,}/#i', $code), 0, "$name: keine Fremdadresse");
             foreach (['localStorage', 'sessionStorage', 'indexedDB', 'document.cookie', 'XMLHttpRequest', 'sendBeacon', 'WebSocket', 'eval(', 'new Function'] as $verboten) {
@@ -733,9 +734,9 @@ JS);
         $f = $k->baustein('bewegung')['felder']['stil'];
         T::eq([$f['typ'], $f['standard']], ['auswahl', 'silhouette'], 'stil ist eine Auswahl, Vorgabe silhouette');
         T::eq(array_slice($f['werte'], 0, 3), ['silhouette', 'piktogramm', 'koerper'], 'die drei Figur-Stile stehen vorn');
-        T::eq(array_slice($f['werte'], 3), ['strich', 'punkte'], 'strich und punkte bleiben gültig (Bestandsschutz)');
+        T::eq(array_slice($f['werte'], 3), ['strich', 'punkte', 'figur'], 'strich und punkte bleiben gültig (Bestandsschutz), seit 3.67.0 folgt figur');
         $o = $ordner($seite());
-        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'] as $stil) {
+        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur'] as $stil) {
             T::eq($schema($seite(['stil' => $stil]), $o), '', "stil $stil wird vom Prüfer angenommen");
         }
         foreach (['knochen', 'Silhouette', 'körper', '', ' silhouette', 'silhouette ', 3, true, ['silhouette']] as $schlecht) {
@@ -747,7 +748,7 @@ JS);
             return (string) file_get_contents("$dir/index.html");
         };
         T::contains($bau([]), 'data-lp-stil="silhouette"', 'ohne Angabe trägt die Figur data-lp-stil="silhouette"');
-        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte'] as $stil) {
+        foreach (['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur'] as $stil) {
             T::contains($bau(['stil' => $stil]), 'data-lp-stil="' . $stil . '"', "gewählter Stil $stil kommt in der Figur an");
         }
         T::notContains($bau([]), 'data-lp-stil="strich"', 'ohne Angabe nicht mehr strich');
@@ -778,5 +779,49 @@ JS);
         foreach ($erg ?: [] as [$ok, $was]) {
             T::ok($ok === true, $was);
         }
+    },
+    'BW16 Stil „figur“ + Ausdruck (3.67.0): Katalog, Prüfer (ausdruck nur bei figur), Bau, Skill/Werkstatt/Doku/Musterbuch; die Kamera liefert keinen Ausdruck' => static function () use ($k, $seite, $ordner, $schema): void {
+        $w = H::wurzel();
+        $b = $k->baustein('bewegung');
+        T::eq($b['felder']['stil']['werte'] ?? null, ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur'], 'stil hat sechs Werte, figur steht am Ende');
+        T::eq($b['felder']['stil']['standard'] ?? null, 'silhouette', 'Standard bleibt silhouette');
+        $a = $b['felder']['ausdruck'] ?? [];
+        T::eq([$a['typ'] ?? null, $a['werte'] ?? null, $a['standard'] ?? null], ['auswahl', ['neutral', 'muede', 'ueberrascht', 'entschlossen'], 'neutral'], 'ausdruck: Auswahl aus vier Werten, Standard neutral');
+        T::eq($a['nur_wenn'] ?? null, ['stil' => 'figur'], 'ausdruck gibt es nur bei stil = figur');
+        T::ok(!($a['pflicht'] ?? false), 'ausdruck ist freiwillig');
+        $o = $ordner($seite());
+        T::eq($schema($seite(['stil' => 'figur']), $o), '', 'stil figur ohne ausdruck gilt');
+        foreach ($a['werte'] ?? [] as $x) {
+            T::eq($schema($seite(['stil' => 'figur', 'ausdruck' => $x]), $o), '', "stil figur mit ausdruck $x gilt");
+        }
+        foreach (['wuetend', 'Muede', 'müde', '', ' neutral', 3, true, ['neutral']] as $schlecht) {
+            T::contains($schema($seite(['stil' => 'figur', 'ausdruck' => $schlecht]), $o), '[sperrend] bausteine.1.ausdruck', 'ausdruck ' . json_encode($schlecht, JSON_UNESCAPED_UNICODE) . ': sperrend');
+        }
+        T::contains($schema($seite(['ausdruck' => 'muede']), $o), '[sperrend] bausteine.1.ausdruck', 'ausdruck ohne stil (= silhouette): sperrend');
+        T::contains($schema($seite(['stil' => 'koerper', 'ausdruck' => 'muede']), $o), '[sperrend] bausteine.1.ausdruck', 'ausdruck bei stil koerper: sperrend');
+        $bau = static function (array $b) use ($seite, $ordner): string {
+            $dir = $ordner($seite($b));
+            T::eq(H::texte(Bauer::bauen($dir)->befunde), '', 'Bau ohne Befunde');
+            return (string) file_get_contents("$dir/index.html");
+        };
+        T::contains($bau(['stil' => 'figur', 'ausdruck' => 'muede']), 'data-lp-stil="figur" data-lp-ausdruck="muede"', 'figur mit ausdruck: beide Attribute an der Figur');
+        T::contains($bau(['stil' => 'figur']), 'data-lp-ausdruck="neutral"', 'figur ohne Angabe: data-lp-ausdruck="neutral"');
+        T::notContains($bau([]), 'data-lp-ausdruck', 'ohne stil figur gibt es das Attribut nicht');
+        T::notContains($bau(['stil' => 'koerper']), 'data-lp-ausdruck', 'bei koerper auch nicht');
+        foreach (['lp/SKILL.md', 'lp/werkstatt.md'] as $datei) {
+            $t = (string) file_get_contents("$w/$datei");
+            T::contains($t, '`figur`', "$datei nennt den Stil figur");
+            T::contains($t, '| `ausdruck` | auswahl', "$datei hat die Zeile für ausdruck");
+            T::contains($t, 'nur wenn `stil` = `figur`', "$datei: ausdruck nur bei figur");
+            T::contains($t, '`neutral`, `muede`, `ueberrascht`, `entschlossen`', "$datei nennt die vier Ausdrücke");
+        }
+        $doku = (string) file_get_contents("$w/docs/bewegung-format.md");
+        T::contains($doku, '`figur`', 'Doku nennt den Stil figur');
+        T::contains($doku, 'data-lp-ausdruck', 'Doku nennt das Attribut data-lp-ausdruck');
+        $fix = json_decode((string) file_get_contents("$w/lp/musterbuch/bewegung--wiedergabe--figur.json"), true);
+        T::eq([$fix['bausteine'][1]['stil'] ?? null, $fix['bausteine'][1]['ausdruck'] ?? null], ['figur', 'neutral'], 'Musterbuch-Beispiel bewegung--wiedergabe--figur wählt figur mit ausdruck neutral');
+        T::contains((string) file_get_contents("$w/musterbuch/bewegung--wiedergabe--figur/index.html"), 'data-lp-stil="figur" data-lp-ausdruck="neutral"', 'gebautes Musterbuch: figur');
+        // ehrlich: aus der Körper-Aufnahme kommt keine Mimik — die Kamera-Vorführung gibt dem Player keinen Ausdruck mit
+        T::notContains((string) file_get_contents("$w/lp/bewegung-live.js"), 'ausdruck', 'bewegung-live.js: kein Ausdruck aus der Kamera');
     },
 ];

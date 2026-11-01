@@ -76,7 +76,7 @@ const LANGSAM_PLAY = `(() => { const p = HTMLMediaElement.prototype.play; HTMLMe
 const VERSTECKEN = () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); };
 
 /** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei), modellOrdner (zweiter Ordner, aus dem Modelldateien kommen: Ziel von data-lp-modell, relativ zur Seite),
- *  3.64.2: stil (Ersatz für data-lp-stil der Figur; null = Attribut weg), thema (data-theme am html), farben ({ figur, grund }: Farben der Leinwand, nur im Test), fenster ({ width, height }). */
+ *  3.64.2: stil (Ersatz für data-lp-stil der Figur; null = Attribut weg), ausdruck (3.67.0: ebenso für data-lp-ausdruck), thema (data-theme am html), farben ({ figur, grund }: Farben der Leinwand, nur im Test), fenster ({ width, height }). */
 async function oeffnen(browser, name, optionen = {}) {
   const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: optionen.fenster || { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
   const page = await kontext.newPage();
@@ -113,6 +113,7 @@ async function oeffnen(browser, name, optionen = {}) {
     if (datei.endsWith('index.html') && (optionen.stil !== undefined || optionen.thema || optionen.farben)) {
       let h = inhalt.toString('utf8');
       if (optionen.stil !== undefined) { h = h.replace(/ data-lp-stil="[^"]*"/, optionen.stil === null ? '' : ` data-lp-stil="${optionen.stil}"`); }
+      if (optionen.ausdruck !== undefined) { h = h.replace(/ data-lp-ausdruck="[^"]*"/, optionen.ausdruck === null ? '' : ` data-lp-ausdruck="${optionen.ausdruck}"`); }
       if (optionen.thema) { h = h.replace('<html ', `<html data-theme="${optionen.thema}" `); }
       if (optionen.farben) { h = h.replace('</head>', `<style>.lp-bewegung-figur canvas{background:${optionen.farben.grund};color:${optionen.farben.figur}}</style></head>`); }
       inhalt = Buffer.from(h, 'utf8');
@@ -372,6 +373,71 @@ function pruefeText(t) {
         }
       }
     }
+  }
+
+  // ===== Stil figur (3.67.0): nur die Figur auf der Leinwand der Seite (keine Bühne), vier Ausdrücke, Kontrast, weniger Bewegung =====
+  {
+    const SEITE = 'bewegung--wiedergabe--figur', AUSD = ['neutral', 'muede', 'ueberrascht', 'entschlossen'];
+    const rgbVon = (t) => String(t).match(/\d+/g).slice(0, 3).map(Number);
+    const w = await oeffnen(browser, SEITE, { still: true });
+    const m = await masse(w.page);
+    pruefe(await w.page.getAttribute('.lp-bewegung-figur', 'data-lp-stil') === 'figur' && await w.page.getAttribute('.lp-bewegung-figur', 'data-lp-ausdruck') === 'neutral', 'Figur: die Figur trägt data-lp-stil="figur" und data-lp-ausdruck="neutral"');
+    pruefe(m.n > 1500 && m.n < 0.5 * m.breite * m.hoehe, `Figur: Standbild mit Figur, aber ohne Bühne (${m.n} von ${m.breite * m.hoehe} Pixeln gezeichnet)`);
+    pruefe(await w.page.evaluate(() => { const c = document.querySelector('.lp-bewegung-figur canvas'); return c.getContext('2d').getImageData(1, 1, 1, 1).data[3] === 0; }), 'Figur: der Hintergrund der Leinwand bleibt durchsichtig (die Bühne gehört der Seite)');
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0 && w.konsole.length === 0, `Figur: keine Fremdanfrage, keine Konsolen-/Seitenfehler (${w.seitenfehler.concat(w.konsole).join('; ')})`);
+    const z = await zugriffe(w.page);
+    pruefe(z.z.length === 0 && z.s === 0 && z.l === 0, 'Figur: kein Cookie, kein Web-Speicher');
+    await w.kontext.close();
+    const sil = await oeffnen(browser, 'bewegung--wiedergabe', { still: true });
+    pruefe((await masse(sil.page)).url !== m.url, 'Figur: das Standbild ist ein anderes als das der Vorgabe silhouette');
+    await sil.kontext.close();
+
+    // vier Ausdrücke = vier verschiedene Bilder; unbekannt und fehlend = neutral
+    const bilder = {};
+    for (const a of AUSD) { const s = await oeffnen(browser, SEITE, { still: true, ausdruck: a }); bilder[a] = (await masse(s.page)).url; await s.kontext.close(); }
+    pruefe(new Set(Object.values(bilder)).size === 4, 'Figur: neutral, müde, überrascht und entschlossen zeigen vier verschiedene Bilder');
+    for (const [was, a] of [['unbekannter Ausdruck „wuetend“', 'wuetend'], ['leerer Ausdruck', ''], ['Ausdruck ohne Attribut', null]]) {
+      const s = await oeffnen(browser, SEITE, { still: true, ausdruck: a });
+      pruefe((await masse(s.page)).url === bilder.neutral && s.seitenfehler.length === 0 && s.konsole.length === 0, `Figur (${was}): fällt auf neutral zurück, kein Fehler`);
+      await s.kontext.close();
+    }
+
+    // hell und dunkel, 1280 und 390 Punkte breit, zwei Markenfarben: Lage, Kontrast der Hauptfarbe (Kleid) und des Randes gegen den Grund
+    const VARIANTEN = [['hell', { thema: 'light' }], ['dunkel', { thema: 'dark' }], ['Marke Grün/Gelb', { farben: { grund: '#1b5e3a', figur: '#ffd84d' } }], ['Marke Rosa/Hellgrau', { farben: { grund: '#f1e4ea', figur: '#c2185b' } }]];
+    for (const [was, opt] of VARIANTEN) {
+      for (const fenster of [{ width: 1280, height: 900 }, { width: 390, height: 800 }]) {
+        const s = await oeffnen(browser, SEITE, { still: true, fenster, ...opt });
+        const mm = await masse(s.page), lage = `figur, ${was}, ${fenster.width} px`;
+        pruefe(mm.n > 1500 && mm.x0 >= 2 && mm.y0 >= 2 && mm.x1 <= mm.breite - 3 && mm.y1 <= mm.hoehe - 3, `Lage ${lage}: Figur liegt ganz in der Leinwand (Rahmen ${mm.x0}–${mm.x1} von ${mm.breite}, ${mm.y0}–${mm.y1} von ${mm.hoehe})`);
+        pruefe(mm.scrollBreit <= mm.fensterBreit && mm.cv.left >= mm.fig.left - 1 && mm.cv.right <= mm.fig.right + 1, `Lage ${lage}: nichts läuft über (Seite ${mm.scrollBreit} von ${mm.fensterBreit} Punkten)`);
+        const gr = rgbVon(mm.grund), k = mm.haupt ? kontrast(mm.haupt, gr) : 0;
+        pruefe(k >= 3, `Farbe ${lage}: die Hauptfarbe der Figur hat gegen den Grund ${k.toFixed(1)} : 1 (Soll ≥ 3)`);
+        // Außenkante: die deckenden Pixel ganz außen (Rand, sonst Kopf/Kleid) gegen den Grund — gemessen an den Pixeln selbst, nicht am Modell
+        const kante = await s.page.evaluate(() => {
+          const c = document.querySelector('.lp-bewegung-figur canvas'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = [];
+          for (let y = 0; y < c.height; y++) { for (let x = 0; x < c.width; x++) { if (d[(y * c.width + x) * 4 + 3] === 255) { o.push([d[(y * c.width + x) * 4], d[(y * c.width + x) * 4 + 1], d[(y * c.width + x) * 4 + 2]]); break; } } }
+          return o;
+        });
+        const kk = kante.length ? kante.map((p) => kontrast(p, gr)).sort((a, b) => a - b)[Math.floor(kante.length * 0.1)] : 0;
+        pruefe(kante.length > 100 && kk >= 3, `Farbe ${lage}: die Außenkante (je Zeile das erste deckende Pixel, 10 %-Wert) hat ${kk.toFixed(1)} : 1 gegen den Grund (Soll ≥ 3)`);
+        pruefe(s.seitenfehler.length === 0 && s.konsole.length === 0 && s.fremd.length === 0, `Lage ${lage}: keine Fehler, keine Fremdanfrage`);
+        await s.kontext.close();
+      }
+    }
+
+    // Bedienung wie bei den anderen Stilen: läuft, Pause, Weniger Bewegung = Standbild
+    const l = await oeffnen(browser, SEITE, {});
+    await warte(400);
+    const a1 = await masse(l.page); await l.page.click('[data-lp-b="pause"]'); const p1 = await masse(l.page); await warte(300); const p2 = await masse(l.page);
+    pruefe(a1.n > 1500 && p1.url === p2.url && await text(l.page, '[data-lp-b="pause"]') === 'Abspielen', 'Bedienung figur: läuft, Pause hält das Bild an');
+    pruefe(l.seitenfehler.length === 0 && l.konsole.length === 0 && l.fremd.length === 0, 'Bedienung figur: keine Fehler, keine Fremdanfrage');
+    await l.kontext.close();
+    const r = await oeffnen(browser, SEITE, { still: true });
+    const r1 = await masse(r.page); await warte(400); const r2 = await masse(r.page);
+    pruefe(r1.n > 1500 && r1.url === r2.url && await text(r.page, '[data-lp-b="pause"]') === 'Abspielen', 'Weniger Bewegung figur: Standbild, nichts bewegt sich (auch kein Blinzeln), Knopf „Abspielen“');
+    await r.page.click('[data-lp-b="pause"]'); await warte(500);
+    pruefe((await masse(r.page)).url !== r1.url, 'Weniger Bewegung figur: „Abspielen“ startet die Bewegung erst auf Wunsch');
+    await r.kontext.close();
   }
 
   // ===== Live: Einwilligung zuerst =====
