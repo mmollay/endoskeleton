@@ -4,6 +4,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.68.1] — 2026-11-03
+
+### Added
+- **Landingpages: Webadressen im Fließtext werden automatisch Links** — Anlass: Martin, 03.11.2026, sah in der Vorschau einer Seite, dass `www.…` im Text nur Text blieb. Erkannt werden `www.<host>[/pfad]` (der Link geht auf `https://www.<host>…`, der sichtbare Text bleibt, wie er geschrieben ist), `https://<host>[/pfad]` und E-Mail-Adressen (Link `mailto:`). **Nur wenn der Host in `link_hosts` des Profils steht** — die Entscheidung trifft allein `Text::https()` (nur https, kein Benutzer, kein Port, Host genau aus der Liste, keine Sonderzeichen); bei E-Mail zählt die Domain der Adresse (mit oder ohne `www.`) und `FILTER_VALIDATE_EMAIL`. Alles andere bleibt Text: fremde Hosts, `www.<erlaubt>.boese.com`, `https://<erlaubt>@boese.com`, Ports, `http://`, `javascript:`, nackte Domains ohne `www.` und ohne `https://`. Satzzeichen und Klammern am Rand (`. , ; : ! ? ) ] } > “ ” " ' « » …`) gehören nicht zum Link. `**www.…**` ergibt `<strong><a …>…</a></strong>`; eine Adresse mit Sternchen darin bleibt Text, damit sich Fettdruck und Link nie verschränken.
+  - **Wo:** `Text::inline($s, $hosts = [])` und `Text::absaetze($s, $klasse = '', $hosts = [])` — Vorgabe leer = Verhalten wie bisher (so bleibt der Linktext in Rechtstexten, der `Text::inline` ohne Liste nutzt, frei von Links im Link). `Kontext::absaetze()` und `Kontext::inline()` geben `Profil::hosts()` weiter: **eine Stelle**, keine Vorlage geändert. Das betrifft alle Absätze der Bausteine (Kopfbereich, Text, Person, Anmeldung samt „danach“, Erfahrungen, Häufige Fragen, Bewegung, Video, Abschluss, Themen) und die Listenpunkte von „Themen“. Überschriften, Dachzeilen, Knöpfe, Fragen, Beschriftungen, Meta-Angaben, JSON-LD und Rechtstexte (dort weiter nur `[Text](https://…)`) bekommen keine Auto-Links.
+  - **Sicherheit:** alles wird mit `Text::e()` maskiert, der `href` ebenso; am Link steht nur `href` (kein `target`, kein `rel`, kein Skript). Das Wort wird an Leerraum getrennt und einzeln geprüft (keine Rückverfolgung, linear); ein Wort über 300 Byte bleibt Text. Gemessen: 320 KB mit 20 000 Adressen in 63 ms, 200 KB Satzzeichen in 2,5 ms, 600 Wörter an der Längengrenze in 84 ms.
+  - **Mailadressen:** `FILTER_VALIDATE_EMAIL` allein lässt `a?cc=x@…`, `a&bcc=x@…` und `o'brien@…` durch (`mailto:a?cc=x@…` setzte Kopfzeilen); darum zusätzlich nur Buchstaben, Ziffern und `. _ % + -` vor dem @.
+  - **Stil:** `lp/lp.css` — Links in Listenpunkten (`.lp-block li a`) sind wie die in Absätzen unterstrichen (Farbe allein genügt als Merkmal nicht). Die Linkfarbe `--primary` auf Seite, Band, Karte und Akzentfläche prüft die Kontrast-Matrix schon (4,5:1).
+  - **Doku:** `lp/skill-kopf.md` und `Skill::werkstatt()` sagen den Agenten: „Adressen im Text werden zum Link, wenn der Host in `link_hosts` steht“ (kein Markdown-Link, kein HTML). `lp/SKILL.md` und `lp/werkstatt.md` neu gebaut.
+  - Keine neue `lp-`-Klasse. Keine Änderung an `base.css`, `shared.js`, Presets, `pages/`, `api/`.
+
+### Tests
+- `tests/text.test.php`: neu vier Gruppen (Adressen, feindliche Fälle einzeln, Fettdruck-Schachtelung mit DOM-Prüfung, Absätze, Rechenzeit); `tests/textlinks.test.php` neu (gebaute Seite: Links im Text, kein Link in Überschrift/Knopf/Frage/Meta/JSON-LD, fremde Hosts bleiben Text, Rechtstexte unverändert). Gegen den Stand 3.68.0 sind die neuen Prüfungen rot.
+
+---
+
 ## [3.68.0] — 2026-11-03
 
 ### Added

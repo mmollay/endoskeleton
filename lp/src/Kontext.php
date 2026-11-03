@@ -1,5 +1,5 @@
 <?php
-/** Hilfen für die Vorlagen unter lp/bausteine/: Maskieren, Abschnitt öffnen, Bilder, Knöpfe, JSON-LD, Anrede. */
+/** Hilfen für die Vorlagen unter lp/bausteine/: Maskieren, Fließtext mit Links, Abschnitt öffnen, Bilder, Knöpfe, JSON-LD, Anrede. */
 
 declare(strict_types=1);
 
@@ -22,14 +22,16 @@ final class Kontext
         return Text::e($s);
     }
 
+    /** Fließtext in einer Zeile (Listenpunkt): **fett**, Adressen auf die link_hosts des Profils werden Links. Nicht für Überschriften, Knöpfe und Beschriftungen — dafür e(). */
     public function inline(string $s): string
     {
-        return Text::inline($s);
+        return Text::inline($s, $this->profil->hosts());
     }
 
+    /** Fließtext in Absätzen: wie inline(), dazu Leerzeile = neuer Absatz. Die einzige Stelle, an der die Hostliste in die Bausteine kommt. */
     public function absaetze(?string $s, string $klasse = ''): string
     {
-        return Text::absaetze((string) $s, $klasse);
+        return Text::absaetze((string) $s, $klasse, $this->profil->hosts());
     }
 
     /** Text je nach Anrede des Profils. */

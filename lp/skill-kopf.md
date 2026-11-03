@@ -36,7 +36,8 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
 
 - Nur Bausteine aus dem Katalog unten, nur ihre Felder. Unbekanntes wird abgelehnt.
 - Der Kopfbereich (`hero`) steht genau einmal und zuerst; er trägt die einzige H1.
-- Texte sind reiner Text: Leerzeile = neuer Absatz, `**fett**` ist die einzige Auszeichnung, echte Umlaute.
+- Texte sind reiner Text: Leerzeile = neuer Absatz, `**fett**` ist die einzige Auszeichnung, echte Umlaute. Adressen im Text (`www.…`,
+  `https://…`, E-Mail-Adressen) werden zum Link, wenn der Host in `link_hosts` steht — dafür kein Markdown-Link und kein HTML.
 - Links nur in Knöpfen (`knopf.ziel`) und Quellen (`url`): `#anker` auf der Seite oder `https://` auf einen Host aus
   `link_hosts` des Profils.
 - Bilder: `bestand/<datei>` aus `profil/bilder/` (Alt-Text aus `bilder.json`) oder `img/<datei>` im Seitenordner

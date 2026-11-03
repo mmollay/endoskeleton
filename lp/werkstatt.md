@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.68.0)
+# Landingpage bearbeiten (Endoskeleton 3.68.1)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -7,6 +7,7 @@ _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand
 - Der Kopfbereich (`hero`) steht genau einmal und ganz oben. Anmeldung und Häufige Fragen gibt es höchstens einmal.
 - Links nur in Knöpfen und Quellen, nur `https://` auf die freigegebenen Websites des Kunden oder `#anker` auf der Seite.
 - Texte ohne HTML. Leerzeile = neuer Absatz, `**fett**` ist die einzige Auszeichnung. Echte Umlaute (ä, ö, ü, ß).
+- Adressen im Text (`www.…`, `https://…`, E-Mail) werden zum Link, wenn der Host in `link_hosts` steht — dafür kein Markdown-Link und kein HTML.
 - Keine Heil- oder Wirkversprechen; die Sperrliste des Kunden wird geprüft, der Kunde gibt die Seite frei.
 - Bilder: `bestand/<datei>` aus dem Bildbestand des Kunden oder `img/<datei>` im Seitenordner (dann mit `alt`, leer nur mit `"dekorativ": true`).
 - Beim Teilen des Seitenlinks (WhatsApp, Facebook, LinkedIn …) erscheint das Bild des Kopfbereichs, wenn `meta.vorschaubild` fehlt. `meta.adresse` setzt der Betreiber — nie ändern oder entfernen.
