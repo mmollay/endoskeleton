@@ -19,6 +19,7 @@
  *   BW14 (3.64.2) Figur-Stil wählbar: Katalogfeld stil (Vorgabe silhouette, alte Werte gelten weiter), Bau, Skill/Werkstatt/Musterbuch kennen die Auswahl
  *   BW15 (3.64.2) Zeichenstile im Player (node, aufzeichnender Kontext): drei Stile zeichnen verschieden, Bestandsschutz strich/punkte, Rückfall auf die Vorgabe, Farbregeln
  *   BW16 (3.67.0) Stil „figur“ und Ausdruck: Katalog (stil mit sechs Werten, ausdruck nur bei figur), Prüfer, Bau, Skill/Werkstatt/Doku/Musterbuch; der Player zeichnet ihn (node: BW15)
+ *   BW17 (3.68.0) Requisit „stab“: Katalog (requisit, hand und laenge nur mit stab), Prüfer, Bau (data-lp-requisit/-hand/-laenge), Skill/Werkstatt/Doku/Musterbuch; der Player rechnet und zeichnet den Stab (node: BW15)
  */
 
 declare(strict_types=1);
@@ -491,8 +492,8 @@ return [
         $w = H::wurzel();
         $js = (string) file_get_contents("$w/lp/bewegung.js");
         $live = (string) file_get_contents("$w/lp/bewegung-live.js");
-        T::ok(strlen((string) gzencode($js, 9)) <= 14500, 'Player gzip ≤ 14,5 KB (seit 3.67.0: Stil figur; vorher 10 KB) (' . strlen((string) gzencode($js, 9)) . ' Byte)');
-        T::ok(strlen($js) <= 41000, 'Player roh ≤ 41 KB (seit 3.67.0: Stil figur; vorher 28 KB) (' . strlen($js) . ' Byte)');
+        T::ok(strlen((string) gzencode($js, 9)) <= 18000, 'Player gzip ≤ 18 KB (seit 3.68.0: Requisit Stab mit Glättung, neue Gesichter, Fäuste vor dem Kopf; seit 3.67.0 14,5 KB, vorher 10 KB) (' . strlen((string) gzencode($js, 9)) . ' Byte)');
+        T::ok(strlen($js) <= 50000, 'Player roh ≤ 50 KB (seit 3.68.0: Requisit Stab mit Glättung, neue Gesichter, Fäuste vor dem Kopf; seit 3.67.0 41 KB, vorher 28 KB) (' . strlen($js) . ' Byte)');
         foreach (['bewegung.js' => $js, 'bewegung-live.js' => $live] as $name => $code) {
             T::eq(preg_match('#https?://|//[a-z0-9.-]+\.[a-z]{2,}/#i', $code), 0, "$name: keine Fremdadresse");
             foreach (['localStorage', 'sessionStorage', 'indexedDB', 'document.cookie', 'XMLHttpRequest', 'sendBeacon', 'WebSocket', 'eval(', 'new Function'] as $verboten) {
@@ -823,5 +824,64 @@ JS);
         T::contains((string) file_get_contents("$w/musterbuch/bewegung--wiedergabe--figur/index.html"), 'data-lp-stil="figur" data-lp-ausdruck="neutral"', 'gebautes Musterbuch: figur');
         // ehrlich: aus der Körper-Aufnahme kommt keine Mimik — die Kamera-Vorführung gibt dem Player keinen Ausdruck mit
         T::notContains((string) file_get_contents("$w/lp/bewegung-live.js"), 'ausdruck', 'bewegung-live.js: kein Ausdruck aus der Kamera');
+    },
+    'BW17 Requisit „stab“ (3.68.0): Katalog (hand und laenge nur mit stab), Prüfer, Bau, Skill/Werkstatt/Doku/Musterbuch; die Kamera liefert keinen Stab, der Player rechnet ihn' => static function () use ($k, $seite, $ordner, $schema): void {
+        $w = H::wurzel();
+        $b = $k->baustein('bewegung');
+        $r = $b['felder']['requisit'] ?? [];
+        T::eq([$r['typ'] ?? null, $r['werte'] ?? null, $r['seit'] ?? null], ['auswahl', ['stab'], '3.68.0'], 'requisit: Auswahl, nur der Wert stab, seit 3.68.0');
+        T::ok(!isset($r['standard']) && !($r['pflicht'] ?? false), 'requisit ist freiwillig und hat keine Vorgabe (leer = kein Requisit)');
+        $h = $b['felder']['hand'] ?? [];
+        T::eq([$h['werte'] ?? null, $h['standard'] ?? null, $h['nur_wenn'] ?? null], [['rechts', 'links', 'beide'], 'rechts', ['requisit' => 'stab']], 'hand: rechts|links|beide, Standard rechts, nur mit requisit = stab');
+        $l = $b['felder']['laenge'] ?? [];
+        T::eq([$l['werte'] ?? null, $l['standard'] ?? null, $l['nur_wenn'] ?? null], [['kurz', 'mittel', 'lang'], 'mittel', ['requisit' => 'stab']], 'laenge: kurz|mittel|lang, Standard mittel, nur mit requisit = stab');
+        $o = $ordner($seite());
+        T::eq($schema($seite(['requisit' => 'stab']), $o), '', 'requisit stab ohne hand und laenge gilt');
+        foreach (['rechts', 'links', 'beide'] as $x) {
+            foreach (['kurz', 'mittel', 'lang'] as $y) {
+                T::eq($schema($seite(['requisit' => 'stab', 'hand' => $x, 'laenge' => $y]), $o), '', "stab: hand $x, laenge $y gilt");
+            }
+        }
+        T::eq($schema($seite(['stil' => 'strich', 'requisit' => 'stab', 'hand' => 'links']), $o), '', 'der Stab gilt in jedem Stil (strich)');
+        T::eq($schema($seite(['stil' => 'figur', 'ausdruck' => 'muede', 'requisit' => 'stab']), $o), '', 'figur mit Ausdruck und Stab zugleich gilt');
+        foreach (['besen', 'Stab', '', 'schwert', 3, true, ['stab']] as $schlecht) {
+            T::contains($schema($seite(['requisit' => $schlecht]), $o), '[sperrend] bausteine.1.requisit', 'requisit ' . json_encode($schlecht, JSON_UNESCAPED_UNICODE) . ': sperrend');
+        }
+        foreach (['mitte', 'Rechts', '', 7, ['links']] as $schlecht) {
+            T::contains($schema($seite(['requisit' => 'stab', 'hand' => $schlecht]), $o), '[sperrend] bausteine.1.hand', 'hand ' . json_encode($schlecht, JSON_UNESCAPED_UNICODE) . ': sperrend');
+        }
+        foreach (['riesig', 'Kurz', '', 2.5] as $schlecht) {
+            T::contains($schema($seite(['requisit' => 'stab', 'laenge' => $schlecht]), $o), '[sperrend] bausteine.1.laenge', 'laenge ' . json_encode($schlecht, JSON_UNESCAPED_UNICODE) . ': sperrend');
+        }
+        T::contains($schema($seite(['hand' => 'links']), $o), '[sperrend] bausteine.1.hand', 'hand ohne Requisit: sperrend');
+        T::contains($schema($seite(['laenge' => 'lang']), $o), '[sperrend] bausteine.1.laenge', 'laenge ohne Requisit: sperrend');
+        $bau = static function (array $b) use ($seite, $ordner): string {
+            $dir = $ordner($seite($b));
+            T::eq(H::texte(Bauer::bauen($dir)->befunde), '', 'Bau ohne Befunde');
+            return (string) file_get_contents("$dir/index.html");
+        };
+        T::contains($bau(['requisit' => 'stab']), ' data-lp-requisit="stab" data-lp-hand="rechts" data-lp-laenge="mittel"', 'stab ohne Angaben: Vorgaben rechts und mittel als Attribute');
+        T::contains($bau(['requisit' => 'stab', 'hand' => 'beide', 'laenge' => 'lang']), ' data-lp-requisit="stab" data-lp-hand="beide" data-lp-laenge="lang"', 'stab mit hand beide, laenge lang: Attribute übernommen');
+        T::contains($bau(['stil' => 'figur', 'ausdruck' => 'muede', 'requisit' => 'stab', 'hand' => 'links']), 'data-lp-ausdruck="muede" data-lp-requisit="stab" data-lp-hand="links"', 'Ausdruck und Stab stehen beide an der Figur');
+        T::notContains($bau([]), 'data-lp-requisit', 'ohne Requisit gibt es das Attribut nicht');
+        T::notContains($bau([]), 'data-lp-hand', 'ohne Requisit auch keine Hand');
+        T::notContains($bau([]), 'data-lp-laenge', 'ohne Requisit auch keine Länge');
+        foreach (['lp/SKILL.md', 'lp/werkstatt.md'] as $datei) {
+            $t = (string) file_get_contents("$w/$datei");
+            T::contains($t, '| `requisit` | auswahl', "$datei hat die Zeile für requisit");
+            T::contains($t, '| `hand` | auswahl', "$datei hat die Zeile für hand");
+            T::contains($t, '| `laenge` | auswahl', "$datei hat die Zeile für laenge");
+            T::contains($t, 'nur wenn `requisit` = `stab`', "$datei: hand und laenge nur mit stab");
+            T::contains($t, '`rechts`, `links`, `beide`', "$datei nennt die drei Hände");
+        }
+        $doku = (string) file_get_contents("$w/docs/bewegung-format.md");
+        foreach (['data-lp-requisit', 'data-lp-hand', 'data-lp-laenge', 'Requisit', 'Handgelenk'] as $wort) {
+            T::contains($doku, $wort, "Doku nennt $wort");
+        }
+        $fix = json_decode((string) file_get_contents("$w/lp/musterbuch/bewegung--wiedergabe--stab.json"), true);
+        T::eq([$fix['bausteine'][1]['requisit'] ?? null, $fix['bausteine'][1]['hand'] ?? null, $fix['bausteine'][1]['laenge'] ?? null], ['stab', 'links', 'mittel'], 'Musterbuch-Beispiel bewegung--wiedergabe--stab wählt stab, links, mittel');
+        T::contains((string) file_get_contents("$w/musterbuch/bewegung--wiedergabe--stab/index.html"), 'data-lp-requisit="stab" data-lp-hand="links" data-lp-laenge="mittel"', 'gebautes Musterbuch: Stab');
+        // ehrlich: die Aufnahme kennt keinen Stab — er wird im Player gerechnet, nie aus der Datei gelesen und nie aus der Kamera
+        T::notContains((string) file_get_contents("$w/lp/bewegung-live.js"), 'requisit', 'bewegung-live.js: kein Requisit aus der Kamera');
     },
 ];

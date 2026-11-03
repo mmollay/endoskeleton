@@ -102,7 +102,7 @@ Fehlermeldung im Browser. Der Player liest nie eine Datei über 300 000 Zeichen 
 Tastatur-Bedienung der Leinwand ruht, solange die Kamera läuft (sonst zeichnete der Beispiel-Player in dieselbe Leinwand).
 
 **Zeichnen und Zeitsteuerung sind getrennt:** `LpBewegung.zeichne(ctx, daten, bild, breite, hoehe, optionen)` ist eine reine Zeichenfunktion
-(Optionen: `farbe`, `grund`, `stil` = `silhouette`|`piktogramm`|`koerper`|`strich`|`punkte`|`figur`, `spiegeln`, `linie`, `ueber`, `schatten`; nur bei `figur` außerdem `ausdruck`, `zeit`, `ruhe`). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei, opt)`
+(Optionen: `farbe`, `grund`, `stil` = `silhouette`|`piktogramm`|`koerper`|`strich`|`punkte`|`figur`, `spiegeln`, `linie`, `ueber`, `schatten`; nur bei `figur` außerdem `ausdruck`, `zeit`, `ruhe`; in jedem Stil `requisit`, `hand`, `laenge`, siehe unten). Sie kennt keine Uhr. `LpBewegung.spielen(cv, stil, bei, opt)`
 fügt Zeitsteuerung, Schleife, Pause und Tempo hinzu. Ein Renderer (z. B. für die Shorts) ruft `zeichne` Bild für Bild selbst auf.
 
 ## Darstellungen der Figur (seit 3.66.0)
@@ -115,15 +115,34 @@ Wert fällt im Player auf die Vorgabe zurück (kein Fehler); der Prüfer des Kit
 | `silhouette` (Vorgabe) | kräftige Figur mit Kontur, Körper etwas gedämpft, Boden-Linie | fast immer: auch klein gut lesbar |
 | `piktogramm` | einfarbige Fläche, Kopf getrennt, dünne Lücke in der Farbe des Hintergrunds, wo sich Teile überdecken | ruhig, wie ein Notausgang-Schild |
 | `koerper` | Figur mit Tiefe: Verlauf von links oben, Schatten unter den Füßen | wenn die Figur Hauptsache ist; braucht etwas mehr Rechenzeit |
-| `figur` (seit 3.67.0) | gezeichnete Figur: dunkler Kopf mit Gesicht aus zwei Lidern und einem Mundstrich, Kleidung in der Markenfarbe, helle Randlinie wie ein Aufkleber, Schatten unter den Füßen | wenn die Figur eine Persönlichkeit haben soll; Feld `ausdruck` |
+| `figur` (seit 3.67.0) | gezeichnete Figur: dunkler Kopf mit Gesicht (Augen mit Pupille, Brauen, Mund), Kleidung in der Markenfarbe, helle Randlinie wie ein Aufkleber, Schatten unter den Füßen | wenn die Figur eine Persönlichkeit haben soll; Feld `ausdruck` |
 | `strich`, `punkte` | Strichfigur / nur die Körperpunkte (die älteren Darstellungen, unverändert) | Bestand |
 
-**Ausdruck (nur bei `figur`, seit 3.67.0):** Das Katalogfeld `ausdruck` (`neutral` Vorgabe | `muede` | `ueberrascht` | `entschlossen`) steht als `data-lp-ausdruck` an der Figur. Es verändert nur die Lider und den Mund; ein unbekannter Wert zeichnet `neutral`. Die Figur blinzelt gelegentlich (eine kleine Zeitfunktion `LpBewegung.blinzeln(ms)`, vier Schläge in 15,4 s); bei „weniger Bewegung“ (`prefers-reduced-motion`) nie. Der Ausdruck kommt von der Seite, nicht aus der Kamera: die Körper-Aufnahme liefert keine Mimik, `lp/bewegung-live.js` kennt kein `ausdruck`. Der Kopf ist fast schwarz; auf hellem Grund trägt er allein, auf dunklem Grund umgibt die ganze Figur eine helle Randlinie (Kontrast mindestens 3 : 1, gemessen und erzwungen). Die Kleidung nimmt die Farbe `color` der Leinwand (Kleid 4,5 : 1, Hose 3,2 : 1 gegen den Grund).
+**Ausdruck (nur bei `figur`, seit 3.67.0):** Das Katalogfeld `ausdruck` (`neutral` Vorgabe | `muede` | `ueberrascht` | `entschlossen`) steht als `data-lp-ausdruck` an der Figur. Es verändert nur das Gesicht (Lider, Pupillen, Brauen, Augenringe, Mund); ein unbekannter Wert zeichnet `neutral`.
+`neutral`: offene Augen, gerade Brauen, schmaler Mund. `muede`: halb geschlossene Lider, hängende Brauen, Augenringe. `ueberrascht`: weit aufgerissene Augen, hohe Brauen, kleiner runder Mund (nur ein Ring, keine gefüllte Fläche). `entschlossen`: schmale Augen, steil nach innen gezogene Brauen, fester Mund.
+Hält die Figur die Hand vor das Kinn (Schlag, Block), werden die Fäuste nach dem Kopf gezeichnet, mit hellem Ring, damit sie sich vom dunklen Kopf abheben. Die Figur blinzelt gelegentlich (eine kleine Zeitfunktion `LpBewegung.blinzeln(ms)`, vier Schläge in 15,4 s); bei „weniger Bewegung“ (`prefers-reduced-motion`) nie. Der Ausdruck kommt von der Seite, nicht aus der Kamera: die Körper-Aufnahme liefert keine Mimik, `lp/bewegung-live.js` kennt kein `ausdruck`. Der Kopf ist fast schwarz; auf hellem Grund trägt er allein, auf dunklem Grund umgibt die ganze Figur eine helle Randlinie (Kontrast mindestens 3 : 1, gemessen und erzwungen). Die Kleidung nimmt die Farbe `color` der Leinwand (Kleid 4,5 : 1, Hose 3,2 : 1 gegen den Grund).
 
 **Farben ohne neue Einstellung:** Der Player kennt eine Figurfarbe (`color` der Leinwand) und liest den Hintergrund (`background-color` der Leinwand oder des
 nächsten Elternelements). Daraus entstehen alle Töne: gedämpft wird zu Schwarz (dunkler Grund) oder Weiß (heller Grund), die Lücke und der Schatten kommen vom Grund. Die
 tragende Farbe jedes Stils (Kontur bei der Silhouette, Fläche beim Piktogramm, Mitte des Körpers) hat gegen den Grund mindestens 3 : 1 (WCAG 1.4.11); ist die
 Markenfarbe zu schwach, wird sie dafür abgedunkelt oder aufgehellt. Die Hauptfarbe bleibt, wie sie ist, wenn sie schon genügt. `LpBewegung.farben(stil, farbe, grund)` liefert die Töne.
+
+## Requisit „Stab“ (seit 3.68.0)
+
+Die Aufnahme kennt keinen Stab und enthält auch keinen: MediaPipe liefert je Hand nur drei Punkte (kleiner Finger, Zeigefinger, Daumen), keine Finger und kein Gerät in der Hand.
+Der Player **errechnet** den Stab aus der Haltung und zeichnet ihn in jedem Stil in der Farbe der Figur (`color` der Leinwand; zum Grund hin mindestens 3 : 1, sonst wird er abgedunkelt oder aufgehellt).
+
+Drei Katalogfelder am Baustein `bewegung`; das Kit schreibt sie als `data-lp-requisit`, `data-lp-hand` und `data-lp-laenge` an die Figur (nur wenn `requisit` = `stab` gewählt ist):
+
+| Feld | Werte | Wirkung |
+|------|-------|---------|
+| `requisit` | `stab` (leer = keines) | schaltet den Stab ein; ein unbekannter Wert zeichnet nichts |
+| `hand` | `rechts` (Vorgabe) \| `links` \| `beide` | die Hand der aufgenommenen Person; `beide`: ein Stab in beiden Händen, mittig zwischen den Händen |
+| `laenge` | `kurz` 0,4 \| `mittel` 0,7 (Vorgabe) \| `lang` 1 | in Körpergrößen (Schlagstock, Stock, Kampfstab) |
+
+**Wie der Stab entsteht:** Der Griff sitzt knapp hinter dem Handgelenk in Richtung der Handpunkte (Mitte aus kleinem Finger, Zeigefinger, Daumen; ersatzweise die Verlängerung Ellbogen → Handgelenk). Die Richtung wird über fünf Bilder gemittelt, damit er bei zittriger Erkennung ruhig bleibt; Bilder, in denen die Hand fehlt, zählen dabei nicht. Die Länge folgt der Rumpflänge der Figur, bleibt in der ganzen Aufnahme gleich und ragt ein Stück hinter der Hand heraus. Ein Stab, der nach unten über den Boden hinausragte, endet auf der Boden-Linie. Beim Winken ragt ein langer Stab mit erhobenem Arm über den Bildrand — die Länge ändert sich nicht, nur `kurz` bleibt im Bild.
+**Ehrlich weglassen:** Sind Ellbogen, Handgelenk oder alle Handpunkte in einem Bild nicht sicher erkannt (Sichtbarkeit unter 0,5), gibt es in diesem Bild keinen Stab — er wird nie irgendwohin geraten. Bei `beide` braucht es beide Hände. Die Figur-Stile zeichnen die Fäuste über dem Stab, damit er „in der Hand“ liegt. `LpBewegung.stab(daten, bild, breite, hoehe, optionen)` liefert die beiden Endpunkte (oder `null`) für Renderer, die selbst zeichnen.
+Die Kamera-Vorführung zeigt das Live-Bild ohne Stab (ein einzelnes Bild lässt sich nicht glätten); die Vorschau der fertigen Aufnahme hält den Stab, weil sie über denselben Player läuft.
 
 ## Kamera-Vorführung (`lp/bewegung-live.js`)
 

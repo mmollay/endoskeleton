@@ -4,6 +4,39 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.68.0] — 2026-11-03
+
+### Added
+- **Bewegung: Requisit „Stab“ (Stockkampf, Schlag mit Stab)** — Anlass: Martin, 01.11.2026, fragte nach einem Stockkampf. Die Pose liefert MediaPipe mit nur drei Punkten je Hand und erkennt nie einen Stock; der Stab steht deshalb **nicht in den Daten**, der Player **errechnet** ihn aus der Handstellung.
+  - **Katalog:** Baustein `bewegung` (Variante `wiedergabe`) hat drei neue Felder: `requisit` (`stab`; leer = keines), `hand` (`rechts` Vorgabe | `links` | `beide`) und `laenge` (`kurz` | `mittel` Vorgabe | `lang`). `hand` und `laenge` sind nur mit `requisit` = `stab` zulässig (sonst sperrend). Das Kit schreibt `data-lp-requisit="stab"`, `data-lp-hand` und `data-lp-laenge` an das `<figure>`; ohne Requisit steht kein neues Attribut in der Seite.
+  - **Rechnung (`lp/bewegung.js`):** der Stab liegt auf der Verlängerung Ellbogen → Handgelenk → Handmitte (Handmitte = Mittelpunkt der drei Handpunkte, ein einziger sichtbarer Handpunkt genügt). Die Länge ist fest und hängt an der Körpergröße: `lang` ≈ eine Körpergröße (3,1 Rumpflängen), `mittel` = 0,7 davon, `kurz` = 0,4; die Hand hält den Stab 15 % hinter seinem Ende. Bei `beide` liegt ein Stab auf der Linie von Griff zu Griff, in der Mitte zwischen den Händen, mindestens ein Drittel länger als der Abstand der Hände (er ragt auf beiden Seiten heraus). Ein Stab, der nach unten über den Boden der Fläche hinausragte, endet auf dem Boden. **Fehlt Ellbogen, Handgelenk oder jeder Handpunkt (Sichtbarkeit unter 0,5), gibt es in diesem Bild keinen Stab** — er wird nie irgendwohin geraten; bei `beide` verlangt es beide Hände.
+  - **Glättung:** die Richtung des Stabes wird über fünf Bilder geglättet (Binomialgewichte 1-4-6-4-1, gegenläufige Richtungen zählen als dieselbe, fehlende Bilder werden übersprungen); der Griff sitzt an der Hand des gezeigten Bildes. Gemessen an verrauschten Handpunkten (Test, drei Zufallsfolgen, % der Bildhöhe): Ruck der Stabspitze sauber 2,60 · ungeglättet 7,8–9,2 · geglättet 3,1–4,0; Zittern je Bild sauber 6,4 · ungeglättet 8,5–8,7 · geglättet 6,6–7,4. Bei `beide` wirkt die Glättung wenig, weil die Richtung dort aus dem Abstand der Hände kommt.
+  - **Zeichnung in allen sechs Stilen:** ein Stab als dicke Linie mit runden Enden, zuletzt gezeichnet (über der Figur), mit der Farbe des Stils (aus `color`; bei `figur` die Kleidfarbe, mit der Randlinie der Figur). Kontrast gegen den Grund in sieben Farbpaaren geprüft (mindestens 3 : 1, sonst wie bei den Stilen angehoben). Bei `punkte` ist der Stab gepunktet. Bei `figur` werden die Fäuste über dem Stab noch einmal gezeichnet, sie umschließen ihn.
+  - **Player-Schnittstelle:** `zeichne` und `spielen` kennen die Optionen `requisit`, `hand`, `laenge`; neu `LpBewegung.stab(d, i, w, h, o)` (nur die Geometrie, für Tests und Vorschauen), `LpBewegung.REQUISITE`, `STAB_HAENDE`, `STAB_LAENGEN`. Die Kamera-Vorführung (`lp/bewegung-live.js`) zeichnet **keinen** Stab (die Glättung braucht mehrere Bilder); die Aufnahme-Vorschau schon.
+
+### Changed
+- **Stil `figur`: Gesichter überarbeitet** (Zeichnung und Zahlen, keine Gesichtserkennung): Augen mit dunkler Pupille und Oberlid, Brauen, bei `muede` halb gesenkte Lider und Augenringe, bei `entschlossen` Lider und Brauen steil nach innen unten, bei `ueberrascht` weit offene Augen mit kleiner Pupille, hoch gezogene Brauen und ein Mund, der nur ein Ring ist. Vorher wirkte `ueberrascht` wie ein Totenkopf (hohle weiße Ovale und gefüllter Mund) und `neutral` und `muede` waren kaum zu unterscheiden (Test: Lid 0,00 gegen 0,55, Augenringe nur bei `muede`).
+- **Stil `figur`: Hand vor dem Kinn** — Ursache war die Zeichnung, nicht die Pose: die dunkle Faust hatte dieselbe Farbe wie der Kopf und keine Kante, und sie wurde ohne Tiefe vor dem Kopf eingeordnet. Jetzt werden die Fäuste nach dem Kopf gezeichnet und tragen einen hellen Ring, **aber nur dort, wo sie den Kopf berühren**; frei im Raum bleibt die Außenkante der Figur dunkel (Kontrast zum Grund). Die Pose selbst bleibt: bei einer Deckung vor dem Kinn verdeckt die Hand weiterhin Mund und Teile des Auges.
+- **Größe des Players und Größenwächter (BW10):** 49 739 Byte, gzip 17 575 Byte (vorher 40 268 / 14 189). Die Grenze steigt von 41 KB / 14,5 KB auf 50 000 Byte / 18 000 Byte. Begründung: der Stab mit Glättung (fünf Bilder, Griff, Boden), die neuen Gesichter und die Fäuste vor dem Kopf; Stile und Formate ohne Requisit zeichnen unverändert.
+- **Browser-Prüfung `ci/browser-bewegung.js`:** die Bedingung, die das Musterbuch-HTML umschreibt, kennt jetzt auch `requisit`, `hand` und `ausdruck` (vorher wurde `ausdruck` beim Umschreiben vergessen, die vier Ausdrücke gaben dort dasselbe Bild).
+
+### Tests
+- `tests/bewegung-zeichnen.js` 192 Prüfungen (vorher 127), alle grün; gegen den Player von 3.67.0 sind die neuen Prüfungen rot. Neu: Block 11 Requisit Stab (Lage, Länge, Hände, fehlende Hand, alle sechs Stile, Kontrast, Glättung gemessen), Block 12 Hand vor dem Kinn (synthetische Daten mit der Faust am Kinn), Block 13 Gesichter. **Die 19 Prüfsummen der älteren Stile (Strich, Punkte, Silhouette, Piktogramm, Körper) sind byte-gleich geblieben.**
+- `tests/bewegung.test.php`: neu BW17 (Katalog, Bauer, Attribute des Requisits); BW10 mit den neuen Grenzen.
+- `php tests/run.php`: 5180 Prüfungen, alle grün (vorher 4996). Browsertest `ci/browser.js`: 899 Prüfungen bestanden (vorher 887). `ci/browser-bewegung.js` (eigenständig, nicht Teil von `ci/browser.js`) hat einen neuen Stab-Block.
+- **Bekannt rot, nicht von dieser Änderung:** in `ci/browser-bewegung.js` melden acht Prüfungen „Farbe figur … Außenkante“ (Kontrast der Beinkante gegen den Bodenstreifen, 1,1 bis 2,7 : 1); sie sind mit dem Stand von 3.67.0 (Klon `main`) ebenso rot.
+
+### Neue `lp-`-Klassen
+Keine. (Der Stab nutzt `lp-bewegung-figur`; Gestaltung unverändert in `lp/lp.css`.)
+
+### Neue Dateien
+`lp/musterbuch/bewegung--wiedergabe--stab.json` und das gebaute `musterbuch/bewegung--wiedergabe--stab/`. Erzeugte Dateien (`lp/SKILL.md`, `lp/werkstatt.md`, Musterbuch) neu gebaut; `docs/bewegung-format.md` beschreibt Requisit, Gesichter und Fäuste.
+
+### Rückweg
+Den Zweig `lp/bewegung-requisit` nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten ohne `requisit` ändern sich nicht (gleiche Attribute, ältere Stile byte-gleich); `stil` = `figur` zeichnet die neuen Gesichter und Fäuste, ein Seitenstand von 3.67.0 sähe nur diese Zeichnung anders.
+
+---
+
 ## [3.67.0] — 2026-11-01
 
 ### Added

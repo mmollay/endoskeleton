@@ -76,7 +76,7 @@ const LANGSAM_PLAY = `(() => { const p = HTMLMediaElement.prototype.play; HTMLMe
 const VERSTECKEN = () => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); };
 
 /** Öffnet eine Seite des Musterbuchs; optionen: kamera (echt|verweigert|ohne), modell (echt|attrappe|wirft|nan|fehlt), verzoegern (ms, bis das Live-Modul antwortet), still, vorher (Skript), datei (Ersatz für die Bewegungsdatei), modellOrdner (zweiter Ordner, aus dem Modelldateien kommen: Ziel von data-lp-modell, relativ zur Seite),
- *  3.64.2: stil (Ersatz für data-lp-stil der Figur; null = Attribut weg), ausdruck (3.67.0: ebenso für data-lp-ausdruck), thema (data-theme am html), farben ({ figur, grund }: Farben der Leinwand, nur im Test), fenster ({ width, height }). */
+ *  3.64.2: stil (Ersatz für data-lp-stil der Figur; null = Attribut weg), ausdruck (3.67.0: ebenso für data-lp-ausdruck), requisit/hand (3.68.0: ebenso für data-lp-requisit und data-lp-hand; null = Requisit weg), thema (data-theme am html), farben ({ figur, grund }: Farben der Leinwand, nur im Test), fenster ({ width, height }). */
 async function oeffnen(browser, name, optionen = {}) {
   const kontext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: optionen.fenster || { width: 1000, height: 1100 }, reducedMotion: optionen.still ? 'reduce' : 'no-preference', permissions: optionen.kamera === 'echt' ? ['camera'] : [] });
   const page = await kontext.newPage();
@@ -110,10 +110,12 @@ async function oeffnen(browser, name, optionen = {}) {
     const datei = path.join(MUSTERBUCH, rel.endsWith('/') || rel === name ? rel.replace(/\/?$/, '/') + 'index.html' : rel);
     if (!datei.startsWith(MUSTERBUCH) || !fs.existsSync(datei) || fs.statSync(datei).isDirectory()) { return r.fulfill({ status: 404, body: '' }); }
     let inhalt = fs.readFileSync(datei);
-    if (datei.endsWith('index.html') && (optionen.stil !== undefined || optionen.thema || optionen.farben)) {
+    if (datei.endsWith('index.html') && (optionen.stil !== undefined || optionen.ausdruck !== undefined || optionen.requisit !== undefined || optionen.hand !== undefined || optionen.thema || optionen.farben)) {
       let h = inhalt.toString('utf8');
       if (optionen.stil !== undefined) { h = h.replace(/ data-lp-stil="[^"]*"/, optionen.stil === null ? '' : ` data-lp-stil="${optionen.stil}"`); }
       if (optionen.ausdruck !== undefined) { h = h.replace(/ data-lp-ausdruck="[^"]*"/, optionen.ausdruck === null ? '' : ` data-lp-ausdruck="${optionen.ausdruck}"`); }
+      if (optionen.requisit !== undefined) { h = h.replace(/ data-lp-requisit="[^"]*"/, optionen.requisit === null ? '' : ` data-lp-requisit="${optionen.requisit}"`); }
+      if (optionen.hand !== undefined) { h = h.replace(/ data-lp-hand="[^"]*"/, ` data-lp-hand="${optionen.hand}"`); }
       if (optionen.thema) { h = h.replace('<html ', `<html data-theme="${optionen.thema}" `); }
       if (optionen.farben) { h = h.replace('</head>', `<style>.lp-bewegung-figur canvas{background:${optionen.farben.grund};color:${optionen.farben.figur}}</style></head>`); }
       inhalt = Buffer.from(h, 'utf8');
@@ -437,6 +439,70 @@ function pruefeText(t) {
     pruefe(r1.n > 1500 && r1.url === r2.url && await text(r.page, '[data-lp-b="pause"]') === 'Abspielen', 'Weniger Bewegung figur: Standbild, nichts bewegt sich (auch kein Blinzeln), Knopf „Abspielen“');
     await r.page.click('[data-lp-b="pause"]'); await warte(500);
     pruefe((await masse(r.page)).url !== r1.url, 'Weniger Bewegung figur: „Abspielen“ startet die Bewegung erst auf Wunsch');
+    await r.kontext.close();
+  }
+
+  // ===== Requisit Stab (3.68.0): errechnet, in jedem Stil gezeichnet, folgt der Wiedergabe; unbekannt = kein Stab =====
+  {
+    const SEITE = 'bewegung--wiedergabe--stab';
+    const w = await oeffnen(browser, SEITE, { still: true });
+    const m = await masse(w.page);
+    const attr = (n) => w.page.getAttribute('.lp-bewegung-figur', n);
+    pruefe(await attr('data-lp-requisit') === 'stab' && await attr('data-lp-hand') === 'links' && await attr('data-lp-laenge') === 'mittel', 'Stab: die Figur trägt data-lp-requisit="stab", data-lp-hand="links", data-lp-laenge="mittel"');
+    pruefe(m.n > 1500 && m.n < 0.5 * m.breite * m.hoehe, `Stab: Standbild mit Figur, ohne Bühne (${m.n} von ${m.breite * m.hoehe} Pixeln gezeichnet)`);
+    pruefe(w.fremd.length === 0 && w.seitenfehler.length === 0 && w.konsole.length === 0, `Stab: keine Fremdanfrage, keine Konsolen-/Seitenfehler (${w.seitenfehler.concat(w.konsole).join('; ')})`);
+    const z = await zugriffe(w.page);
+    pruefe(z.z.length === 0 && z.s === 0 && z.l === 0, 'Stab: kein Cookie, kein Web-Speicher');
+    await w.kontext.close();
+
+    // ohne Requisit und mit unbekanntem Wert: dasselbe Bild ohne Stab; mit Stab ein anderes; die andere Hand ein drittes
+    const ohne = await oeffnen(browser, SEITE, { still: true, requisit: null });
+    const mo = await masse(ohne.page);
+    pruefe(mo.url !== m.url && mo.n < m.n, `Stab: mit Stab zeichnet die Figur mehr Pixel als ohne (${m.n} gegen ${mo.n}) und ein anderes Bild`);
+    await ohne.kontext.close();
+    for (const [was, opt] of [['unbekanntes Requisit „besen“', { requisit: 'besen' }], ['leeres Requisit', { requisit: '' }]]) {
+      const s = await oeffnen(browser, SEITE, { still: true, ...opt });
+      pruefe((await masse(s.page)).url === mo.url && s.seitenfehler.length === 0 && s.konsole.length === 0, `Stab (${was}): zeichnet keinen Stab, kein Fehler`);
+      await s.kontext.close();
+    }
+    const bilder = { links: m.url };
+    for (const h of ['rechts', 'beide']) { const s = await oeffnen(browser, SEITE, { still: true, hand: h }); bilder[h] = (await masse(s.page)).url; pruefe(s.seitenfehler.length === 0 && s.konsole.length === 0, `Stab (hand ${h}): kein Fehler`); await s.kontext.close(); }
+    const hs = await oeffnen(browser, SEITE, { still: true, hand: 'unsinn' });
+    pruefe((await masse(hs.page)).url === bilder.rechts && hs.seitenfehler.length === 0, 'Stab: unbekannte Hand fällt auf rechts zurück');
+    await hs.kontext.close();
+    pruefe(new Set(Object.values(bilder)).size === 3, 'Stab: links, rechts und beide Hände zeigen drei verschiedene Bilder');
+
+    // jeder Stil bekommt einen sichtbaren Stab
+    for (const stil of ['silhouette', 'piktogramm', 'koerper', 'strich', 'punkte', 'figur']) {
+      const a = await oeffnen(browser, SEITE, { still: true, stil });
+      const b = await oeffnen(browser, SEITE, { still: true, stil, requisit: null });
+      const ma = await masse(a.page), mb = await masse(b.page);
+      pruefe(ma.url !== mb.url && ma.n > mb.n && a.seitenfehler.length === 0 && a.konsole.length === 0, `Stab im Stil ${stil}: gezeichnet (${ma.n} gegen ${mb.n} Pixel), kein Fehler`);
+      await a.kontext.close(); await b.kontext.close();
+    }
+
+    // Lage: hell/dunkel, 1280 und 390 Punkte breit
+    for (const [was, opt] of [['hell', { thema: 'light' }], ['dunkel', { thema: 'dark' }]]) {
+      for (const fenster of [{ width: 1280, height: 900 }, { width: 390, height: 800 }]) {
+        const s = await oeffnen(browser, SEITE, { still: true, fenster, ...opt });
+        const mm = await masse(s.page);
+        pruefe(mm.scrollBreit <= mm.fensterBreit && mm.cv.left >= mm.fig.left - 1 && mm.cv.right <= mm.fig.right + 1, `Stab ${was}, ${fenster.width} px: nichts läuft über (Seite ${mm.scrollBreit} von ${mm.fensterBreit})`);
+        pruefe(mm.n > 1500 && s.seitenfehler.length === 0 && s.konsole.length === 0 && s.fremd.length === 0, `Stab ${was}, ${fenster.width} px: Figur da, keine Fehler`);
+        await s.kontext.close();
+      }
+    }
+
+    // Bedienung: läuft mit Stab, Pause hält an, Weniger Bewegung = Standbild
+    const l = await oeffnen(browser, SEITE, {});
+    await warte(400);
+    const a1 = await masse(l.page); await l.page.click('[data-lp-b="pause"]'); const p1 = await masse(l.page); await warte(300); const p2 = await masse(l.page);
+    pruefe(a1.n > 1500 && p1.url === p2.url && await text(l.page, '[data-lp-b="pause"]') === 'Abspielen', 'Bedienung Stab: läuft, Pause hält das Bild an');
+    await l.page.click('[data-lp-b="pause"]'); await warte(600);
+    pruefe((await masse(l.page)).url !== p1.url && l.seitenfehler.length === 0 && l.konsole.length === 0 && l.fremd.length === 0, 'Bedienung Stab: Weiterspielen bewegt das Bild (auch den Stab), keine Fehler, keine Fremdanfrage');
+    await l.kontext.close();
+    const r = await oeffnen(browser, SEITE, { still: true });
+    const r1 = await masse(r.page); await warte(400);
+    pruefe((await masse(r.page)).url === r1.url && await text(r.page, '[data-lp-b="pause"]') === 'Abspielen', 'Weniger Bewegung Stab: Standbild, Knopf „Abspielen“');
     await r.kontext.close();
   }
 

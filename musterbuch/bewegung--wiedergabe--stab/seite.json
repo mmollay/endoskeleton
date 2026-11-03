@@ -1,0 +1,30 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Bewegung – Wiedergabe, Figur mit Stab",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Bewegung“ in der Variante „wiedergabe“ mit der Darstellung „figur“ und dem Requisit „stab“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Bewegung – Wiedergabe, Figur mit Stab",
+            "text": "Baustein „bewegung“, Variante „wiedergabe“, Darstellung „figur“ mit dem Requisit „stab“ (seit 3.68.0): Der Stab steckt in der linken Hand, die Figur winkt mit der rechten. Er wird aus der Handstellung errechnet, die Aufnahme kennt keinen Stab."
+        },
+        {
+            "typ": "bewegung",
+            "variante": "wiedergabe",
+            "stil": "figur",
+            "ausdruck": "neutral",
+            "requisit": "stab",
+            "hand": "links",
+            "laenge": "mittel",
+            "titel": "So sieht eine aufgezeichnete Bewegung mit Stab aus",
+            "bewegung": "bew/beispiel-winken.bewegung",
+            "alt": "Eine Figur hält einen Stab in der linken Hand, steht damit auf dem Boden und winkt dreimal mit dem rechten Arm.",
+            "text": "Diese Bewegung wurde nicht gefilmt, sondern berechnet. Sie läuft ohne Kamera und ohne Anfrage an Dritte."
+        }
+    ]
+}

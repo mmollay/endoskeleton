@@ -40,6 +40,7 @@ const erg = [];
 const pruefe = (ok, was) => erg.push([!!ok, was]);
 const versuch = (f) => { try { return f(); } catch (e) { return { fehler: String(e && e.message) }; } };
 
+const block = (name, f) => { try { f(); } catch (e) { pruefe(false, `${name}: Prüfung bricht ab (${e && e.message})`); } };   // ein älterer Player ohne die Funktion = rote Prüfung statt Absturz
 const NEU = ['silhouette', 'piktogramm', 'koerper'];
 pruefe(JSON.stringify(api.STILE) === JSON.stringify([...NEU, 'strich', 'punkte', 'figur']) && api.VORGABE === 'silhouette', 'Player kennt STILE (drei neue, dann strich und punkte, seit 3.67.0 am Ende figur) und VORGABE silhouette');
 
@@ -235,5 +236,153 @@ pruefe(!fh.fehler && fh.randNoetig === false && lums(fh.kopf) >= 0 && lums(fh.ko
   const l = lauf(winken, 20, { farbe: 'rgb(255, 255, 255)', grund: 'rgb(27, 36, 48)', stil: 'figur' }).log;
   pruefe(!fd.fehler && Array.isArray(fd.rand) && l.some((z) => z[0] === '=fillStyle' && z[1] === `rgb(${fd.rand.join(',')})`), 'figur auf dunklem Grund: der helle Rand wird auch gezeichnet');
 }
+
+
+// ===== (11) 3.68.0 Requisit „Stab“: aus den Handpunkten errechnet, in jedem Stil gezeichnet, geglättet, nie ins Blaue =====
+const STAB = { requisit: 'stab' };
+const ALLE = [...NEU, 'strich', 'punkte', 'figur'];
+const FW = 360, FH = 640, RH = Math.min(FH, FW / winken.verhaeltnis);
+const st = (i, o, d = winken) => versuch(() => api.stab(d, i, FW, FH, o));
+const laenge = (s) => Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y);
+const px = (d, i, k) => ({ x: d.rahmen[i][k * 3] * RH * d.verhaeltnis + (FW - RH * d.verhaeltnis) / 2, y: d.rahmen[i][k * 3 + 1] * RH + (FH - RH) / 2 });
+const abstandLinie = (p, s) => Math.abs((s.b.x - s.a.x) * (s.a.y - p.y) - (s.a.x - p.x) * (s.b.y - s.a.y)) / laenge(s);
+const winkelZu = (s, von, nach) => { const a = [s.b.x - s.a.x, s.b.y - s.a.y], b = [nach.x - von.x, nach.y - von.y]; return Math.acos(Math.abs(a[0] * b[0] + a[1] * b[1]) / Math.hypot(...a) / Math.hypot(...b)) * 180 / Math.PI; };
+pruefe(typeof api.stab === 'function' && JSON.stringify(api.REQUISITE) === '["stab"]' && JSON.stringify(api.STAB_HAENDE) === '["rechts","links","beide"]' && JSON.stringify(api.STAB_LAENGEN) === '["kurz","mittel","lang"]', 'Player nennt das Requisit „stab“ mit Hand (rechts, links, beide) und Länge (kurz, mittel, lang)');
+
+// Lage: der Stab geht durch die Hand, folgt dem Unterarm, ragt nach vorn heraus; die Länge ist fest und wächst mit der Stufe
+block('Stab Lage', () => {
+  const s = st(45, { ...STAB }), r = st(45, { ...STAB, hand: 'rechts' }), l = st(45, { ...STAB, hand: 'links' });
+  pruefe(s && !s.fehler && JSON.stringify(s) === JSON.stringify(r), 'Stab: ohne Handangabe gilt die rechte Hand');
+  const hand = px(winken, 45, 16), ell = px(winken, 45, 14), lw = px(winken, 45, 15), le = px(winken, 45, 13);
+  pruefe(s && !s.fehler && abstandLinie(hand, s) <= 0.03 * RH, `Stab rechts: geht durch die Hand (Abstand Handgelenk – Stab ${s && !s.fehler ? (abstandLinie(hand, s) / RH * 100).toFixed(1) : '?'} % der Bildhöhe, Soll ≤ 3)`);
+  pruefe(s && !s.fehler && winkelZu(s, ell, hand) <= 45, `Stab rechts: folgt dem Unterarm (Winkel ${s && !s.fehler ? winkelZu(s, ell, hand).toFixed(0) : '?'}° zur Linie Ellbogen–Handgelenk, Soll ≤ 45)`);
+  pruefe(s && !s.fehler && Math.hypot(s.b.x - ell.x, s.b.y - ell.y) > Math.hypot(s.a.x - ell.x, s.a.y - ell.y), 'Stab rechts: das längere Ende ragt von der Hand weg nach vorn (Verlängerung des Unterarms)');
+  pruefe(l && !l.fehler && abstandLinie(lw, l) <= 0.03 * RH && winkelZu(l, le, lw) <= 45 && JSON.stringify(l) !== JSON.stringify(s), 'Stab links: sitzt an der linken Hand, nicht an der rechten');
+  const k = st(45, { ...STAB, laenge: 'kurz' }), m = st(45, { ...STAB, laenge: 'mittel' }), g = st(45, { ...STAB, laenge: 'lang' }), u = st(45, { ...STAB, laenge: 'riesig' });
+  const rumpf = Math.hypot((px(winken, 45, 11).x + px(winken, 45, 12).x - px(winken, 45, 23).x - px(winken, 45, 24).x) / 2, (px(winken, 45, 11).y + px(winken, 45, 12).y - px(winken, 45, 23).y - px(winken, 45, 24).y) / 2);
+  pruefe([k, m, g].every((x) => x && !x.fehler) && Math.abs(laenge(m) / laenge(g) - 0.7) < 0.01 && Math.abs(laenge(k) / laenge(g) - 0.4) < 0.01 && Math.abs(laenge(g) / (3.1 * rumpf) - 1) < 0.08,
+    `Länge: kurz : mittel : lang = 0,4 : 0,7 : 1, lang ≈ eine Körpergröße (3,1 Rumpflängen; gemessen ${g && !g.fehler ? (laenge(g) / rumpf).toFixed(2) : '?'})`);
+  pruefe(u && !u.fehler && JSON.stringify(u) === JSON.stringify(m), 'Länge: ein unbekannter Wert gilt als mittel');
+  const ls = [15, 30, 45, 60, 75].map((i) => st(i, { ...STAB }));
+  pruefe(ls.every((x) => x && !x.fehler) && Math.max(...ls.map(laenge)) - Math.min(...ls.map(laenge)) < 1e-6, 'Länge ist fest: in allen Bildern gleich lang (hängt nicht an der Haltung)');
+  const sp = st(45, { ...STAB, spiegeln: true });
+  pruefe(sp && !sp.fehler && Math.abs(sp.a.x - (FW - s.a.x)) < 1e-6 && Math.abs(sp.b.x - (FW - s.b.x)) < 1e-6 && Math.abs(sp.a.y - s.a.y) < 1e-6, 'Spiegeln: der Stab wird mitgespiegelt');
+});
+
+// Beide Hände: ein Stab, mittig zwischen den Griffen, entlang der Linie von Hand zu Hand, ragt auf beiden Seiten heraus
+block('Stab beide Hände', () => {
+  const b = st(45, { ...STAB, hand: 'beide' }), h1 = px(winken, 45, 16), h2 = px(winken, 45, 15);
+  pruefe(b && !b.fehler, 'Beide Hände: ein Stab entsteht');
+  const mit = { x: (b.a.x + b.b.x) / 2, y: (b.a.y + b.b.y) / 2 }, hm = { x: (h1.x + h2.x) / 2, y: (h1.y + h2.y) / 2 };
+  pruefe(b && !b.fehler && Math.hypot(mit.x - hm.x, mit.y - hm.y) <= 0.04 * RH, `Beide Hände: die Mitte des Stabes liegt zwischen den Handpunkten (Abstand ${b && !b.fehler ? (Math.hypot(mit.x - hm.x, mit.y - hm.y) / RH * 100).toFixed(1) : '?'} % der Bildhöhe, Soll ≤ 4)`);
+  pruefe(b && !b.fehler && winkelZu(b, h1, h2) <= 8, `Beide Hände: der Stab liegt auf der Linie von Hand zu Hand (Abweichung ${b && !b.fehler ? winkelZu(b, h1, h2).toFixed(1) : '?'}°, Soll ≤ 8)`);
+  pruefe(b && !b.fehler && laenge(b) >= 1.29 * Math.hypot(h1.x - h2.x, h1.y - h2.y), 'Beide Hände: der Stab ist länger als der Abstand der Hände (ragt auf beiden Seiten heraus)');
+});
+
+// Fehlt die Hand, fehlt der Stab: ehrlich weglassen, nichts irgendwohin zeichnen
+block('Stab fehlende Hand', () => {
+  const ohnePunkte = (ks, i = 45) => { const d = JSON.parse(JSON.stringify(winken)); ks.forEach((k) => { for (let a = 0; a < 3; a++) d.rahmen[i][k * 3 + a] = 0; }); return d; };
+  const faelle = { 'Handgelenk': [16], 'Ellbogen': [14], 'alle drei Handpunkte': [18, 20, 22] };
+  for (const [name, ks] of Object.entries(faelle)) {
+    const d = ohnePunkte(ks);
+    pruefe(st(45, { ...STAB }, d) === null, `Hand fehlt (${name} nicht sichtbar): kein Stab`);
+    pruefe(ALLE.every((stil) => summe(lauf(d, 45, { ...HELL, stil, ...STAB }).log) === summe(lauf(d, 45, { ...HELL, stil }).log)), `Hand fehlt (${name}): alle sechs Stile zeichnen dann dasselbe wie ohne Requisit (nichts wird irgendwohin gezeichnet)`);
+  }
+  const eins = ohnePunkte([18, 20]);
+  const e = st(45, { ...STAB }, eins);
+  pruefe(e && !e.fehler && Number.isFinite(e.a.x) && Number.isFinite(e.b.y), 'ein einziger Handpunkt (Daumen) genügt für die Handmitte: der Stab bleibt');
+  const d2 = ohnePunkte([16]);
+  pruefe(st(45, { ...STAB, hand: 'beide' }, d2) === null && st(45, { ...STAB, hand: 'links' }, d2) !== null, 'beide Hände verlangt beide: fehlt eine, gibt es keinen Stab; die linke Hand allein bleibt davon unberührt');
+  const nb = ohnePunkte([14, 16, 18, 20, 22], 44), z = st(45, { ...STAB }, nb);
+  pruefe(z && !z.fehler && [z.a.x, z.a.y, z.b.x, z.b.y].every(Number.isFinite), 'fehlt die Hand nur im Nachbarbild, bleibt der Stab bestehen (die Glättung überspringt das Bild, kein NaN)');
+});
+
+// Jeder Stil zeichnet ihn; unbekannte Requisiten werden ignoriert; Sonderfälle ohne Fehler
+for (const stil of ALLE) {
+  const mit = versuch(() => lauf(winken, 45, { ...HELL, stil, ...STAB })), ohne = lauf(winken, 45, { ...HELL, stil });
+  pruefe(!mit.fehler && summe(mit.log) !== summe(ohne.log) && mit.mal() > ohne.mal(), `${stil}: mit Requisit „stab“ kommt mindestens eine Zeichnung dazu (${mit.fehler || `${ohne.mal()} → ${mit.mal()} Füll- und Strichbefehle`})`);
+  const fremd = ['knochen', '', null, 'STAB', 'stab ', 42, {}].map((x) => versuch(() => lauf(winken, 45, { ...HELL, stil, requisit: x })));
+  pruefe(fremd.every((x) => !x.fehler && summe(x.log) === summe(ohne.log)), `${stil}: ein unbekanntes Requisit zeichnet nichts dazu und ist kein Fehler`);
+  const vier = [versuch(() => lauf(d3, 7, { ...HELL, stil, ...STAB })), versuch(() => lauf(winken, 45, { ...HELL, stil, ...STAB, spiegeln: true, ueber: true, schatten: 'rgba(0, 0, 0, 0.6)' })),
+    versuch(() => lauf(winken, 45, { ...HELL, stil, ...STAB, hand: 'beide', laenge: 'lang' }, 200, 200)), versuch(() => lauf({ dim: 2, verhaeltnis: 640 / 480, rahmen: [winken.rahmen[10]] }, 0, { ...HELL, stil, ...STAB }, 640, 480))];
+  pruefe(vier.every((x) => !x.fehler), `${stil}: Stab auch mit Tiefe (dim 3), gespiegelt über dem Bild, in einer quadratischen Fläche und bei nur einem Bild (Kamera) ohne Fehler`);
+}
+block('Stab Kontrast', () => {   // Kontrast des Stabes gegen den Grund ≥ 3 : 1
+  for (const [name, [farbe, grund]] of Object.entries(PAARE)) {
+    const gr = grundRgb(grund);
+    const farbeVon = (stil) => { const l = lauf(winken, 45, { farbe, grund, stil, ...STAB }).log, z = l.filter((x) => x[0] === '=strokeStyle').pop(); return z && z[1].match(/\d+/g).slice(0, 3).map(Number); };
+    const ks = ['strich', 'punkte'].map((stil) => krs(farbeVon(stil), gr)), fp = versuch(() => api.farben('figur', farbe, grund));
+    pruefe(ks.every((k) => k >= 3) && !fp.fehler && krs(fp.kleid, gr) >= 3, `Stab-Farbe, ${name}: strich ${ks[0].toFixed(1)} : 1, punkte ${ks[1].toFixed(1)} : 1, figur (Kleidfarbe) ${fp.fehler ? 0 : krs(fp.kleid, gr).toFixed(1)} : 1 gegen den Grund (Soll ≥ 3)`);
+  }
+});
+
+// Glättung: Zittern vor und nach (Maß wie Bahn BF: mittlere Bewegung der Stabspitze von Bild zu Bild in % der Bildhöhe; Ruck = mittlere zweite Differenz).
+// „Vorher“ = jedes Bild einzeln (ohne Nachbarn, also ungeglättet), „nachher“ = die ganze Aufnahme. Rauschen: AR(0,6) mit den Werten von Bahn BF, Zufallszahlen fest gesät.
+block('Stab Glättung', () => {
+  const mul = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const SIG = { 11: 0.004, 12: 0.004, 13: 0.006, 14: 0.006, 15: 0.008, 16: 0.008, 17: 0.011, 18: 0.011, 19: 0.011, 20: 0.011, 21: 0.011, 22: 0.011 };
+  const rausch = (seed) => {
+    const r = mul(seed), ar = {}, d = JSON.parse(JSON.stringify(winken));
+    d.rahmen = winken.rahmen.map((f) => { const g = f.slice(); for (const k in SIG) for (const a of [0, 1]) { const q = k + '_' + a; ar[q] = 0.6 * (ar[q] || 0) + Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r()) * SIG[k] * 0.8; g[k * 3 + a] = Math.round(Math.min(1, Math.max(0, f[k * 3 + a] + ar[q])) * 1e3) / 1e3; } return g; });
+    return d;
+  };
+  const spur = (d, o, einzeln) => { const t = []; for (let i = 16; i <= 75; i++) { const s = einzeln ? api.stab({ ...d, rahmen: [d.rahmen[i]] }, 0, FW, FH, o) : api.stab(d, i, FW, FH, o); t.push(s && s.b); } return t; };
+  const mittel = (t, f) => { let z = 0, n = 0; for (let i = 1; i < t.length - 1; i++) if (t[i - 1] && t[i] && t[i + 1]) { z += f(t, i); n++; } return 100 * z / n / FH; };
+  const zittern = (t) => mittel(t, (x, i) => Math.hypot(x[i].x - x[i - 1].x, x[i].y - x[i - 1].y));
+  const ruck = (t) => mittel(t, (x, i) => Math.hypot(x[i + 1].x - 2 * x[i].x + x[i - 1].x, x[i + 1].y - 2 * x[i].y + x[i - 1].y));
+  const abw = (t, c) => { let z = 0; t.forEach((p, i) => { z += Math.hypot(p.x - c[i].x, p.y - c[i].y); }); return 100 * z / t.length / FH; };
+  const o = { ...STAB, laenge: 'mittel' }, sauber = spur(winken, o, false), zs = zittern(sauber), rs = ruck(sauber), reihen = [];
+  for (const seed of [1, 2, 3]) {
+    const n = rausch(seed), roh = spur(n, o, true), gl = spur(n, o, false);
+    reihen.push({ zr: zittern(roh), zg: zittern(gl), rr: ruck(roh), rg: ruck(gl), ar: abw(roh, sauber), ag: abw(gl, sauber) });
+  }
+  const f1 = (v) => v.toFixed(2);
+  pruefe(reihen.every((x) => x.rg - rs <= 0.4 * (x.rr - rs)), `Glättung, Ruck der Stabspitze (zweite Differenz, % der Bildhöhe): sauber ${f1(rs)}, verrauscht ungeglättet ${reihen.map((x) => f1(x.rr)).join('/')}, geglättet ${reihen.map((x) => f1(x.rg)).join('/')} — das Rauschen sinkt auf höchstens 40 %`);
+  pruefe(reihen.every((x) => x.zg - zs <= 0.6 * (x.zr - zs)), `Glättung, Zittern der Stabspitze (Bewegung je Bild, % der Bildhöhe): sauber ${f1(zs)}, ungeglättet ${reihen.map((x) => f1(x.zr)).join('/')}, geglättet ${reihen.map((x) => f1(x.zg)).join('/')} — der Rauschanteil sinkt auf höchstens 60 %`);
+  pruefe(reihen.every((x) => x.ag < x.ar), `Glättung: die geglättete Stabspitze liegt näher an der wahren Lage als die ungeglättete (Abweichung ${reihen.map((x) => f1(x.ag)).join('/')} gegen ${reihen.map((x) => f1(x.ar)).join('/')} % der Bildhöhe)`);
+});
+
+// ===== (12) 3.68.0 Hand vor dem Kinn: die Fäuste liegen (ohne Tiefe) über dem Kopf; berührt eine den Kopf, hat sie einen hellen Ring, frei im Raum nicht =====
+block('Hand vor dem Kinn', () => {
+  // Beide Fäuste vor dem Kinn (Schlag-Deckung): Bild 20 der Beispielbewegung mit Handgelenken kurz unter der Nase, Ellbogen unten
+  const kinn = JSON.parse(JSON.stringify(winken)), f = kinn.rahmen[20], nase = [f[0], f[1]];
+  const setze = (j, x, y) => { f[j * 3] = x; f[j * 3 + 1] = y; f[j * 3 + 2] = 1; };
+  [[13, 15, 17, 19, 21, 1], [14, 16, 18, 20, 22, -1]].forEach(([e, w, a, b, c, v]) => {
+    setze(e, nase[0] + v * 0.12, nase[1] + 0.25); setze(w, nase[0] + v * 0.05, nase[1] + 0.085);
+    setze(a, nase[0] + v * 0.06, nase[1] + 0.06); setze(b, nase[0] + v * 0.04, nase[1] + 0.055); setze(c, nase[0] + v * 0.03, nase[1] + 0.06);
+  });
+  const l = lauf(kinn, 20, FIG).log, r = 0.028 * RH;
+  const bogen = (log, rad) => log.slice(log.map((z) => z[0]).lastIndexOf('createRadialGradient')).filter((z) => z[0] === 'arc' && Math.abs(z[3] - rad) < 0.05).length;
+  pruefe(bogen(l, r) >= 2, `Hand vor dem Kinn: beide Fäuste werden nach dem Kopf gezeichnet (${bogen(l, r)} Kreise der Handgröße nach dem Kopf, Soll 2)`);
+  pruefe(bogen(l, r + 0.0035 * RH) >= 2, 'Hand vor dem Kinn: jede Faust hat einen hellen Ring und löst sich vom dunklen Kopf');
+  const frei = lauf(winken, 20, FIG).log;
+  pruefe(bogen(frei, r) >= 2 && bogen(frei, r + 0.0035 * RH) === 0, 'Fäuste frei im Raum (Arm erhoben, Arm unten): kein Ring — die Außenkante der Figur bleibt dunkel (Kontrast zum Grund)');
+  const mitSt = lauf(kinn, 20, { ...FIG, ...STAB, hand: 'beide', laenge: 'kurz' }).log;
+  pruefe(bogen(mitSt, r) >= 4, 'Stab in beiden Händen (figur): die Fäuste werden über dem Stab noch einmal gezeichnet, sie umschließen ihn');
+});
+
+// ===== (13) 3.68.0 Gesichter: „überrascht“ ist kein Totenkopf, „neutral“ und „müde“ unterscheiden sich, „entschlossen“ hat Brauen =====
+block('Gesichter', () => {
+  const teil = (log) => { const i0 = log.findIndex((z) => z[0] === 'clip'); let t = 1, j = i0 + 1; for (; j < log.length && t > 0; j++) { if (log[j][0] === 'save') t++; else if (log[j][0] === 'restore') t--; } return log.slice(i0, j); };
+  const G = {}, KOPFFARBE = 'rgb(12,14,17)';
+  AUSD.forEach((a) => { G[a] = teil(lauf(winken, 20, { ...FIG, ausdruck: a, ruhe: true }).log); });
+  const aug = (t) => { const r = t.findIndex((z) => z[0] === 'rect'), e = t.findIndex((z, n) => n > r && z[0] === 'ellipse'); return { lid: (t[r][2] + t[e][4]) / (2 * t[e][4]), ry: t[e][4], rx: t[e][3] }; };
+  const dreh = (t) => t.filter((z) => z[0] === 'rotate').map((z) => z[1]), geh = (t) => t.filter((z) => z[0] === 'translate');
+  const A = Object.fromEntries(AUSD.map((a) => [a, versuch(() => aug(G[a]))]));
+  pruefe(AUSD.every((a) => !A[a].fehler), 'Gesicht: jedes Auge ist eine Ellipse, vom Oberlid oben abgeschnitten');
+  pruefe(AUSD.every((a) => G[a].filter((z) => z[0] === '=fillStyle' && z[1] === KOPFFARBE).length >= 2), 'Gesicht: jedes Auge hat eine dunkle Pupille (zwei Pupillen in allen vier Ausdrücken)');
+  pruefe(AUSD.every((a) => G[a].filter((z) => z[0] === 'quadraticCurveTo').length >= 2), 'Gesicht: jeder Ausdruck hat zwei Brauen');
+  pruefe(A.neutral.lid < 0.05 && A.muede.lid >= 0.4 && A.entschlossen.lid > 0.2 && A.entschlossen.lid < A.muede.lid && A.ueberrascht.lid < 0.05, `neutral und müde unterscheiden sich: neutral hat die Augen offen (Lid ${A.neutral.lid.toFixed(2)}), müde hängt das Lid halb herab (${A.muede.lid.toFixed(2)})`);
+  pruefe(G.muede.filter((z) => z[0] === 'ellipse').length >= G.neutral.filter((z) => z[0] === 'ellipse').length + 2, 'müde hat zusätzlich Augenringe (zwei Bögen unter den Augen), neutral nicht');
+  const wink = (a) => dreh(G[a])[2];   // rechtes Auge: + = außen tiefer
+  pruefe(Math.abs(wink('neutral')) < 1e-6 && wink('muede') > 0.1 && wink('entschlossen') < -0.1 && Math.abs(wink('ueberrascht')) < 1e-6, 'Neigung der Augen: müde außen tiefer, entschlossen innen tiefer, neutral und überrascht gerade');
+  const abstandBraue = (a) => { const t = geh(G[a]); return t[0][2] - t[1][2]; };   // Auge minus Braue (größer = Braue höher)
+  pruefe(abstandBraue('ueberrascht') > abstandBraue('neutral') && abstandBraue('neutral') > abstandBraue('entschlossen'), 'Brauen: bei überrascht am höchsten, bei neutral darunter, bei entschlossen am tiefsten');
+  const braueWinkel = (a) => dreh(G[a])[3];
+  pruefe(braueWinkel('entschlossen') < -0.2 && braueWinkel('muede') > 0.1 && Math.abs(braueWinkel('neutral')) < 1e-6, 'Brauen: bei entschlossen steil nach innen unten, bei müde außen tiefer, bei neutral waagerecht');
+  const g = G.ueberrascht, letzte = g.map((z) => z[0]).lastIndexOf('ellipse');
+  pruefe(g[letzte + 1] && g[letzte + 1][0] === 'stroke' && !g.slice(letzte).some((z) => z[0] === 'fill'), 'überrascht: der Mund ist nur ein Rand (Ring), keine helle gefüllte Fläche — kein Totenkopf');
+  pruefe(A.ueberrascht.ry > A.neutral.ry * 1.15 && A.ueberrascht.rx > A.neutral.rx, 'überrascht: die Augen sind größer als bei neutral (aufgerissen), mit Pupille statt hohler weißer Ovale');
+});
 
 process.stdout.write(JSON.stringify(erg));

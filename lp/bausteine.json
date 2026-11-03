@@ -1,5 +1,5 @@
 {
-  "version": "3.67.0",
+  "version": "3.68.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -227,7 +227,7 @@
       }
     },
     "bewegung": {
-      "name": "Bewegung", "seit": "3.66.0", "geaendert": "3.67.0",
+      "name": "Bewegung", "seit": "3.66.0", "geaendert": "3.68.0",
       "klassen": {
         "lp-bewegung": "3.66.0", "lp-bewegung--wiedergabe": "3.66.0", "lp-bewegung--live": "3.66.0", "lp-bewegung-text": "3.66.0",
         "lp-bewegung-figur": "3.66.0", "lp-bewegung-beschriftung": "3.66.0", "lp-bewegung-leiste": "3.66.0", "lp-bewegung-wahl": "3.66.0",
@@ -239,8 +239,11 @@
         "text":       { "typ": "absatz", "label": "Text", "max": 400 },
         "bewegung":   { "typ": "bewegungsdatei", "label": "Bewegungsdatei", "pflicht": true },
         "alt":        { "typ": "zeile", "label": "Beschreibung der Bewegung (für Screenreader, wird auch als Bildunterschrift gezeigt)", "max": 200, "pflicht": true },
-        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte", "figur"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen; figur (seit 3.67.0) ist eine gezeichnete Figur mit dunklem Kopf, Gesicht aus zwei Lidern und einem Mundstrich, Kleidung in der Markenfarbe und heller Randlinie — dazu passt das Feld ausdruck" },
-        "ausdruck":   { "typ": "auswahl", "label": "Ausdruck der Figur (nur bei Darstellung figur)", "werte": ["neutral", "muede", "ueberrascht", "entschlossen"], "standard": "neutral", "nur_wenn": { "stil": "figur" }, "seit": "3.67.0", "fehlt": "neutral (ruhiger Blick, die Figur blinzelt gelegentlich); müde hat schwere Lider; überrascht weite Augen und einen runden Mund; entschlossen einen festen Blick. Der Ausdruck kommt von der Seite, nicht von der Kamera; bei „weniger Bewegung“ blinzelt die Figur nie" },
+        "stil":       { "typ": "auswahl", "label": "Darstellung der Figur", "werte": ["silhouette", "piktogramm", "koerper", "strich", "punkte", "figur"], "standard": "silhouette", "fehlt": "silhouette (Vorgabe: kräftige Figur mit Kontur, auch klein gut lesbar); piktogramm ist ruhig, wie ein Notausgang-Schild; der dritte Wert ist die Figur mit Tiefe („Körper mit Volumen“) und braucht etwas mehr Rechenzeit; strich (Strichfigur) und punkte (nur die Körperpunkte) sind die älteren, schlichten Darstellungen; figur (seit 3.67.0) ist eine gezeichnete Figur mit dunklem Kopf, Gesicht aus Augen mit Pupille, Brauen und Mund, Kleidung in der Markenfarbe und heller Randlinie — dazu passt das Feld ausdruck" },
+        "ausdruck":   { "typ": "auswahl", "label": "Ausdruck der Figur (nur bei Darstellung figur)", "werte": ["neutral", "muede", "ueberrascht", "entschlossen"], "standard": "neutral", "nur_wenn": { "stil": "figur" }, "seit": "3.67.0", "fehlt": "neutral (offener, ruhiger Blick, die Figur blinzelt gelegentlich); müde hat halb geschlossene Lider, Augenringe und hängende Brauen; überrascht weit aufgerissene Augen, hohe Brauen und einen kleinen runden Mund; entschlossen schmale Augen und steil nach innen gezogene Brauen. Der Ausdruck kommt von der Seite, nicht von der Kamera; bei „weniger Bewegung“ blinzelt die Figur nie" },
+        "requisit":   { "typ": "auswahl", "label": "Requisit in der Hand (leer = keines)", "werte": ["stab"], "seit": "3.68.0", "fehlt": "kein Requisit. stab zeichnet einen Stab in der Hand der Figur, in jeder Darstellung und in deren Farbe. Die Aufnahme kennt keinen Stab: der Player errechnet ihn aus Handgelenk, Handpunkten und Unterarm, mit fester Länge und geglättet; fehlt in einem Bild die Hand (nicht sicher erkannt), fehlt dort auch der Stab. Passend dazu die Felder hand und laenge" },
+        "hand":       { "typ": "auswahl", "label": "Welche Hand den Stab hält (nur mit Requisit stab)", "werte": ["rechts", "links", "beide"], "standard": "rechts", "nur_wenn": { "requisit": "stab" }, "seit": "3.68.0", "fehlt": "rechts (die rechte Hand der aufgenommenen Person); links ebenso; beide: ein Stab in beiden Händen, mittig zwischen den Händen, er ragt auf beiden Seiten heraus (nur wenn beide Hände erkannt sind)" },
+        "laenge":     { "typ": "auswahl", "label": "Länge des Stabes (nur mit Requisit stab)", "werte": ["kurz", "mittel", "lang"], "standard": "mittel", "nur_wenn": { "requisit": "stab" }, "seit": "3.68.0", "fehlt": "mittel (0,7 Körpergrößen; kurz 0,4 wie ein Schlagstock, lang 1 wie ein Kampfstab so groß wie die Person). Die Länge richtet sich nach dem Rumpf der Figur und bleibt in der ganzen Aufnahme gleich; ein Stab, der nach unten über den Boden hinausragte, endet auf dem Boden" },
         "knopf_text": { "typ": "zeile", "label": "Text auf dem Kamera-Knopf", "max": 40, "nicht_leer": true, "nur_bei": ["live"], "fehlt": "Kamera starten" }
       },
       "regeln": { "hoechstens_variante": { "live": 1 } },
