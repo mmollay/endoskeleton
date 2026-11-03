@@ -4,6 +4,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.69.0] — 2026-11-03
+
+### Added
+- **Bewegung: Quelle „Datei“** — `lp/bewegung-live.js` exportiert `ausVideo(video, o)`: wertet ein Video der Seite Bild für Bild aus (30 Bilder je Sekunde ab `start`, höchstens 300 Bilder), mit Fortschritt und Abbruch, eine Person, gleiches Format „bewegung v1“; Anlass: Panel rc1420 „Bewegung aus Video“ (Bahn VB). Kamera-Ablauf unverändert; `quelle` der Kamera-Datei bleibt `eigene-aufnahme`.
+
+### Tests
+- `tests/bewegung.test.php` BW18 (node mit Erkenner-Attrappe und nachgebautem Video: Bildzahl, 10-Sekunden-Grenze, leer, zu kurz (auch genau ein Bild), nur ein erkanntes Bild, Abbruch, steigende Zeitstempel über zwei Läufe, PHP-Prüfer nimmt die Datei an, Gesicht leer).
+- `ci/browser-bewegung.js`: neuer Block „Datei“ mit einem ffmpeg-Testbild (3 s, kein Mensch) über eine Objekt-URL; mit Attrappe 75 Bilder und gültige Datei, mit echtem Modell 75 Bilder und keine Datei. Hinweis: auf main brechen die Läufe mit echtem Modell bereits bei der Kamera-Aufnahme (Zeile 535) ab, und 8 Prüfungen „Farbe figur … Außenkante“ sind auf main schon rot — beides nicht aus diesem Zweig.
+
+---
+
 ## [3.68.1] — 2026-11-03
 
 ### Added

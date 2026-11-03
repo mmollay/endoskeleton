@@ -778,6 +778,37 @@ function pruefeText(t) {
     await w.kontext.close();
   }
 
+  // Quelle „Datei“ (Zweig lp/bewegung-video): ausVideo() mit einem künstlichen Testvideo (ffmpeg-Testbild, 3 s, KEIN Mensch) — über eine Objekt-URL wie im Panel.
+  // Attrappe: Raster und Datei. Echtes Modell (falls ES_MODELL da): die Erkennung läuft durch und findet im Testbild niemanden. Die Güte an echten Menschen prüft das nicht.
+  const testvideo = path.join(require('os').tmpdir(), `bw-testvideo-${process.pid}.webm`);
+  let videoDa = false;
+  try { execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc=size=320x180:rate=30', '-t', '3', '-c:v', 'libvpx', '-b:v', '300k', testvideo]); videoDa = true; } catch (e) { console.log('  Hinweis: ffmpeg fehlt — Quelle „Datei“ nicht im Browser geprüft.'); }
+  for (const modell of videoDa ? ['attrappe', ...(MODELL_DA ? ['echt'] : [])] : []) {
+    const w = await oeffnen(browser, 'bewegung--live', { kamera: 'ohne', modell });
+    const e = await w.page.evaluate(async (b64) => {
+      const { ausVideo } = await import('./es/bewegung-live.js');
+      const roh = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([roh], { type: 'video/webm' }));
+      const v = document.createElement('video');
+      v.muted = true; v.preload = 'auto'; v.src = url;
+      const t0 = performance.now(), schritte = [];
+      try {
+        const r = await ausVideo(v, { api: window.LpBewegung, wurzel: 'modell/', start: 0.5, name: 'Testbild', quelle: 'synthetisch', fortschritt: (a, b) => schritte.push(a + '/' + b) });
+        return { bilder: r.bilder, erkannt: r.erkannt, von: r.von, bis: r.bis, datei: r.text ? JSON.parse(r.text) : null, ms: Math.round(performance.now() - t0), imDokument: document.contains(v), letzter: schritte[schritte.length - 1] };
+      } catch (x) { return { fehler: String(x && x.message) }; } finally { URL.revokeObjectURL(url); }
+    }, fs.readFileSync(testvideo).toString('base64'));
+    if (modell === 'attrappe') {
+      pruefe(!e.fehler && e.bilder === 75 && e.erkannt === 75 && e.letzter === '75/75' && e.von === 0.5 && e.bis === 3, `Datei (Attrappe): 3-s-Video ab 0,5 s → 75 Bilder, Fortschritt 75/75 (${JSON.stringify({ ...e, datei: !!e.datei })})`);
+      pruefe(!!e.datei && pruefen(e.datei, JSON.stringify(e.datei).length) === null && e.datei.quelle === 'synthetisch' && e.datei.rahmen.length === 75 && e.datei.verhaeltnis === 1.7778, 'Datei (Attrappe): gültige Bewegungsdatei mit Herkunft synthetisch und dem Verhältnis des Videos');
+    } else {
+      pruefe(!e.fehler && e.bilder === 75 && e.datei === null, `Datei (echtes Modell): die Erkennung läuft über 75 Bilder und findet im Testbild keinen Menschen — keine Datei (erkannt ${e.erkannt}, ${e.ms} ms${e.fehler ? ', Fehler ' + e.fehler : ''})`);
+      console.log(`  Datei (echtes Modell, Testbild ohne Mensch): 75 Bilder in ${e.ms} ms ausgewertet, erkannt ${e.erkannt}`);
+    }
+    pruefe(e.imDokument === false && w.fremd.length === 0 && w.seitenfehler.length === 0, `Datei (${modell}): das Video hängt nie im Dokument, keine Fremdanfrage, kein Browserfehler (${w.fremd.join(', ')} ${w.seitenfehler.join('; ')})`);
+    await w.kontext.close();
+  }
+  if (videoDa) { fs.unlinkSync(testvideo); }
+
   // Ohne Kamera, ohne Erlaubnis, ohne Modell, ohne WASM: Hinweis, die Beispielbewegung läuft weiter
   for (const [was, opt, kameraAngefragt] of [
     ['Erlaubnis verweigert', { kamera: 'verweigert', modell: 'attrappe' }, 1],

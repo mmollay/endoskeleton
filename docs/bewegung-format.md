@@ -160,6 +160,17 @@ Kamera aus und es erscheint der Hinweis, dass die Kamera hier nicht verfügbar i
 `nicht_leer`). Der Knopftext soll das Wort „Kamera“ enthalten, damit der Besucher weiß, was der Klick auslöst — das steht als Hinweis in
 `lp/werkstatt.md`, nicht als Zwang.
 
+### Quelle „Datei“: Bewegung aus einem Video (unveröffentlicht, Zweig `lp/bewegung-video`)
+
+`import { ausVideo } from 'lp/bewegung-live.js'` wertet ein `<video>` aus, das die Seite selbst hält (zum Beispiel über `URL.createObjectURL(datei)`;
+das Video wird **nirgends hochgeladen**). `await ausVideo(video, { api: window.LpBewegung, wurzel, start, name, quelle, fortschritt, signal })`:
+
+- springt ab `start` (Sekunden) Bild für Bild mit 30 Bildern je Sekunde, **höchstens 300 Bilder = 10 Sekunden**, und erkennt je Bild **eine** Person
+  (dieselbe Erkennung, dieselbe Glättung der Gesichtspunkte und dasselbe Format wie die Kamera);
+- `wurzel` ist der Modellordner (wie `data-lp-modell`), `fortschritt(i, n)` meldet jedes Bild, `signal` (ein `AbortSignal`) bricht ab und wirft `'abgebrochen'`;
+- liefert `{ text, bilder, erkannt, von, bis }`; `text` ist `null`, wenn in weniger als zwei Bildern eine Person erkannt wurde. Ein zu kurzes Video
+  (weniger als zwei Bilder ab `start`) wirft `'kurz'`, eine Datei, die den Formatprüfer nicht besteht, wirft `'fehler:<Kennung>'`.
+
 ### Aufnahme an die eigene Seite übergeben (seit 3.66.0)
 
 Eine Seite, die die Aufnahme selbst weiterverwendet (etwa ein Verwaltungsbereich, der sie auf dem eigenen Server ablegt), braucht den Umweg über den

@@ -730,6 +730,82 @@ JS);
         T::contains($doku, 'lp-bewegung:aufnahme', 'Doku nennt das Ereignis');
         T::contains($doku, 'data-lp-modell', 'Doku nennt das Attribut');
     },
+    'BW18 Quelle „Datei“ (Zweig lp/bewegung-video): ausVideo() in node mit eingespieltem Erkenner und nachgebautem Video — Raster, 10-s-Grenze, Herkunft, Gesicht leer, Zeitstempel, Abbruch, niemand erkannt' => static function (): void {
+        $w = H::wurzel();
+        $t = T::tmp();
+        copy("$w/lp/bewegung-live.js", "$t/live.mjs");
+        copy("$w/lp/bewegung.js", "$t/player.cjs");
+        @mkdir("$t/modell", 0700, true);
+        // Der Erkenner: 33 Punkte (oder keine, wenn window.__leer), merkt sich jeden Zeitstempel und die Videozeit dazu.
+        file_put_contents("$t/modell/vision_bundle.js", <<<'JS'
+export const FilesetResolver = { forVisionTasks: async (p) => ({ p }) };
+export const PoseLandmarker = { createFromOptions: async () => ({ detectForVideo: (v, ts) => {
+  globalThis.__aufrufe.push([ts, v.currentTime]);
+  return { landmarks: globalThis.__leer || (globalThis.__einer && globalThis.__aufrufe.length > 1) ? [] : [Array.from({ length: 33 }, (_, i) => ({ x: 0.3 + i * 0.01, y: 0.1 + i * 0.02, z: 0, visibility: 0.9 }))] };
+} }) };
+JS);
+        file_put_contents("$t/lauf.mjs", <<<'JS'
+import { createRequire } from 'node:module';
+import { ausVideo } from './live.mjs';
+const api = createRequire(import.meta.url)('./player.cjs');
+globalThis.document = { baseURI: new URL('./seite.html', import.meta.url).href };
+/** Ein nachgebautes <video>: Länge, Seitenverhältnis 16:9; Springen meldet „seeked“ einen Takt später. */
+const video = (dauer) => {
+  const v = new EventTarget();
+  let zeit = 0;
+  v.readyState = 4; v.duration = dauer; v.videoWidth = 1280; v.videoHeight = 720; v.sprung = 0;
+  Object.defineProperty(v, 'currentTime', { get: () => zeit, set: (x) => { zeit = x; v.sprung++; setTimeout(() => v.dispatchEvent(new Event('seeked')), 0); } });
+  return v;
+};
+const fall = async (dauer, o, vorher) => {
+  globalThis.__aufrufe = []; globalThis.__leer = !!o.leer; globalThis.__einer = !!o.einer;
+  const v = video(dauer), schritte = [];
+  try {
+    const e = await ausVideo(v, { api, wurzel: 'modell/', fortschritt: (a, b) => schritte.push([a, b]), ...o, ...(vorher ? vorher(v) : {}) });
+    return { e: { ...e, text: e.text ? JSON.parse(e.text) : null, bytes: e.text ? e.text.length : 0 }, aufrufe: globalThis.__aufrufe, schritte, sprung: v.sprung };
+  } catch (x) { return { fehler: x.message, aufrufe: globalThis.__aufrufe, schritte }; }
+};
+const aus = {};
+aus.kurz4 = await fall(4, { start: 1, name: 'Aus Video', quelle: 'einwilligung' });
+aus.lang = await fall(60, { start: 5 });
+aus.leer = await fall(3, { leer: true });
+aus.ende = await fall(3, { start: 3 });
+aus.einbild = await fall(1 / 30, { start: 0 });
+aus.einer = await fall(3, { einer: true });
+const ac = new AbortController();
+aus.abbruch = await fall(20, { signal: ac.signal, fortschritt: (a) => { if (a === 10) ac.abort(); } });
+aus.zweiter = await fall(2, { start: 0 });
+process.stdout.write(JSON.stringify(aus));
+JS);
+        exec('node ' . escapeshellarg("$t/lauf.mjs") . ' 2>&1', $zeilen, $rc);
+        $a = json_decode(implode("\n", $zeilen), true);
+        T::ok(is_array($a), 'node liefert JSON (Rückgabe ' . $rc . '): ' . substr(implode(' ', $zeilen), 0, 300));
+        $k = $a['kurz4'];
+        $d = $k['e']['text'] ?? [];
+        T::eq([$k['e']['bilder'] ?? null, $k['e']['erkannt'] ?? null, $k['e']['von'] ?? null, $k['e']['bis'] ?? null], [90, 90, 1, 4], '4-s-Video ab Sekunde 1: 90 Bilder (3 s im 30-Hz-Raster), alle erkannt, von 1 bis 4');
+        T::eq([$d['v'] ?? null, $d['name'] ?? null, $d['quelle'] ?? null, $d['fps'] ?? null, $d['dim'] ?? null, $d['dauer_ms'] ?? null, $d['verhaeltnis'] ?? null, count($d['rahmen'] ?? [])], [1, 'Aus Video', 'einwilligung', 30, 2, 3000, 1.7778, 90], 'Format v1 mit Name, Herkunft aus o.quelle, 30 fps, 3000 ms, Verhältnis des Videos');
+        T::eq(\Endo\Lp\Bewegung::pruefenText(json_encode($d, JSON_THROW_ON_ERROR)), null, 'der PHP-Prüfer des Kits nimmt die Datei an');
+        $gesicht = array_map(static fn (int $i): array => array_slice($d['rahmen'][0] ?? [], $i * 3, 3), [1, 2, 3, 4, 5, 6, 9, 10]);
+        T::eq(array_unique(array_merge(...$gesicht)), [0], 'Augen und Mund sind 0, 0, 0 (nie gespeichert)');
+        T::eq(array_map(static fn (array $z): float => round($z[1], 4), array_slice($k['aufrufe'], 0, 3)), [1.0, 1.0333, 1.0667], 'erkannt wird an Sekunde 1, 1 + 1/30, 1 + 2/30 … (Raster der Videozeit)');
+        $ts = array_column($a['kurz4']['aufrufe'], 0);
+        $steigend = true;
+        for ($i = 1; $i < count($ts); $i++) { $steigend = $steigend && $ts[$i] > $ts[$i - 1]; }
+        T::ok($steigend && count($ts) === 90, 'Zeitstempel steigen streng (MediaPipe-Regel)');
+        T::ok(min(array_column($a['zweiter']['aufrufe'], 0)) > max($ts), 'ein späterer Lauf beginnt mit größeren Zeitstempeln als der frühere');
+        T::eq(end($k['schritte']), [90, 90], 'Fortschritt meldet zuletzt 90 von 90');
+        T::eq([$a['lang']['e']['bilder'] ?? null, $a['lang']['e']['von'] ?? null, $a['lang']['e']['bis'] ?? null, $a['lang']['e']['text']['dauer_ms'] ?? null], [300, 5, 15, 10000], '60-s-Video ab Sekunde 5: höchstens 10 s (300 Bilder), von 5 bis 15');
+        T::ok(($a['lang']['e']['bytes'] ?? 0) <= 300000, 'die 10-s-Datei bleibt unter 300 KB (' . ($a['lang']['e']['bytes'] ?? 0) . ' Byte)');
+        T::eq([array_key_exists('text', $a['leer']['e'] ?? []) ? $a['leer']['e']['text'] : 'x', $a['leer']['e']['erkannt'] ?? null, $a['leer']['e']['bilder'] ?? null], [null, 0, 90], 'niemand im Bild: keine Datei (text null), 0 von 90 erkannt');
+        T::eq($a['ende']['fehler'] ?? null, 'kurz', 'Start am Ende des Videos: Fehler „kurz“, kein Bild');
+        T::eq($a['einbild']['fehler'] ?? null, 'kurz', 'nur ein Bild Länge: Fehler „kurz“ (zwei Bilder sind das Mindeste)');
+        T::eq([array_key_exists('text', $a['einer']['e'] ?? []) ? $a['einer']['e']['text'] : 'x', $a['einer']['e']['erkannt'] ?? null], [null, 1], 'nur ein Bild mit Person: keine Datei (zwei erkannte Bilder sind das Mindeste)');
+        T::eq([$a['abbruch']['fehler'] ?? null, count($a['abbruch']['aufrufe'])], ['abgebrochen', 10], 'Abbruch nach dem 10. Bild: Fehler „abgebrochen“, kein elftes Bild');
+        T::eq($a['zweiter']['e']['text']['quelle'] ?? null, 'eigene-aufnahme', 'ohne o.quelle: eigene-aufnahme (wie die Kamera)');
+        $live = (string) file_get_contents("$w/lp/bewegung-live.js");
+        T::contains($live, 'export async function ausVideo', 'ausVideo ist eine Ausfuhr des Live-Skripts');
+        T::notContains($live, 'fetch(', 'auch ausVideo lädt nichts selbst und sendet nichts');
+    },
     'BW14 Figur-Stil wählbar (3.64.2): Katalogfeld stil mit Vorgabe silhouette, vierter Wert abgewiesen, Bau schreibt data-lp-stil, Skill/Werkstatt/Musterbuch kennen die Auswahl' => static function () use ($k, $seite, $ordner, $schema): void {
         $w = H::wurzel();
         $f = $k->baustein('bewegung')['felder']['stil'];

@@ -4,7 +4,9 @@
    Browser gespeichert (kein Cookie, kein Web-Speicher), das <video> hängt nie im Dokument. Aufgenommen werden nur Körperpunkte (Format
    „bewegung v1“, docs/bewegung-format.md), Augen und Mund nie. Ohne Kamera, Erlaubnis, WebGL oder WASM: Hinweis, die Beispielbewegung läuft weiter.
    Für Seiten, die die Aufnahme selbst weiterverwenden: am Ende einer Aufnahme geht am <figure> das Ereignis lp-bewegung:aufnahme
-   (detail.text = die fertige .bewegung-Datei), und das Attribut data-lp-modell nennt einen anderen Modellordner. Das Kit selbst sendet nichts. */
+   (detail.text = die fertige .bewegung-Datei), und das Attribut data-lp-modell nennt einen anderen Modellordner. Das Kit selbst sendet nichts.
+   Quelle „Datei“ (Zweig lp/bewegung-video, für 3.69.0): ausVideo() wertet statt der Kamera ein gewähltes Video aus — dieselbe Erkennung, dasselbe Format;
+   das Video bleibt im Browser (Objekt-URL, nie im Dokument), nur die Körperpunkte werden zur Datei. */
 const STANDARD = new URL('../modell/', import.meta.url).href;
 const FPS = 30;
 const MAX_BILDER = 300;                                    // 10 s bei 30 Bildern je Sekunde
@@ -57,8 +59,61 @@ function bild(pose, gesicht) {
 
 /** Die Datei wie lp/musterbuch/bew/beispiel-winken.bewegung: Kopf, Punktnamen, ein Bild je Zeile. */
 function alsText(d) {
-  return '{"v":1,"name":' + JSON.stringify(d.name) + ',"quelle":"eigene-aufnahme","verhaeltnis":' + d.verhaeltnis + ',"fps":' + FPS + ',"dim":2,"dauer_ms":' + d.dauer_ms
+  return '{"v":1,"name":' + JSON.stringify(d.name) + ',"quelle":' + JSON.stringify(d.quelle || 'eigene-aufnahme') + ',"verhaeltnis":' + d.verhaeltnis + ',"fps":' + FPS + ',"dim":2,"dauer_ms":' + d.dauer_ms
     + ',\n"punkte":' + JSON.stringify(d.punkte) + ',\n"rahmen":[\n' + d.rahmen.map((r) => '[' + r.join(',') + ']').join(',\n') + '\n]}\n';
+}
+
+let videoUhr = 0;                                           // Zeitstempel für detectForVideo: steigen über alle Läufe einer Seite (MediaPipe verlangt das)
+
+/** Wartet auf ein Ereignis des Videos (oder auf dessen Fehler). */
+function ereignis(video, name) {
+  return new Promise((ok, nein) => {
+    const weg = () => { video.removeEventListener(name, gut); video.removeEventListener('error', schlecht); };
+    const gut = () => { weg(); ok(); }, schlecht = () => { weg(); nein(new Error('video')); };
+    video.addEventListener(name, gut);
+    video.addEventListener('error', schlecht);
+  });
+}
+
+/** Quelle „Datei“: wertet ein Video Bild für Bild aus statt der Kamera. video ist ein <video> mit gesetzter src (etwa eine Objekt-URL der gewählten Datei),
+    das nicht im Dokument hängen muss. Ab o.start (Sekunden) werden höchstens 10 s im Raster von 30 Bildern je Sekunde angesprungen und erkannt (eine Person).
+    o: api (LpBewegung: NAMEN, GESICHT, pruefen), wurzel (Modellordner wie data-lp-modell; sonst ../modell/ neben dem Skript), name, quelle (Format, Standard
+    eigene-aufnahme), fortschritt(fertig, gesamt), signal (AbortSignal: bricht zwischen zwei Bildern ab, Fehler 'abgebrochen').
+    Ergebnis: { text, bilder, erkannt, von, bis } — text ist die fertige Datei (wie beim Kamera-Download) oder null, wenn in weniger als zwei Bildern jemand zu
+    sehen war; erkannt = Bilder mit Person; von/bis in Sekunden. Wirft 'kurz' (ab start bleibt kein Bild), 'video' (nicht abspielbar) oder 'fehler:<Kennung>'. */
+export async function ausVideo(video, o) {
+  const api = o.api, signal = o.signal;
+  const halt = () => { if (signal && signal.aborted) throw ABBRUCH; };
+  const lm = await laden(o.wurzel ? modellordner(o.wurzel, document.baseURI, STANDARD) : STANDARD);
+  halt();
+  if (video.readyState < 2) await ereignis(video, 'loadeddata');
+  halt();
+  const von = Math.max(0, Number(o.start) || 0), dauer = video.duration;
+  const n = Math.min(MAX_BILDER, Math.floor(((Number.isFinite(dauer) ? dauer : 0) - von) * FPS + 1e-6));
+  if (!(n >= 2)) throw new Error('kurz');
+  const rahmen = [], basis = Math.max(videoUhr + 1, performance.now());
+  let erkannt = 0;
+  for (let i = 0; i < n; i++) {
+    halt();
+    const t = von + i / FPS;
+    if (Math.abs(video.currentTime - t) > 1e-4) {
+      const gesucht = ereignis(video, 'seeked');
+      video.currentTime = t;
+      await gesucht;
+    }
+    halt();
+    videoUhr = basis + i * 1000 / FPS;
+    const pose = lm.detectForVideo(video, videoUhr).landmarks[0] || null;
+    if (pose) erkannt++;
+    rahmen.push(bild(pose, api.GESICHT));
+    if (o.fortschritt) o.fortschritt(i + 1, n);
+  }
+  const bis = runden(von + n / FPS, 3);
+  if (erkannt < 2) return { text: null, bilder: n, erkannt, von, bis };
+  const text = alsText({ name: o.name || 'Aus Video', quelle: o.quelle, verhaeltnis: runden(video.videoWidth / video.videoHeight, 4), dauer_ms: Math.round(n * 1000 / FPS), punkte: api.NAMEN, rahmen });
+  const kennung = api.pruefen(JSON.parse(text), new Blob([text]).size);
+  if (kennung) throw new Error('fehler:' + kennung);
+  return { text, bilder: n, erkannt, von, bis };
 }
 
 function herunterladen(text) {
