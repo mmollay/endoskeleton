@@ -4,6 +4,64 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.70.0] — 2026-11-04
+
+Etappe 1 des Auftrags „mehr wiederverwendbare Bausteine und bessere Ausgabe“ (Vorschlag der Panel-Instanz, freigegeben von Martin am 04.11.2026):
+der **Qualitätsboden**, an dem sich ab jetzt jeder Baustein messen lässt. Neue Bausteine kommen in den Etappen 2 und 3.
+
+### Added
+- **Hell und dunkel:** neues neutrales Testprofil `lp/musterbuch/_testprofil-dunkel/`. Es hat dieselben Angaben, Bilder und Tokens wie `_testprofil`, aber dunkle Farben, und besteht die Kontrastmatrix (`rahmen.farbpaare`); der Fokus `#2b6ee0` trägt weiße Schrift mit 4,76 : 1 und hebt sich von jeder dunklen Fläche mit mindestens 3,1 : 1 ab. Es gibt **keinen Dunkelmodus nach Systemeinstellung** (Entscheidung Martin, 04.11.): Hell oder dunkel ist eine Sache des Kundenprofils. Das Profilformat bleibt unverändert.
+- **Druckansicht** (`lp/lp.css`, neuer Abschnitt DRUCK). Der Browser druckt keine Hintergründe. Bisher stand deshalb die Schrift der Knöpfe weiß auf weißem Papier, und bei einem dunklen Profil war jeder Text hell auf weiß. Jetzt gilt im Druck:
+  - Die Flächen des Profils werden durchsichtig, die Schriftfarben erben das Schwarz, das `base.css` im Druck setzt (`currentColor`). In `lp.css` steht weiterhin keine feste Farbe.
+  - Knöpfe haben keine Fläche, sondern einen Rahmen.
+  - Formular, Abspielknopf und die Bedienelemente der Bewegung (Leiste, Kamera) entfallen.
+  - Das Bild hinter dem Kopfbereich steht über dem Text, Karten brechen nicht mitten durch.
+  - `lp/lp.js` klappt alle Fragen vor dem Druck auf (`beforeprint`) und danach wieder zu, die vorher zu waren (`afterprint`).
+- **Bilder sparsam laden:** Breite Bilder bekommen beim Bau kleinere Fassungen mit `srcset`/`sizes`.
+  - Neue Klasse `lp/src/Bildgroessen.php`. Sie erzeugt mit GD 480er- und 960er-Fassungen nach `es/groessen/bestand-<name>-<breite>w.webp` bzw. `es/groessen/img-<name>-<breite>w.webp`. Der eigene Ordner sorgt dafür, dass kein Bild des Bestands überschrieben wird und `img/` und `bestand/` sich nie in die Quere kommen.
+  - Eine Fassung entsteht nur, wenn sie mindestens ein Fünftel schmaler ist als das Original. Das Original bleibt `src` und die größte Fassung, `width`/`height` bleiben die des Originals (kein Verschieben beim Laden).
+  - Kann GD kein WebP, baut die Seite wie bisher ohne `srcset`.
+  - `sizes` richtet sich nach der Verwendung (`Kontext::GROESSEN`): `voll` (Bild hinter dem Kopfbereich), `spalte` (Video breit), `halb` (Bild/Video neben dem Text) und `klein` (Person, 12 rem).
+  - `Kontext::bild()` und `Kontext::videoStart()` haben dafür einen neuen letzten Parameter `$groesse` (Vorgabe `spalte`), `Kontext::$erzeugt` sammelt die Bytes, `Bauer` legt sie ab.
+  - Gemessen: das ganze Musterbuch (26 Seiten) baut in 0,9 s.
+- **Prüfer:** Jede Fassung im `srcset` gilt wie ein Bild (WebP, höchstens 400 KB). Der Byte-Vergleich mit dem Neubau (`nachbau`) deckt sie mit ab.
+- **Prüfliste im Musterbuch:** `musterbuch/pruefliste.html`, gebaut von `ci/musterbuch-bauen.php` aus `lp/pruefliste.json`, verlinkt von der Übersicht. Sie hat 16 Punkte in 13 Bereichen; jeder automatische Punkt nennt die Prüfung, die ihn abdeckt, zwei Punkte sind Stichproben von Hand (Bildschirmleser, Bearbeiten-Modus des Panels).
+
+### Changed
+- **Eigenes Video:** Der Fokusrahmen am `<video>` gilt jetzt bei `:focus-within` statt `:focus-visible`. Nach dem ersten Tab-Halt liegt der Fokus in der Bedienleiste des Browsers (Schatten-DOM), dort trifft nur `:focus-within`; der Rahmen fehlte also bisher, sobald man mit Tab in die Bedienleiste kam (neuer Browsertest „Tastatur“). Die Prüfung VD10 in `tests/herovideodatei.test.php` ist entsprechend angepasst, die Anforderung (sichtbarer Fokus mit dem Fokus-Token) ist dieselbe.
+- **Musterbuch:** `index.html` verlinkt die Prüfliste. Die gebauten Seiten mit Bildern (`hero--bild-rechts`, `hero--bild-hinten`, `person--bild-links`, `video--breit`, `video--mit-text`) tragen `srcset`/`sizes` und den Ordner `es/groessen/`.
+- `lp/skill-kopf.md` (also `lp/SKILL.md`): Absatz „Qualitätsboden“ in „Einen Baustein hinzufügen“.
+- **Für bestehende Seiten:** Die Ausgabe ändert sich (Druckregeln, `srcset`, Fokus am Video), die **Befunde nicht** (Art und Feld gleich). Die Marken-Automatik des Panels kann Entwürfe deshalb weiter anheben.
+
+### Tests
+- **Neu `tests/qualitaet.test.php`** (QB01 bis QB06: Druckregeln, Aufklappen für den Druck, `srcset` breit/schmal/`img/` neben `bestand/`, gleiche Bytes beim Neubau, Prüfer erkennt eine Fassung, die kein WebP ist, Prüfliste). Gegen den Stand 3.69.0 sind alle sechs rot.
+- `tests/musterbuch.test.php`:
+  - Das dunkle Testprofil ist wirklich dunkel, hat dieselben Angaben wie das helle und besteht die Matrix.
+  - **Jede Fixture baut auch mit dem dunklen Profil ohne Befund** und besteht den Prüfer.
+  - Die kleineren Bildfassungen werden mit dem Musterbuch nach Format und Maßen verglichen, nicht nach Bytes, weil diese an der libwebp des Rechners hängen.
+  - Den Prüfer lässt der Test deshalb auf dem frischen Bau laufen. Der Prüfer selbst bleibt streng: Auf dem Rechner, der baut (im Panel immer), vergleicht er weiter Byte für Byte.
+- **`ci/browser.js`:**
+  - Das dunkle Musterbuch wird zu Beginn mit `ci/musterbuch-bauen.php --profil lp/musterbuch/_testprofil-dunkel` in einen Temp-Ordner gebaut und liegt unter `http://lp.test/dunkel/`. Das PHP dafür kommt aus `ES_PHP`, Vorgabe `php`, auf server6 `php8.2`.
+  - Die Breiten sind jetzt **320, 360, 390, 768, 1280, 1440** (768 und 1440 neu), jede Seite hell und dunkel, dazu die Prüfliste. Die Bildschirmfotos entstehen bei 390 und 1440, hell und dunkel, dazu Druckbilder.
+  - Neu für jede Seite:
+    - **Tastatur:** Tab-Rundgang, jeder Halt mit sichtbarem Fokus, im Bild und nicht verdeckt.
+    - **Weniger Bewegung:** keine laufende Animation, kein Übergang, kein weiches Scrollen.
+    - **Druck:** kein Überlauf, nichts Festes oder Klebendes, Fragen offen, jeder Text lesbar auf weißem Papier, danach wie vorher.
+- **Bekannt rot, nicht von dieser Änderung**, in diesem Container auch auf dem unveränderten Stand 3.69.0:
+  - `Verlassen: Navigation weg von der Seite sendet genau ein verlassen` wackelt; siehe 3.67.0.
+  - `Dachzeile 60 Zeichen @1440: 1 Zeilen statt 2–2` kommt von den Schriften im Container.
+
+### Neue `lp-`-Klassen
+Keine.
+
+### Neue Dateien
+`lp/src/Bildgroessen.php`, `lp/pruefliste.json`, `lp/musterbuch/_testprofil-dunkel/` (Profil, Logo, Bilder, Rechtstexte — neutral), `tests/qualitaet.test.php`, `musterbuch/pruefliste.html`, `musterbuch/*/es/groessen/`.
+
+### Rückweg
+Den Zweig nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten mit Marke 3.69.0 bauen weiter mit ihrem Stand; eine Seite, die auf 3.70.0 gehoben wurde, baut mit 3.69.0 wieder ohne `srcset` und ohne Druckregeln (keine Felder geändert).
+
+---
+
 ## [3.69.0] — 2026-11-03
 
 ### Added

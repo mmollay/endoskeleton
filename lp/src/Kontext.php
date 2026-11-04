@@ -10,8 +10,22 @@ final class Kontext
     /** Schwellen der Titelgröße in Zeichen: Stufe = Anzahl der Schwellen, die der Titel überschreitet (0 = Normalgröße). Einzige Liste — hero.php schreibt sie ins HTML, lp.js liest sie dort. */
     public const TITEL_STUFEN = [36, 52, 68];
 
+    /**
+     * Wie breit ein Bild auf der Seite höchstens steht (sizes zu srcset, 3.70.0) — je Verwendung, nicht je Bild. Der Inhalt ist höchstens
+     * 75 rem breit (base.css --max-width) mit 1,5 rem Rand; „halb“ ist die Bildspalte neben dem Text (ab 60 rem zwei Spalten).
+     */
+    public const GROESSEN = [
+        'voll' => '100vw',
+        'spalte' => '(min-width: 75rem) 72rem, 100vw',
+        'halb' => '(min-width: 75rem) 36rem, (min-width: 60rem) 48vw, 100vw',
+        'klein' => '12rem',
+    ];
+
     /** @var array<string, string> Zielpfad im Seitenordner (es/bilder/…) => Quelldatei */
     public array $kopien = [];
+
+    /** @var array<string, string> Zielpfad im Seitenordner (es/groessen/…) => erzeugte Bytes (kleinere Fassungen der Bilder, 3.70.0) */
+    public array $erzeugt = [];
 
     public function __construct(public readonly Profil $profil, public readonly array $meta, private readonly string $seite)
     {
@@ -75,21 +89,47 @@ final class Kontext
     /**
      * <img> mit Maßen aus der Datei. bestand/<name> wird nach es/bilder/ kopiert, img/<name> bleibt, wo es ist.
      * $stumm: das Bild steht in einem beschrifteten Bedienelement und bekommt kein eigenes alt.
+     * $groesse (3.70.0): Schlüssel aus GROESSEN — wie breit das Bild hier höchstens steht; ist das Bild breit genug, kommen kleinere
+     * Fassungen (Bildgroessen) mit srcset und sizes dazu, das Original bleibt die größte.
      */
-    public function bild(array $bild, string $klasse, bool $wichtig = false, bool $stumm = false): string
+    public function bild(array $bild, string $klasse, bool $wichtig = false, bool $stumm = false, string $groesse = 'spalte'): string
     {
-        [$src, $alt, $mass] = $this->bildDaten($bild);
+        [$src, $alt, $mass, $quelle] = $this->bildDaten($bild);
         if ($stumm || ($bild['dekorativ'] ?? false) === true) {
             $alt = '';
         }
         $laden = $wichtig ? ' fetchpriority="high" decoding="async"' : ' loading="lazy" decoding="async"';
-        return sprintf('<img class="%s" src="%s" alt="%s" width="%d" height="%d"%s>', $klasse, $this->e($src), $this->e($alt), $mass[0], $mass[1], $laden);
+        return sprintf('<img class="%s" src="%s"%s alt="%s" width="%d" height="%d"%s>', $klasse, $this->e($src), $this->srcset($src, $quelle, $mass, $groesse),
+            $this->e($alt), $mass[0], $mass[1], $laden);
+    }
+
+    /** srcset und sizes eines WebP-Bildes (3.70.0); leer, wenn es keine kleinere Fassung gibt. */
+    private function srcset(string $src, string $quelle, array $mass, string $groesse): string
+    {
+        $sizes = self::GROESSEN[$groesse] ?? throw new \LogicException("unbekannte Bildgröße $groesse");
+        if (($mass[2] ?? null) !== IMAGETYPE_WEBP) {
+            return '';
+        }
+        $satz = [];
+        foreach (Bildgroessen::breiten((int) $mass[0]) as $breite) {
+            $ziel = Bildgroessen::pfad($src, $breite);
+            $daten = $this->erzeugt[$ziel] ?? Bildgroessen::erzeugen($quelle, $breite);
+            if ($daten !== null) {
+                $this->erzeugt[$ziel] = $daten;
+                $satz[] = "$ziel {$breite}w";
+            }
+        }
+        if ($satz === []) {
+            return '';
+        }
+        $satz[] = "$src {$mass[0]}w";
+        return sprintf(' srcset="%s" sizes="%s"', $this->e(implode(', ', $satz)), $this->e($sizes));
     }
 
     /**
-     * Adresse im Seitenordner, Alt-Text und Maße eines Bildes des Bauplans; bestand/<name> wird dabei zum Kopieren nach es/bilder/ vorgemerkt.
+     * Adresse im Seitenordner, Alt-Text, Maße und Quelldatei eines Bildes des Bauplans; bestand/<name> wird dabei zum Kopieren nach es/bilder/ vorgemerkt.
      *
-     * @return array{0: string, 1: string, 2: array} [src, alt, getimagesize]
+     * @return array{0: string, 1: string, 2: array, 3: string} [src, alt, getimagesize, Quelldatei]
      */
     private function bildDaten(array $bild): array
     {
@@ -106,7 +146,7 @@ final class Kontext
             $alt = (string) ($bild['alt'] ?? '');
         }
         $mass = @getimagesize($quelle) ?: throw new BauFehler("Bildmaße nicht lesbar: $datei");
-        return [$src, $alt, $mass];
+        return [$src, $alt, $mass, $quelle];
     }
 
     public function knopf(array $knopf): string
@@ -118,12 +158,12 @@ final class Kontext
      * Video mit zwei Klicks: Rahmen (16:9) mit dem Startbild in einem Knopf, dazu der Ersatzlink — der Baustein „video“ und der Kopfbereich
      * mit Video (3.61.0) schreiben ihn hier. Bis zum Klick gibt es keine Anfrage an YouTube; lp.js setzt das iframe erst danach ein.
      */
-    public function videoStart(string $kennung, string $titel, array $bild, bool $wichtig = false): string
+    public function videoStart(string $kennung, string $titel, array $bild, bool $wichtig = false, string $groesse = 'spalte'): string
     {
         $beschriftung = 'Video abspielen: ' . $titel . ' (lädt Inhalte von YouTube)';
         return '<div class="lp-video-rahmen">' . "\n"
             . sprintf('<button type="button" class="lp-video-start" data-lp-kennung="%s" data-lp-titel="%s" aria-label="%s">', $this->e($kennung), $this->e($titel), $this->e($beschriftung)) . "\n"
-            . $this->bild($bild, 'lp-video-bild', $wichtig, true) . "\n"
+            . $this->bild($bild, 'lp-video-bild', $wichtig, true, $groesse) . "\n"
             . "</button>\n</div>\n"
             . '<p class="lp-video-link">' . $this->du('Mit dem Klick auf das Bild lädst du das Video von YouTube. Du kannst es auch', 'Mit dem Klick auf das Bild laden Sie das Video von YouTube. Sie können es auch')
             . ' <a href="https://www.youtube.com/watch?v=' . $this->e($kennung) . '">auf YouTube ansehen</a>.</p>';

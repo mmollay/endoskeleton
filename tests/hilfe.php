@@ -21,6 +21,12 @@ final class H
         return self::wurzel() . '/lp/musterbuch/_testprofil';
     }
 
+    /** Das dunkle Testprofil (3.70.0): jeder Baustein auch auf dunklem Grund. */
+    public static function testprofilDunkel(): string
+    {
+        return self::wurzel() . '/lp/musterbuch/_testprofil-dunkel';
+    }
+
     /** Ein gültiger Bauplan: Kopfbereich, die übergebenen Bausteine, Anmeldung (Ziel der Knöpfe). */
     public static function seite(array $mitte = [], array $meta = []): array
     {

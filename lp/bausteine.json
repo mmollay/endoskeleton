@@ -1,5 +1,5 @@
 {
-  "version": "3.69.0",
+  "version": "3.70.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },

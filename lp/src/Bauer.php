@@ -64,6 +64,7 @@ final class Bauer
         foreach ($k->kopien as $ziel => $quelle) {
             $dateien[$ziel] = (string) file_get_contents($quelle);
         }
+        $dateien += $k->erzeugt;   // kleinere Fassungen der Bilder für srcset (3.70.0, Bildgroessen)
         $vorschau = Vorschau::bauen($plan, $profil, $seite, $katalog);
         $befunde = array_merge($befunde, $vorschau['befunde']);
         $dateien += $vorschau['dateien'];

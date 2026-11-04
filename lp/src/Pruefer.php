@@ -452,6 +452,10 @@ final class Pruefer
             }
         }
         $this->bildDatei($datei, $src);
+        // srcset (3.70.0): jede Fassung gilt wie das Bild selbst (WebP, höchstens 400 KB); „<Pfad> <Breite>w“, durch Kommas getrennt
+        foreach (array_filter(array_map('trim', explode(',', $img->getAttribute('srcset')))) as $kandidat) {
+            $this->bildDatei($datei, (string) strtok($kandidat, " \t"));
+        }
     }
 
     /** Ein Bild (oder Startbild eines Videos) im Seitenordner: WebP und höchstens 400 KB. */

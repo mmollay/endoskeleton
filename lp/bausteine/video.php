@@ -18,7 +18,7 @@ $titel = (string) $b['titel'];
 
 </div>
 <?php endif ?>
-<?= ($b['anbieter'] ?? 'youtube') === 'datei' ? $k->videoDatei($b['datei'], $titel, $b['vorschau']) : $k->videoStart($b['kennung'], $titel, $b['vorschau']) ?>
+<?= ($b['anbieter'] ?? 'youtube') === 'datei' ? $k->videoDatei($b['datei'], $titel, $b['vorschau']) : $k->videoStart($b['kennung'], $titel, $b['vorschau'], false, $b['variante'] === 'mit-text' ? 'halb' : 'spalte') ?>
 
 </div>
 </section>

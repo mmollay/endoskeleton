@@ -90,6 +90,11 @@ CSS in `lp/lp.css` (nur Tokens) → Fixture je Variante in `lp/musterbuch/` → 
 `php ci/musterbuch-bauen.php` und `php ci/skill-bauen.php` → CHANGELOG nennt jede neue Klasse → VERSION zuletzt →
 Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Varianten werden nie umbenannt oder entfernt.
 
+Qualitätsboden (seit 3.70.0, `musterbuch/pruefliste.html` aus `lp/pruefliste.json`): Jeder Baustein besteht hell und dunkel
+(`lp/musterbuch/_testprofil-dunkel`), bei 320, 360, 390, 768, 1280 und 1440 px, mit der Tastatur (Fokus sichtbar und nicht verdeckt),
+mit „weniger Bewegung“ und im Druck (`ci/browser.js`, dazu `tests/qualitaet.test.php`). Bilder gehen immer über `Kontext::bild()` mit
+der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilder kleinere Fassungen (`srcset`).
+
 ## Seiteneinstellungen (`meta`)
 
 | Feld | Typ | Pflicht | Grenzen |
@@ -100,7 +105,7 @@ Tag → `scripts/version-ablegen.sh`. Namen von Bausteinen, Feldern und Variante
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.69.0)
+## Bausteine (Katalog 3.70.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 

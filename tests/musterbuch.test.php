@@ -11,7 +11,10 @@ require_once __DIR__ . '/hilfe.php';
 
 use Endo\Lp\Bauer;
 use Endo\Lp\Bewegung;
+use Endo\Lp\Bildgroessen;
 use Endo\Lp\Katalog;
+use Endo\Lp\Kontrast;
+use Endo\Lp\Profil;
 use Endo\Lp\Pruefer;
 use Endo\Lp\Sammelordner;
 use Endo\Lp\Videodatei;
@@ -74,7 +77,30 @@ $tests = [
         T::eq($dirs, $ist, 'keine veralteten Ordner im Musterbuch');
     },
 ];
+$tests['dunkles Testprofil (3.70.0): wirklich dunkel, neutral wie das helle, besteht die Kontrastmatrix'] = static function () use ($w, $k): void {
+    $hell = Profil::laden(H::testprofil());
+    $dunkel = Profil::laden(H::testprofilDunkel());
+    T::ok(Kontrast::verhaeltnis($dunkel->tokens['--bg'], '#000000') < 1.3, 'Seitengrund dunkel (' . $dunkel->tokens['--bg'] . ')');
+    T::ok(Kontrast::verhaeltnis($dunkel->tokens['--card-bg'], '#000000') < 1.6, 'Karten dunkel (' . $dunkel->tokens['--card-bg'] . ')');
+    T::eq($dunkel->pruefen(), [], 'Profil ohne Befund');
+    T::eq(Kontrast::pruefe($dunkel->tokens, $k->rahmen['farbpaare'], 'profil.css', 'Kundenprofil'), [], 'Kontrastmatrix bestanden');
+    $ohneName = static fn (array $d): array => array_diff_key($d, ['name' => 1]);
+    T::eq($ohneName($dunkel->daten), $ohneName($hell->daten), 'dieselben Angaben wie das helle Testprofil (nur der Name unterscheidet sich)');
+    T::eq(array_keys($dunkel->tokens), array_keys($hell->tokens), 'dieselben Tokens');
+    T::eq((string) file_get_contents(H::testprofilDunkel() . '/bilder/bilder.json'), (string) file_get_contents(H::testprofil() . '/bilder/bilder.json'), 'dieselben Bilder');
+};
 foreach ($ist as $name) {
+    $tests["$name: baut auch mit dem dunklen Testprofil ohne Befund (3.70.0)"] = static function () use ($w, $name): void {
+        $seite = json_decode((string) file_get_contents("$w/lp/musterbuch/$name.json"), true);
+        $o = H::ordner($seite, null, H::testprofilDunkel());
+        $videos = Videodatei::imPlan($seite);
+        if ($videos) { mkdir("$o/vid", 0700, true); }
+        foreach ($videos as $video) { copy("$w/lp/musterbuch/$video", "$o/$video") || throw new RuntimeException("Probedatei fehlt: $video"); }
+        H::bewegungen($o, $seite);
+        $e = Bauer::bauen($o);
+        T::eq(H::texte($e->befunde), '', 'keine Befunde');
+        T::eq(H::texte(H::sperrend(Pruefer::pruefen($o, '2026-09-27T12:00'))), '', 'Prüfer ohne sperrende Befunde');
+    };
     $tests["$name: baut ohne Befund und gleicht dem Musterbuch"] = static function () use ($w, $name): void {
         $seite = json_decode((string) file_get_contents("$w/lp/musterbuch/$name.json"), true);
         $o = H::ordner($seite);
@@ -82,9 +108,16 @@ foreach ($ist as $name) {
         if ($videos) { mkdir("$o/vid", 0700, true); }
         foreach ($videos as $video) { copy("$w/lp/musterbuch/$video", "$o/$video") || throw new RuntimeException("Probedatei fehlt: $video"); }
         H::bewegungen($o, $seite);
-        $e = Bauer::bauen($o, false);
+        $e = Bauer::bauen($o);
         T::eq(H::texte($e->befunde), '', 'keine Befunde');
         foreach ($e->dateien as $pfad => $inhalt) {
+            if (str_starts_with($pfad, Bildgroessen::ORDNER . '/')) {
+                // Kleinere Fassungen der Bilder (3.70.0): die Bytes hängen an der libwebp des Rechners — gleich sein müssen Format und Maße
+                $gold = @getimagesizefromstring((string) @file_get_contents("$w/musterbuch/$name/$pfad"));
+                $neu = getimagesizefromstring($inhalt);
+                T::ok($gold !== false && array_slice($gold, 0, 3) === array_slice((array) $neu, 0, 3), "musterbuch/$name/$pfad: WebP in denselben Maßen (sonst: php ci/musterbuch-bauen.php)");
+                continue;
+            }
             T::ok(@file_get_contents("$w/musterbuch/$name/$pfad") === $inhalt, "musterbuch/$name/$pfad aktuell (sonst: php ci/musterbuch-bauen.php)");
         }
         T::eq(@file_get_contents("$w/musterbuch/$name/seite.json"), file_get_contents("$w/lp/musterbuch/$name.json"), 'Bauplan kopiert');
@@ -97,7 +130,9 @@ foreach ($ist as $name) {
         sort($ist); sort($soll);
         T::eq($ist, $soll, 'keine veralteten Dateien');
         T::ok(!file_exists("$w/musterbuch/$name/profil/VERSION"), 'keine VERSION-Datei unter dem DocumentRoot (die Haupt-.htaccess sperrt sie mit „denied“ → fail2ban)');
-        T::eq(H::texte(H::sperrend(Pruefer::pruefen("$w/musterbuch/$name", '2026-09-27T12:00'))), '', 'Prüfer ohne sperrende Befunde');
+        // Der Prüfer vergleicht Byte für Byte mit einem Neubau — das gilt auf dem Rechner, der gebaut hat (3.70.0: die Bildfassungen hängen an
+        // seiner libwebp). Darum prüft er hier den frischen Bau; dass das Musterbuch dem gleicht, steht oben.
+        T::eq(H::texte(H::sperrend(Pruefer::pruefen($o, '2026-09-27T12:00'))), '', 'Prüfer ohne sperrende Befunde');
     };
 }
 return $tests;

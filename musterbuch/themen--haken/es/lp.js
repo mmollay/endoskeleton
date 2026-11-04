@@ -15,6 +15,17 @@
     });
   });
 
+  // Druck (3.70.0): Auf Papier lässt sich nichts aufklappen — für den Druck sind alle Fragen offen, danach wieder wie vorher.
+  var zugeklappt = [];
+  window.addEventListener('beforeprint', function () {
+    zugeklappt = Array.from(document.querySelectorAll('details:not([open])'));
+    zugeklappt.forEach(function (d) { d.open = true; });
+  });
+  window.addEventListener('afterprint', function () {
+    zugeklappt.forEach(function (d) { d.open = false; });
+    zugeklappt = [];
+  });
+
   // Termine: vergangene ausblenden; ist keiner mehr offen, den Ersatztext zeigen.
   var jetzt = Date.now();
   document.querySelectorAll('.lp-termin').forEach(function (block) {

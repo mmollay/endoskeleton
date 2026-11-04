@@ -392,7 +392,8 @@ return [
         $c = $css();
         T::ok(preg_match('/\.lp-video-datei\s*\{[^}]*width:\s*100%;[^}]*height:\s*100%;[^}]*\}/', $c) === 1, '.lp-video-datei füllt den 16:9-Rahmen');
         T::ok(preg_match('/\.lp-video-datei\s*\{[^}]*object-fit:\s*contain;/', $c) === 1, 'das Video wird nie abgeschnitten (contain)');
-        T::ok(preg_match('/\.lp-video-datei:focus-visible\s*\{[^}]*var\(--focus\)/', $c) === 1, 'sichtbarer Fokus mit dem Fokus-Token');
+        // 3.70.0: :focus-within statt :focus-visible — mit der Tastatur liegt der Fokus bald in der Bedienleiste (Schatten-DOM), dort trifft nur :focus-within
+        T::ok(preg_match('/\.lp-video-datei:focus-within\s*\{[^}]*var\(--focus\)/', $c) === 1, 'sichtbarer Fokus mit dem Fokus-Token');
         preg_match_all('/\.lp-video-datei[^{]*\{[^}]*\}/', $c, $m);
         T::ok(count($m[0]) >= 2, 'Regeln gefunden');
         foreach ($m[0] as $regel) {

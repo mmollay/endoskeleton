@@ -406,7 +406,9 @@ section.lp-termin--band {
   object-fit: contain;
 }
 
-.lp-video-datei:focus-visible {
+/* :focus-within statt :focus-visible (3.70.0): Nach dem ersten Tab-Halt (das Video selbst) liegt der Fokus in der Bedienleiste des Videos
+   (Schatten-DOM des Browsers) — dort trifft nur noch :focus-within auf das <video>, der Rahmen fehlte (Browsertest „Tastatur“). */
+.lp-video-datei:focus-within {
   outline: 0.1875rem solid var(--focus);
   outline-offset: -0.1875rem;
 }
@@ -888,6 +890,83 @@ section.lp-abschluss--akzent {
 
   .lp-hero .lp-block-innen {
     gap: var(--space-lg);
+  }
+}
+
+/* ─── DRUCK ─────────────────────────────────────────────────────────────── */
+/* 3.70.0: Papier statt Bildschirm. Der Browser druckt keine Hintergründe — ohne diesen Abschnitt stünde die helle Schrift eines dunklen
+   Profils auf weißem Papier, und die Schrift der Knöpfe (--text-on-primary) auf Weiß statt auf ihrer Farbe. base.css druckt den Text schwarz
+   auf weiß (body); hier erben alle Schriftfarben des Profils diese Farbe (currentColor), alle Flächen werden durchsichtig — ohne feste Farbe in
+   lp.css. Was auf Papier nichts tut (Formular, Abspielknopf, Kamera, Bedienleiste der Bewegung), entfällt; Karten brechen nicht mitten durch;
+   das Bild hinter dem Kopfbereich steht über dem Text. Die Fragen klappt lp.js für den Druck auf (beforeprint) und danach wieder zu. */
+@media print {
+  .lp-seite {
+    --bg: transparent;
+    --bg-alt: transparent;
+    --card-bg: transparent;
+    --lp-akzent: transparent;
+    --border: currentColor;
+    --heading: currentColor;
+    --text: currentColor;
+    --text-muted: currentColor;
+    --primary: currentColor;
+    --primary-dark: currentColor;
+    --error: currentColor;
+  }
+
+  .lp-seite .btn {
+    background: transparent;
+    color: inherit;
+    border: 0.0625rem solid currentColor;
+    box-shadow: none;
+  }
+
+  /* base.css druckt hinter jeden Link seine Adresse — auf Papier hilft das nur bei Adressen im Netz, nicht bei „(index.html)“ hinter dem Logo,
+     „(impressum.html)“ oder „(mailto:…)“ hinter einer schon lesbaren E-Mail-Adresse. */
+  .lp-seite a[href]:not([href^="https:"])::after {
+    content: none;
+  }
+
+  section.lp-block,
+  section.lp-hero--bild-hinten {
+    padding: var(--space-md) 0;
+  }
+
+  .lp-formular,
+  .lp-video-start::before,
+  .lp-video-start::after,
+  .lp-bewegung-leiste,
+  .lp-bewegung-kamera {
+    display: none;
+  }
+
+  .lp-video-rahmen {
+    background: transparent;
+  }
+
+  .lp-hero--bild-hinten .lp-block-innen {
+    min-height: 0;
+  }
+
+  .lp-hero--bild-hinten .lp-hero-bild {
+    position: static;
+    aspect-ratio: 3 / 2;
+    height: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  .lp-hero--bild-hinten .lp-hero-text {
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .lp-faq-frage,
+  .lp-termin-eintrag,
+  .lp-erfahrung,
+  .lp-person-inhalt,
+  .lp-video-rahmen,
+  .lp-bewegung-figur {
+    break-inside: avoid;
   }
 }
 

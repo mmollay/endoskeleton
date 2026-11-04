@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prüfliste der Landingpage-Bausteine – Endoskeleton 3.70.0</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=1e73415e71">
+</head>
+<body class="lp-seite">
+<main id="inhalt" class="lp-inhalt">
+<section class="lp-block" aria-labelledby="mb-titel">
+<div class="lp-block-innen container">
+<h1 id="mb-titel">Prüfliste der Landingpage-Bausteine</h1>
+<p>Was jeder Baustein in jeder Variante erfüllt, bevor er ins Musterbuch kommt, und womit es geprüft wird. „automatisch“ läuft bei jedem Testlauf (php tests/run.php, node ci/browser.js); „von Hand“ ist eine Stichprobe je neuem Baustein.</p>
+<h2>Tastatur und Fokus</h2>
+<ul>
+<li>Jedes Bedienelement ist mit der Tabulatortaste erreichbar, zeigt einen sichtbaren Fokusrahmen, steht dabei im Bild und wird von nichts verdeckt — hell und dunkel, bei 390 und 1440 px. <span>(automatisch: <code>ci/browser.js Tastatur</code>)</span></li>
+<li>Der Sprunglink „Zum Inhalt springen“ ist der erste Halt; Formularfehler setzen den Fokus auf das erste fehlerhafte Feld. <span>(automatisch: <code>ci/browser.js Tastatur: Sprunglink zuerst</code>)</span></li>
+</ul>
+<h2>Kontrast</h2>
+<ul>
+<li>Jede Schriftfarbe des Profils besteht auf jeder Fläche (Seite, Band, Karte, Akzent) 4,5 : 1, der Fokusrahmen 3 : 1 — sonst baut die Seite nicht. <span>(automatisch: <code>lp/src/Kontrast.php</code>, <code>tests/kontrast.test.php</code>)</span></li>
+<li>Im Browser hat jeder sichtbare Text gegen seinen tatsächlichen Hintergrund genug Kontrast, in jeder Breite, hell und dunkel. <span>(automatisch: <code>ci/browser.js kontrastImBrowser</code>)</span></li>
+</ul>
+<h2>Hell und Dunkel</h2>
+<ul>
+<li>Jeder Baustein baut mit dem hellen und mit dem dunklen Testprofil ohne Befund und besteht den Prüfer. <span>(automatisch: <code>tests/musterbuch.test.php</code>, <code>lp/musterbuch/_testprofil-dunkel/profil.css</code>)</span></li>
+</ul>
+<h2>Breiten</h2>
+<ul>
+<li>Kein waagrechtes Scrollen bei 320, 360, 390, 768, 1280 und 1440 px, hell und dunkel. <span>(automatisch: <code>ci/browser.js BREITEN</code>)</span></li>
+</ul>
+<h2>Weniger Bewegung</h2>
+<ul>
+<li>Mit „weniger Bewegung“ läuft keine Animation, kein Übergang und kein weiches Scrollen. <span>(automatisch: <code>ci/browser.js weniger Bewegung</code>)</span></li>
+</ul>
+<h2>Druck</h2>
+<ul>
+<li>Gedruckt steht jeder Text lesbar auf weißem Papier (auch bei dunklem Profil), Fragen sind aufgeklappt, nichts ist fest oder klebend, nichts ragt über den Rand; Formular und Abspielknöpfe entfallen. <span>(automatisch: <code>tests/qualitaet.test.php QB01 QB02</code>, <code>ci/browser.js Druck</code>)</span></li>
+</ul>
+<h2>Bilder</h2>
+<ul>
+<li>Jedes Bild ist WebP, höchstens 400 KB, hat Maße (kein Verschieben beim Laden) und einen Alt-Text oder ist als Schmuck gekennzeichnet; unterhalb des Kopfbereichs lädt es erst, wenn es ins Bild kommt. <span>(automatisch: <code>lp/src/Pruefer.php</code>, <code>tests/pruefen.test.php</code>)</span></li>
+<li>Breite Bilder kommen mit kleineren Fassungen (srcset, sizes je Verwendung) — das Handy lädt nicht das Bild in voller Breite. <span>(automatisch: <code>lp/src/Bildgroessen.php</code>, <code>tests/qualitaet.test.php QB03 QB04 QB05</code>)</span></li>
+</ul>
+<h2>Datenschutz</h2>
+<ul>
+<li>Keine Anfrage an fremde Server; ein YouTube-Video lädt erst nach dem Klick (youtube-nocookie), ein eigenes Video startet nie von selbst. <span>(automatisch: <code>ci/browser.js Fremdanfragen</code>, <code>lp/src/Pruefer.php</code>)</span></li>
+</ul>
+<h2>Sauberes HTML</h2>
+<ul>
+<li>Keine Inline-Stile, keine Inline-Skripte, keine on…-Attribute; genau eine H1; Überschriften ohne Sprung; lp.css nur mit Tokens. <span>(automatisch: <code>tests/bauen.test.php</code>, <code>lp/src/Pruefer.php</code>)</span></li>
+</ul>
+<h2>Texte</h2>
+<ul>
+<li>Echte Umlaute, keine Platzhalter, nichts von der Sperrliste; jeder Text ist maskiert. <span>(automatisch: <code>tests/texte.test.php</code>, <code>tests/maskierung.test.php</code>, <code>tests/pruefen-sperrliste.test.php</code>)</span></li>
+</ul>
+<h2>Musterbuch</h2>
+<ul>
+<li>Jede Variante hat ihre Seite im Musterbuch; jeder Neubau gleicht ihr Byte für Byte (die kleineren Bildfassungen nach Maßen). <span>(automatisch: <code>tests/musterbuch.test.php</code>)</span></li>
+</ul>
+<h2>Bildschirmleser</h2>
+<ul>
+<li>Abschnitte, Überschriften, Listen und Knöpfe werden sinnvoll angesagt; Schmuck wird nicht vorgelesen. <span>(von Hand)</span></li>
+</ul>
+<h2>Panel</h2>
+<ul>
+<li>Jeder Text eines neuen Bausteins steht genau einmal sichtbar auf der Seite, damit der Bearbeiten-Modus des Panels ihn findet. <span>(von Hand)</span></li>
+</ul>
+<p><a href="index.html">Zurück zur Übersicht</a></p>
+</div>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "titel": "Prüfliste der Landingpage-Bausteine",
+  "einleitung": "Was jeder Baustein in jeder Variante erfüllt, bevor er ins Musterbuch kommt, und womit es geprüft wird. „automatisch“ läuft bei jedem Testlauf (php tests/run.php, node ci/browser.js); „von Hand“ ist eine Stichprobe je neuem Baustein.",
+  "punkte": [
+    { "bereich": "Tastatur und Fokus", "punkt": "Jedes Bedienelement ist mit der Tabulatortaste erreichbar, zeigt einen sichtbaren Fokusrahmen, steht dabei im Bild und wird von nichts verdeckt — hell und dunkel, bei 390 und 1440 px.", "wie": "automatisch", "pruefungen": ["ci/browser.js Tastatur"] },
+    { "bereich": "Tastatur und Fokus", "punkt": "Der Sprunglink „Zum Inhalt springen“ ist der erste Halt; Formularfehler setzen den Fokus auf das erste fehlerhafte Feld.", "wie": "automatisch", "pruefungen": ["ci/browser.js Tastatur: Sprunglink zuerst"] },
+    { "bereich": "Kontrast", "punkt": "Jede Schriftfarbe des Profils besteht auf jeder Fläche (Seite, Band, Karte, Akzent) 4,5 : 1, der Fokusrahmen 3 : 1 — sonst baut die Seite nicht.", "wie": "automatisch", "pruefungen": ["lp/src/Kontrast.php", "tests/kontrast.test.php"] },
+    { "bereich": "Kontrast", "punkt": "Im Browser hat jeder sichtbare Text gegen seinen tatsächlichen Hintergrund genug Kontrast, in jeder Breite, hell und dunkel.", "wie": "automatisch", "pruefungen": ["ci/browser.js kontrastImBrowser"] },
+    { "bereich": "Hell und Dunkel", "punkt": "Jeder Baustein baut mit dem hellen und mit dem dunklen Testprofil ohne Befund und besteht den Prüfer.", "wie": "automatisch", "pruefungen": ["tests/musterbuch.test.php", "lp/musterbuch/_testprofil-dunkel/profil.css"] },
+    { "bereich": "Breiten", "punkt": "Kein waagrechtes Scrollen bei 320, 360, 390, 768, 1280 und 1440 px, hell und dunkel.", "wie": "automatisch", "pruefungen": ["ci/browser.js BREITEN"] },
+    { "bereich": "Weniger Bewegung", "punkt": "Mit „weniger Bewegung“ läuft keine Animation, kein Übergang und kein weiches Scrollen.", "wie": "automatisch", "pruefungen": ["ci/browser.js weniger Bewegung"] },
+    { "bereich": "Druck", "punkt": "Gedruckt steht jeder Text lesbar auf weißem Papier (auch bei dunklem Profil), Fragen sind aufgeklappt, nichts ist fest oder klebend, nichts ragt über den Rand; Formular und Abspielknöpfe entfallen.", "wie": "automatisch", "pruefungen": ["tests/qualitaet.test.php QB01 QB02", "ci/browser.js Druck"] },
+    { "bereich": "Bilder", "punkt": "Jedes Bild ist WebP, höchstens 400 KB, hat Maße (kein Verschieben beim Laden) und einen Alt-Text oder ist als Schmuck gekennzeichnet; unterhalb des Kopfbereichs lädt es erst, wenn es ins Bild kommt.", "wie": "automatisch", "pruefungen": ["lp/src/Pruefer.php", "tests/pruefen.test.php"] },
+    { "bereich": "Bilder", "punkt": "Breite Bilder kommen mit kleineren Fassungen (srcset, sizes je Verwendung) — das Handy lädt nicht das Bild in voller Breite.", "wie": "automatisch", "pruefungen": ["lp/src/Bildgroessen.php", "tests/qualitaet.test.php QB03 QB04 QB05"] },
+    { "bereich": "Datenschutz", "punkt": "Keine Anfrage an fremde Server; ein YouTube-Video lädt erst nach dem Klick (youtube-nocookie), ein eigenes Video startet nie von selbst.", "wie": "automatisch", "pruefungen": ["ci/browser.js Fremdanfragen", "lp/src/Pruefer.php"] },
+    { "bereich": "Sauberes HTML", "punkt": "Keine Inline-Stile, keine Inline-Skripte, keine on…-Attribute; genau eine H1; Überschriften ohne Sprung; lp.css nur mit Tokens.", "wie": "automatisch", "pruefungen": ["tests/bauen.test.php", "lp/src/Pruefer.php"] },
+    { "bereich": "Texte", "punkt": "Echte Umlaute, keine Platzhalter, nichts von der Sperrliste; jeder Text ist maskiert.", "wie": "automatisch", "pruefungen": ["tests/texte.test.php", "tests/maskierung.test.php", "tests/pruefen-sperrliste.test.php"] },
+    { "bereich": "Musterbuch", "punkt": "Jede Variante hat ihre Seite im Musterbuch; jeder Neubau gleicht ihr Byte für Byte (die kleineren Bildfassungen nach Maßen).", "wie": "automatisch", "pruefungen": ["tests/musterbuch.test.php"] },
+    { "bereich": "Bildschirmleser", "punkt": "Abschnitte, Überschriften, Listen und Knöpfe werden sinnvoll angesagt; Schmuck wird nicht vorgelesen.", "wie": "von Hand", "pruefungen": [] },
+    { "bereich": "Panel", "punkt": "Jeder Text eines neuen Bausteins steht genau einmal sichtbar auf der Seite, damit der Bearbeiten-Modus des Panels ihn findet.", "wie": "von Hand", "pruefungen": [] }
+  ]
+}

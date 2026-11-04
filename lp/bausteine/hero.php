@@ -7,7 +7,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 $titelId = $k->id($nr, 'titel');
 $video = null;
 if ($b['variante'] === 'bild-rechts' && isset($b['bild'])) {
-    $video = isset($b['video_kennung']) ? $k->videoStart($b['video_kennung'], $b['titel'], $b['bild'], true)
+    $video = isset($b['video_kennung']) ? $k->videoStart($b['video_kennung'], $b['titel'], $b['bild'], true, 'halb')
         : (isset($b['video_datei']) ? $k->videoDatei($b['video_datei'], $b['titel'], $b['bild']) : null);
 }
 ?>
@@ -30,7 +30,7 @@ if ($b['variante'] === 'bild-rechts' && isset($b['bild'])) {
 
 </div>
 <?php elseif ($b['variante'] !== 'schlicht' && isset($b['bild'])): ?>
-<?= $k->bild($b['bild'], 'lp-hero-bild', true) ?>
+<?= $k->bild($b['bild'], 'lp-hero-bild', true, false, $b['variante'] === 'bild-hinten' ? 'voll' : 'halb') ?>
 
 <?php endif ?>
 </div>

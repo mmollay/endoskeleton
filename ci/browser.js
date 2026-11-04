@@ -7,16 +7,26 @@
  *   ES_PLAYWRIGHT=/home/pawbot/projects/panel/node_modules/playwright node ci/browser.js
  *
  * Kein npm install im Endoskeleton (Schadcode-Commit eb8a34d) — Playwright kommt von außen.
+ *
+ * Hell und dunkel (3.70.0): Zu Beginn baut ci/musterbuch-bauen.php das Musterbuch mit dem dunklen Testprofil
+ * (lp/musterbuch/_testprofil-dunkel) in einen Temp-Ordner; es liegt unter http://lp.test/dunkel/. Das PHP dafür ist
+ * ES_PHP (Vorgabe php; auf server6 php8.2, dort ist php 8.5 ohne mbstring).
  */
 'use strict';
 
 const pw = require(process.env.ES_PLAYWRIGHT || '/home/pawbot/projects/panel/node_modules/playwright');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const MUSTERBUCH = path.join(__dirname, '..', 'musterbuch');
 const BILDER = path.join(__dirname, 'bilder');
-const BREITEN = [320, 360, 390, 1280];
+const BREITEN = [320, 360, 390, 768, 1280, 1440];
+// Das dunkle Musterbuch (3.70.0): jeder Baustein auch auf dunklem Kundenprofil.
+const DUNKEL = fs.mkdtempSync(path.join(os.tmpdir(), 'lp-dunkel-'));
+execFileSync(process.env.ES_PHP || 'php', [path.join(__dirname, 'musterbuch-bauen.php'), '--profil', path.join(__dirname, '..', 'lp', 'musterbuch', '_testprofil-dunkel'), '--ziel', DUNKEL], { stdio: 'pipe' });
+const TOENE = [['hell', (name) => name], ['dunkel', (name) => (name ? `dunkel/${name}` : 'dunkel')]];
 // Spione für die Statistik (3.56.0): zählen jeden Zugriff auf Cookies, Web-Speicher und IndexedDB in window.__zugriffe.
 const SPION = `(() => {
   window.__zugriffe = [];
@@ -102,14 +112,16 @@ async function oeffnen(browser, name, breite, optionen = {}) {
     }
     if (u.host !== 'lp.test') { fremd.push(u.href); return r.abort(); }
     angefragt.push(decodeURIComponent(u.pathname));
-    let f = path.join(MUSTERBUCH, decodeURIComponent(u.pathname));
+    const dunkel = /^\/dunkel(\/|$)/.test(u.pathname);
+    const wurzel = dunkel ? DUNKEL : MUSTERBUCH;
+    let f = path.join(wurzel, decodeURIComponent(dunkel ? u.pathname.slice('/dunkel'.length) || '/' : u.pathname));
     if (f.endsWith(path.sep)) { f = path.join(f, 'index.html'); }
-    if (!f.startsWith(MUSTERBUCH) || !fs.existsSync(f)) { return r.fulfill({ status: 404, body: 'fehlt' }); }
+    if (!f.startsWith(wurzel) || !fs.existsSync(f)) { return r.fulfill({ status: 404, body: 'fehlt' }); }
     const inhalt = fs.readFileSync(f);
     return r.fulfill({ status: 200, body: optionen.umschreiben && f.endsWith('.html') ? optionen.umschreiben(inhalt.toString('utf8')) : inhalt, contentType: TYPEN[path.extname(f)] || 'application/octet-stream' });
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
-  await page.goto(`http://lp.test/${name}${name ? '/' : ''}${optionen.suche || ''}`);
+  await page.goto(`http://lp.test/${name}${name && !name.endsWith('.html') ? '/' : ''}${optionen.suche || ''}`);   // pruefliste.html (3.70.0) ohne Schrägstrich
   return { page, fremd, kontext, abfragen, beacons, anmeldungen, angefragt };
 }
 
@@ -153,23 +165,147 @@ function kontrastImBrowser(nur) {
   return aus;
 }
 
+/**
+ * Kontrast im Druck (3.70.0): Der Browser druckt keine Hintergründe — jeder sichtbare Text steht auf weißem Papier. Gemessen wird deshalb
+ * jede Schriftfarbe gegen Weiß, unabhängig vom Hintergrund der Seite (ein dunkles Profil hätte sonst helle Schrift auf weißem Papier).
+ */
+function papierKontrast() {
+  const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
+  const hell = ([r, g, b]) => {
+    const k = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+    return 0.2126 * k(r) + 0.7152 * k(g) + 0.0722 * k(b);
+  };
+  const aus = [];
+  for (const el of document.querySelectorAll('body *')) {
+    const text = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+    if (!text || el.closest('[hidden], script, .form-hp, .skip-link')) { continue; }
+    const r = el.getBoundingClientRect();
+    const st = getComputedStyle(el);
+    if (r.width === 0 || r.height === 0 || st.visibility === 'hidden') { continue; }
+    const verhaeltnis = 1.05 / (hell(rgb(st.color)) + 0.05);
+    const groesse = parseFloat(st.fontSize);
+    const gross = groesse >= 24 || (groesse >= 18.66 && parseInt(st.fontWeight, 10) >= 700);
+    if (verhaeltnis < (gross ? 3 : 4.5)) { aus.push(`${text.slice(0, 40)} (${verhaeltnis.toFixed(2)}:1 auf Papier)`); }
+  }
+  return aus;
+}
+
+/**
+ * Tastatur-Rundgang (3.70.0): Tab durch alle bedienbaren Elemente der Seite, bis der Fokus die Seite verlässt. Je Halt: sichtbarer
+ * Fokusrahmen (oder der hereingerutschte Sprunglink), im Bild und nicht verdeckt (der Punkt in der Mitte des sichtbaren Teils
+ * gehört zum Element selbst — eine klebende Leiste davor fiele hier auf).
+ */
+async function tastaturRundgang(page, hoechstens = 80) {
+  const halte = [];
+  for (let i = 0; i < hoechstens; i++) {
+    await page.keyboard.press('Tab');
+    const h = await page.evaluate(() => {
+      const e = document.activeElement;
+      if (!e || e === document.body || e === document.documentElement) { return null; }
+      const s = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      const sichtbar = e.classList.contains('skip-link') ? s.top === '0px' : (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || s.boxShadow !== 'none';
+      const x1 = Math.max(r.left, 0), x2 = Math.min(r.right, window.innerWidth), y1 = Math.max(r.top, 0), y2 = Math.min(r.bottom, window.innerHeight);
+      const imBild = x2 - x1 >= 1 && y2 - y1 >= 1;
+      const t = imBild ? document.elementFromPoint((x1 + x2) / 2, (y1 + y2) / 2) : null;
+      const klasse = typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/)[0] : '';
+      return { was: e.tagName.toLowerCase() + (e.id ? '#' + e.id : klasse), sichtbar, imBild, frei: !!t && (t === e || e.contains(t)) };
+    });
+    if (h === null) {
+      if (halte.length) { break; }
+      continue;
+    }
+    halte.push(h);
+  }
+  return halte;
+}
+
 (async () => {
   const browser = await pw.chromium.launch();
   fs.mkdirSync(BILDER, { recursive: true });
   const seiten = fs.readdirSync(MUSTERBUCH, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
   pruefe(seiten.length >= 16, `Musterbuch enthält alle Seiten (${seiten.length})`);
 
-  // Jede Seite in jeder Breite: kein waagrechtes Scrollen, keine Fremdanfrage, Kontrast gemessen
-  for (const name of ['', ...seiten]) {
-    for (const breite of BREITEN) {
-      const { page, fremd, kontext } = await oeffnen(browser, name, breite);
-      const ueber = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      pruefe(ueber <= 0, `${name || 'Übersicht'} @${breite}: waagrecht ${ueber}px zu breit`);
-      pruefe(fremd.length === 0, `${name || 'Übersicht'} @${breite}: Fremdanfragen ${fremd.join(', ')}`);
-      const schwach = await page.evaluate(kontrastImBrowser);
-      pruefe(schwach.length === 0, `${name || 'Übersicht'} @${breite}: zu wenig Kontrast: ${schwach.join(' | ')}`);
-      if (name && (breite === 390 || breite === 1280)) { await page.screenshot({ path: path.join(BILDER, `${name}-${breite}.png`), fullPage: true }); }
-      await kontext.close();
+  // Jede Seite in jeder Breite, hell und dunkel (3.70.0): kein waagrechtes Scrollen, keine Fremdanfrage, Kontrast gemessen
+  const dunkleSeiten = fs.readdirSync(DUNKEL, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
+  pruefe(JSON.stringify(dunkleSeiten) === JSON.stringify(seiten), `dunkles Musterbuch enthält dieselben Seiten (${dunkleSeiten.length} von ${seiten.length})`);
+  for (const [ton, adresse] of TOENE) {
+    for (const name of ['', 'pruefliste.html', ...seiten]) {   // Übersicht, Prüfliste (3.70.0), jede Seite
+      for (const breite of BREITEN) {
+        const was = `${ton} ${name || 'Übersicht'} @${breite}`;
+        const { page, fremd, kontext } = await oeffnen(browser, adresse(name), breite);
+        const ueber = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        pruefe(ueber <= 0, `${was}: waagrecht ${ueber}px zu breit`);
+        pruefe(fremd.length === 0, `${was}: Fremdanfragen ${fremd.join(', ')}`);
+        const schwach = await page.evaluate(kontrastImBrowser);
+        pruefe(schwach.length === 0, `${was}: zu wenig Kontrast: ${schwach.join(' | ')}`);
+        if (name && (breite === 390 || breite === 1440)) { await page.screenshot({ path: path.join(BILDER, `${name}-${ton}-${breite}.png`), fullPage: true }); }
+        await kontext.close();
+      }
+    }
+  }
+
+  // Qualitätsboden (3.70.0) für jede Seite, hell und dunkel: Tastatur (Fokus sichtbar, im Bild, nicht verdeckt), weniger Bewegung
+  // (keine laufende Animation, kein Übergang, kein weiches Scrollen) und Druck (kein Überlauf, nichts Festes oder Klebendes, Fragen
+  // aufgeklappt, jeder Text lesbar auf weißem Papier; nach dem Druck wie vorher).
+  for (const [ton, adresse] of TOENE) {
+    for (const name of seiten) {
+      for (const breite of [390, 1440]) {
+        const was = `${ton} ${name} @${breite}`;
+        const { page, kontext } = await oeffnen(browser, adresse(name), breite, { reducedMotion: 'reduce' });
+        // erst, wenn alles geladen ist: der Bewegungs-Player setzt die Größe seiner Leinwand nach dem Laden der Bewegung — ein früher Tab-Halt rutschte sonst aus dem Bild
+        await page.waitForLoadState('networkidle');
+        const halte = await tastaturRundgang(page);
+        pruefe(halte.length >= 2, `${was} Tastatur: Tab erreicht die Seite (${halte.length} Halte)`);
+        const ohneRahmen = halte.filter((h) => !h.sichtbar).map((h) => h.was);
+        pruefe(ohneRahmen.length === 0, `${was} Tastatur: Fokus nicht sichtbar an ${ohneRahmen.join(', ')}`);
+        const verdeckt = halte.filter((h) => !h.imBild || !h.frei).map((h) => `${h.was}${h.imBild ? ' (verdeckt)' : ' (nicht im Bild)'}`);
+        pruefe(verdeckt.length === 0, `${was} Tastatur: Fokus nicht zu sehen an ${verdeckt.join(', ')}`);
+        await kontext.close();
+      }
+      {
+        const { page, kontext } = await oeffnen(browser, adresse(name), 1280, { reducedMotion: 'reduce' });
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await page.waitForTimeout(150);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(150);
+        const bewegt = await page.evaluate(() => ({
+          laufend: document.getAnimations().filter((a) => a.playState === 'running').map((a) => (a.effect && a.effect.target ? a.effect.target.tagName.toLowerCase() : '?')),
+          // in Sekunden (base.css setzt „weniger Bewegung“ als 0.01ms); wie unten bei „keine Übergänge“ gilt erst über 1 ms als Übergang
+          uebergang: [...document.querySelectorAll('*')].filter((e) => getComputedStyle(e).transitionDuration.split(',').some((d) => parseFloat(d) * (d.includes('ms') ? 0.001 : 1) > 0.001)).map((e) => e.tagName.toLowerCase() + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/)[0] : '')).slice(0, 5),
+          weich: getComputedStyle(document.documentElement).scrollBehavior,
+        }));
+        pruefe(bewegt.laufend.length === 0, `${ton} ${name} weniger Bewegung: laufende Animation an ${bewegt.laufend.join(', ')}`);
+        pruefe(bewegt.uebergang.length === 0, `${ton} ${name} weniger Bewegung: Übergang an ${bewegt.uebergang.join(', ')}`);
+        pruefe(bewegt.weich !== 'smooth', `${ton} ${name} weniger Bewegung: weiches Scrollen`);
+        await kontext.close();
+      }
+      {
+        // „weniger Bewegung“: base.css blendet Linkfarben 0,2 s über — beim Umschalten auf Druck stünde sonst die Farbe mitten im Übergang
+        // (beim echten Drucken gibt es keinen Übergang)
+        const { page, kontext } = await oeffnen(browser, adresse(name), 768, { reducedMotion: 'reduce' });
+        const vorher = await page.evaluate(() => [...document.querySelectorAll('details')].map((d) => d.open));
+        await page.emulateMedia({ media: 'print' });
+        await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+        // Beim Umschalten laufen Übergänge an (base.css: auch bei „weniger Bewegung“ 0,01 ms, am <body>) — erst danach messen, wie beim echten Druck
+        await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => null))));
+        const druck = await page.evaluate(() => ({
+          ueber: document.documentElement.scrollWidth - window.innerWidth,
+          fest: [...document.querySelectorAll('body *')].filter((e) => ['fixed', 'sticky'].includes(getComputedStyle(e).position) && e.getBoundingClientRect().height > 0).map((e) => e.tagName.toLowerCase() + '.' + e.className),
+          zu: [...document.querySelectorAll('details')].filter((d) => !d.open).length,
+        }));
+        pruefe(druck.ueber <= 0, `${ton} ${name} Druck: waagrecht ${druck.ueber}px zu breit`);
+        pruefe(druck.fest.length === 0, `${ton} ${name} Druck: feste oder klebende Elemente ${druck.fest.join(', ')}`);
+        pruefe(druck.zu === 0, `${ton} ${name} Druck: ${druck.zu} Fragen zugeklappt`);
+        const blass = await page.evaluate(papierKontrast);
+        pruefe(blass.length === 0, `${ton} ${name} Druck: auf Papier zu blass: ${blass.join(' | ')}`);
+        if (ton === 'dunkel' || name === 'faq--standard') { await page.screenshot({ path: path.join(BILDER, `${name}-${ton}-druck.png`), fullPage: true }); }
+        await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+        await page.emulateMedia({ media: 'screen' });
+        const nachher = await page.evaluate(() => [...document.querySelectorAll('details')].map((d) => d.open));
+        pruefe(JSON.stringify(nachher) === JSON.stringify(vorher), `${ton} ${name} Druck: nach dem Druck aufgeklappt wie vorher (${nachher} statt ${vorher})`);
+        await kontext.close();
+      }
     }
   }
 
@@ -1207,6 +1343,7 @@ function kontrastImBrowser(nur) {
   }
 
   await browser.close();
+  fs.rmSync(DUNKEL, { recursive: true, force: true });
   console.log('');
   if (fehler.length) {
     console.log(`FEHLER — ${fehler.length} Problem(e), ${bestanden} Prüfung(en) bestanden\n`);

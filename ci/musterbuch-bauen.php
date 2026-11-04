@@ -104,7 +104,45 @@ Dateien::schreiben("$ziel/index.html", <<<HTML
 <div class="lp-block-innen container">
 <h1 id="mb-titel">Musterbuch der Landingpage-Bausteine</h1>
 <p>Jeder Baustein in jeder Variante (Endoskeleton $version).</p>
+<p><a href="pruefliste.html">Prüfliste: was jeder Baustein erfüllt und womit es geprüft wird</a></p>
 <ul>
 {$liste[0]}
 HTML . "\n" . implode("\n", array_slice($liste, 1)) . "\n</ul>\n</div>\n</section>\n</main>\n</body>\n</html>\n");
+// Prüfliste (3.70.0): aus lp/pruefliste.json, im Aussehen der Übersicht; Bereiche als Überschriften, je Punkt das Wie und die Prüfungen
+$pl = json_decode((string) file_get_contents("$w/lp/pruefliste.json"), true, 8, JSON_THROW_ON_ERROR);
+$bereiche = [];
+foreach ($pl['punkte'] as $p) {
+    $wie = $p['pruefungen'] === [] ? Text::e($p['wie']) : Text::e($p['wie']) . ': ' . implode(', ', array_map(static fn (string $d): string => '<code>' . Text::e($d) . '</code>', $p['pruefungen']));
+    $bereiche[$p['bereich']][] = '<li>' . Text::e($p['punkt']) . ' <span>(' . $wie . ')</span></li>';
+}
+$abschnitte = '';
+foreach ($bereiche as $bereich => $punkte) {
+    $abschnitte .= '<h2>' . Text::e($bereich) . "</h2>\n<ul>\n" . implode("\n", $punkte) . "\n</ul>\n";
+}
+$titel = Text::e($pl['titel']);
+$einleitung = Text::e($pl['einleitung']);
+Dateien::schreiben("$ziel/pruefliste.html", <<<HTML
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$titel – Endoskeleton $version</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=$css">
+</head>
+<body class="lp-seite">
+<main id="inhalt" class="lp-inhalt">
+<section class="lp-block" aria-labelledby="mb-titel">
+<div class="lp-block-innen container">
+<h1 id="mb-titel">$titel</h1>
+<p>$einleitung</p>
+$abschnitte<p><a href="index.html">Zurück zur Übersicht</a></p>
+</div>
+</section>
+</main>
+</body>
+</html>
+
+HTML);
 echo count($liste), " Seiten im Musterbuch gebaut\n";

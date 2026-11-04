@@ -18,7 +18,7 @@ $mitBild = $b['variante'] === 'bild-links' && isset($b['bild']);
 
 <div class="lp-person-inhalt">
 <?php if ($mitBild): ?>
-<?= $k->bild($b['bild'], 'lp-person-bild') ?>
+<?= $k->bild($b['bild'], 'lp-person-bild', false, false, 'klein') ?>
 
 <?php endif ?>
 <div class="lp-person-text">
