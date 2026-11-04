@@ -14,27 +14,49 @@ der **Qualitätsboden**, an dem sich ab jetzt jeder Baustein messen lässt. Neue
 - **Druckansicht** (`lp/lp.css`, neuer Abschnitt DRUCK). Der Browser druckt keine Hintergründe. Bisher stand deshalb die Schrift der Knöpfe weiß auf weißem Papier, und bei einem dunklen Profil war jeder Text hell auf weiß. Jetzt gilt im Druck:
   - Die Flächen des Profils werden durchsichtig, die Schriftfarben erben das Schwarz, das `base.css` im Druck setzt (`currentColor`). In `lp.css` steht weiterhin keine feste Farbe.
   - Knöpfe haben keine Fläche, sondern einen Rahmen.
-  - Formular, Abspielknopf und die Bedienelemente der Bewegung (Leiste, Kamera) entfallen.
-  - Das Bild hinter dem Kopfbereich steht über dem Text, Karten brechen nicht mitten durch.
+  - Formularfelder, Abspielknopf und die Bedienelemente der Bewegung (Leiste, Kamera) entfallen. Meldungen des Formulars (Danke, Plätze) bleiben als Text.
+  - Das Bild hinter dem Kopfbereich steht unter dem Text statt dahinter, Karten brechen nicht mitten durch.
+  - Die Adresse hinter einem Link (`base.css`) steht nur noch bei `https:`-Links, nicht hinter Logo, Rechtsseiten und `mailto:`.
+  - Die Leinwand der Bewegung behält ihren Grund (`print-color-adjust: exact`). `bewegung.js` malt die Figur hell auf diesen Grund; ohne ihn wäre sie auf Papier verschwunden. Grund und Farbe kommen dafür aus `--lp-figur-grund` und `--lp-figur-farbe`, gesetzt an `:root` aus `--heading` und `--bg` des Profils (am Bildschirm unverändert).
   - `lp/lp.js` klappt alle Fragen vor dem Druck auf (`beforeprint`) und danach wieder zu, die vorher zu waren (`afterprint`).
-- **Bilder sparsam laden:** Breite Bilder bekommen beim Bau kleinere Fassungen mit `srcset`/`sizes`.
+- **Bilder sparsam laden:** Große Bilder bekommen beim Bau kleinere Fassungen mit `srcset`/`sizes`.
   - Neue Klasse `lp/src/Bildgroessen.php`. Sie erzeugt mit GD 480er- und 960er-Fassungen nach `es/groessen/bestand-<name>-<breite>w.webp` bzw. `es/groessen/img-<name>-<breite>w.webp`. Der eigene Ordner sorgt dafür, dass kein Bild des Bestands überschrieben wird und `img/` und `bestand/` sich nie in die Quere kommen.
-  - Eine Fassung entsteht nur, wenn sie mindestens ein Fünftel schmaler ist als das Original. Das Original bleibt `src` und die größte Fassung, `width`/`height` bleiben die des Originals (kein Verschieben beim Laden).
-  - Kann GD kein WebP, baut die Seite wie bisher ohne `srcset`.
-  - `sizes` richtet sich nach der Verwendung (`Kontext::GROESSEN`): `voll` (Bild hinter dem Kopfbereich), `spalte` (Video breit), `halb` (Bild/Video neben dem Text) und `klein` (Person, 12 rem).
+  - Eine Fassung entsteht nur, wenn alle Bedingungen erfüllt sind:
+    - Das Original hat mindestens 50 KB. Darunter spart sie kaum etwas, und flache Grafiken werden neu gerechnet oft sogar größer.
+    - Das Original hat höchstens 16 Millionen Bildpunkte, wie die Vorschaukarte. Im Panel hat der Bau 15 s und 256 MB.
+    - Die Fassung ist mindestens ein Fünftel schmaler als das Original, also ist das Original mindestens 600 px breit.
+    - Die Fassung hat weniger Bytes als das Original.
+  - Das Bild wird einmal entpackt und mit `imagecopyresampled` verkleinert. Durchsichtiges bleibt durchsichtig, ohne Farbsaum an der Kante.
+  - Das Original bleibt `src` und die größte Fassung, `width`/`height` bleiben die des Originals (kein Verschieben beim Laden).
+  - Kann GD kein WebP (oder das Bild nicht lesen, etwa ein animiertes WebP), baut die Seite wie bisher ohne `srcset`.
+  - `sizes` richtet sich nach der Verwendung (`Kontext::GROESSEN`):
+    - `voll`: Bild hinter dem Kopfbereich
+    - `spalte`: Video breit
+    - `halb`: Bild oder Video neben dem Text im Kopfbereich
+    - `neben-text`: Video mit Text, Spalten 1fr 1.3fr
+    - `klein`: Person, 12 rem
   - `Kontext::bild()` und `Kontext::videoStart()` haben dafür einen neuen letzten Parameter `$groesse` (Vorgabe `spalte`), `Kontext::$erzeugt` sammelt die Bytes, `Bauer` legt sie ab.
-  - Gemessen: das ganze Musterbuch (26 Seiten) baut in 0,9 s.
-- **Prüfer:** Jede Fassung im `srcset` gilt wie ein Bild (WebP, höchstens 400 KB). Der Byte-Vergleich mit dem Neubau (`nachbau`) deckt sie mit ab.
+  - Gemessen: das ganze Musterbuch baut in rund 1 s.
+- **Prüfer:** Jede Fassung im `srcset` gilt wie ein Bild (WebP, höchstens 400 KB); das Original, das dort auch steht, wird nicht doppelt gemeldet. Der Byte-Vergleich mit dem Neubau (`nachbau`) deckt die Fassungen mit ab.
+- **Neues neutrales Testbild** `beispiel-landschaft.webp` (erzeugte Grafik, 1600×900, 88 KB) in beiden Testprofilen und eine weitere Musterbuch-Seite `hero--bild-hinten--foto`, damit `srcset` auch im Musterbuch und im Browsertest vorkommt. Die bisherigen Testbilder haben 4 und 7 KB und bekommen keine Fassung.
 - **Prüfliste im Musterbuch:** `musterbuch/pruefliste.html`, gebaut von `ci/musterbuch-bauen.php` aus `lp/pruefliste.json`, verlinkt von der Übersicht. Sie hat 16 Punkte in 13 Bereichen; jeder automatische Punkt nennt die Prüfung, die ihn abdeckt, zwei Punkte sind Stichproben von Hand (Bildschirmleser, Bearbeiten-Modus des Panels).
 
 ### Changed
-- **Eigenes Video:** Der Fokusrahmen am `<video>` gilt jetzt bei `:focus-within` statt `:focus-visible`. Nach dem ersten Tab-Halt liegt der Fokus in der Bedienleiste des Browsers (Schatten-DOM), dort trifft nur `:focus-within`; der Rahmen fehlte also bisher, sobald man mit Tab in die Bedienleiste kam (neuer Browsertest „Tastatur“). Die Prüfung VD10 in `tests/herovideodatei.test.php` ist entsprechend angepasst, die Anforderung (sichtbarer Fokus mit dem Fokus-Token) ist dieselbe.
-- **Musterbuch:** `index.html` verlinkt die Prüfliste. Die gebauten Seiten mit Bildern (`hero--bild-rechts`, `hero--bild-hinten`, `person--bild-links`, `video--breit`, `video--mit-text`) tragen `srcset`/`sizes` und den Ordner `es/groessen/`.
+- **Eigenes Video:** Der Fokusrahmen am `<video>` gilt jetzt bei `:focus-within` statt `:focus-visible`. Nach dem ersten Tab-Halt liegt der Fokus in der Bedienleiste des Browsers (Schatten-DOM), dort trifft nur `:focus-within`; der Rahmen fehlte also bisher, sobald man mit Tab in die Bedienleiste kam (neuer Browsertest „Tastatur“).
+  - Sichtbar anders: Der Rahmen erscheint jetzt auch nach einem Mausklick ins Video. In den Schatten-DOM des Browsers kommt keine Regel hinein, um das zu unterscheiden.
+  - Die Prüfung VD10 in `tests/herovideodatei.test.php` ist entsprechend angepasst, die Anforderung (sichtbarer Fokus mit dem Fokus-Token) ist dieselbe.
+- **Bewegung:** Die Leinwand nutzt `--lp-figur-grund`/`--lp-figur-farbe` statt `--heading`/`--bg` direkt. Am Bildschirm ist das derselbe Wert; im Druck bleibt er stehen (siehe Druckansicht).
+- **Musterbuch:** `index.html` verlinkt die Prüfliste. Neue Seite `hero--bild-hinten--foto` mit `srcset`/`sizes` und `es/groessen/` (27 Seiten statt 26).
 - `lp/skill-kopf.md` (also `lp/SKILL.md`): Absatz „Qualitätsboden“ in „Einen Baustein hinzufügen“.
 - **Für bestehende Seiten:** Die Ausgabe ändert sich (Druckregeln, `srcset`, Fokus am Video), die **Befunde nicht** (Art und Feld gleich). Die Marken-Automatik des Panels kann Entwürfe deshalb weiter anheben.
 
 ### Tests
-- **Neu `tests/qualitaet.test.php`** (QB01 bis QB06: Druckregeln, Aufklappen für den Druck, `srcset` breit/schmal/`img/` neben `bestand/`, gleiche Bytes beim Neubau, Prüfer erkennt eine Fassung, die kein WebP ist, Prüfliste). Gegen den Stand 3.69.0 sind alle sechs rot.
+- **Neu `tests/qualitaet.test.php`** (QB01 bis QB07). Gegen den Stand 3.69.0 sind QB01 bis QB06 rot.
+  - QB01, QB02: Druckregeln und Aufklappen für den Druck.
+  - QB03, QB04: `srcset` für große, schmale, flache und riesige Bilder; `img/` neben `bestand/`.
+  - QB05: Ein Neubau in einem eigenen Prozess ergibt dieselben Bytes; der Prüfer erkennt eine Fassung, die kein WebP ist.
+  - QB06: Die Prüfliste nennt nur Prüfungen, die es in ihrer Datei gibt.
+  - QB07: Durchsichtige Kante ohne Farbsaum. Gegen den ersten Entwurf mit `imagescale` war QB07 rot.
 - `tests/musterbuch.test.php`:
   - Das dunkle Testprofil ist wirklich dunkel, hat dieselben Angaben wie das helle und besteht die Matrix.
   - **Jede Fixture baut auch mit dem dunklen Profil ohne Befund** und besteht den Prüfer.
@@ -46,7 +68,10 @@ der **Qualitätsboden**, an dem sich ab jetzt jeder Baustein messen lässt. Neue
   - Neu für jede Seite:
     - **Tastatur:** Tab-Rundgang, jeder Halt mit sichtbarem Fokus, im Bild und nicht verdeckt.
     - **Weniger Bewegung:** keine laufende Animation, kein Übergang, kein weiches Scrollen.
-    - **Druck:** kein Überlauf, nichts Festes oder Klebendes, Fragen offen, jeder Text lesbar auf weißem Papier, danach wie vorher.
+    - **Tastatur**, zusätzlich: Der Rundgang muss das Seitenende erreichen.
+    - **Druck** bei 718 px (bedruckbare Breite von A4): kein Überlauf, nichts Festes oder Klebendes, Fragen offen, die Leinwand der Bewegung mit gedrucktem Grund, jeder Text lesbar auf weißem Papier (mit Deckkraft und `opacity` über Weiß verrechnet; durchsichtig gilt als unsichtbar), danach wie vorher.
+  - Gemessen wird erst, wenn die Übergänge beim Umschalten auf Druck beendet sind (`base.css` gibt auch bei „weniger Bewegung“ 0,01 ms), und den Tastatur-Rundgang erst nach dem Laden (`networkidle`).
+  - Der Temp-Ordner des dunklen Musterbuchs wird auch nach einem Fehler gelöscht (`process.on('exit')`).
 - **Bekannt rot, nicht von dieser Änderung**, in diesem Container auch auf dem unveränderten Stand 3.69.0:
   - `Verlassen: Navigation weg von der Seite sendet genau ein verlassen` wackelt; siehe 3.67.0.
   - `Dachzeile 60 Zeichen @1440: 1 Zeilen statt 2–2` kommt von den Schriften im Container.
@@ -55,7 +80,7 @@ der **Qualitätsboden**, an dem sich ab jetzt jeder Baustein messen lässt. Neue
 Keine.
 
 ### Neue Dateien
-`lp/src/Bildgroessen.php`, `lp/pruefliste.json`, `lp/musterbuch/_testprofil-dunkel/` (Profil, Logo, Bilder, Rechtstexte — neutral), `tests/qualitaet.test.php`, `musterbuch/pruefliste.html`, `musterbuch/*/es/groessen/`.
+`lp/src/Bildgroessen.php`, `lp/pruefliste.json`, `lp/musterbuch/_testprofil-dunkel/` (Profil, Logo, Bilder, Rechtstexte — neutral), `lp/musterbuch/_testprofil*/bilder/beispiel-landschaft.webp`, `lp/musterbuch/hero--bild-hinten--foto.json`, `tests/qualitaet.test.php`, `musterbuch/pruefliste.html`, `musterbuch/hero--bild-hinten--foto/`.
 
 ### Rückweg
 Den Zweig nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten mit Marke 3.69.0 bauen weiter mit ihrem Stand; eine Seite, die auf 3.70.0 gehoben wurde, baut mit 3.69.0 wieder ohne `srcset` und ohne Druckregeln (keine Felder geändert).

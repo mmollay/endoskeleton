@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Prüfliste der Landingpage-Bausteine – Endoskeleton 3.70.0</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=1e73415e71">
+<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=aa5ddb7874">
 </head>
 <body class="lp-seite">
 <main id="inhalt" class="lp-inhalt">
@@ -37,12 +37,12 @@
 </ul>
 <h2>Druck</h2>
 <ul>
-<li>Gedruckt steht jeder Text lesbar auf weißem Papier (auch bei dunklem Profil), Fragen sind aufgeklappt, nichts ist fest oder klebend, nichts ragt über den Rand; Formular und Abspielknöpfe entfallen. <span>(automatisch: <code>tests/qualitaet.test.php QB01 QB02</code>, <code>ci/browser.js Druck</code>)</span></li>
+<li>Gedruckt steht jeder Text lesbar auf weißem Papier (auch bei dunklem Profil), Fragen sind aufgeklappt, nichts ist fest oder klebend, nichts ragt über den Rand; Formularfelder und Abspielknöpfe entfallen, die Figur der Bewegung behält ihren Grund. Bilder (auch das Logo) druckt der Browser, wie sie sind — ein helles Logo eines dunklen Profils ist auf Papier blass. <span>(automatisch: <code>tests/qualitaet.test.php QB01</code>, <code>tests/qualitaet.test.php QB02</code>, <code>ci/browser.js Druck</code>)</span></li>
 </ul>
 <h2>Bilder</h2>
 <ul>
 <li>Jedes Bild ist WebP, höchstens 400 KB, hat Maße (kein Verschieben beim Laden) und einen Alt-Text oder ist als Schmuck gekennzeichnet; unterhalb des Kopfbereichs lädt es erst, wenn es ins Bild kommt. <span>(automatisch: <code>lp/src/Pruefer.php</code>, <code>tests/pruefen.test.php</code>)</span></li>
-<li>Breite Bilder kommen mit kleineren Fassungen (srcset, sizes je Verwendung) — das Handy lädt nicht das Bild in voller Breite. <span>(automatisch: <code>lp/src/Bildgroessen.php</code>, <code>tests/qualitaet.test.php QB03 QB04 QB05</code>)</span></li>
+<li>Große Bilder (ab 50 KB, mindestens 600 px breit, höchstens 16 Millionen Bildpunkte) kommen mit kleineren Fassungen (srcset, sizes je Verwendung) — das Handy lädt nicht das Bild in voller Breite; durchsichtige Bilder bleiben ohne Farbsaum. <span>(automatisch: <code>lp/src/Bildgroessen.php</code>, <code>tests/qualitaet.test.php QB03</code>, <code>tests/qualitaet.test.php QB04</code>, <code>tests/qualitaet.test.php QB05</code>, <code>tests/qualitaet.test.php QB07</code>)</span></li>
 </ul>
 <h2>Datenschutz</h2>
 <ul>

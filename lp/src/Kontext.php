@@ -18,6 +18,7 @@ final class Kontext
         'voll' => '100vw',
         'spalte' => '(min-width: 75rem) 72rem, 100vw',
         'halb' => '(min-width: 75rem) 36rem, (min-width: 60rem) 48vw, 100vw',
+        'neben-text' => '(min-width: 75rem) 40rem, (min-width: 60rem) 54vw, 100vw',   // Video neben dem Text (lp-video--mit-text, Spalten 1fr 1.3fr)
         'klein' => '12rem',
     ];
 
@@ -107,17 +108,11 @@ final class Kontext
     private function srcset(string $src, string $quelle, array $mass, string $groesse): string
     {
         $sizes = self::GROESSEN[$groesse] ?? throw new \LogicException("unbekannte Bildgröße $groesse");
-        if (($mass[2] ?? null) !== IMAGETYPE_WEBP) {
-            return '';
-        }
         $satz = [];
-        foreach (Bildgroessen::breiten((int) $mass[0]) as $breite) {
+        foreach (Bildgroessen::fassungen($quelle, $mass) as $breite => $daten) {
             $ziel = Bildgroessen::pfad($src, $breite);
-            $daten = $this->erzeugt[$ziel] ?? Bildgroessen::erzeugen($quelle, $breite);
-            if ($daten !== null) {
-                $this->erzeugt[$ziel] = $daten;
-                $satz[] = "$ziel {$breite}w";
-            }
+            $this->erzeugt[$ziel] = $daten;
+            $satz[] = "$ziel {$breite}w";
         }
         if ($satz === []) {
             return '';

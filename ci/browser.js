@@ -25,6 +25,7 @@ const BILDER = path.join(__dirname, 'bilder');
 const BREITEN = [320, 360, 390, 768, 1280, 1440];
 // Das dunkle Musterbuch (3.70.0): jeder Baustein auch auf dunklem Kundenprofil.
 const DUNKEL = fs.mkdtempSync(path.join(os.tmpdir(), 'lp-dunkel-'));
+process.on('exit', () => fs.rmSync(DUNKEL, { recursive: true, force: true }));   // auch nach einem Fehler (exit 1 oder 2)
 execFileSync(process.env.ES_PHP || 'php', [path.join(__dirname, 'musterbuch-bauen.php'), '--profil', path.join(__dirname, '..', 'lp', 'musterbuch', '_testprofil-dunkel'), '--ziel', DUNKEL], { stdio: 'pipe' });
 const TOENE = [['hell', (name) => name], ['dunkel', (name) => (name ? `dunkel/${name}` : 'dunkel')]];
 // Spione für die Statistik (3.56.0): zählen jeden Zugriff auf Cookies, Web-Speicher und IndexedDB in window.__zugriffe.
@@ -182,7 +183,12 @@ function papierKontrast() {
     const r = el.getBoundingClientRect();
     const st = getComputedStyle(el);
     if (r.width === 0 || r.height === 0 || st.visibility === 'hidden') { continue; }
-    const verhaeltnis = 1.05 / (hell(rgb(st.color)) + 0.05);
+    // Deckkraft der Schrift: Alpha der Farbe mal opacity des Elements und aller Vorfahren — über Weiß verrechnet; durchsichtig = unsichtbar
+    const [cr, cg, cb, ca = 1] = rgb(st.color);
+    let deck = ca;
+    for (let e = el; e; e = e.parentElement) { deck *= parseFloat(getComputedStyle(e).opacity); }
+    if (deck <= 0.01) { aus.push(`${text.slice(0, 40)} (unsichtbar auf Papier)`); continue; }
+    const verhaeltnis = 1.05 / (hell([cr, cg, cb].map((c) => c * deck + 255 * (1 - deck))) + 0.05);
     const groesse = parseFloat(st.fontSize);
     const gross = groesse >= 24 || (groesse >= 18.66 && parseInt(st.fontWeight, 10) >= 700);
     if (verhaeltnis < (gross ? 3 : 4.5)) { aus.push(`${text.slice(0, 40)} (${verhaeltnis.toFixed(2)}:1 auf Papier)`); }
@@ -195,8 +201,9 @@ function papierKontrast() {
  * Fokusrahmen (oder der hereingerutschte Sprunglink), im Bild und nicht verdeckt (der Punkt in der Mitte des sichtbaren Teils
  * gehört zum Element selbst — eine klebende Leiste davor fiele hier auf).
  */
-async function tastaturRundgang(page, hoechstens = 80) {
+async function tastaturRundgang(page, hoechstens = 150) {
   const halte = [];
+  halte.zuEnde = false;   // true, wenn der Fokus die Seite wieder verlassen hat (sonst endete der Rundgang an der Grenze)
   for (let i = 0; i < hoechstens; i++) {
     await page.keyboard.press('Tab');
     const h = await page.evaluate(() => {
@@ -212,7 +219,7 @@ async function tastaturRundgang(page, hoechstens = 80) {
       return { was: e.tagName.toLowerCase() + (e.id ? '#' + e.id : klasse), sichtbar, imBild, frei: !!t && (t === e || e.contains(t)) };
     });
     if (h === null) {
-      if (halte.length) { break; }
+      if (halte.length) { halte.zuEnde = true; break; }
       continue;
     }
     halte.push(h);
@@ -257,6 +264,7 @@ async function tastaturRundgang(page, hoechstens = 80) {
         await page.waitForLoadState('networkidle');
         const halte = await tastaturRundgang(page);
         pruefe(halte.length >= 2, `${was} Tastatur: Tab erreicht die Seite (${halte.length} Halte)`);
+        pruefe(halte.zuEnde, `${was} Tastatur: Rundgang erreicht das Ende der Seite (nach ${halte.length} Halten noch nicht)`);
         const ohneRahmen = halte.filter((h) => !h.sichtbar).map((h) => h.was);
         pruefe(ohneRahmen.length === 0, `${was} Tastatur: Fokus nicht sichtbar an ${ohneRahmen.join(', ')}`);
         const verdeckt = halte.filter((h) => !h.imBild || !h.frei).map((h) => `${h.was}${h.imBild ? ' (verdeckt)' : ' (nicht im Bild)'}`);
@@ -283,7 +291,8 @@ async function tastaturRundgang(page, hoechstens = 80) {
       {
         // „weniger Bewegung“: base.css blendet Linkfarben 0,2 s über — beim Umschalten auf Druck stünde sonst die Farbe mitten im Übergang
         // (beim echten Drucken gibt es keinen Übergang)
-        const { page, kontext } = await oeffnen(browser, adresse(name), 768, { reducedMotion: 'reduce' });
+        // 718 px: die bedruckbare Breite von A4 bei 96 dpi und üblichem Rand
+        const { page, kontext } = await oeffnen(browser, adresse(name), 718, { reducedMotion: 'reduce' });
         const vorher = await page.evaluate(() => [...document.querySelectorAll('details')].map((d) => d.open));
         await page.emulateMedia({ media: 'print' });
         await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
@@ -293,10 +302,17 @@ async function tastaturRundgang(page, hoechstens = 80) {
           ueber: document.documentElement.scrollWidth - window.innerWidth,
           fest: [...document.querySelectorAll('body *')].filter((e) => ['fixed', 'sticky'].includes(getComputedStyle(e).position) && e.getBoundingClientRect().height > 0).map((e) => e.tagName.toLowerCase() + '.' + e.className),
           zu: [...document.querySelectorAll('details')].filter((d) => !d.open).length,
+          // die Bewegung malt hell auf den Grund der Leinwand — der muss gedruckt werden (sonst verschwindet die Figur)
+          leinwand: [...document.querySelectorAll('canvas')].filter((c) => c.getBoundingClientRect().width > 0).map((c) => {
+            const st = getComputedStyle(c);
+            const a = (st.backgroundColor.match(/[\d.]+/g) || []).map(Number);
+            return { deckend: a.length === 3 || (a.length === 4 && a[3] > 0.99), exakt: st.printColorAdjust === 'exact' || st.webkitPrintColorAdjust === 'exact' };
+          }),
         }));
         pruefe(druck.ueber <= 0, `${ton} ${name} Druck: waagrecht ${druck.ueber}px zu breit`);
         pruefe(druck.fest.length === 0, `${ton} ${name} Druck: feste oder klebende Elemente ${druck.fest.join(', ')}`);
         pruefe(druck.zu === 0, `${ton} ${name} Druck: ${druck.zu} Fragen zugeklappt`);
+        pruefe(druck.leinwand.every((l) => l.deckend && l.exakt), `${ton} ${name} Druck: Leinwand ohne gedruckten Grund ${JSON.stringify(druck.leinwand)}`);
         const blass = await page.evaluate(papierKontrast);
         pruefe(blass.length === 0, `${ton} ${name} Druck: auf Papier zu blass: ${blass.join(' | ')}`);
         if (ton === 'dunkel' || name === 'faq--standard') { await page.screenshot({ path: path.join(BILDER, `${name}-${ton}-druck.png`), fullPage: true }); }
@@ -1343,7 +1359,6 @@ async function tastaturRundgang(page, hoechstens = 80) {
   }
 
   await browser.close();
-  fs.rmSync(DUNKEL, { recursive: true, force: true });
   console.log('');
   if (fehler.length) {
     console.log(`FEHLER — ${fehler.length} Problem(e), ${bestanden} Prüfung(en) bestanden\n`);

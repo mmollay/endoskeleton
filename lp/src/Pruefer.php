@@ -452,9 +452,13 @@ final class Pruefer
             }
         }
         $this->bildDatei($datei, $src);
-        // srcset (3.70.0): jede Fassung gilt wie das Bild selbst (WebP, höchstens 400 KB); „<Pfad> <Breite>w“, durch Kommas getrennt
+        // srcset (3.70.0): jede Fassung gilt wie das Bild selbst (WebP, höchstens 400 KB); „<Pfad> <Breite>w“, durch Kommas getrennt.
+        // Das Original steht dort auch — es ist oben schon geprüft (sonst käme ein Befund doppelt).
         foreach (array_filter(array_map('trim', explode(',', $img->getAttribute('srcset')))) as $kandidat) {
-            $this->bildDatei($datei, (string) strtok($kandidat, " \t"));
+            $pfad = (string) (preg_split('/\s+/', $kandidat)[0] ?? '');
+            if ($pfad !== '' && $pfad !== $src) {
+                $this->bildDatei($datei, $pfad);
+            }
         }
     }
 

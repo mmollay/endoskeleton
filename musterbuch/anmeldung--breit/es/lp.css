@@ -3376,6 +3376,13 @@ section.lp-termin--band {
 }
 
 /* ─── BEWEGUNG ──────────────────────────────────────────────────────────── */
+/* Grund und Farbe der Figur (3.70.0) als eigene Werte, gesetzt an :root aus dem Profil: Der Druck macht --heading und --bg an der Seite
+   durchsichtig (Abschnitt DRUCK) — die Leinwand soll gedruckt aussehen wie am Bildschirm (die Figur malt bewegung.js hell auf diesen Grund). */
+:root {
+  --lp-figur-grund: var(--heading);
+  --lp-figur-farbe: var(--bg);
+}
+
 .lp-bewegung-text {
   max-width: 40rem;
   margin-bottom: var(--space-lg);
@@ -3395,8 +3402,8 @@ section.lp-termin--band {
   max-height: 32rem;
   margin: 0 auto;
   border-radius: var(--radius-lg);
-  background: var(--heading);
-  color: var(--bg);
+  background: var(--lp-figur-grund);
+  color: var(--lp-figur-farbe);
 }
 
 .lp-bewegung-figur canvas:focus-visible {
@@ -3843,8 +3850,9 @@ section.lp-abschluss--akzent {
 /* 3.70.0: Papier statt Bildschirm. Der Browser druckt keine Hintergründe — ohne diesen Abschnitt stünde die helle Schrift eines dunklen
    Profils auf weißem Papier, und die Schrift der Knöpfe (--text-on-primary) auf Weiß statt auf ihrer Farbe. base.css druckt den Text schwarz
    auf weiß (body); hier erben alle Schriftfarben des Profils diese Farbe (currentColor), alle Flächen werden durchsichtig — ohne feste Farbe in
-   lp.css. Was auf Papier nichts tut (Formular, Abspielknopf, Kamera, Bedienleiste der Bewegung), entfällt; Karten brechen nicht mitten durch;
-   das Bild hinter dem Kopfbereich steht über dem Text. Die Fragen klappt lp.js für den Druck auf (beforeprint) und danach wieder zu. */
+   lp.css. Was auf Papier nichts tut (Formularfelder, Abspielknopf, Kamera, Bedienleiste der Bewegung), entfällt — Meldungen des Formulars (Danke,
+   Plätze) bleiben als Text; Karten brechen nicht mitten durch; das Bild hinter dem Kopfbereich steht unter dem Text statt dahinter; die Leinwand
+   der Bewegung behält ihren Grund (sonst verschwände die helle Figur). Die Fragen klappt lp.js für den Druck auf (beforeprint) und danach wieder zu. */
 @media print {
   .lp-seite {
     --bg: transparent;
@@ -3878,7 +3886,7 @@ section.lp-abschluss--akzent {
     padding: var(--space-md) 0;
   }
 
-  .lp-formular,
+  .lp-formular fieldset,
   .lp-video-start::before,
   .lp-video-start::after,
   .lp-bewegung-leiste,
@@ -3886,8 +3894,19 @@ section.lp-abschluss--akzent {
     display: none;
   }
 
+  .lp-formular {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
   .lp-video-rahmen {
     background: transparent;
+  }
+
+  .lp-bewegung-figur canvas {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .lp-hero--bild-hinten .lp-block-innen {
