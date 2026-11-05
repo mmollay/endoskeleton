@@ -1,0 +1,37 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Öffnungszeiten – tabelle",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Öffnungszeiten“ in der Variante „tabelle“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Öffnungszeiten – tabelle",
+            "text": "Baustein „zeiten“ in der Variante „tabelle“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "zeiten",
+            "variante": "tabelle",
+            "titel": "Öffnungszeiten",
+            "zeilen": [
+                {
+                    "tage": "Montag bis Freitag",
+                    "zeit": "9:00 bis 18:00 Uhr"
+                },
+                {
+                    "tage": "Samstag",
+                    "zeit": "9:00 bis 12:00 Uhr"
+                },
+                {
+                    "tage": "Sonntag und Feiertage",
+                    "zeit": "geschlossen"
+                }
+            ],
+            "hinweis": "In den Ferien gelten eigene Zeiten."
+        }
+    ]
+}

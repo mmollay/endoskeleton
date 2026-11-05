@@ -1,0 +1,58 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Preise und Leistungen – karten",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Preise und Leistungen“ in der Variante „karten“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Preise und Leistungen – karten",
+            "text": "Baustein „preise“ in der Variante „karten“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "preise",
+            "variante": "karten",
+            "titel": "Preise",
+            "text": "Alle Angebote mit Unterlagen. Du kannst jederzeit wechseln.",
+            "angebote": [
+                {
+                    "name": "Einzelstunde",
+                    "betrag": "60 €",
+                    "hinweis": "je Termin",
+                    "punkte": [
+                        "60 Minuten",
+                        "Unterlagen zum Mitnehmen"
+                    ]
+                },
+                {
+                    "name": "Fünferblock",
+                    "betrag": "270 €",
+                    "hinweis": "statt 300 €",
+                    "text": "Für alle, die dranbleiben wollen.",
+                    "punkte": [
+                        "fünf Termine",
+                        "freie Terminwahl",
+                        "Übungsblätter für zu Hause"
+                    ],
+                    "hervorgehoben": true,
+                    "knopf": {
+                        "text": "Platz sichern",
+                        "ziel": "#start"
+                    }
+                },
+                {
+                    "name": "Gruppe",
+                    "betrag": "auf Anfrage",
+                    "punkte": [
+                        "ab vier Personen",
+                        "bei euch vor Ort"
+                    ]
+                }
+            ]
+        }
+    ]
+}

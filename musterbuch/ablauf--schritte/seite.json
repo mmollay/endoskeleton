@@ -1,0 +1,44 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Ablauf – schritte",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Ablauf“ in der Variante „schritte“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Ablauf – schritte",
+            "text": "Baustein „ablauf“ in der Variante „schritte“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "ablauf",
+            "variante": "schritte",
+            "titel": "So läuft es ab",
+            "text": "Vier Schritte vom ersten Klick bis zum Termin.",
+            "schritte": [
+                {
+                    "titel": "Anmelden",
+                    "text": "Du meldest dich mit Namen und E-Mail-Adresse an."
+                },
+                {
+                    "titel": "Bestätigen",
+                    "zeit": "sofort",
+                    "text": "Du bestätigst die Anmeldung in der E-Mail."
+                },
+                {
+                    "titel": "Zugang bekommen",
+                    "zeit": "am Vortag",
+                    "text": "Du bekommst den Zugangslink per E-Mail."
+                },
+                {
+                    "titel": "Dabei sein",
+                    "zeit": "19:00 Uhr",
+                    "text": "Du klickst auf den Link und bist dabei."
+                }
+            ]
+        }
+    ]
+}

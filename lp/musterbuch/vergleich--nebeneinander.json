@@ -1,0 +1,43 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Vorher und Nachher – nebeneinander",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Vorher und Nachher“ in der Variante „nebeneinander“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Vorher und Nachher – nebeneinander",
+            "text": "Baustein „vergleich“ in der Variante „nebeneinander“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "vergleich",
+            "variante": "nebeneinander",
+            "titel": "Vorher und nachher",
+            "text": "So sah es aus — und so sieht es jetzt aus.",
+            "paare": [
+                {
+                    "vorher": {
+                        "datei": "bestand/beispiel-video.webp"
+                    },
+                    "nachher": {
+                        "datei": "bestand/beispiel-landschaft.webp"
+                    },
+                    "beschriftung": "Der Garten im Frühling"
+                },
+                {
+                    "vorher": {
+                        "datei": "bestand/beispiel-vortrag.webp"
+                    },
+                    "nachher": {
+                        "datei": "bestand/beispiel-landschaft.webp",
+                        "alt": "Derselbe Platz nach dem Umbau"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Zahlenband – schlicht",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Zahlenband“ in der Variante „schlicht“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Zahlenband – schlicht",
+            "text": "Baustein „zahlen“ in der Variante „schlicht“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "zahlen",
+            "variante": "schlicht",
+            "titel": "Auf einen Blick",
+            "eintraege": [
+                {
+                    "wert": "6",
+                    "beschriftung": "Abende"
+                },
+                {
+                    "wert": "90",
+                    "beschriftung": "Minuten je Abend"
+                },
+                {
+                    "wert": "12",
+                    "beschriftung": "Plätze"
+                }
+            ]
+        }
+    ]
+}

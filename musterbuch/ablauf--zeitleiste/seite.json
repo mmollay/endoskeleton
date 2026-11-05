@@ -1,0 +1,39 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Ablauf – zeitleiste",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Ablauf“ in der Variante „zeitleiste“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Ablauf – zeitleiste",
+            "text": "Baustein „ablauf“ in der Variante „zeitleiste“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "ablauf",
+            "variante": "zeitleiste",
+            "titel": "Der Kurs im Überblick",
+            "schritte": [
+                {
+                    "titel": "Grundlagen",
+                    "zeit": "Woche 1",
+                    "text": "Wir lernen uns kennen und legen die Ziele fest."
+                },
+                {
+                    "titel": "Üben",
+                    "zeit": "Woche 2 bis 5",
+                    "text": "Jede Woche ein Thema mit Übungen für zu Hause."
+                },
+                {
+                    "titel": "Abschluss",
+                    "zeit": "Woche 6",
+                    "text": "Rückblick, Fragen und wie es weitergeht."
+                }
+            ]
+        }
+    ]
+}

@@ -149,12 +149,8 @@ final class Pruefer
         if (is_string($this->plan['meta']['vorschaubild'] ?? null)) {
             $bilder['meta.vorschaubild'] = $this->plan['meta']['vorschaubild'];
         }
-        foreach ($this->plan['bausteine'] as $i => $b) {
-            foreach (['bild', 'vorschau'] as $f) {
-                if (is_string($b[$f]['datei'] ?? null)) {
-                    $bilder["bausteine.$i.$f"] = $b[$f]['datei'];
-                }
-            }
+        foreach ($this->bildfelder() as $pfad => $bild) {
+            $bilder[$pfad] = $bild['datei'];
         }
         foreach ($bilder as $pfad => $datei) {
             if (!str_starts_with($datei, 'bestand/')) {
@@ -170,15 +166,47 @@ final class Pruefer
         }
     }
 
+    /**
+     * Alle Bildfelder des Bauplans (Pfad => Bild {datei, alt?, dekorativ?}), gefunden über den Katalog-Typ „bild“ — oben im Baustein und in
+     * Listen aus Einträgen (3.71.0: Team, Referenzen, Vorher und Nachher). Bis 3.70.0 waren es nur die Felder „bild“ und „vorschau“ oben im
+     * Baustein; die bestehenden Bausteine haben genau diese, ihre Befunde bleiben gleich.
+     *
+     * @return array<string, array>
+     */
+    private function bildfelder(): array
+    {
+        $katalog = Katalog::laden("$this->endo/lp/bausteine.json");
+        $aus = [];
+        $suchen = static function (array $werte, array $felder, string $pfad) use (&$suchen, &$aus): void {
+            foreach ($felder as $name => $def) {
+                $w = $werte[$name] ?? null;
+                if (($def['typ'] ?? null) === 'bild' && is_array($w) && is_string($w['datei'] ?? null)) {
+                    $aus["$pfad.$name"] = $w;
+                } elseif (($def['typ'] ?? null) === 'liste' && is_array($w) && !is_string($def['eintrag']['typ'] ?? null)) {
+                    foreach ($w as $i => $x) {
+                        if (is_array($x)) {
+                            $suchen($x, $def['eintrag'], "$pfad.$name.$i");
+                        }
+                    }
+                }
+            }
+        };
+        foreach ($this->plan['bausteine'] ?? [] as $i => $b) {
+            $e = is_array($b) ? $katalog->baustein((string) ($b['typ'] ?? '')) : null;
+            if ($e !== null) {
+                $suchen($b, $e['felder'], "bausteine.$i");
+            }
+        }
+        return $aus;
+    }
+
     /** Sperrliste, Grenzwörter, Platzhalter und ASCII-Umlaute in allen Textfeldern des Bauplans und in genutzten Alt-Texten. */
     private function texte(): void
     {
         $felder = $this->textfelder();
-        foreach ($this->plan['bausteine'] ?? [] as $i => $b) {
-            foreach (['bild', 'vorschau'] as $f) {
-                if (isset($b[$f]['datei']) && !isset($b[$f]['alt']) && str_starts_with($b[$f]['datei'], 'bestand/')) {
-                    $felder["bausteine.$i.$f.alt"] = (string) ($this->profil->bild(substr($b[$f]['datei'], 8))['alt'] ?? '');
-                }
+        foreach ($this->bildfelder() as $pfad => $bild) {
+            if (!isset($bild['alt']) && str_starts_with($bild['datei'], 'bestand/')) {
+                $felder["$pfad.alt"] = (string) ($this->profil->bild(substr($bild['datei'], 8))['alt'] ?? '');
             }
         }
         $sperr = $this->liste('sperrliste');

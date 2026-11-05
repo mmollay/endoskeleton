@@ -4,6 +4,54 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.71.0] — 2026-11-05
+
+Etappe 2 des Auftrags „mehr wiederverwendbare Bausteine“ (Auftrag der Panel-Instanz vom 05.11.2026, von Martin freigegeben): **sieben neue
+Bausteine mit Listen aus Einträgen**. Bestehende Bausteine, Felder und Regeln sind unverändert; bestehende Seiten bauen gleich (nur `es/lp.css` wächst um die neuen Abschnitte).
+
+### Added — die Listenfelder (für den Feldtyp des Panels in `views/landingpages/_feld.php`)
+Alle Listen sind Pflicht und haben Objekte als Einträge; Text ist reiner Text (`**fett**`, Adressen aus `link_hosts` werden Links), Bilder wie überall `{datei, alt, dekorativ}`.
+
+| Baustein (`typ`) | Varianten | Listenfeld | Einträge | Felder je Eintrag (Typ, Höchstlänge, Pflicht) | Weitere Felder des Bausteins |
+|---|---|---|---|---|---|
+| `preise` „Preise und Leistungen“ | `karten`, `liste` | `angebote` | 1–6 | `name` (zeile, 60, Pflicht), `betrag` (zeile, 30, Pflicht — freier Text: „ab 49 €“, „auf Anfrage“), `hinweis` (zeile, 60), `text` (absatz, 300), `punkte` (Liste aus zeile 120, 1–8), `hervorgehoben` (janein, Vorgabe nein), `knopf` (knopf) | `titel` (zeile, 60, Pflicht), `text` (absatz, 400); höchstens 2 je Seite |
+| `ablauf` „Ablauf“ | `schritte`, `zeitleiste` | `schritte` | 2–10 | `titel` (zeile, 80, Pflicht), `zeit` (zeile, 40 — „am Vortag“, „Woche 1“), `text` (absatz, 400) | `titel` (Pflicht), `text` (absatz, 400); höchstens 2 |
+| `zahlen` „Zahlenband“ | `band`, `schlicht` | `eintraege` | 2–6 | `wert` (zeile, 12, Pflicht — „1.500“, „98 %“), `beschriftung` (zeile, 60, Pflicht) | `titel` (Pflicht); höchstens 2 |
+| `team` „Team“ | `karten`, `liste` | `personen` | 1–12 | `name` (zeile, 60, Pflicht), `rolle` (zeile, 80), `text` (absatz, 300), `bild` (bild) | `titel` (Pflicht), `text` (absatz, 400); höchstens 2 |
+| `zeiten` „Öffnungszeiten“ | `tabelle`, `karte` | `zeilen` | 1–10 | `tage` (zeile, 40, Pflicht), `zeit` (zeile, 60, Pflicht — „9:00 bis 18:00 Uhr“, „geschlossen“) | `titel` (Pflicht), `hinweis` (absatz, 300); höchstens 1 |
+| `referenzen` „Referenzen“ | `raster`, `leiste` | `eintraege` | 2–12 | `titel` (zeile, 80, Pflicht), `text` (absatz, 300), `name` (zeile, 80 — Auftraggeber), `bild` (bild) | `titel` (Pflicht), `text` (absatz, 400); höchstens 2 |
+| `vergleich` „Vorher und Nachher“ | `nebeneinander` | `paare` | 1–4 | `vorher` (bild, Pflicht), `nachher` (bild, Pflicht), `beschriftung` (zeile, 120) | `titel` (Pflicht), `text` (absatz, 400); höchstens 2 |
+
+- **Für das Panel bewusst so gebaut:** keine Bedingungen `pflicht_wenn`/`nur_wenn` (das Panel versteht sie nicht), keine Felder `preis` oder `termine` (das Panel behandelt sie besonders — der Betrag heißt darum `betrag`), Knöpfe nur als `knopf` (Anker oder https auf `link_hosts`). Jeder Text steht genau einmal sichtbar in einem eigenen Element (Bearbeiten-Modus findet ihn); feste Wörter wie „Vorher“/„Nachher“ sind keine Felder.
+- **Darstellung:** Listen sind `<ul role="list">` (Zahlen, Team, Referenzen, Preise, Vorher/Nachher), `<ol>` (Ablauf, Nummer per CSS-Zähler) und `<dl>` (Öffnungszeiten); Einträge mit Überschrift tragen H3 unter der H2 des Abschnitts. „Hervorgehoben“ ist ein dicker Rahmen mit Schatten, nicht nur eine Farbe. Referenzen als Leiste: waagrechte Leiste mit CSS-Scroll-Snap, ohne Skript, als beschrifteter Bereich (`role="region"`, `aria-label`, `tabindex="0"`) mit der Tastatur erreichbar und mit den Pfeiltasten scrollbar; im Druck ein Raster. Vorher und Nachher: nebeneinander, auf dem Handy untereinander, jedes Bild sichtbar beschriftet. Alle Abschnitte in Hell und Dunkel, im Druck (Nummer der Schritte ohne Fläche, Karten brechen nicht durch) und mit „weniger Bewegung“.
+- **Bilder in Karten:** neue Größe `karte` in `Kontext::GROESSEN` (`(min-width: 48rem) 22rem, 100vw`), große Bilder bekommen wie seit 3.70.0 kleinere Fassungen.
+- **Noch nicht in 3.71.0** (kann ohne Bruch dazukommen): Hochzählen im Zahlenband (eigenes Feld), Schieberegler bei Vorher/Nachher (eigene Variante), feste Anmeldeleiste (`leiste`, Etappe 3), Branchenvorlagen (Etappe 4).
+
+### Changed
+- **Prüfer: Bilder in Listen.** Bildrechte (`freigegeben`, eingebrannter Text) und die Alt-Texte aus dem Bildbestand (Sperrliste, Grenzwörter, Umlaute) gelten jetzt für jedes Feld vom Katalog-Typ `bild` — oben im Baustein **und in Einträgen von Listen** (Pfad z. B. `bausteine.2.personen.1.bild`). Bis 3.70.0 waren es nur die Felder `bild` und `vorschau` oben im Baustein; die bestehenden Bausteine haben genau diese, ihre Befunde sind gleich (alle 27 alten Musterbuch-Seiten: Befunde 3.70.0 = 3.71.0, hell und dunkel).
+
+### Tests
+- Neu `tests/listen.test.php` (LB01–LB07): Katalog der Listenfelder (Grenzen, Felder je Eintrag, keine Sonderfelder, kein `*_wenn`), Markup je Baustein samt „jeder Text genau einmal“, Grenzen und unbekannte Felder sperren mit „Eintrag N“, Bildrechte und Alt-Texte in Listen (Pfad mit Eintrag), Leiste der Referenzen (Bereich, Tastatur, ohne Skript), Vorher/Nachher beschriftet, Maskierung in allen Listenfeldern.
+- `tests/katalog.test.php`: die Liste der Typen um die sieben neuen erweitert.
+- Musterbuch: 13 neue Seiten (je Variante eine), 40 statt 27; alle bauen hell und dunkel ohne Befund.
+
+### Neue `lp-`-Klassen (alle seit 3.71.0)
+`lp-preise`, `lp-preise--karten`, `lp-preise--liste`, `lp-preise-text`, `lp-preise-liste`, `lp-angebot`, `lp-angebot--hervorgehoben`, `lp-angebot-name`, `lp-angebot-betrag`, `lp-angebot-hinweis`, `lp-angebot-text`, `lp-angebot-punkte`,
+`lp-ablauf`, `lp-ablauf--schritte`, `lp-ablauf--zeitleiste`, `lp-ablauf-text`, `lp-ablauf-liste`, `lp-schritt`, `lp-schritt-zeit`, `lp-schritt-titel`, `lp-schritt-text`,
+`lp-zahlen`, `lp-zahlen--band`, `lp-zahlen--schlicht`, `lp-zahlen-liste`, `lp-zahl`, `lp-zahl-wert`, `lp-zahl-beschriftung`,
+`lp-team`, `lp-team--karten`, `lp-team--liste`, `lp-team-text`, `lp-team-liste`, `lp-mitglied`, `lp-mitglied-bild`, `lp-mitglied-name`, `lp-mitglied-rolle`, `lp-mitglied-text`,
+`lp-zeiten`, `lp-zeiten--tabelle`, `lp-zeiten--karte`, `lp-zeiten-liste`, `lp-zeiten-tage`, `lp-zeiten-zeit`, `lp-zeiten-hinweis`,
+`lp-referenzen`, `lp-referenzen--raster`, `lp-referenzen--leiste`, `lp-referenzen-text`, `lp-referenzen-rahmen`, `lp-referenzen-liste`, `lp-referenz`, `lp-referenz-bild`, `lp-referenz-titel`, `lp-referenz-text`, `lp-referenz-name`,
+`lp-vergleich`, `lp-vergleich--nebeneinander`, `lp-vergleich-text`, `lp-vergleich-liste`, `lp-paar`, `lp-paar-bilder`, `lp-paar-bild`, `lp-paar-marke`, `lp-paar-beschriftung`.
+
+### Neue Dateien
+`lp/bausteine/{preise,ablauf,zahlen,team,zeiten,referenzen,vergleich}.php`, `lp/musterbuch/<typ>--<variante>.json` (13), `musterbuch/<typ>--<variante>/` (13), `tests/listen.test.php`.
+
+### Rückweg
+Den Zweig nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten mit Marke 3.70.0 bauen weiter mit ihrem Stand; eine Seite mit einem der neuen Bausteine braucht 3.71.0 (ältere Stände lehnen den unbekannten Typ beim Bau ab).
+
+---
+
 ## [3.70.0] — 2026-11-04
 
 Etappe 1 des Auftrags „mehr wiederverwendbare Bausteine und bessere Ausgabe“ (Vorschlag der Panel-Instanz, freigegeben von Martin am 04.11.2026):
