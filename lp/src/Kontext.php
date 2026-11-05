@@ -20,6 +20,7 @@ final class Kontext
         'halb' => '(min-width: 75rem) 36rem, (min-width: 60rem) 48vw, 100vw',
         'neben-text' => '(min-width: 75rem) 40rem, (min-width: 60rem) 54vw, 100vw',   // Video neben dem Text (lp-video--mit-text, Spalten 1fr 1.3fr)
         'klein' => '12rem',
+        'karte' => '(min-width: 48rem) 22rem, 100vw',   // Bild in einer Karte (Team, Referenzen, 3.71.0)
     ];
 
     /** @var array<string, string> Zielpfad im Seitenordner (es/bilder/…) => Quelldatei */

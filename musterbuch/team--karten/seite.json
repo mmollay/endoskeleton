@@ -1,0 +1,45 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Team – karten",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Team“ in der Variante „karten“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Team – karten",
+            "text": "Baustein „team“ in der Variante „karten“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "team",
+            "variante": "karten",
+            "titel": "Wer dich begleitet",
+            "text": "Ein kleines Team, das sich Zeit nimmt.",
+            "personen": [
+                {
+                    "name": "Anna Beispiel",
+                    "rolle": "Kursleitung",
+                    "text": "Anna leitet die Kurse seit vielen Jahren.",
+                    "bild": {
+                        "datei": "bestand/beispiel-vortrag.webp"
+                    }
+                },
+                {
+                    "name": "Ben Muster",
+                    "rolle": "Organisation",
+                    "text": "Ben kümmert sich um Termine und Fragen.",
+                    "bild": {
+                        "datei": "bestand/beispiel-landschaft.webp"
+                    }
+                },
+                {
+                    "name": "Carla Probe",
+                    "rolle": "Assistenz"
+                }
+            ]
+        }
+    ]
+}

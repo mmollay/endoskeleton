@@ -1,5 +1,5 @@
 {
-  "version": "3.70.0",
+  "version": "3.71.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -250,6 +250,166 @@
       "beispiel": {
         "typ": "bewegung", "variante": "wiedergabe", "titel": "So sieht eine aufgezeichnete Bewegung aus", "bewegung": "bew/beispiel-winken.bewegung",
         "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+      }
+    },
+    "preise": {
+      "name": "Preise und Leistungen", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-preise": "3.71.0", "lp-preise--karten": "3.71.0", "lp-preise--liste": "3.71.0", "lp-preise-text": "3.71.0", "lp-preise-liste": "3.71.0",
+        "lp-angebot": "3.71.0", "lp-angebot--hervorgehoben": "3.71.0", "lp-angebot-name": "3.71.0", "lp-angebot-betrag": "3.71.0", "lp-angebot-hinweis": "3.71.0",
+        "lp-angebot-text": "3.71.0", "lp-angebot-punkte": "3.71.0"
+      },
+      "varianten": ["karten", "liste"],
+      "felder": {
+        "titel":    { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":     { "typ": "absatz", "label": "Text", "max": 400 },
+        "angebote": { "typ": "liste", "label": "Angebote", "min": 1, "max": 6, "pflicht": true,
+                      "eintrag": { "name": { "typ": "zeile", "label": "Name", "max": 60, "pflicht": true },
+                                   "betrag": { "typ": "zeile", "label": "Betrag", "max": 30, "pflicht": true },
+                                   "hinweis": { "typ": "zeile", "label": "Hinweis zum Betrag", "max": 60 },
+                                   "text": { "typ": "absatz", "label": "Beschreibung", "max": 300 },
+                                   "punkte": { "typ": "liste", "label": "Leistungen", "min": 0, "max": 8, "eintrag": { "typ": "zeile", "label": "Leistung", "max": 120 } },
+                                   "hervorgehoben": { "typ": "janein", "label": "Hervorgehoben", "standard": false },
+                                   "knopf": { "typ": "knopf", "label": "Knopf" } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "preise", "titel": "Preise",
+        "angebote": [
+          { "name": "Einzelstunde", "betrag": "60 €", "hinweis": "je Termin", "punkte": ["60 Minuten", "Unterlagen zum Mitnehmen"] },
+          { "name": "Fünferblock", "betrag": "270 €", "hinweis": "statt 300 €", "punkte": ["fünf Termine", "freie Terminwahl"], "hervorgehoben": true,
+            "knopf": { "text": "Platz sichern", "ziel": "#anmeldung" } }
+        ]
+      }
+    },
+    "ablauf": {
+      "name": "Ablauf", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-ablauf": "3.71.0", "lp-ablauf--schritte": "3.71.0", "lp-ablauf--zeitleiste": "3.71.0", "lp-ablauf-text": "3.71.0", "lp-ablauf-liste": "3.71.0",
+        "lp-schritt": "3.71.0", "lp-schritt-zeit": "3.71.0", "lp-schritt-titel": "3.71.0", "lp-schritt-text": "3.71.0"
+      },
+      "varianten": ["schritte", "zeitleiste"],
+      "felder": {
+        "titel":    { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":     { "typ": "absatz", "label": "Text", "max": 400 },
+        "schritte": { "typ": "liste", "label": "Schritte", "min": 2, "max": 10, "pflicht": true,
+                      "eintrag": { "titel": { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+                                   "zeit": { "typ": "zeile", "label": "Zeitangabe", "max": 40 },
+                                   "text": { "typ": "absatz", "label": "Text", "max": 400 } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "ablauf", "titel": "So läuft es ab",
+        "schritte": [
+          { "titel": "Anmelden", "text": "Du meldest dich mit Namen und E-Mail-Adresse an." },
+          { "titel": "Zugang bekommen", "zeit": "am Vortag", "text": "Du bekommst den Zugangslink per E-Mail." },
+          { "titel": "Dabei sein", "zeit": "19:00 Uhr", "text": "Du klickst auf den Link und bist dabei." }
+        ]
+      }
+    },
+    "zahlen": {
+      "name": "Zahlenband", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-zahlen": "3.71.0", "lp-zahlen--band": "3.71.0", "lp-zahlen--schlicht": "3.71.0", "lp-zahlen-liste": "3.71.0", "lp-zahl": "3.71.0", "lp-zahl-wert": "3.71.0",
+        "lp-zahl-beschriftung": "3.71.0"
+      },
+      "varianten": ["band", "schlicht"],
+      "felder": {
+        "titel":     { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "eintraege": { "typ": "liste", "label": "Zahlen", "min": 2, "max": 6, "pflicht": true,
+                       "eintrag": { "wert": { "typ": "zeile", "label": "Zahl", "max": 12, "pflicht": true },
+                                    "beschriftung": { "typ": "zeile", "label": "Beschriftung", "max": 60, "pflicht": true } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "zahlen", "titel": "In Zahlen",
+        "eintraege": [ { "wert": "12", "beschriftung": "Jahre Erfahrung" }, { "wert": "1.500", "beschriftung": "Teilnehmende" }, { "wert": "4,8", "beschriftung": "von 5 Punkten im Schnitt" } ]
+      }
+    },
+    "team": {
+      "name": "Team", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-team": "3.71.0", "lp-team--karten": "3.71.0", "lp-team--liste": "3.71.0", "lp-team-text": "3.71.0", "lp-team-liste": "3.71.0", "lp-mitglied": "3.71.0",
+        "lp-mitglied-bild": "3.71.0", "lp-mitglied-name": "3.71.0", "lp-mitglied-rolle": "3.71.0", "lp-mitglied-text": "3.71.0"
+      },
+      "varianten": ["karten", "liste"],
+      "felder": {
+        "titel":    { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":     { "typ": "absatz", "label": "Text", "max": 400 },
+        "personen": { "typ": "liste", "label": "Personen", "min": 1, "max": 12, "pflicht": true,
+                      "eintrag": { "name": { "typ": "zeile", "label": "Name", "max": 60, "pflicht": true },
+                                   "rolle": { "typ": "zeile", "label": "Rolle", "max": 80 },
+                                   "text": { "typ": "absatz", "label": "Text", "max": 300 },
+                                   "bild": { "typ": "bild", "label": "Bild" } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "team", "titel": "Wer dich begleitet",
+        "personen": [ { "name": "Anna Beispiel", "rolle": "Kursleitung", "text": "Anna leitet die Kurse seit vielen Jahren." }, { "name": "Ben Muster", "rolle": "Organisation" } ]
+      }
+    },
+    "zeiten": {
+      "name": "Öffnungszeiten", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-zeiten": "3.71.0", "lp-zeiten--tabelle": "3.71.0", "lp-zeiten--karte": "3.71.0", "lp-zeiten-liste": "3.71.0", "lp-zeiten-tage": "3.71.0", "lp-zeiten-zeit": "3.71.0",
+        "lp-zeiten-hinweis": "3.71.0"
+      },
+      "varianten": ["tabelle", "karte"],
+      "felder": {
+        "titel":   { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "zeilen":  { "typ": "liste", "label": "Zeilen", "min": 1, "max": 10, "pflicht": true,
+                     "eintrag": { "tage": { "typ": "zeile", "label": "Tage", "max": 40, "pflicht": true },
+                                  "zeit": { "typ": "zeile", "label": "Zeit", "max": 60, "pflicht": true } } },
+        "hinweis": { "typ": "absatz", "label": "Hinweis", "max": 300 }
+      },
+      "regeln": { "hoechstens": 1 },
+      "beispiel": {
+        "typ": "zeiten", "titel": "Öffnungszeiten",
+        "zeilen": [ { "tage": "Montag bis Freitag", "zeit": "9:00 bis 18:00 Uhr" }, { "tage": "Samstag", "zeit": "9:00 bis 12:00 Uhr" }, { "tage": "Sonntag und Feiertage", "zeit": "geschlossen" } ],
+        "hinweis": "In den Ferien gelten eigene Zeiten."
+      }
+    },
+    "referenzen": {
+      "name": "Referenzen", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-referenzen": "3.71.0", "lp-referenzen--raster": "3.71.0", "lp-referenzen--leiste": "3.71.0", "lp-referenzen-text": "3.71.0", "lp-referenzen-rahmen": "3.71.0",
+        "lp-referenzen-liste": "3.71.0", "lp-referenz": "3.71.0", "lp-referenz-bild": "3.71.0", "lp-referenz-titel": "3.71.0", "lp-referenz-text": "3.71.0", "lp-referenz-name": "3.71.0"
+      },
+      "varianten": ["raster", "leiste"],
+      "felder": {
+        "titel":     { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":      { "typ": "absatz", "label": "Text", "max": 400 },
+        "eintraege": { "typ": "liste", "label": "Referenzen", "min": 2, "max": 12, "pflicht": true,
+                       "eintrag": { "titel": { "typ": "zeile", "label": "Titel", "max": 80, "pflicht": true },
+                                    "text": { "typ": "absatz", "label": "Text", "max": 300 },
+                                    "name": { "typ": "zeile", "label": "Auftraggeber", "max": 80 },
+                                    "bild": { "typ": "bild", "label": "Bild" } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "referenzen", "titel": "Referenzen",
+        "eintraege": [ { "titel": "Gartenumbau", "text": "Neue Wege und Beete in sechs Wochen.", "name": "Familie Beispiel" }, { "titel": "Terrasse", "text": "Holzterrasse mit Beleuchtung.", "name": "Muster GmbH" } ]
+      }
+    },
+    "vergleich": {
+      "name": "Vorher und Nachher", "seit": "3.71.0", "geaendert": "3.71.0",
+      "klassen": {
+        "lp-vergleich": "3.71.0", "lp-vergleich--nebeneinander": "3.71.0", "lp-vergleich-text": "3.71.0", "lp-vergleich-liste": "3.71.0", "lp-paar": "3.71.0",
+        "lp-paar-bilder": "3.71.0", "lp-paar-bild": "3.71.0", "lp-paar-marke": "3.71.0", "lp-paar-beschriftung": "3.71.0"
+      },
+      "varianten": ["nebeneinander"],
+      "felder": {
+        "titel": { "typ": "zeile", "label": "Titel", "max": 60, "pflicht": true },
+        "text":  { "typ": "absatz", "label": "Text", "max": 400 },
+        "paare": { "typ": "liste", "label": "Paare", "min": 1, "max": 4, "pflicht": true,
+                   "eintrag": { "vorher": { "typ": "bild", "label": "Bild vorher", "pflicht": true },
+                                "nachher": { "typ": "bild", "label": "Bild nachher", "pflicht": true },
+                                "beschriftung": { "typ": "zeile", "label": "Beschriftung", "max": 120 } } }
+      },
+      "regeln": { "hoechstens": 2 },
+      "beispiel": {
+        "typ": "vergleich", "titel": "Vorher und nachher",
+        "paare": [ { "vorher": { "datei": "bestand/beispiel-video.webp" }, "nachher": { "datei": "bestand/beispiel-landschaft.webp" }, "beschriftung": "Ein Beispiel" } ]
       }
     }
   }

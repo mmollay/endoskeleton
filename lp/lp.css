@@ -875,6 +875,395 @@ section.lp-abschluss--akzent {
   justify-self: center;
 }
 
+/* ─── LISTEN-BAUSTEINE (3.71.0): gemeinsame Regeln ─────────────────────── */
+/* Einleitender Text über der Liste und Abstände in den Einträgen: das Raster (gap) setzt sie — „.lp-block p + p“ würde sonst dazwischen greifen. */
+.lp-preise-text,
+.lp-ablauf-text,
+.lp-team-text,
+.lp-referenzen-text,
+.lp-vergleich-text {
+  max-width: 40rem;
+}
+
+.lp-angebot > p + p,
+.lp-schritt > p + p,
+.lp-zahl > p + p,
+.lp-mitglied > p + p,
+.lp-referenz > p + p {
+  margin-top: 0;
+}
+
+.lp-preise-liste,
+.lp-ablauf-liste,
+.lp-zahlen-liste,
+.lp-team-liste,
+.lp-referenzen-liste,
+.lp-vergleich-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.lp-preise-liste > li,
+.lp-ablauf-liste > li,
+.lp-zahlen-liste > li,
+.lp-team-liste > li,
+.lp-referenzen-liste > li,
+.lp-vergleich-liste > li {
+  margin: 0;
+}
+
+/* ─── PREISE UND LEISTUNGEN ─────────────────────────────────────────────── */
+.lp-preise--karten .lp-preise-liste {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.lp-preise--liste .lp-preise-liste {
+  max-width: 46rem;
+}
+
+.lp-angebot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+/* Hervorgehoben: dicker Rahmen und Schatten — nicht nur eine andere Farbe */
+.lp-angebot--hervorgehoben {
+  border: 0.1875rem solid var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.lp-angebot-name {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.lp-angebot-betrag {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--heading);
+}
+
+.lp-angebot-hinweis {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.lp-angebot-punkte {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.lp-angebot .lp-knopf {
+  margin-top: auto;   /* Knöpfe stehen unten bündig, auch bei verschieden langen Karten */
+  text-decoration: none;   /* ein Knopf, kein Link im Fließtext (.lp-block li a unterstreicht sonst) */
+}
+
+/* ─── ABLAUF ────────────────────────────────────────────────────────────── */
+.lp-ablauf-liste {
+  max-width: 46rem;
+  counter-reset: lp-schritt;
+}
+
+.lp-schritt {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+  padding-left: 3.25rem;
+  counter-increment: lp-schritt;
+}
+
+.lp-ablauf--schritte .lp-schritt::before {
+  content: counter(lp-schritt);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-weight: 700;
+}
+
+.lp-ablauf--zeitleiste .lp-schritt {
+  margin-left: 0.5rem;
+  padding-left: 2rem;
+  padding-bottom: var(--space-sm);
+  border-left: 0.1875rem solid var(--border);
+}
+
+.lp-ablauf--zeitleiste .lp-schritt::before {
+  content: "";
+  position: absolute;
+  left: -0.75rem;
+  top: 0.3rem;
+  width: 1.3125rem;
+  height: 1.3125rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  border: 0.1875rem solid var(--bg);
+}
+
+.lp-schritt-zeit {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.lp-schritt-titel {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+/* ─── ZAHLENBAND ────────────────────────────────────────────────────────── */
+section.lp-zahlen--band {
+  background: var(--lp-akzent);
+}
+
+.lp-zahlen-liste {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.lp-zahl {
+  display: grid;
+  gap: var(--space-xs);
+  text-align: center;
+}
+
+.lp-zahl-wert {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--primary);
+}
+
+.lp-zahl-beschriftung {
+  margin: 0;
+  color: var(--text);
+}
+
+/* ─── TEAM ──────────────────────────────────────────────────────────────── */
+.lp-team--karten .lp-team-liste {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.lp-team--liste .lp-team-liste {
+  max-width: 46rem;
+}
+
+.lp-mitglied {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+}
+
+.lp-team--karten .lp-mitglied {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.lp-mitglied-bild {
+  width: 100%;
+  max-width: 12rem;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.lp-team--liste .lp-mitglied:has(.lp-mitglied-bild) {
+  grid-template-columns: 6rem 1fr;
+  column-gap: var(--space-md);
+}
+
+.lp-team--liste .lp-mitglied:has(.lp-mitglied-bild) > :not(.lp-mitglied-bild) {
+  grid-column: 2;
+}
+
+.lp-team--liste .lp-mitglied-bild {
+  grid-row: 1 / span 4;
+  max-width: 6rem;
+}
+
+.lp-mitglied-name {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.lp-mitglied-rolle {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ─── ÖFFNUNGSZEITEN ────────────────────────────────────────────────────── */
+.lp-zeiten-liste {
+  max-width: 34rem;
+  margin: 0;
+}
+
+.lp-zeiten-liste > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-lg);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-zeiten-tage {
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.lp-zeiten-zeit {
+  margin: 0;
+  color: var(--text);
+}
+
+.lp-zeiten--karte .lp-zeiten-liste {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-lg);
+}
+
+.lp-zeiten--karte .lp-zeiten-liste > div:last-child {
+  border-bottom: 0;
+}
+
+.lp-zeiten-hinweis {
+  max-width: 34rem;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ─── REFERENZEN ────────────────────────────────────────────────────────── */
+.lp-referenzen--raster .lp-referenzen-liste {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+/* Leiste: waagrecht mit Scroll-Snap, ohne Skript; der Rahmen ist mit der Tastatur erreichbar (tabindex) und scrollt mit den Pfeiltasten */
+.lp-referenzen--leiste .lp-referenzen-rahmen {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: var(--space-sm);
+}
+
+.lp-referenzen--leiste .lp-referenzen-liste {
+  grid-auto-flow: column;
+  grid-auto-columns: min(80%, 20rem);
+}
+
+.lp-referenzen--leiste .lp-referenz {
+  scroll-snap-align: start;
+}
+
+.lp-referenzen-rahmen:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.1875rem;
+}
+
+.lp-referenz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.lp-referenz-bild {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.lp-referenz-titel {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.lp-referenz-name {
+  margin-top: auto;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* ─── VORHER UND NACHHER ────────────────────────────────────────────────── */
+.lp-vergleich-liste {
+  gap: var(--space-xl);
+}
+
+.lp-paar {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.lp-paar-bilder {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 40rem) {
+  .lp-paar-bilder {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.lp-paar-bilder > div {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+  min-width: 0;
+}
+
+.lp-paar-marke {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.lp-paar-bild {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.lp-paar-beschriftung {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
 /* ─── KOMPAKTER AUF DEM HANDY ───────────────────────────────────────────── */
 /* Unter 48 rem war der Rhythmus der des Desktops: jeder Block 4 rem Innenabstand oben UND unten (zwischen zwei Blöcken auf gleichem Grund 8 rem Leere, mehr als ein halber
    Bildschirm), dazu 1,5 rem Raster-Abstand zwischen den Zeilen. Auf dem Handy sind es 2 rem je Block (4 rem zwischen zwei Blöcken; in einem getönten Band 2 rem) und 1 rem im Raster;
@@ -984,8 +1373,31 @@ section.lp-abschluss--akzent {
   .lp-erfahrung,
   .lp-person-inhalt,
   .lp-video-rahmen,
-  .lp-bewegung-figur {
+  .lp-bewegung-figur,
+  .lp-angebot,
+  .lp-schritt,
+  .lp-zahl,
+  .lp-mitglied,
+  .lp-zeiten-liste,
+  .lp-referenz,
+  .lp-paar {
     break-inside: avoid;
+  }
+
+  /* Listen-Bausteine (3.71.0): die Nummer der Schritte ohne Fläche (sonst weiße Ziffer auf weißem Papier), die Leiste der Referenzen als Raster */
+  .lp-ablauf--schritte .lp-schritt::before {
+    background: transparent;
+    color: inherit;
+    border: 0.0625rem solid currentColor;
+  }
+
+  .lp-referenzen--leiste .lp-referenzen-rahmen {
+    overflow: visible;
+  }
+
+  .lp-referenzen--leiste .lp-referenzen-liste {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   }
 }
 

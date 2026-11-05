@@ -27,6 +27,12 @@ php lp/sammelordner.php <sammelordner>                     # .htaccess des Samme
 Befunde kommen als JSON-Lines `{art, pfad, technik, kunde}`: `sperrend` verhindert Bau bzw. Freigabe, `hinweis` ist
 zum Gegenlesen. `kunde` nennt den Abschnitt mit Nummer und Namen und ist für den Kunden geschrieben.
 
+Checkliste (Barrierefreiheit, Formulare): `php lp/checkliste.php <seite>` liest nur die gebaute Seite und `seite.json` und
+ändert die Befunde von `lp/pruefen.php` nie. JSON-Lines `{art, bereich, pfad, technik, kunde}`, `bereich` ist `barrierefreiheit`
+oder `formular`; `mangel` (Exit 1) ist ein sicherer Verstoß, `hinweis` (Exit 0) zum Gegenlesen. Darum: jedes Bild beschreiben
+(kein Dateiname, nicht nur „Foto“, höchstens 150 Zeichen; Schmuck nur mit `"dekorativ": true`), Knopftexte nennen das Ziel
+(nicht „hier“ oder „Mehr“). Im Formular gilt jedes Feld ohne „(freiwillig)“ in der Beschriftung als Pflicht. Den Kontrast prüft der Bau.
+
 Im Profil optional: `--lp-logo-hoehe` (Höhe des Logos im Kopf, Vorgabe `3rem`).
 
 Bestehende Seiten baut immer der Stand ihrer Marke:

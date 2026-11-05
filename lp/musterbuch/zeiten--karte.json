@@ -1,0 +1,32 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Öffnungszeiten – karte",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Öffnungszeiten“ in der Variante „karte“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Öffnungszeiten – karte",
+            "text": "Baustein „zeiten“ in der Variante „karte“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "zeiten",
+            "variante": "karte",
+            "titel": "Wann wir erreichbar sind",
+            "zeilen": [
+                {
+                    "tage": "Dienstag und Donnerstag",
+                    "zeit": "14:00 bis 19:00 Uhr"
+                },
+                {
+                    "tage": "Freitag",
+                    "zeit": "10:00 bis 13:00 Uhr"
+                }
+            ]
+        }
+    ]
+}

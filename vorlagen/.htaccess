@@ -1,0 +1,2 @@
+# Vorlagen sind keine Webseite: alles 404 (nie „Require all denied" — fail2ban sperrt bei „denied" die aufrufende Adresse).
+RedirectMatch 404 ".*"

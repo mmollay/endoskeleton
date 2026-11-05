@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.70.0)
+# Landingpage bearbeiten (Endoskeleton 3.71.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -283,5 +283,252 @@ Varianten: `wiedergabe`, `live` · Variante `live` höchstens 1-mal
     "titel": "So sieht eine aufgezeichnete Bewegung aus",
     "bewegung": "bew/beispiel-winken.bewegung",
     "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+}
+```
+
+### Preise und Leistungen (`preise`)
+
+Varianten: `karten`, `liste` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `angebote` | liste | ja | 1–6 Einträge |
+| `angebote[].name` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `angebote[].betrag` | zeile | ja | eine Zeile, ≤ 30 Zeichen |
+| `angebote[].hinweis` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `angebote[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `angebote[].punkte` | liste | – | 0–8 Einträge (eine Zeile, ≤ 120 Zeichen) |
+| `angebote[].hervorgehoben` | janein | – | `true` / `false`; Standard `` |
+| `angebote[].knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
+
+```json
+{
+    "typ": "preise",
+    "titel": "Preise",
+    "angebote": [
+        {
+            "name": "Einzelstunde",
+            "betrag": "60 €",
+            "hinweis": "je Termin",
+            "punkte": [
+                "60 Minuten",
+                "Unterlagen zum Mitnehmen"
+            ]
+        },
+        {
+            "name": "Fünferblock",
+            "betrag": "270 €",
+            "hinweis": "statt 300 €",
+            "punkte": [
+                "fünf Termine",
+                "freie Terminwahl"
+            ],
+            "hervorgehoben": true,
+            "knopf": {
+                "text": "Platz sichern",
+                "ziel": "#anmeldung"
+            }
+        }
+    ]
+}
+```
+
+### Ablauf (`ablauf`)
+
+Varianten: `schritte`, `zeitleiste` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `schritte` | liste | ja | 2–10 Einträge |
+| `schritte[].titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `schritte[].zeit` | zeile | – | eine Zeile, ≤ 40 Zeichen |
+| `schritte[].text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+
+```json
+{
+    "typ": "ablauf",
+    "titel": "So läuft es ab",
+    "schritte": [
+        {
+            "titel": "Anmelden",
+            "text": "Du meldest dich mit Namen und E-Mail-Adresse an."
+        },
+        {
+            "titel": "Zugang bekommen",
+            "zeit": "am Vortag",
+            "text": "Du bekommst den Zugangslink per E-Mail."
+        },
+        {
+            "titel": "Dabei sein",
+            "zeit": "19:00 Uhr",
+            "text": "Du klickst auf den Link und bist dabei."
+        }
+    ]
+}
+```
+
+### Zahlenband (`zahlen`)
+
+Varianten: `band`, `schlicht` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `eintraege` | liste | ja | 2–6 Einträge |
+| `eintraege[].wert` | zeile | ja | eine Zeile, ≤ 12 Zeichen |
+| `eintraege[].beschriftung` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+
+```json
+{
+    "typ": "zahlen",
+    "titel": "In Zahlen",
+    "eintraege": [
+        {
+            "wert": "12",
+            "beschriftung": "Jahre Erfahrung"
+        },
+        {
+            "wert": "1.500",
+            "beschriftung": "Teilnehmende"
+        },
+        {
+            "wert": "4,8",
+            "beschriftung": "von 5 Punkten im Schnitt"
+        }
+    ]
+}
+```
+
+### Team (`team`)
+
+Varianten: `karten`, `liste` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `personen` | liste | ja | 1–12 Einträge |
+| `personen[].name` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `personen[].rolle` | zeile | – | eine Zeile, ≤ 80 Zeichen |
+| `personen[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `personen[].bild` | bild | – | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "team",
+    "titel": "Wer dich begleitet",
+    "personen": [
+        {
+            "name": "Anna Beispiel",
+            "rolle": "Kursleitung",
+            "text": "Anna leitet die Kurse seit vielen Jahren."
+        },
+        {
+            "name": "Ben Muster",
+            "rolle": "Organisation"
+        }
+    ]
+}
+```
+
+### Öffnungszeiten (`zeiten`)
+
+Varianten: `tabelle`, `karte` · höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `zeilen` | liste | ja | 1–10 Einträge |
+| `zeilen[].tage` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
+| `zeilen[].zeit` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `hinweis` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+
+```json
+{
+    "typ": "zeiten",
+    "titel": "Öffnungszeiten",
+    "zeilen": [
+        {
+            "tage": "Montag bis Freitag",
+            "zeit": "9:00 bis 18:00 Uhr"
+        },
+        {
+            "tage": "Samstag",
+            "zeit": "9:00 bis 12:00 Uhr"
+        },
+        {
+            "tage": "Sonntag und Feiertage",
+            "zeit": "geschlossen"
+        }
+    ],
+    "hinweis": "In den Ferien gelten eigene Zeiten."
+}
+```
+
+### Referenzen (`referenzen`)
+
+Varianten: `raster`, `leiste` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `eintraege` | liste | ja | 2–12 Einträge |
+| `eintraege[].titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `eintraege[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `eintraege[].name` | zeile | – | eine Zeile, ≤ 80 Zeichen |
+| `eintraege[].bild` | bild | – | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "referenzen",
+    "titel": "Referenzen",
+    "eintraege": [
+        {
+            "titel": "Gartenumbau",
+            "text": "Neue Wege und Beete in sechs Wochen.",
+            "name": "Familie Beispiel"
+        },
+        {
+            "titel": "Terrasse",
+            "text": "Holzterrasse mit Beleuchtung.",
+            "name": "Muster GmbH"
+        }
+    ]
+}
+```
+
+### Vorher und Nachher (`vergleich`)
+
+Varianten: `nebeneinander` · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `paare` | liste | ja | 1–4 Einträge |
+| `paare[].vorher` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `paare[].nachher` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `paare[].beschriftung` | zeile | – | eine Zeile, ≤ 120 Zeichen |
+
+```json
+{
+    "typ": "vergleich",
+    "titel": "Vorher und nachher",
+    "paare": [
+        {
+            "vorher": {
+                "datei": "bestand/beispiel-video.webp"
+            },
+            "nachher": {
+                "datei": "bestand/beispiel-landschaft.webp"
+            },
+            "beschriftung": "Ein Beispiel"
+        }
+    ]
 }
 ```

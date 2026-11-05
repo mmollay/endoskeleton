@@ -27,6 +27,12 @@ php lp/sammelordner.php <sammelordner>                     # .htaccess des Samme
 Befunde kommen als JSON-Lines `{art, pfad, technik, kunde}`: `sperrend` verhindert Bau bzw. Freigabe, `hinweis` ist
 zum Gegenlesen. `kunde` nennt den Abschnitt mit Nummer und Namen und ist für den Kunden geschrieben.
 
+Checkliste (Barrierefreiheit, Formulare): `php lp/checkliste.php <seite>` liest nur die gebaute Seite und `seite.json` und
+ändert die Befunde von `lp/pruefen.php` nie. JSON-Lines `{art, bereich, pfad, technik, kunde}`, `bereich` ist `barrierefreiheit`
+oder `formular`; `mangel` (Exit 1) ist ein sicherer Verstoß, `hinweis` (Exit 0) zum Gegenlesen. Darum: jedes Bild beschreiben
+(kein Dateiname, nicht nur „Foto“, höchstens 150 Zeichen; Schmuck nur mit `"dekorativ": true`), Knopftexte nennen das Ziel
+(nicht „hier“ oder „Mehr“). Im Formular gilt jedes Feld ohne „(freiwillig)“ in der Beschriftung als Pflicht. Den Kontrast prüft der Bau.
+
 Im Profil optional: `--lp-logo-hoehe` (Höhe des Logos im Kopf, Vorgabe `3rem`).
 
 Bestehende Seiten baut immer der Stand ihrer Marke:
@@ -105,7 +111,7 @@ der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilde
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.70.0)
+## Bausteine (Katalog 3.71.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -378,5 +384,252 @@ Varianten: `wiedergabe`, `live` · seit 3.66.0, geändert 3.68.0 · Variante `li
     "titel": "So sieht eine aufgezeichnete Bewegung aus",
     "bewegung": "bew/beispiel-winken.bewegung",
     "alt": "Eine Figur winkt dreimal mit dem rechten Arm und senkt ihn wieder."
+}
+```
+
+### `preise` — Preise und Leistungen
+
+Varianten: `karten`, `liste` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `angebote` | liste | ja | 1–6 Einträge |
+| `angebote[].name` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `angebote[].betrag` | zeile | ja | eine Zeile, ≤ 30 Zeichen |
+| `angebote[].hinweis` | zeile | – | eine Zeile, ≤ 60 Zeichen |
+| `angebote[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `angebote[].punkte` | liste | – | 0–8 Einträge (eine Zeile, ≤ 120 Zeichen) |
+| `angebote[].hervorgehoben` | janein | – | `true` / `false`; Standard `` |
+| `angebote[].knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
+
+```json
+{
+    "typ": "preise",
+    "titel": "Preise",
+    "angebote": [
+        {
+            "name": "Einzelstunde",
+            "betrag": "60 €",
+            "hinweis": "je Termin",
+            "punkte": [
+                "60 Minuten",
+                "Unterlagen zum Mitnehmen"
+            ]
+        },
+        {
+            "name": "Fünferblock",
+            "betrag": "270 €",
+            "hinweis": "statt 300 €",
+            "punkte": [
+                "fünf Termine",
+                "freie Terminwahl"
+            ],
+            "hervorgehoben": true,
+            "knopf": {
+                "text": "Platz sichern",
+                "ziel": "#anmeldung"
+            }
+        }
+    ]
+}
+```
+
+### `ablauf` — Ablauf
+
+Varianten: `schritte`, `zeitleiste` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `schritte` | liste | ja | 2–10 Einträge |
+| `schritte[].titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `schritte[].zeit` | zeile | – | eine Zeile, ≤ 40 Zeichen |
+| `schritte[].text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+
+```json
+{
+    "typ": "ablauf",
+    "titel": "So läuft es ab",
+    "schritte": [
+        {
+            "titel": "Anmelden",
+            "text": "Du meldest dich mit Namen und E-Mail-Adresse an."
+        },
+        {
+            "titel": "Zugang bekommen",
+            "zeit": "am Vortag",
+            "text": "Du bekommst den Zugangslink per E-Mail."
+        },
+        {
+            "titel": "Dabei sein",
+            "zeit": "19:00 Uhr",
+            "text": "Du klickst auf den Link und bist dabei."
+        }
+    ]
+}
+```
+
+### `zahlen` — Zahlenband
+
+Varianten: `band`, `schlicht` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `eintraege` | liste | ja | 2–6 Einträge |
+| `eintraege[].wert` | zeile | ja | eine Zeile, ≤ 12 Zeichen |
+| `eintraege[].beschriftung` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+
+```json
+{
+    "typ": "zahlen",
+    "titel": "In Zahlen",
+    "eintraege": [
+        {
+            "wert": "12",
+            "beschriftung": "Jahre Erfahrung"
+        },
+        {
+            "wert": "1.500",
+            "beschriftung": "Teilnehmende"
+        },
+        {
+            "wert": "4,8",
+            "beschriftung": "von 5 Punkten im Schnitt"
+        }
+    ]
+}
+```
+
+### `team` — Team
+
+Varianten: `karten`, `liste` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `personen` | liste | ja | 1–12 Einträge |
+| `personen[].name` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `personen[].rolle` | zeile | – | eine Zeile, ≤ 80 Zeichen |
+| `personen[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `personen[].bild` | bild | – | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "team",
+    "titel": "Wer dich begleitet",
+    "personen": [
+        {
+            "name": "Anna Beispiel",
+            "rolle": "Kursleitung",
+            "text": "Anna leitet die Kurse seit vielen Jahren."
+        },
+        {
+            "name": "Ben Muster",
+            "rolle": "Organisation"
+        }
+    ]
+}
+```
+
+### `zeiten` — Öffnungszeiten
+
+Varianten: `tabelle`, `karte` · seit 3.71.0, geändert 3.71.0 · höchstens 1-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `zeilen` | liste | ja | 1–10 Einträge |
+| `zeilen[].tage` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
+| `zeilen[].zeit` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `hinweis` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+
+```json
+{
+    "typ": "zeiten",
+    "titel": "Öffnungszeiten",
+    "zeilen": [
+        {
+            "tage": "Montag bis Freitag",
+            "zeit": "9:00 bis 18:00 Uhr"
+        },
+        {
+            "tage": "Samstag",
+            "zeit": "9:00 bis 12:00 Uhr"
+        },
+        {
+            "tage": "Sonntag und Feiertage",
+            "zeit": "geschlossen"
+        }
+    ],
+    "hinweis": "In den Ferien gelten eigene Zeiten."
+}
+```
+
+### `referenzen` — Referenzen
+
+Varianten: `raster`, `leiste` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `eintraege` | liste | ja | 2–12 Einträge |
+| `eintraege[].titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `eintraege[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `eintraege[].name` | zeile | – | eine Zeile, ≤ 80 Zeichen |
+| `eintraege[].bild` | bild | – | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+
+```json
+{
+    "typ": "referenzen",
+    "titel": "Referenzen",
+    "eintraege": [
+        {
+            "titel": "Gartenumbau",
+            "text": "Neue Wege und Beete in sechs Wochen.",
+            "name": "Familie Beispiel"
+        },
+        {
+            "titel": "Terrasse",
+            "text": "Holzterrasse mit Beleuchtung.",
+            "name": "Muster GmbH"
+        }
+    ]
+}
+```
+
+### `vergleich` — Vorher und Nachher
+
+Varianten: `nebeneinander` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
+| `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `paare` | liste | ja | 1–4 Einträge |
+| `paare[].vorher` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `paare[].nachher` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
+| `paare[].beschriftung` | zeile | – | eine Zeile, ≤ 120 Zeichen |
+
+```json
+{
+    "typ": "vergleich",
+    "titel": "Vorher und nachher",
+    "paare": [
+        {
+            "vorher": {
+                "datei": "bestand/beispiel-video.webp"
+            },
+            "nachher": {
+                "datei": "bestand/beispiel-landschaft.webp"
+            },
+            "beschriftung": "Ein Beispiel"
+        }
+    ]
 }
 ```

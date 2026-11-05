@@ -1,0 +1,36 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Preise und Leistungen – liste",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Preise und Leistungen“ in der Variante „liste“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Preise und Leistungen – liste",
+            "text": "Baustein „preise“ in der Variante „liste“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "preise",
+            "variante": "liste",
+            "titel": "Leistungen",
+            "angebote": [
+                {
+                    "name": "Erstgespräch",
+                    "betrag": "kostenlos",
+                    "hinweis": "30 Minuten",
+                    "text": "Wir klären, was du brauchst."
+                },
+                {
+                    "name": "Beratung",
+                    "betrag": "ab 90 €",
+                    "hinweis": "je Stunde",
+                    "text": "Persönlich oder online."
+                }
+            ]
+        }
+    ]
+}

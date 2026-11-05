@@ -10,8 +10,11 @@ namespace Endo\Lp;
 
 final class Cli
 {
-    /** @param callable(list<string>): list<Befund> $fn  bekommt die Argumente ohne Skriptnamen */
-    public static function lauf(array $argv, string $aufruf, int $mindestens, callable $fn, ?int $hoechstens = null): never
+    /**
+     * @param callable(list<string>): list<Befund> $fn  bekommt die Argumente ohne Skriptnamen
+     * @param ?callable(list<object>): bool $sperrt  wann Exit 1 gilt (Vorgabe Befund::sperrt; die Checkliste: Pruefpunkt::mangelhaft)
+     */
+    public static function lauf(array $argv, string $aufruf, int $mindestens, callable $fn, ?int $hoechstens = null, ?callable $sperrt = null): never
     {
         $args = array_slice($argv, 1);
         if (count($args) < $mindestens || count($args) > ($hoechstens ?? $mindestens) || in_array($args[0] ?? '', ['-h', '--help'], true)) {
@@ -27,7 +30,7 @@ final class Cli
         foreach ($befunde as $b) {
             echo json_encode($b->alsArray(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
         }
-        exit(Befund::sperrt($befunde) ? 1 : 0);
+        exit(($sperrt ?? Befund::sperrt(...))($befunde) ? 1 : 0);
     }
 
     /** Wert einer Option --name <wert>; entfernt beide aus $args. */

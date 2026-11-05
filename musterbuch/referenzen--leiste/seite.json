@@ -1,0 +1,58 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Referenzen – leiste",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Referenzen“ in der Variante „leiste“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Referenzen – leiste",
+            "text": "Baustein „referenzen“ in der Variante „leiste“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "referenzen",
+            "variante": "leiste",
+            "titel": "Unsere Arbeiten",
+            "eintraege": [
+                {
+                    "titel": "Gartenumbau",
+                    "text": "Neue Wege und Beete in sechs Wochen.",
+                    "name": "Familie Beispiel",
+                    "bild": {
+                        "datei": "bestand/beispiel-landschaft.webp"
+                    }
+                },
+                {
+                    "titel": "Vortragsreihe",
+                    "text": "Sechs Abende mit je 80 Gästen.",
+                    "name": "Beispiel Akademie",
+                    "bild": {
+                        "datei": "bestand/beispiel-vortrag.webp"
+                    }
+                },
+                {
+                    "titel": "Lernvideo",
+                    "text": "Ein Erklärvideo in drei Teilen.",
+                    "name": "Muster GmbH",
+                    "bild": {
+                        "datei": "bestand/beispiel-video.webp"
+                    }
+                },
+                {
+                    "titel": "Terrasse",
+                    "text": "Holzterrasse mit Beleuchtung.",
+                    "name": "Familie Probe"
+                },
+                {
+                    "titel": "Seminarraum",
+                    "text": "Ein Raum für zwölf Personen.",
+                    "name": "Verein Beispiel"
+                }
+            ]
+        }
+    ]
+}

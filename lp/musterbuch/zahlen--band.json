@@ -1,0 +1,40 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Zahlenband – band",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Zahlenband“ in der Variante „band“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Zahlenband – band",
+            "text": "Baustein „zahlen“ in der Variante „band“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "zahlen",
+            "variante": "band",
+            "titel": "In Zahlen",
+            "eintraege": [
+                {
+                    "wert": "12",
+                    "beschriftung": "Jahre Erfahrung"
+                },
+                {
+                    "wert": "1.500",
+                    "beschriftung": "Teilnehmende"
+                },
+                {
+                    "wert": "4,8",
+                    "beschriftung": "von 5 Punkten im Schnitt"
+                },
+                {
+                    "wert": "98 %",
+                    "beschriftung": "würden es weiterempfehlen"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Team – liste",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Team“ in der Variante „liste“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Team – liste",
+            "text": "Baustein „team“ in der Variante „liste“ (seit 3.71.0, geändert 3.71.0)."
+        },
+        {
+            "typ": "team",
+            "variante": "liste",
+            "titel": "Ansprechpersonen",
+            "personen": [
+                {
+                    "name": "Anna Beispiel",
+                    "rolle": "Kursleitung",
+                    "text": "Fragen zu Inhalt und Ablauf.",
+                    "bild": {
+                        "datei": "bestand/beispiel-vortrag.webp"
+                    }
+                },
+                {
+                    "name": "Ben Muster",
+                    "rolle": "Organisation",
+                    "text": "Fragen zu Anmeldung und Rechnung."
+                }
+            ]
+        }
+    ]
+}

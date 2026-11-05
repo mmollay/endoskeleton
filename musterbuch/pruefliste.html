@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prüfliste der Landingpage-Bausteine – Endoskeleton 3.70.0</title>
+<title>Prüfliste der Landingpage-Bausteine – Endoskeleton 3.71.0</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=aa5ddb7874">
+<link rel="stylesheet" href="hero--schlicht/es/lp.css?v=4e4cecb31f">
 </head>
 <body class="lp-seite">
 <main id="inhalt" class="lp-inhalt">
@@ -51,6 +51,10 @@
 <h2>Sauberes HTML</h2>
 <ul>
 <li>Keine Inline-Stile, keine Inline-Skripte, keine on…-Attribute; genau eine H1; Überschriften ohne Sprung; lp.css nur mit Tokens. <span>(automatisch: <code>tests/bauen.test.php</code>, <code>lp/src/Pruefer.php</code>)</span></li>
+</ul>
+<h2>Barrierefreiheit und Formular</h2>
+<ul>
+<li>Jede gebaute Seite besteht die Checkliste (lp/checkliste.php) ohne Mangel: jedes Bild beschrieben (kein Dateiname, nicht nur „Foto“) oder als Schmuck gekennzeichnet, das Logo beschrieben, jeder Link und Knopf mit Namen, die Sprache gesetzt, genau eine H1, kein tabindex über 0, kein Fokusrahmen ohne Ersatz entfernt; im Formular ein Ziel mit https, der Link auf die Datenschutzerklärung, jedes Feld beschriftet, Pflichtfelder als Pflicht ausgezeichnet, nichts vorangehakt und ein Honigtopf, den weder Tastatur noch Bildschirmleser erreichen. Nichtssagende Linktexte, Überschriftensprünge und sehr lange Beschreibungen sind Hinweise. <span>(automatisch: <code>lp/src/Checkliste.php</code>, <code>tests/checkliste.test.php CL01</code>, <code>tests/checkliste.test.php CL02</code>, <code>tests/checkliste.test.php CL03</code>, <code>tests/checkliste.test.php CL04</code>, <code>tests/checkliste.test.php CL05</code>, <code>tests/checkliste.test.php CL06</code>, <code>tests/checkliste.test.php CL07</code>, <code>tests/checkliste.test.php CL08</code>, <code>tests/checkliste.test.php CL09</code>, <code>tests/checkliste.test.php CL10</code>, <code>tests/checkliste.test.php CL11</code>, <code>tests/checkliste.test.php CL12</code>, <code>tests/checkliste.test.php CL13</code>, <code>tests/checkliste.test.php CL14</code>, <code>tests/checkliste.test.php CL15</code>, <code>tests/checkliste.test.php CL16</code>)</span></li>
 </ul>
 <h2>Texte</h2>
 <ul>
