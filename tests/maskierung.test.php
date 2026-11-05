@@ -12,6 +12,8 @@ use Endo\Lp\Bauer;
 use Endo\Lp\Katalog;
 
 const ANGRIFF = '<script>alert(1)</script>"onmouseover=x';
+/** Für Felder, die kürzer sein müssen als ANGRIFF (3.71.0: Zahl im Zahlenband, Betrag im Preis): ein kurzer, ebenso gefährlicher Text. */
+const ANGRIFF_KURZ = '<i>"x</i>&';
 
 $k = Katalog::laden();
 
@@ -22,7 +24,7 @@ $vergiften = static function (array $b, array $felder) use (&$vergiften): array 
             continue;
         }
         if (in_array($def['typ'], ['zeile', 'absatz'], true)) {
-            $b[$name] = ANGRIFF;
+            $b[$name] = isset($def['max']) && $def['max'] < mb_strlen(ANGRIFF) ? ANGRIFF_KURZ : ANGRIFF;
         } elseif ($def['typ'] === 'knopf') {
             $b[$name] = ['text' => ANGRIFF, 'ziel' => '#anmeldung'];
         } elseif ($def['typ'] === 'liste' && isset($b[$name])) {
@@ -55,6 +57,7 @@ foreach ($k->bausteine as $typ => $e) {
             $h = (string) @file_get_contents("$o/index.html");
             T::ok($h !== '', 'Seite gebaut');
             T::ok(substr_count($h, ANGRIFF) === 0, 'Angriffstext nie roh');
+            T::ok(substr_count($h, ANGRIFF_KURZ) === 0, 'kurzer Angriffstext nie roh');
             T::notContains($h, '<script>alert', 'kein eingeschleustes Skript');
             T::notContains($h, '"onmouseover', 'kein eingeschleustes Attribut');
             T::eq(substr_count($h, '<script'), substr_count($h, '</script>'), 'jedes Skript sauber geschlossen');

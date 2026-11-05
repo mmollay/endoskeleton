@@ -33,6 +33,7 @@ Alle Listen sind Pflicht und haben Objekte als Einträge; Text ist reiner Text (
 ### Tests
 - Neu `tests/listen.test.php` (LB01–LB07): Katalog der Listenfelder (Grenzen, Felder je Eintrag, keine Sonderfelder, kein `*_wenn`), Markup je Baustein samt „jeder Text genau einmal“, Grenzen und unbekannte Felder sperren mit „Eintrag N“, Bildrechte und Alt-Texte in Listen (Pfad mit Eintrag), Leiste der Referenzen (Bereich, Tastatur, ohne Skript), Vorher/Nachher beschriftet, Maskierung in allen Listenfeldern.
 - `tests/katalog.test.php`: die Liste der Typen um die sieben neuen erweitert.
+- `tests/maskierung.test.php`: Felder, die kürzer sein müssen als der Angriffstext (`zahlen.eintraege[].wert` 12, `preise.angebote[].betrag` 30), bekommen einen kurzen, ebenso gefährlichen Angriffstext (`<i>"x</i>&`), der ebenfalls nie roh ankommen darf — vorher hätte der Test solche Felder nicht befüllen können.
 - Musterbuch: 13 neue Seiten (je Variante eine), 40 statt 27; alle bauen hell und dunkel ohne Befund.
 
 ### Neue `lp-`-Klassen (alle seit 3.71.0)
