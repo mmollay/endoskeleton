@@ -153,7 +153,7 @@ final class AdminWeg
             return self::ungueltig($datei, 'ordner: bestehender, beschreibbarer Ordner außerhalb des DocumentRoot');
         }
         $zahlen = [];
-        foreach (['sitzung_minuten' => 30, 'bremse_versuche' => 5, 'bremse_minuten' => 15] as $name => $vorgabe) {
+        foreach (['sitzung_minuten' => 30, 'sitzung_hoechstens_minuten' => 720, 'bremse_versuche' => 5, 'bremse_minuten' => 15] as $name => $vorgabe) {
             $wert = $k[$name] ?? $vorgabe;
             if (!is_int($wert) || $wert < 1 || $wert > 1440) { return self::ungueltig($datei, "$name: ganze Zahl von 1 bis 1440"); }
             $zahlen[$name] = $wert;
@@ -177,8 +177,11 @@ final class AdminWeg
             return false;
         }
         $zuletzt = $this->sitzung['admin_zuletzt'] ?? null;
-        if (!is_int($zuletzt) || $this->anfrage['zeit'] - $zuletzt > $this->konfig['sitzung_minuten'] * 60) {
-            unset($this->sitzung['admin'], $this->sitzung['admin_zuletzt']);
+        $seit = $this->sitzung['admin_seit'] ?? null;
+        // Ablauf nach Untätigkeit — und spätestens nach sitzung_hoechstens_minuten (Vorgabe 12 Stunden) seit der Anmeldung, auch bei laufender Arbeit
+        if (!is_int($zuletzt) || $this->anfrage['zeit'] - $zuletzt > $this->konfig['sitzung_minuten'] * 60
+            || !is_int($seit) || $this->anfrage['zeit'] - $seit > $this->konfig['sitzung_hoechstens_minuten'] * 60) {
+            unset($this->sitzung['admin'], $this->sitzung['admin_zuletzt'], $this->sitzung['admin_seit']);
 
             return false;
         }
@@ -220,6 +223,7 @@ final class AdminWeg
         ($this->erneuern)();
         $this->sitzung['admin'] = self::kennung($this->konfig);
         $this->sitzung['admin_zuletzt'] = $this->anfrage['zeit'];
+        $this->sitzung['admin_seit'] = $this->anfrage['zeit'];
         $this->sitzung['admin_csrf'] = bin2hex(random_bytes(32));
 
         return true;

@@ -72,7 +72,7 @@ return (static function (): array {
                 T::eq(AdminWeg::konfigLaden($kaputt), null, 'Syntaxfehler → aus');
                 $k = AdminWeg::konfigLaden($umgebung(['herkuenfte' => ['HTTPS://Example.com/', 'https://www.example.com'], 'dienst_schluessel' => 'x'])[0]) ?? [];
                 T::eq($k['herkuenfte'] ?? null, ['https://example.com', 'https://www.example.com'], 'Herkünfte klein, ohne Schrägstrich am Ende');
-                T::eq([$k['sitzung_minuten'] ?? 0, $k['bremse_versuche'] ?? 0, $k['bremse_minuten'] ?? 0], [30, 5, 15], 'Vorgaben');
+                T::eq([$k['sitzung_minuten'] ?? 0, $k['sitzung_hoechstens_minuten'] ?? 0, $k['bremse_versuche'] ?? 0, $k['bremse_minuten'] ?? 0], [30, 720, 5, 15], 'Vorgaben');
                 T::eq($k['dienst_schluessel'] ?? null, 'x', 'eigene Werte bleiben für einstellung() erhalten');
                 if (defined('PASSWORD_ARGON2ID')) {
                     $argon = password_hash('x', PASSWORD_ARGON2ID, ['memory_cost' => 1024, 'time_cost' => 1, 'threads' => 1]);
@@ -107,6 +107,18 @@ return (static function (): array {
             T::ok($spaeter(59 * 60)->angemeldet(), 'jede Prüfung verlängert die Sitzung');
             T::ok(!$spaeter(89 * 60 + 1)->angemeldet(), 'nach über 30 Minuten Untätigkeit abgemeldet');
             T::ok(!isset($s['admin']) && !$spaeter(89 * 60 + 2)->angemeldet(), 'Kennzeichen entfernt, bleibt abgemeldet');
+            // Höchstablauf (Prüfung 3.71.0): auch bei laufender Arbeit spätestens nach 12 Stunden seit der Anmeldung abgemeldet
+            $h = [];
+            $tok = (new AdminWeg($k, $anfrage(['methode' => 'GET']), $h, $erneuern))->csrfToken();
+            T::ok((new AdminWeg($k, $anfrage(['csrf' => $tok]), $h, $erneuern))->anmelden($passwort), 'neu angemeldet');
+            $aktiv = true;
+            for ($min = 25; $min <= 720; $min += 25) {
+                $aktiv = $aktiv && (new AdminWeg($k, $anfrage(['methode' => 'GET', 'zeit' => $jetzt + $min * 60]), $h, $erneuern))->angemeldet();
+            }
+            T::ok($aktiv, 'alle 25 Minuten aktiv: bis 12 Stunden angemeldet');
+            T::ok(!(new AdminWeg($k, $anfrage(['methode' => 'GET', 'zeit' => $jetzt + 720 * 60 + 60]), $h, $erneuern))->angemeldet(), 'nach über 12 Stunden abgemeldet, trotz Aktivität');
+            T::ok(!isset($h['admin'], $h['admin_seit']), 'Kennzeichen und Anmeldezeit entfernt');
+            T::eq(($konfig(['sitzung_hoechstens_minuten' => 60]))['sitzung_hoechstens_minuten'], 60, 'Höchstdauer einstellbar');
         },
 
         'Sitzung gehört zur Installation: fremde Seite, neues Passwort, leeres Passwort, eigener Sitzungsordner (Prüfung 3.71.0)' => static function () use ($konfig, $umgebung, $anfrage, $passwort, $jetzt, $nichts, $v, $ohneKommentar): void {
@@ -147,7 +159,7 @@ return (static function (): array {
             $k = $konfig(['herkuenfte' => ['https://example.com', 'https://www.example.com']]);
             $token = bin2hex(random_bytes(32));
             $status = static function (array $mehr, ?array $sitzung = null) use ($k, $anfrage, $abbruch, $nichts, $token, $jetzt): int {
-                $s = $sitzung ?? ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token];
+                $s = $sitzung ?? ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_seit' => $jetzt, 'admin_csrf' => $token];
                 $a = new AdminWeg($k, $anfrage($mehr + ['csrf' => $token]), $s, $nichts);
 
                 return $abbruch(static fn () => $a->verlangeSchreiben());
@@ -169,9 +181,9 @@ return (static function (): array {
             T::eq($status(['csrf' => substr($token, 0, 63)]), 403, 'gekürztes CSRF-Token → 403');
             T::eq($status([], []), 403, 'Sitzung ohne Token → 403');
             T::eq($status([], ['admin_csrf' => $token]), 401, 'nicht angemeldet → 401');
-            T::eq($status([], ['admin' => 'ja', 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token]), 401, 'nur das Kennzeichen dieser Installation zählt');
-            T::eq($status([], ['admin' => true, 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token]), 401, 'das alte Kennzeichen true zählt nicht mehr');
-            T::eq($status([], ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt - 31 * 60, 'admin_csrf' => $token]), 401, 'abgelaufene Sitzung → 401');
+            T::eq($status([], ['admin' => 'ja', 'admin_zuletzt' => $jetzt, 'admin_seit' => $jetzt, 'admin_csrf' => $token]), 401, 'nur das Kennzeichen dieser Installation zählt');
+            T::eq($status([], ['admin' => true, 'admin_zuletzt' => $jetzt, 'admin_seit' => $jetzt, 'admin_csrf' => $token]), 401, 'das alte Kennzeichen true zählt nicht mehr');
+            T::eq($status([], ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt - 31 * 60, 'admin_seit' => $jetzt - 31 * 60, 'admin_csrf' => $token]), 401, 'abgelaufene Sitzung → 401');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post', 'HTTP_X_CSRF_TOKEN' => 'kopf'], ['csrf' => 'feld'])['csrf'], 'kopf', 'Token aus X-CSRF-Token vor dem Formularfeld');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post'], ['csrf' => 'feld'])['csrf'], 'feld', 'sonst aus dem Formularfeld csrf');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post'], ['csrf' => ['feld']])['csrf'], '', 'Formularfeld als Liste zählt nicht');
@@ -192,7 +204,7 @@ return (static function (): array {
             T::eq($abbruch(static fn () => $weg(['csrf' => ''], $vorher)->anmelden($passwort)), 403, 'Anmelden ohne CSRF-Token → 403');
             T::eq($n, 0, 'abgewiesen: keine neue Sitzung');
             T::ok(!is_dir($k['ordner'] . '/bremse'), 'abgewiesene Anfragen zählen nicht für die Bremse');
-            $s = ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token, 'anderes' => 1];
+            $s = ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_seit' => $jetzt, 'admin_csrf' => $token, 'anderes' => 1];
             T::eq($abbruch(static fn () => $weg(['methode' => 'GET'], $s)->abmelden()), 405, 'Abmelden per GET → 405');
             T::eq($abbruch(static fn () => $weg(['csrf' => bin2hex(random_bytes(32))], $s)->abmelden()), 403, 'Abmelden mit falschem Token → 403');
             $a = new AdminWeg($k, $anfrage(['csrf' => $token]), $s, $erneuern);

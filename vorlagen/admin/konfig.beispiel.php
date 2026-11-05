@@ -28,6 +28,7 @@ return [
 
     // Abmelden nach so vielen Minuten Untätigkeit.
     'sitzung_minuten' => 30,
+    'sitzung_hoechstens_minuten' => 720,   // spätestens nach 12 Stunden neu anmelden, auch bei laufender Arbeit
 
     // Bremse: höchstens so viele Anmeldeversuche je Adresse im Fenster (Minuten), danach 429.
     'bremse_versuche' => 5,
