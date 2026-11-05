@@ -97,7 +97,7 @@ return (static function (): array {
             T::eq($a->anmelden(''), false, 'leeres Passwort abgelehnt');
             T::eq($a->anmelden($passwort . str_repeat('x', 2000)), false, 'überlanges Passwort abgelehnt');
             T::eq($a->anmelden($passwort), true, 'richtiges Passwort meldet an');
-            T::ok($a->angemeldet() && ($s['admin'] ?? null) === true, 'Sitzungskennzeichen admin gesetzt');
+            T::ok($a->angemeldet() && ($s['admin'] ?? null) === AdminWeg::kennung($k), 'Sitzungskennzeichen admin gesetzt (an diese Installation gebunden)');
             T::ok($id !== 'alte-id', 'neue Sitzungs-ID (session_regenerate_id)');
             T::ok(is_string($s['admin_csrf'] ?? null) && $s['admin_csrf'] !== $token, 'neues CSRF-Token nach der Anmeldung');
             $spaeter = static function (int $sekunden) use ($k, $anfrage, &$s, $erneuern, $jetzt): AdminWeg {
@@ -109,11 +109,42 @@ return (static function (): array {
             T::ok(!isset($s['admin']) && !$spaeter(89 * 60 + 2)->angemeldet(), 'Kennzeichen entfernt, bleibt abgemeldet');
         },
 
+        'Sitzung gehört zur Installation: fremde Seite, neues Passwort, leeres Passwort, eigener Sitzungsordner (Prüfung 3.71.0)' => static function () use ($konfig, $umgebung, $protokoll, $anfrage, $passwort, $jetzt, $nichts, $v, $ohneKommentar): void {
+            $k = $konfig();
+            $s = [];
+            $a = new AdminWeg($k, $anfrage(['csrf' => (new AdminWeg($k, $anfrage(['methode' => 'GET']), $s, $nichts))->csrfToken()]), $s, $nichts);
+            T::ok($a->anmelden($passwort), 'auf Seite A angemeldet');
+            $fremd = $s;
+            $andere = $konfig();   // zweite Kundenseite desselben Servers: eigener Datenordner, sogar dasselbe Passwort
+            T::ok(!(new AdminWeg($andere, $anfrage(['methode' => 'GET']), $fremd, $nichts))->angemeldet(), 'die Sitzung von Seite A gilt auf Seite B nicht');
+            T::ok(!isset($fremd['admin']), 'das fremde Kennzeichen wird dabei entfernt');
+            $neu = $s;
+            $neuesPasswort = ['passwort_hash' => password_hash('anderes-' . $passwort, PASSWORD_BCRYPT, ['cost' => 4])] + $k;
+            T::ok(!(new AdminWeg($neuesPasswort, $anfrage(['methode' => 'GET']), $neu, $nichts))->angemeldet(), 'ein neues Passwort meldet laufende Sitzungen ab');
+            T::ok((new AdminWeg($k, $anfrage(['methode' => 'GET', 'zeit' => $jetzt + 60]), $s, $nichts))->angemeldet(), 'auf Seite A weiter angemeldet');
+            $log = $protokoll(static function () use ($umgebung): void {
+                T::eq(AdminWeg::konfigLaden($umgebung(['passwort_hash' => password_hash('', PASSWORD_BCRYPT, ['cost' => 4])])[0]), null, 'Hash eines leeren Passworts → Admin aus');
+            });
+            T::contains($log, 'Hash eines leeren Passworts', '… mit Grund im Fehlerprotokoll');
+            $b = password_hash($passwort, PASSWORD_BCRYPT, ['cost' => 4]);
+            T::ok(is_array(AdminWeg::konfigLaden($umgebung(['passwort_hash' => '$2b$' . substr($b, 4)])[0])), 'bcrypt-Hash mit $2b$ (andere Werkzeuge) wird angenommen');
+            $quelle = $ohneKommentar((string) file_get_contents("$v/api/_admin.php"));
+            T::contains($quelle, "'save_path' => \$sitzungen", 'Sitzungen im eigenen Ordner der Installation');
+            T::contains($quelle, "\$konfig['ordner'] . '/sitzungen'", '… im Datenordner außerhalb des DocumentRoot');
+        },
+
+        'Bremse zählt IPv6 je /64-Netz und IPv4 in IPv6 wie IPv4 (Prüfung 3.71.0)' => static function (): void {
+            T::eq(AdminWeg::bremsSchluessel('2001:db8::1'), AdminWeg::bremsSchluessel('2001:db8::ffff:2'), 'zwei Adressen aus demselben /64 zählen gemeinsam');
+            T::ok(AdminWeg::bremsSchluessel('2001:db8::1') !== AdminWeg::bremsSchluessel('2001:db8:0:1::1'), 'ein anderes /64 zählt getrennt');
+            T::eq(AdminWeg::bremsSchluessel('::ffff:192.0.2.1'), AdminWeg::bremsSchluessel('192.0.2.1'), 'IPv4 in IPv6 wie IPv4');
+            T::ok(AdminWeg::bremsSchluessel('192.0.2.1') !== AdminWeg::bremsSchluessel('192.0.2.2'), 'IPv4 je Adresse');
+        },
+
         'schreibende Anfrage: nur POST, nur eigene Herkunft, nur mit CSRF-Token, nur angemeldet' => static function () use ($konfig, $anfrage, $abbruch, $nichts, $jetzt): void {
             $k = $konfig(['herkuenfte' => ['https://example.com', 'https://www.example.com']]);
             $token = bin2hex(random_bytes(32));
             $status = static function (array $mehr, ?array $sitzung = null) use ($k, $anfrage, $abbruch, $nichts, $token, $jetzt): int {
-                $s = $sitzung ?? ['admin' => true, 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token];
+                $s = $sitzung ?? ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token];
                 $a = new AdminWeg($k, $anfrage($mehr + ['csrf' => $token]), $s, $nichts);
 
                 return $abbruch(static fn () => $a->verlangeSchreiben());
@@ -135,8 +166,9 @@ return (static function (): array {
             T::eq($status(['csrf' => substr($token, 0, 63)]), 403, 'gekürztes CSRF-Token → 403');
             T::eq($status([], []), 403, 'Sitzung ohne Token → 403');
             T::eq($status([], ['admin_csrf' => $token]), 401, 'nicht angemeldet → 401');
-            T::eq($status([], ['admin' => 'ja', 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token]), 401, 'nur das Kennzeichen true zählt');
-            T::eq($status([], ['admin' => true, 'admin_zuletzt' => $jetzt - 31 * 60, 'admin_csrf' => $token]), 401, 'abgelaufene Sitzung → 401');
+            T::eq($status([], ['admin' => 'ja', 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token]), 401, 'nur das Kennzeichen dieser Installation zählt');
+            T::eq($status([], ['admin' => true, 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token]), 401, 'das alte Kennzeichen true zählt nicht mehr');
+            T::eq($status([], ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt - 31 * 60, 'admin_csrf' => $token]), 401, 'abgelaufene Sitzung → 401');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post', 'HTTP_X_CSRF_TOKEN' => 'kopf'], ['csrf' => 'feld'])['csrf'], 'kopf', 'Token aus X-CSRF-Token vor dem Formularfeld');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post'], ['csrf' => 'feld'])['csrf'], 'feld', 'sonst aus dem Formularfeld csrf');
             T::eq(AdminWeg::anfrageAus(['REQUEST_METHOD' => 'post'], ['csrf' => ['feld']])['csrf'], '', 'Formularfeld als Liste zählt nicht');
@@ -157,7 +189,7 @@ return (static function (): array {
             T::eq($abbruch(static fn () => $weg(['csrf' => ''], $vorher)->anmelden($passwort)), 403, 'Anmelden ohne CSRF-Token → 403');
             T::eq($n, 0, 'abgewiesen: keine neue Sitzung');
             T::ok(!is_dir($k['ordner'] . '/bremse'), 'abgewiesene Anfragen zählen nicht für die Bremse');
-            $s = ['admin' => true, 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token, 'anderes' => 1];
+            $s = ['admin' => AdminWeg::kennung($k), 'admin_zuletzt' => $jetzt, 'admin_csrf' => $token, 'anderes' => 1];
             T::eq($abbruch(static fn () => $weg(['methode' => 'GET'], $s)->abmelden()), 405, 'Abmelden per GET → 405');
             T::eq($abbruch(static fn () => $weg(['csrf' => bin2hex(random_bytes(32))], $s)->abmelden()), 403, 'Abmelden mit falschem Token → 403');
             $a = new AdminWeg($k, $anfrage(['csrf' => $token]), $s, $erneuern);

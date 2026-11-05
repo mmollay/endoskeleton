@@ -268,7 +268,7 @@
                                    "betrag": { "typ": "zeile", "label": "Betrag", "max": 30, "pflicht": true },
                                    "hinweis": { "typ": "zeile", "label": "Hinweis zum Betrag", "max": 60 },
                                    "text": { "typ": "absatz", "label": "Beschreibung", "max": 300 },
-                                   "punkte": { "typ": "liste", "label": "Leistungen", "min": 1, "max": 8, "eintrag": { "typ": "zeile", "label": "Leistung", "max": 120 } },
+                                   "punkte": { "typ": "liste", "label": "Leistungen", "min": 0, "max": 8, "eintrag": { "typ": "zeile", "label": "Leistung", "max": 120 } },
                                    "hervorgehoben": { "typ": "janein", "label": "Hervorgehoben", "standard": false },
                                    "knopf": { "typ": "knopf", "label": "Knopf" } } }
       },

@@ -17,7 +17,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 </div>
 <?php endif ?>
-<ol class="lp-ablauf-liste">
+<ol class="lp-ablauf-liste" role="list">
 <?php foreach ($b['schritte'] as $s): ?>
 <li class="lp-schritt">
 <?php if (trim((string) ($s['zeit'] ?? '')) !== ''): ?>

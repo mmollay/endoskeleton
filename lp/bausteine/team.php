@@ -20,7 +20,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <?php foreach ($b['personen'] as $p): ?>
 <li class="lp-mitglied">
 <?php if (isset($p['bild'])): ?>
-<?= $k->bild($p['bild'], 'lp-mitglied-bild', false, false, 'karte') ?>
+<?= $k->bild($p['bild'], 'lp-mitglied-bild', false, false, 'klein') ?>
 
 <?php endif ?>
 <h3 class="lp-mitglied-name"><?= $k->e($p['name']) ?></h3>

@@ -58,6 +58,15 @@ und ohne Konfiguration antwortet ohnehin jede PHP-Datei mit 404.
 - `X-Forwarded-For` als Adresse der Bremse nehmen, solange kein eigener Proxy davor steht — der Kopf ist frei fälschbar.
 - Inline-Skripte oder `style=`-Attribute: Die Content-Security-Policy verbietet sie, und das soll so bleiben.
 
+## Grenzen
+
+- **Gleiche Herkunft wie die öffentliche Seite:** Herkunftsprüfung, `SameSite` und CSRF-Token schützen gegen *fremde* Seiten. Ein Skript, das auf derselben
+  Herkunft läuft (eingebundenes Fremd-Skript, Werbe- oder Statistik-Code, eine Lücke in der öffentlichen Seite), kann alles, was der angemeldete Admin kann.
+  Lädt die öffentliche Seite fremde Skripte, gehört der Admin auf eine **eigene (Sub-)Domain** (z. B. `admin.example.com`) mit eigener Konfiguration.
+- **Mehrere Seiten auf einem Server:** Jede Seite bekommt ihren **eigenen Datenordner** (`ordner`) und ihre eigene Konfiguration — die Sitzungen liegen in
+  `<ordner>/sitzungen`, das Anmelde-Kennzeichen ist an Datenordner und Passwort gebunden. Zwei Seiten mit demselben Ordner teilen sich Sitzungen und Daten.
+- **Hinter einem Reverse-Proxy** zählt die Bremse alle Besucher gemeinsam (`REMOTE_ADDR`); IPv6 zählt je /64-Netz.
+
 ## Checkliste
 
 - [ ] Konfiguration außerhalb des DocumentRoot, Rechte 600, Pfad per `ADMIN_KONFIG`

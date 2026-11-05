@@ -299,7 +299,7 @@ Varianten: `karten`, `liste` · höchstens 2-mal
 | `angebote[].betrag` | zeile | ja | eine Zeile, ≤ 30 Zeichen |
 | `angebote[].hinweis` | zeile | – | eine Zeile, ≤ 60 Zeichen |
 | `angebote[].text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
-| `angebote[].punkte` | liste | – | 1–8 Einträge (eine Zeile, ≤ 120 Zeichen) |
+| `angebote[].punkte` | liste | – | 0–8 Einträge (eine Zeile, ≤ 120 Zeichen) |
 | `angebote[].hervorgehoben` | janein | – | `true` / `false`; Standard `` |
 | `angebote[].knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 

@@ -63,7 +63,14 @@ final class AdminWeg
             exit;
         }
         set_exception_handler(static function (Throwable $e) use ($json): void { self::abbruchSenden($e, $json); });
+        // Eigener Sitzungsordner je Installation (im Datenordner, außerhalb des DocumentRoot): Sitzungen anderer Seiten desselben Servers
+        // liegen nie im selben Speicher — eine dort vergebene Sitzungs-ID kennt diese Installation nicht (use_strict_mode verwirft sie).
+        $sitzungen = $konfig['ordner'] . '/sitzungen';
+        if (!is_dir($sitzungen) && !@mkdir($sitzungen, 0700) && !is_dir($sitzungen)) { throw new AdminAbbruch(500, 'Sitzung nicht verfügbar.'); }
         session_start([
+            'save_path' => $sitzungen,
+            'gc_probability' => 1,            // eigener Ordner: der Cron der Distribution räumt ihn nicht auf, PHP selbst tut es
+            'gc_divisor' => 100,
             'name' => self::SITZUNG,          // __Host-: nur mit Secure, Path=/ und ohne Domain gültig
             'cookie_lifetime' => 0,
             'cookie_path' => '/',
@@ -133,8 +140,12 @@ final class AdminWeg
         }
         if (!is_array($k)) { return self::ungueltig($datei, 'gibt kein Array zurück'); }
         $hash = $k['passwort_hash'] ?? null;
-        if (!is_string($hash) || !in_array(password_get_info($hash)['algoName'], ['bcrypt', 'argon2i', 'argon2id'], true)) {
+        $bcrypt = is_string($hash) && preg_match('#^\$2[aby]\$\d\d\$[./A-Za-z0-9]{53}$#D', $hash) === 1;   // $2y$ (PHP), $2a$/$2b$ (andere Werkzeuge)
+        if (!is_string($hash) || (!$bcrypt && !in_array(password_get_info($hash)['algoName'], ['argon2i', 'argon2id'], true))) {
             return self::ungueltig($datei, 'passwort_hash fehlt (mit password_hash() erzeugen)');
+        }
+        if (password_verify('', $hash)) {
+            return self::ungueltig($datei, 'passwort_hash ist der Hash eines leeren Passworts');
         }
         $herkuenfte = array_map(static fn (mixed $h): string => is_string($h) ? strtolower(rtrim($h, '/')) : '', (array) ($k['herkuenfte'] ?? []));
         if ($herkuenfte === [] || preg_grep('#^https?://[a-z0-9.-]+(:\d{1,5})?$#D', $herkuenfte, PREG_GREP_INVERT) !== []) {
@@ -162,7 +173,12 @@ final class AdminWeg
     /** Angemeldet und nicht zu lange untätig; jede Prüfung verlängert die Sitzung, eine abgelaufene wird abgemeldet. */
     public function angemeldet(): bool
     {
-        if (($this->sitzung['admin'] ?? false) !== true) { return false; }
+        $marke = $this->sitzung['admin'] ?? null;
+        if (!is_string($marke) || !hash_equals(self::kennung($this->konfig), $marke)) {
+            unset($this->sitzung['admin'], $this->sitzung['admin_zuletzt']);   // fremde Installation, altes Passwort oder Unsinn: abgemeldet
+
+            return false;
+        }
         $zuletzt = $this->sitzung['admin_zuletzt'] ?? null;
         if (!is_int($zuletzt) || $this->anfrage['zeit'] - $zuletzt > $this->konfig['sitzung_minuten'] * 60) {
             unset($this->sitzung['admin'], $this->sitzung['admin_zuletzt']);
@@ -172,6 +188,15 @@ final class AdminWeg
         $this->sitzung['admin_zuletzt'] = $this->anfrage['zeit'];
 
         return true;
+    }
+
+    /**
+     * Das Kennzeichen „angemeldet“ in der Sitzung: gebunden an diese Installation (Datenordner) und an den Passwort-Hash. Eine Sitzung einer
+     * anderen Seite desselben Servers gilt hier nie; ein neues Passwort meldet alle laufenden Sitzungen ab.
+     */
+    public static function kennung(array $konfig): string
+    {
+        return hash_hmac('sha256', 'admin-sitzung|' . $konfig['ordner'], $konfig['passwort_hash']);
     }
 
     /** Das CSRF-Token der Sitzung (zufällig, 32 Byte), für das versteckte Formularfeld „csrf“ und <meta name="csrf-token">. */
@@ -193,10 +218,10 @@ final class AdminWeg
     {
         $this->schreibendPruefen();
         $this->bremsen();
-        if (strlen($passwort) > 1024 || !password_verify($passwort, $this->konfig['passwort_hash'])) { return false; }
+        if ($passwort === '' || strlen($passwort) > 1024 || !password_verify($passwort, $this->konfig['passwort_hash'])) { return false; }
         if (is_file($this->bremsDatei())) { unlink($this->bremsDatei()); }
         ($this->erneuern)();
-        $this->sitzung['admin'] = true;
+        $this->sitzung['admin'] = self::kennung($this->konfig);
         $this->sitzung['admin_zuletzt'] = $this->anfrage['zeit'];
         $this->sitzung['admin_csrf'] = bin2hex(random_bytes(32));
 
@@ -306,7 +331,24 @@ final class AdminWeg
      */
     private function bremsDatei(): string
     {
-        return $this->konfig['ordner'] . '/bremse/' . hash_hmac('sha256', $this->anfrage['ip'], $this->konfig['passwort_hash']) . '.json';
+        return $this->konfig['ordner'] . '/bremse/' . hash_hmac('sha256', self::bremsSchluessel($this->anfrage['ip']), $this->konfig['passwort_hash']) . '.json';
+    }
+
+    /**
+     * Wofür die Bremse zählt: IPv4 je Adresse, IPv6 je /64-Netz (ein Anschluss bekommt meist ein ganzes /64 — sonst wären aus einem Netz
+     * unbegrenzt viele Versuche möglich), IPv4 in IPv6 („::ffff:192.0.2.1“) wie IPv4.
+     */
+    public static function bremsSchluessel(string $ip): string
+    {
+        $bin = @inet_pton($ip);
+        if ($bin === false) {
+            return 'anders:' . $ip;
+        }
+        if (strlen($bin) === 16 && str_starts_with($bin, str_repeat("\0", 10) . "\xff\xff")) {
+            $bin = substr($bin, 12);
+        }
+
+        return strlen($bin) === 4 ? 'v4:' . inet_ntop($bin) : 'v6:' . bin2hex(substr($bin, 0, 8));
     }
 
     private static function innerhalb(string $pfad, string $docroot): bool

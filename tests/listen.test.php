@@ -84,6 +84,11 @@ return [
         [, $x] = $bau($musterbuch('preise--karten'));
         T::eq($x->query('//li[contains(@class,"lp-angebot--hervorgehoben")]')->length, 1, 'genau ein Angebot hervorgehoben');
         T::eq($x->query('//li[contains(@class,"lp-angebot--hervorgehoben")]//a[contains(@class,"lp-knopf")][@href="#start"]')->length, 1, 'Knopf im Angebot');
+        $leer = $musterbuch('preise--liste');
+        $leer['angebote'][0]['punkte'] = [];
+        [$befunde, $x] = $bau($leer);
+        T::eq(H::texte(H::sperrend($befunde)), '', 'leere Liste der Leistungen sperrt nicht (optionales Feld, min 0)');
+        T::eq($x->query('(//li[contains(@class,"lp-angebot")])[1]//ul[contains(@class,"lp-angebot-punkte")]')->length, 0, '… und erzeugt keine leere Liste');
         [, $x] = $bau($musterbuch('zahlen--schlicht'));
         T::eq(array_map(static fn ($n) => $n->textContent, iterator_to_array($x->query('//p[contains(@class,"lp-zahl-wert")]'))), ['6', '90', '12'], 'Zahlen als Text, wie im Bauplan (kein Hochzählen)');
     },
@@ -96,6 +101,10 @@ return [
             $zuViele[$feld] = array_fill(0, $e['felder'][$feld]['max'] + 1, $eintrag);
             [$befunde] = $bau($zuViele);
             T::contains(H::texte($befunde), "bausteine.1.$feld: " . ($e['felder'][$feld]['max'] + 1) . ' Einträge, erlaubt', "$typ: zu viele Einträge sperren");
+            $zuWenige = $b;
+            $zuWenige[$feld] = array_slice($b[$feld], 0, $e['felder'][$feld]['min'] - 1);
+            [$befunde] = $bau($zuWenige);
+            T::contains(H::texte($befunde), "bausteine.1.$feld: " . count($zuWenige[$feld]) . ' Einträge, erlaubt', "$typ: zu wenige Einträge sperren");
             $fremd = $b;
             $fremd[$feld][0]['unbekannt'] = 'x';
             [$befunde] = $bau($fremd);
