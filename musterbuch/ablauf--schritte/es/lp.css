@@ -3915,6 +3915,7 @@ section.lp-abschluss--akzent {
 
 .lp-angebot .lp-knopf {
   margin-top: auto;   /* Knöpfe stehen unten bündig, auch bei verschieden langen Karten */
+  text-decoration: none;   /* ein Knopf, kein Link im Fließtext (.lp-block li a unterstreicht sonst) */
 }
 
 /* ─── ABLAUF ────────────────────────────────────────────────────────────── */
