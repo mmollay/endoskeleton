@@ -27,6 +27,15 @@ Alle Listen sind Pflicht und haben Objekte als Einträge; Text ist reiner Text (
 - **Bilder in Karten:** neue Größe `karte` in `Kontext::GROESSEN` (`(min-width: 48rem) 22rem, 100vw`), große Bilder bekommen wie seit 3.70.0 kleinere Fassungen.
 - **Noch nicht in 3.71.0** (kann ohne Bruch dazukommen): Hochzählen im Zahlenband (eigenes Feld), Schieberegler bei Vorher/Nachher (eigene Variante), feste Anmeldeleiste (`leiste`, Etappe 3), Branchenvorlagen (Etappe 4).
 
+### Added — Vorlage „sicherer Admin-Weg“ (Schritt 2 des Auftrags)
+- **`vorlagen/admin/`** (Anlass: Bei einer Kundenseite stand ein geheimer Schlüssel im öffentlichen JavaScript, mit dem der Admin-Bereich angesprochen wurde). Eine kopierbare Vorlage für Kundenseiten mit Verwaltungsbereich — **kein Schlüssel im Browser und nicht im Code**:
+  - `api/_admin.php` (Bibliothek `AdminWeg`, eine Datei, kein Framework): Anmeldung per POST mit `password_verify` (Argon2id/bcrypt), danach gilt nur die **Server-Sitzung** (`$_SESSION['admin']`, Cookie `__Host-admin` mit `HttpOnly`, `Secure`, `SameSite=Strict`, neue Sitzungs-ID bei An- und Abmeldung, Ablauf nach Untätigkeit). Jede schreibende Anfrage braucht POST (sonst 405), die **eigene Herkunft** — `Origin`, ersatzweise `Referer`, dazu `Sec-Fetch-Site` — und das CSRF-Token der Sitzung (sonst 403), dazu eine Anmeldung (sonst 401). Die Bremse gegen Durchprobieren zählt je Adresse in einem gleitenden Fenster (danach 429 mit `Retry-After`); die IP wird nur als HMAC gespeichert. Jede Antwort trägt `Cache-Control: no-store`, `nosniff`, `Referrer-Policy: same-origin` und eine Content-Security-Policy ohne Inline-Skript und -Stil.
+  - Die Konfiguration (Passwort-Hash, erlaubte Herkünfte, Datenordner, Sitzungsdauer, Bremse) steht **nur außerhalb des DocumentRoot**; ihren Pfad nennt `ADMIN_KONFIG`. Fehlt sie oder ist sie ungültig, antwortet jede Admin-Datei mit 404 — aus, nie offen. Muster: `konfig.beispiel.php` (nur Platzhalter, mit dem Befehl für den Hash).
+  - Beispiele: `admin/index.php` (Anmeldeseite, danach „Text speichern“), `api/aktion.php` (Endpunkt, JSON), `admin/admin.js` (fetch mit `credentials: 'same-origin'` und `X-CSRF-Token` aus `<meta>`).
+  - Gesperrt wird immer per `RedirectMatch 404`, nie mit `Require all denied` (fail2ban sperrt bei „denied“ die aufrufende Adresse): Hilfsdateien `api/_*.php` über `RedirectMatch 404 "/api/_"`; `vorlagen/` antwortet auf skeleton.ssi.at ganz mit 404.
+  - README mit Einbau, Verboten und Checkliste. Tests: `tests/admin.test.php` (187 Prüfungen) — Logik ohne Webserver, dazu ein Durchlauf über `php -S` (404 ohne Konfiguration, Cookie-Flags, Anmeldung, Aktion, Abmeldung); sechs absichtlich eingebaute Fehler (Herkunft, CSRF, Bremse, neue Sitzungs-ID, HttpOnly, 404) lassen die Tests jeweils scheitern.
+  - Offen: echtes Apache ungeprüft (nach dem Ausrollen `curl -I https://skeleton.ssi.at/vorlagen/admin/admin/index.php` → 404 erwartet); die Musterdateien des Fixes für survivaltraining.at waren in dieser Sitzung nicht erreichbar, ein Abgleich steht aus.
+
 ### Changed
 - **Prüfer: Bilder in Listen.** Bildrechte (`freigegeben`, eingebrannter Text) und die Alt-Texte aus dem Bildbestand (Sperrliste, Grenzwörter, Umlaute) gelten jetzt für jedes Feld vom Katalog-Typ `bild` — oben im Baustein **und in Einträgen von Listen** (Pfad z. B. `bausteine.2.personen.1.bild`). Bis 3.70.0 waren es nur die Felder `bild` und `vorschau` oben im Baustein; die bestehenden Bausteine haben genau diese, ihre Befunde sind gleich (alle 27 alten Musterbuch-Seiten: Befunde 3.70.0 = 3.71.0, hell und dunkel).
 
@@ -46,7 +55,7 @@ Alle Listen sind Pflicht und haben Objekte als Einträge; Text ist reiner Text (
 `lp-vergleich`, `lp-vergleich--nebeneinander`, `lp-vergleich-text`, `lp-vergleich-liste`, `lp-paar`, `lp-paar-bilder`, `lp-paar-bild`, `lp-paar-marke`, `lp-paar-beschriftung`.
 
 ### Neue Dateien
-`lp/bausteine/{preise,ablauf,zahlen,team,zeiten,referenzen,vergleich}.php`, `lp/musterbuch/<typ>--<variante>.json` (13), `musterbuch/<typ>--<variante>/` (13), `tests/listen.test.php`.
+`lp/bausteine/{preise,ablauf,zahlen,team,zeiten,referenzen,vergleich}.php`, `lp/musterbuch/<typ>--<variante>.json` (13), `musterbuch/<typ>--<variante>/` (13), `tests/listen.test.php`, `vorlagen/.htaccess`, `vorlagen/admin/` (README, `.htaccess`, `konfig.beispiel.php`, `api/_admin.php`, `api/aktion.php`, `admin/index.php`, `admin/admin.js`), `tests/admin.test.php`.
 
 ### Rückweg
 Den Zweig nicht zusammenführen oder die Zusammenführung zurücknehmen. Seiten mit Marke 3.70.0 bauen weiter mit ihrem Stand; eine Seite mit einem der neuen Bausteine braucht 3.71.0 (ältere Stände lehnen den unbekannten Typ beim Bau ab).
