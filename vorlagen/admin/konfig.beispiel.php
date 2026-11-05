@@ -7,10 +7,10 @@
  *     SetEnv ADMIN_KONFIG /home/KONTO/admin-konfig.php
  * Solange die Datei fehlt oder ungültig ist (etwa mit dem Platzhalter unten), antworten alle Admin-Dateien mit 404.
  *
- * Passwort-Hash erzeugen — das Passwort wird verdeckt abgefragt und landet weder im Shell-Verlauf noch in der Prozessliste:
- *     read -rs PW && printf %s "$PW" | php -r 'echo password_hash(stream_get_contents(STDIN), PASSWORD_ARGON2ID), PHP_EOL;'; unset PW
- * Kurzform (das Passwort steht dann im Shell-Verlauf):
- *     php -r 'echo password_hash("DAS-PASSWORT", PASSWORD_ARGON2ID), PHP_EOL;'
+ * Passwort-Hash erzeugen (bash) — das Passwort wird verdeckt abgefragt, Leerzeichen am Rand bleiben erhalten, eine leere Eingabe bricht ab,
+ * und es landet weder im Shell-Verlauf noch in der Prozessliste:
+ *     IFS= read -rsp 'Passwort: ' PW && echo && [ -n "$PW" ] && printf %s "$PW" | php -r 'echo password_hash(stream_get_contents(STDIN), PASSWORD_ARGON2ID), PHP_EOL;'; unset PW
+ * Keine Kurzform mit dem Passwort im Befehl: in php -r "…" verfälscht PHP $ und \ im Passwort, und es stünde im Shell-Verlauf.
  * Kennt das PHP des Servers kein Argon2id, PASSWORD_DEFAULT (bcrypt) nehmen. Den Hash in einfache Anführungszeichen setzen ($ im Hash).
  */
 

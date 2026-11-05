@@ -109,7 +109,7 @@ return (static function (): array {
             T::ok(!isset($s['admin']) && !$spaeter(89 * 60 + 2)->angemeldet(), 'Kennzeichen entfernt, bleibt abgemeldet');
         },
 
-        'Sitzung gehört zur Installation: fremde Seite, neues Passwort, leeres Passwort, eigener Sitzungsordner (Prüfung 3.71.0)' => static function () use ($konfig, $umgebung, $protokoll, $anfrage, $passwort, $jetzt, $nichts, $v, $ohneKommentar): void {
+        'Sitzung gehört zur Installation: fremde Seite, neues Passwort, leeres Passwort, eigener Sitzungsordner (Prüfung 3.71.0)' => static function () use ($konfig, $umgebung, $anfrage, $passwort, $jetzt, $nichts, $v, $ohneKommentar): void {
             $k = $konfig();
             $s = [];
             $a = new AdminWeg($k, $anfrage(['csrf' => (new AdminWeg($k, $anfrage(['methode' => 'GET']), $s, $nichts))->csrfToken()]), $s, $nichts);
@@ -122,10 +122,13 @@ return (static function (): array {
             $neuesPasswort = ['passwort_hash' => password_hash('anderes-' . $passwort, PASSWORD_BCRYPT, ['cost' => 4])] + $k;
             T::ok(!(new AdminWeg($neuesPasswort, $anfrage(['methode' => 'GET']), $neu, $nichts))->angemeldet(), 'ein neues Passwort meldet laufende Sitzungen ab');
             T::ok((new AdminWeg($k, $anfrage(['methode' => 'GET', 'zeit' => $jetzt + 60]), $s, $nichts))->angemeldet(), 'auf Seite A weiter angemeldet');
-            $log = $protokoll(static function () use ($umgebung): void {
-                T::eq(AdminWeg::konfigLaden($umgebung(['passwort_hash' => password_hash('', PASSWORD_BCRYPT, ['cost' => 4])])[0]), null, 'Hash eines leeren Passworts → Admin aus');
-            });
-            T::contains($log, 'Hash eines leeren Passworts', '… mit Grund im Fehlerprotokoll');
+            // Hash eines leeren Passworts (bloßes Enter beim Erzeugen): niemand kommt hinein — das leere Passwort lehnt anmelden() immer ab
+            // (keine Prüfung in konfigLaden(): die liefe bei jeder Anfrage und kostete je nach Hash bis zu einer Viertelsekunde)
+            $leer = $konfig(['passwort_hash' => password_hash('', PASSWORD_BCRYPT, ['cost' => 4])]);
+            $sl = [];
+            $tok = (new AdminWeg($leer, $anfrage(['methode' => 'GET']), $sl, $nichts))->csrfToken();
+            T::eq((new AdminWeg($leer, $anfrage(['csrf' => $tok]), $sl, $nichts))->anmelden(''), false, 'Hash eines leeren Passworts: leeres Passwort abgelehnt');
+            T::ok(!isset($sl['admin']), '… und nicht angemeldet');
             $b = password_hash($passwort, PASSWORD_BCRYPT, ['cost' => 4]);
             T::ok(is_array(AdminWeg::konfigLaden($umgebung(['passwort_hash' => '$2b$' . substr($b, 4)])[0])), 'bcrypt-Hash mit $2b$ (andere Werkzeuge) wird angenommen');
             $quelle = $ohneKommentar((string) file_get_contents("$v/api/_admin.php"));

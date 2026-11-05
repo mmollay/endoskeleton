@@ -144,9 +144,6 @@ final class AdminWeg
         if (!is_string($hash) || (!$bcrypt && !in_array(password_get_info($hash)['algoName'], ['argon2i', 'argon2id'], true))) {
             return self::ungueltig($datei, 'passwort_hash fehlt (mit password_hash() erzeugen)');
         }
-        if (password_verify('', $hash)) {
-            return self::ungueltig($datei, 'passwort_hash ist der Hash eines leeren Passworts');
-        }
         $herkuenfte = array_map(static fn (mixed $h): string => is_string($h) ? strtolower(rtrim($h, '/')) : '', (array) ($k['herkuenfte'] ?? []));
         if ($herkuenfte === [] || preg_grep('#^https?://[a-z0-9.-]+(:\d{1,5})?$#D', $herkuenfte, PREG_GREP_INVERT) !== []) {
             return self::ungueltig($datei, 'herkuenfte: Liste wie [\'https://example.com\'] — Schema und Host, ohne Pfad');
