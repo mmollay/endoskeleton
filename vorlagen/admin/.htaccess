@@ -1,0 +1,7 @@
+# Admin-Weg (Vorlage aus dem SSI Endoskeleton): diese Zeilen gehören in die .htaccess der Kundenseite (Wurzel) — ergänzen, nicht ersetzen.
+# Gesperrtes antwortet mit 404 (RedirectMatch), nie mit „Require all denied" — fail2ban sperrt bei „denied" die aufrufende Adresse.
+# Hilfsdateien heißen api/_*.php und sind von außen nie erreichbar; die Musterkonfiguration gehört gar nicht in den DocumentRoot.
+RedirectMatch 404 "/api/_"
+RedirectMatch 404 "(?i)/konfig\.beispiel\.php$"
+# Pfad der Konfiguration (außerhalb des DocumentRoot), hier oder im vhost:
+# SetEnv ADMIN_KONFIG /home/KONTO/admin-konfig.php
