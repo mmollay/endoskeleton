@@ -16,12 +16,12 @@ if ($b['variante'] === 'bild-rechts' && isset($b['bild'])) {
 <div class="lp-block-innen container">
 <div class="lp-hero-text">
 <?php if (($b['dachzeile'] ?? '') !== ''): ?>
-<p class="lp-hero-dachzeile"><?= $k->e($b['dachzeile']) ?></p>
+<p class="lp-hero-dachzeile"<?= $k->feld($nr, 'dachzeile') ?>><?= $k->e($b['dachzeile']) ?></p>
 <?php endif ?>
-<h1 class="lp-hero-titel" id="<?= $titelId ?>"<?= $k->groesse($b['titel']) ?>><?= $k->e($b['titel']) ?></h1>
-<?= $k->absaetze($b['text'] ?? '') ?>
+<h1 class="lp-hero-titel" id="<?= $titelId ?>"<?= $k->groesse($b['titel']) ?><?= $k->feld($nr, 'titel') ?>><?= $k->e($b['titel']) ?></h1>
+<?= $k->absaetze($b['text'] ?? '', feld: $k->feld($nr, 'text')) ?>
 
-<?= isset($b['knopf']) ? $k->knopf($b['knopf']) : '' ?>
+<?= isset($b['knopf']) ? $k->knopf($b['knopf'], $k->feld($nr, 'knopf.text')) : '' ?>
 
 </div>
 <?php if ($video !== null): ?>

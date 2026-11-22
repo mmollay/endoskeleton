@@ -22,11 +22,11 @@ $mitBild = $b['variante'] === 'bild-links' && isset($b['bild']);
 
 <?php endif ?>
 <div class="lp-person-text">
-<p class="lp-person-name"><?= $k->e((string) ($b['name'] ?? '')) ?></p>
+<p class="lp-person-name"<?= $k->feld($nr, 'name') ?>><?= $k->e((string) ($b['name'] ?? '')) ?></p>
 <?php if (($b['rolle'] ?? '') !== ''): ?>
-<p class="lp-person-rolle"><?= $k->e($b['rolle']) ?></p>
+<p class="lp-person-rolle"<?= $k->feld($nr, 'rolle') ?>><?= $k->e($b['rolle']) ?></p>
 <?php endif ?>
-<?= $k->absaetze($b['text'] ?? '') ?>
+<?= $k->absaetze($b['text'] ?? '', feld: $k->feld($nr, 'text')) ?>
 
 </div>
 </div>

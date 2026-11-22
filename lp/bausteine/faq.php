@@ -8,11 +8,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <?= $k->titel($nr, $b['titel']) ?>
 
 <div class="lp-faq-liste">
-<?php foreach ($b['fragen'] as $f): ?>
+<?php foreach ($b['fragen'] as $i => $f): ?>
 <details class="lp-faq-frage">
-<summary><?= $k->e($f['frage']) ?></summary>
+<summary<?= $k->feld($nr, "fragen.$i.frage") ?>><?= $k->e($f['frage']) ?></summary>
 <div class="lp-faq-antwort">
-<?= $k->absaetze($f['antwort']) ?>
+<?= $k->absaetze($f['antwort'], feld: $k->feld($nr, "fragen.$i.antwort")) ?>
 
 </div>
 </details>

@@ -16,12 +16,12 @@ if (trim((string) ($b['text'] ?? '')) === '') {
 <div class="lp-block-innen container">
 <div class="lp-hinweis-kasten">
 <?php if (trim((string) ($b['kennzeichnung'] ?? '')) !== ''): ?>
-<p class="lp-hinweis-kennzeichnung"><?= $k->e($b['kennzeichnung']) ?></p>
+<p class="lp-hinweis-kennzeichnung"<?= $k->feld($nr, 'kennzeichnung') ?>><?= $k->e($b['kennzeichnung']) ?></p>
 <?php endif ?>
 <?= $k->titel($nr, $b['titel']) ?>
 
 <div class="lp-hinweis-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 </div>

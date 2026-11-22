@@ -13,12 +13,12 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 <?php if (trim((string) ($b['text'] ?? '')) !== ''): ?>
 <div class="lp-vergleich-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
 <ul class="lp-vergleich-liste" role="list">
-<?php foreach ($b['paare'] as $paar): ?>
+<?php foreach ($b['paare'] as $i => $paar): ?>
 <li>
 <figure class="lp-paar">
 <div class="lp-paar-bilder">
@@ -34,7 +34,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 </div>
 </div>
 <?php if (trim((string) ($paar['beschriftung'] ?? '')) !== ''): ?>
-<figcaption class="lp-paar-beschriftung"><?= $k->e($paar['beschriftung']) ?></figcaption>
+<figcaption class="lp-paar-beschriftung"<?= $k->feld($nr, "paare.$i.beschriftung") ?>><?= $k->e($paar['beschriftung']) ?></figcaption>
 <?php endif ?>
 </figure>
 </li>

@@ -12,10 +12,10 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <?= $k->titel($nr, $b['titel']) ?>
 
 <ul class="lp-zahlen-liste" role="list">
-<?php foreach ($b['eintraege'] as $z): ?>
+<?php foreach ($b['eintraege'] as $i => $z): ?>
 <li class="lp-zahl">
-<p class="lp-zahl-wert"><?= $k->e($z['wert']) ?></p>
-<p class="lp-zahl-beschriftung"><?= $k->e($z['beschriftung']) ?></p>
+<p class="lp-zahl-wert"<?= $k->feld($nr, "eintraege.$i.wert") ?>><?= $k->e($z['wert']) ?></p>
+<p class="lp-zahl-beschriftung"<?= $k->feld($nr, "eintraege.$i.beschriftung") ?>><?= $k->e($z['beschriftung']) ?></p>
 </li>
 <?php endforeach ?>
 </ul>

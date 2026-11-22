@@ -12,24 +12,24 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 <?php if (trim((string) ($b['text'] ?? '')) !== ''): ?>
 <div class="lp-team-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
 <ul class="lp-team-liste" role="list">
-<?php foreach ($b['personen'] as $p): ?>
+<?php foreach ($b['personen'] as $i => $p): ?>
 <li class="lp-mitglied">
 <?php if (isset($p['bild'])): ?>
 <?= $k->bild($p['bild'], 'lp-mitglied-bild', false, false, 'klein') ?>
 
 <?php endif ?>
-<h3 class="lp-mitglied-name"><?= $k->e($p['name']) ?></h3>
+<h3 class="lp-mitglied-name"<?= $k->feld($nr, "personen.$i.name") ?>><?= $k->e($p['name']) ?></h3>
 <?php if (trim((string) ($p['rolle'] ?? '')) !== ''): ?>
-<p class="lp-mitglied-rolle"><?= $k->e($p['rolle']) ?></p>
+<p class="lp-mitglied-rolle"<?= $k->feld($nr, "personen.$i.rolle") ?>><?= $k->e($p['rolle']) ?></p>
 <?php endif ?>
 <?php if (trim((string) ($p['text'] ?? '')) !== ''): ?>
 <div class="lp-mitglied-text">
-<?= $k->absaetze($p['text']) ?>
+<?= $k->absaetze($p['text'], feld: $k->feld($nr, "personen.$i.text")) ?>
 
 </div>
 <?php endif ?>

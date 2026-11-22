@@ -38,9 +38,9 @@ final class Text
     }
 
     /** Leerzeile = neuer Absatz, Zeilenumbruch = <br>. $klasse (optional) steht an jedem Absatz; $hosts und $mails machen Adressen zu Links (siehe inline). */
-    public static function absaetze(string $s, string $klasse = '', array $hosts = [], bool $mails = false): string
+    public static function absaetze(string $s, string $klasse = '', array $hosts = [], bool $mails = false, string $feld = ''): string
     {
-        $p = $klasse !== '' ? '<p class="' . self::e($klasse) . '">' : '<p>';
+        $p = ($klasse !== '' ? '<p class="' . self::e($klasse) . '"' : '<p') . $feld . '>';   // $feld: Markierung (Kontext::feld) an jedem Absatz — mehrere Absätze, derselbe Pfad
         $aus = [];
         foreach (preg_split('/\n[ \t]*\n/', str_replace("\r\n", "\n", $s)) ?: [] as $absatz) {
             $zeilen = array_values(array_filter(array_map('trim', explode("\n", $absatz)), static fn (string $z): bool => $z !== ''));

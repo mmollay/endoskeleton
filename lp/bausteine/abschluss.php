@@ -9,11 +9,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 <?php if (($b['text'] ?? '') !== ''): ?>
 <div class="lp-abschluss-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
-<?= $k->knopf($b['knopf']) ?>
+<?= $k->knopf($b['knopf'], $k->feld($nr, 'knopf.text')) ?>
 
 </div>
 </section>

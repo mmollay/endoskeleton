@@ -7,11 +7,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <div class="lp-block-innen container">
 <?= $k->titel($nr, $b['titel']) ?>
 
-<?= $k->absaetze($b['text'] ?? '') ?>
+<?= $k->absaetze($b['text'] ?? '', feld: $k->feld($nr, 'text')) ?>
 
 <ul class="lp-themen-liste" role="list">
-<?php foreach ($b['punkte'] as $punkt): ?>
-<li class="lp-themen-punkt"><?= $k->inline($punkt) ?></li>
+<?php foreach ($b['punkte'] as $i => $punkt): ?>
+<li class="lp-themen-punkt"<?= $k->feld($nr, "punkte.$i") ?>><?= $k->inline($punkt) ?></li>
 <?php endforeach ?>
 </ul>
 </div>

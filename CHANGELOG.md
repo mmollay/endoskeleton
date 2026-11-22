@@ -4,6 +4,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.74.0] — 2026-11-22
+
+Feld-Markierung für „Direkt im Bild bearbeiten“ (Auftrag der Panel-Instanz, Martin: „Ja, sauber umbauen“): Das Panel fand Texte im Bild bisher
+nur über ihren Wortlaut — zwei Knöpfe mit gleichem Text („Schütze Deine Lieblinge — jetzt anmelden“ oben und im Formular) ließen sich nicht
+auseinanderhalten. **Im Bau mit `--felder` trägt jedes Textstück aus einem Feld des Bauplans seinen Pfad.** Ohne `--felder` baut jede Seite
+Byte für Byte wie bisher (Musterbuch unverändert); ausgeliefert wird immer ohne.
+
+### Added — Schalter `--felder` für `lp/bauen.php` und `lp/pruefen.php`
+- Attribut `data-lp-feld="bausteine.<Stelle>.<pfad>"` an jedem Element, dessen Text aus genau einem Feld kommt: Dachzeile, Titel, Absätze
+  (jeder Absatz eines Textes trägt denselben Pfad), Knöpfe (`knopf.text` am Link, `knopf_text` am Formular-Knopf), Ort, Text ohne Termin,
+  Dank nach dem Absenden, Frage über dem freien Textfeld (nur mit eigenem Wert), Punktelisten je Eintrag (`punkte.2`), Fragen und Antworten,
+  Personen, Schritte, Zeiten, Angebote, Paare, Zahlen. Nichts aus `meta` und nichts aus dem Profil.
+- Die Markierung ist nur ein Wegweiser: Wer schreiben darf und welcher Pfad gilt, entscheidet allein das Panel.
+- `pruefen.php --felder` vergleicht mit dem markierten Bau; ohne `--felder` sperrt die Prüfung einen markierten Ordner („nicht auf dem Stand
+  ihres Bauplans“) — ein markierter Bau geht so nie versehentlich hinaus.
+- `Kontext::feld()`, `Text::absaetze(..., feld:)`, `Bauer::bauen(..., felder:)`, `Pruefer::pruefen(..., felder:)`, `Cli::schalter()`.
+- Test `feldmarkierung` (FM01–FM05).
+
+---
+
 ## [3.73.0] — 2026-11-22
 
 Meta-Pixel mit Einwilligung (Auftrag der Panel-Instanz, von Martin entschieden): **eine Landingpage kann das Meta-Pixel nutzen — geladen wird es

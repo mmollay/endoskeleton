@@ -42,9 +42,9 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <div class="lp-block-innen container">
 <?= $k->titel($nr, $b['titel']) ?>
 
-<?= $k->absaetze($b['text'] ?? '') ?>
+<?= $k->absaetze($b['text'] ?? '', feld: $k->feld($nr, 'text')) ?>
 
-<?= $k->absaetze($b['danach'] ?? '', 'lp-anmeldung-danach', true) ?>
+<?= $k->absaetze($b['danach'] ?? '', 'lp-anmeldung-danach', true, feld: $k->feld($nr, 'danach')) ?>
 <form class="lp-formular" method="post"<?= $ziel !== '' ? ' action="' . $k->e($ziel) . '"' : '' ?>>
 <?php if ($ziel === ''): ?>
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>
@@ -67,7 +67,7 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <?php endforeach ?>
 <?php if ($freifeld): ?>
 <div class="lp-feld lp-freifeld">
-<label for="lp-f-anliegen"><?= $k->e($frage) ?> <span class="lp-freiwillig">(freiwillig)</span></label>
+<label for="lp-f-anliegen"<?= trim((string) ($b['freifeld_frage'] ?? '')) !== '' ? $k->feld($nr, 'freifeld_frage') : '' ?>><?= $k->e($frage) ?> <span class="lp-freiwillig">(freiwillig)</span></label>
 <textarea id="lp-f-anliegen" name="anliegen" rows="4" maxlength="1000" aria-describedby="lp-f-anliegen-hinweis"></textarea>
 <p class="lp-freifeld-hinweis" id="lp-f-anliegen-hinweis">Höchstens 1000 Zeichen.</p>
 </div>
@@ -92,12 +92,12 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <?php if ($newsletterText !== ''): ?>
 <input type="hidden" name="newsletter_kurz" value="<?= substr(hash('sha256', $newsletterText), 0, 12) ?>">
 <?php endif ?>
-<button type="submit" class="btn btn-primary lp-knopf"><?= $k->e($b['knopf_text']) ?></button>
+<button type="submit" class="btn btn-primary lp-knopf"<?= $k->feld($nr, 'knopf_text') ?>><?= $k->e($b['knopf_text']) ?></button>
 </fieldset>
 <?php if ($ziel !== ''): ?>
 <noscript><p class="lp-anmeldung-hinweis"><?= $k->e($k->du('Nach dem Absenden bekommst du eine E-Mail von uns. Kommt keine an, schau bitte im Spam-Ordner nach und versuche es sonst noch einmal.', 'Nach dem Absenden bekommen Sie eine E-Mail von uns. Kommt keine an, sehen Sie bitte im Spam-Ordner nach und versuchen Sie es sonst noch einmal.')) ?></p></noscript>
 <?php endif ?>
-<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><span class="lp-anmeldung-danke-text"><?= $mail($b['danke']) ?></span> <span class="lp-anmeldung-danke-nachsatz"><?= $mail($k->du('Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.')) ?></span></p>
+<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><span class="lp-anmeldung-danke-text"<?= $k->feld($nr, 'danke') ?>><?= $mail($b['danke']) ?></span> <span class="lp-anmeldung-danke-nachsatz"><?= $mail($k->du('Falls du schon angemeldet warst, bekommst du keine neue E-Mail.', 'Falls Sie schon angemeldet waren, bekommen Sie keine neue E-Mail.')) ?></span></p>
 </form>
 </div>
 </section>

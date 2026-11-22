@@ -11,16 +11,16 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <?= $k->titel($nr, $b['titel']) ?>
 
 <dl class="lp-zeiten-liste">
-<?php foreach ($b['zeilen'] as $z): ?>
+<?php foreach ($b['zeilen'] as $i => $z): ?>
 <div>
-<dt class="lp-zeiten-tage"><?= $k->e($z['tage']) ?></dt>
-<dd class="lp-zeiten-zeit"><?= $k->e($z['zeit']) ?></dd>
+<dt class="lp-zeiten-tage"<?= $k->feld($nr, "zeilen.$i.tage") ?>><?= $k->e($z['tage']) ?></dt>
+<dd class="lp-zeiten-zeit"<?= $k->feld($nr, "zeilen.$i.zeit") ?>><?= $k->e($z['zeit']) ?></dd>
 </div>
 <?php endforeach ?>
 </dl>
 <?php if (trim((string) ($b['hinweis'] ?? '')) !== ''): ?>
 <div class="lp-zeiten-hinweis">
-<?= $k->absaetze($b['hinweis']) ?>
+<?= $k->absaetze($b['hinweis'], feld: $k->feld($nr, 'hinweis')) ?>
 
 </div>
 <?php endif ?>

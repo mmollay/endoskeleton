@@ -35,9 +35,10 @@ final class Pruefer
     }
 
     /** @return list<Befund> */
-    public static function pruefen(string $seite, ?string $heute = null, ?string $endo = null): array
+    /** @param bool $felder der Ordner ist mit --felder gebaut (3.74.0, Vorschau des Panels): verglichen wird mit diesem Bau */
+    public static function pruefen(string $seite, ?string $heute = null, ?string $endo = null, bool $felder = false): array
     {
-        $bau = Bauer::bauen($seite, false, $endo);
+        $bau = Bauer::bauen($seite, false, $endo, $felder);
         if (Befund::sperrt($bau->befunde)) {
             return $bau->befunde;
         }

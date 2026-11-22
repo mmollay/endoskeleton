@@ -14,7 +14,7 @@ $titel = (string) $b['titel'];
 
 <?php if ($b['variante'] === 'mit-text'): ?>
 <div class="lp-video-text">
-<?= $k->absaetze($b['text'] ?? '') ?>
+<?= $k->absaetze($b['text'] ?? '', feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>

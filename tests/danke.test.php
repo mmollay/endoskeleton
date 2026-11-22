@@ -22,7 +22,7 @@ $regel = static function (string $css, string $selektor): ?string {
 return [
     'die Meldung ist ein <p> mit zwei Spannen, E-Mail bleibt zusammen' => static function (): void {
         $quelle = (string) file_get_contents(H::wurzel() . '/lp/bausteine/anmeldung.php');
-        T::ok(preg_match('~<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><span class="lp-anmeldung-danke-text">.*?</span> <span class="lp-anmeldung-danke-nachsatz">.*?</span></p>~s', $quelle) === 1,
+        T::ok(preg_match('~<p class="lp-anmeldung-danke" role="status" tabindex="-1" hidden><span class="lp-anmeldung-danke-text"(?:<\?= \$k->feld\(\$nr, \'danke\'\) \?>)?>.*?</span> <span class="lp-anmeldung-danke-nachsatz">.*?</span></p>~s', $quelle) === 1,
             'der Baustein: <p class="lp-anmeldung-danke" role="status" …> mit den Spannen -text und -nachsatz (Leerzeichen dazwischen, damit der Text derselbe bleibt)');
         T::contains($quelle, "str_replace('E-Mail', '<span class=\"lp-ohne-umbruch\">E-Mail</span>', \$k->e(\$t))", '„E-Mail“ wird erst NACH dem Maskieren umhüllt — der Text selbst bleibt maskiert');
     },

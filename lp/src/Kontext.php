@@ -29,8 +29,19 @@ final class Kontext
     /** @var array<string, string> Zielpfad im Seitenordner (es/groessen/…) => erzeugte Bytes (kleinere Fassungen der Bilder, 3.70.0) */
     public array $erzeugt = [];
 
-    public function __construct(public readonly Profil $profil, public readonly array $meta, private readonly string $seite)
+    /** $felder (3.74.0): Bau für „Direkt im Bild bearbeiten“ — feld() markiert dann jedes Textstück mit seinem Pfad im Bauplan. */
+    public function __construct(public readonly Profil $profil, public readonly array $meta, private readonly string $seite, public readonly bool $felder = false)
     {
+    }
+
+    /**
+     * Die Markierung eines Textstücks mit seinem Feld (3.74.0): ` data-lp-feld="bausteine.<Stelle im Bauplan>.<pfad>"` — nur im Bau mit --felder, den das Panel
+     * für seine Vorschau nutzt; sonst leer, die Seite bleibt Byte für Byte gleich. $nr ist die Nummer des Abschnitts (Stelle + 1), $pfad der Weg im Baustein
+     * (Punktelisten je Eintrag: „punkte.2“). Die Markierung ist nur ein Wegweiser, nie eine Erlaubnis: Was bearbeitet werden darf, entscheidet das Panel.
+     */
+    public function feld(int $nr, string $pfad): string
+    {
+        return $this->felder ? ' data-lp-feld="' . $this->e('bausteine.' . ($nr - 1) . '.' . $pfad) . '"' : '';
     }
 
     public function e(string $s): string
@@ -48,9 +59,9 @@ final class Kontext
      * Fließtext in Absätzen: wie inline(), dazu Leerzeile = neuer Absatz. Die einzige Stelle, an der die Hostliste in die Bausteine kommt.
      * $mails (3.72.0): jede Mailadresse nach strengem Muster wird ein mailto:-Link, auch auf fremde Domains (Text::inline) — nur für „danach“.
      */
-    public function absaetze(?string $s, string $klasse = '', bool $mails = false): string
+    public function absaetze(?string $s, string $klasse = '', bool $mails = false, string $feld = ''): string
     {
-        return Text::absaetze((string) $s, $klasse, $this->profil->hosts(), $mails);
+        return Text::absaetze((string) $s, $klasse, $this->profil->hosts(), $mails, $feld);
     }
 
     /** Text je nach Anrede des Profils. */
@@ -88,7 +99,7 @@ final class Kontext
 
     public function titel(int $nr, string $text): string
     {
-        return '<h2 class="lp-titel" id="' . $this->id($nr, 'titel') . '">' . $this->e($text) . '</h2>';
+        return '<h2 class="lp-titel" id="' . $this->id($nr, 'titel') . '"' . $this->feld($nr, 'titel') . '>' . $this->e($text) . '</h2>';
     }
 
     /**
@@ -148,9 +159,10 @@ final class Kontext
         return [$src, $alt, $mass, $quelle];
     }
 
-    public function knopf(array $knopf): string
+    /** $feld: die Markierung seines Textes (feld()), leer ohne --felder. */
+    public function knopf(array $knopf, string $feld = ''): string
     {
-        return '<a class="btn btn-primary lp-knopf" href="' . $this->e((string) $knopf['ziel']) . '">' . $this->e((string) $knopf['text']) . '</a>';
+        return '<a class="btn btn-primary lp-knopf" href="' . $this->e((string) $knopf['ziel']) . '"' . $feld . '>' . $this->e((string) $knopf['text']) . '</a>';
     }
 
     /**

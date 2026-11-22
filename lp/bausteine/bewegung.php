@@ -17,13 +17,13 @@ $beschriftung = $k->id($nr, 'beschriftung');
 
 <?php if (!empty($b['text'])): ?>
 <div class="lp-bewegung-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
 <figure class="lp-bewegung-figur" data-lp-bewegung="<?= $k->e($b['bewegung']) ?>" data-lp-stil="<?= $k->e($b['stil'] ?? 'silhouette') ?>"<?= ($b['stil'] ?? '') === 'figur' ? ' data-lp-ausdruck="' . $k->e($b['ausdruck'] ?? 'neutral') . '"' : '' ?><?= ($b['requisit'] ?? '') === 'stab' ? ' data-lp-requisit="stab" data-lp-hand="' . $k->e($b['hand'] ?? 'rechts') . '" data-lp-laenge="' . $k->e($b['laenge'] ?? 'mittel') . '"' : '' ?> data-lp-modus="<?= $k->e($b['variante']) ?>">
 <canvas width="<?= $d['breite'] ?>" height="<?= $d['hoehe'] ?>" role="img" tabindex="0" aria-labelledby="<?= $beschriftung ?>"></canvas>
-<figcaption class="lp-bewegung-beschriftung" id="<?= $beschriftung ?>"><?= $k->e($b['alt']) ?></figcaption>
+<figcaption class="lp-bewegung-beschriftung" id="<?= $beschriftung ?>"<?= $k->feld($nr, 'alt') ?>><?= $k->e($b['alt']) ?></figcaption>
 </figure>
 <div class="lp-bewegung-leiste" data-lp-b="steuerung" role="group" aria-label="Steuerung der Bewegung" hidden>
 <button type="button" class="btn btn-secondary" data-lp-b="pause" data-an="Pause" data-aus="Abspielen">Pause</button>
@@ -41,7 +41,7 @@ $beschriftung = $k->id($nr, 'beschriftung');
 <p class="lp-bewegung-hinweis"><?= $k->du('Das Kamerabild bleibt auf deinem Gerät und wird nicht gespeichert oder übertragen. Die Kamera schaltet sich erst nach deinem Klick ein; die Körperpunkte einer Aufnahme bleiben im Arbeitsspeicher, bis du sie selbst als Datei sicherst.',
     'Das Kamerabild bleibt auf Ihrem Gerät und wird nicht gespeichert oder übertragen. Die Kamera schaltet sich erst nach Ihrem Klick ein; die Körperpunkte einer Aufnahme bleiben im Arbeitsspeicher, bis Sie sie selbst als Datei sichern.') ?></p>
 <div class="lp-bewegung-leiste" role="group" aria-label="Kamera und Aufnahme">
-<button type="button" class="btn btn-primary" data-lp-b="kamera" data-an="Kamera ausschalten" data-aus="<?= $k->e($b['knopf_text'] ?? 'Kamera starten') ?>"><?= $k->e($b['knopf_text'] ?? 'Kamera starten') ?></button>
+<button type="button" class="btn btn-primary" data-lp-b="kamera" data-an="Kamera ausschalten" data-aus="<?= $k->e($b['knopf_text'] ?? 'Kamera starten') ?>"<?= isset($b['knopf_text']) ? $k->feld($nr, 'knopf_text') : '' ?>><?= $k->e($b['knopf_text'] ?? 'Kamera starten') ?></button>
 <label class="lp-bewegung-wahl" hidden>Darstellung
 <select data-lp-b="bild">
 <option value="kamera">Skelett über dem Kamerabild</option>

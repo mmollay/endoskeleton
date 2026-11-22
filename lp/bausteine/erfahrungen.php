@@ -8,11 +8,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 <?= $k->titel($nr, $b['titel']) ?>
 
 <ul class="lp-erfahrungen-liste" role="list">
-<?php foreach ($b['eintraege'] as $e): $wer = $e['name'] . (($e['ort'] ?? '') !== '' ? ', ' . $e['ort'] : ''); ?>
+<?php foreach ($b['eintraege'] as $i => $e): $wer = $e['name'] . (($e['ort'] ?? '') !== '' ? ', ' . $e['ort'] : ''); ?>
 <li>
 <figure class="lp-erfahrung">
 <blockquote class="lp-erfahrung-text">
-<?= $k->absaetze($e['text']) ?>
+<?= $k->absaetze($e['text'], feld: $k->feld($nr, "eintraege.$i.text")) ?>
 
 </blockquote>
 <figcaption class="lp-erfahrung-name"><?= $k->e($wer) ?> · <a class="lp-erfahrung-quelle" href="<?= $k->e($e['quelle']) ?>" aria-label="<?= $k->e('Originalbericht von ' . $e['name']) ?>">Originalbericht</a></figcaption>

@@ -14,27 +14,27 @@ $leiste = $b['variante'] === 'leiste';
 
 <?php if (trim((string) ($b['text'] ?? '')) !== ''): ?>
 <div class="lp-referenzen-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
 <div class="lp-referenzen-rahmen"<?= $leiste ? ' tabindex="0" role="region" aria-label="' . $k->e($b['titel'] . ' (waagrecht scrollbar)') . '"' : '' ?>>
 <ul class="lp-referenzen-liste" role="list">
-<?php foreach ($b['eintraege'] as $r): ?>
+<?php foreach ($b['eintraege'] as $i => $r): ?>
 <li class="lp-referenz">
 <?php if (isset($r['bild'])): ?>
 <?= $k->bild($r['bild'], 'lp-referenz-bild', false, false, 'karte') ?>
 
 <?php endif ?>
-<h3 class="lp-referenz-titel"><?= $k->e($r['titel']) ?></h3>
+<h3 class="lp-referenz-titel"<?= $k->feld($nr, "eintraege.$i.titel") ?>><?= $k->e($r['titel']) ?></h3>
 <?php if (trim((string) ($r['text'] ?? '')) !== ''): ?>
 <div class="lp-referenz-text">
-<?= $k->absaetze($r['text']) ?>
+<?= $k->absaetze($r['text'], feld: $k->feld($nr, "eintraege.$i.text")) ?>
 
 </div>
 <?php endif ?>
 <?php if (trim((string) ($r['name'] ?? '')) !== ''): ?>
-<p class="lp-referenz-name"><?= $k->e($r['name']) ?></p>
+<p class="lp-referenz-name"<?= $k->feld($nr, "eintraege.$i.name") ?>><?= $k->e($r['name']) ?></p>
 <?php endif ?>
 </li>
 <?php endforeach ?>

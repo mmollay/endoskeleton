@@ -11,7 +11,8 @@ namespace Endo\Lp;
 
 final class Bauer
 {
-    public static function bauen(string $seite, bool $schreiben = true, ?string $endo = null): Ergebnis
+    /** $felder (3.74.0): jedes Textstück trägt seinen Pfad im Bauplan (Kontext::feld) — nur für die Vorschau des Panels, nie für die Auslieferung. */
+    public static function bauen(string $seite, bool $schreiben = true, ?string $endo = null, bool $felder = false): Ergebnis
     {
         $endo ??= dirname(__DIR__, 2);
         $version = trim((string) file_get_contents("$endo/VERSION"));
@@ -44,7 +45,7 @@ final class Bauer
         }
 
         $meta = $plan['meta'];
-        $k = new Kontext($profil, $meta, $seite);
+        $k = new Kontext($profil, $meta, $seite, $felder);
         $bloecke = [];
         foreach (self::folge($plan['bausteine']) as $i) {
             $b = $plan['bausteine'][$i];

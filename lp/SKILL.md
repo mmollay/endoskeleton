@@ -21,6 +21,8 @@ php lp/profil-uebernehmen.php <seite> <sammelordner>/_profil  # Profil in die Se
 # seite.json füllen: jede Lücke {{…}} ersetzen
 php lp/bauen.php <seite>                                   # Exit 0 gebaut, 1 Befunde, 2 technischer Fehler
 php lp/pruefen.php <seite>                                 # vor jeder Freigabe; --heute JJJJ-MM-TTTHH:MM für Tests
+# --felder (bauen.php und pruefen.php, ab 3.74.0): nur für die Vorschau „Direkt im Bild bearbeiten“ — jedes Textstück trägt
+# data-lp-feld="bausteine.<Stelle>.<pfad>"; die ausgelieferte Seite baut immer ohne --felder
 php lp/sammelordner.php <sammelordner>                     # .htaccess des Sammelordners (404-Sperren, kein Cache)
 ```
 
@@ -118,7 +120,7 @@ der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilde
 | `indexieren` | janein | – | `true` / `false` |
 | `meta_pixel_id` | kennung | – | `^[0-9]{10,20}\z`; seit 3.73.0; fehlt: kein Meta-Pixel und kein Einwilligungsbanner; mit ID zeigt die Seite ein Banner (Zustimmen oder Ablehnen) und lädt das Meta-Pixel erst nach der Zustimmung; die Datenschutzerklärung im Profil muss Meta nennen; nur eintragen, wenn der Inhaber der Seite die ID nennt — nie erfinden |
 
-## Bausteine (Katalog 3.73.0)
+## Bausteine (Katalog 3.74.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 

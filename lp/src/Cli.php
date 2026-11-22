@@ -45,6 +45,17 @@ final class Cli
         return $wert;
     }
 
+    /** Ein Schalter ohne Wert (--name): true, wenn er da war; entfernt ihn aus $args. */
+    public static function schalter(array &$args, string $name): bool
+    {
+        $i = array_search($name, $args, true);
+        if ($i === false) {
+            return false;
+        }
+        array_splice($args, $i, 1);
+        return true;
+    }
+
     public static function ordner(string $pfad): string
     {
         $echt = $pfad === '' ? false : realpath($pfad);

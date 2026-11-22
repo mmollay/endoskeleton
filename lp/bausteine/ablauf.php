@@ -13,20 +13,20 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 
 <?php if (trim((string) ($b['text'] ?? '')) !== ''): ?>
 <div class="lp-ablauf-text">
-<?= $k->absaetze($b['text']) ?>
+<?= $k->absaetze($b['text'], feld: $k->feld($nr, 'text')) ?>
 
 </div>
 <?php endif ?>
 <ol class="lp-ablauf-liste" role="list">
-<?php foreach ($b['schritte'] as $s): ?>
+<?php foreach ($b['schritte'] as $i => $s): ?>
 <li class="lp-schritt">
 <?php if (trim((string) ($s['zeit'] ?? '')) !== ''): ?>
-<p class="lp-schritt-zeit"><?= $k->e($s['zeit']) ?></p>
+<p class="lp-schritt-zeit"<?= $k->feld($nr, "schritte.$i.zeit") ?>><?= $k->e($s['zeit']) ?></p>
 <?php endif ?>
-<h3 class="lp-schritt-titel"><?= $k->e($s['titel']) ?></h3>
+<h3 class="lp-schritt-titel"<?= $k->feld($nr, "schritte.$i.titel") ?>><?= $k->e($s['titel']) ?></h3>
 <?php if (trim((string) ($s['text'] ?? '')) !== ''): ?>
 <div class="lp-schritt-text">
-<?= $k->absaetze($s['text']) ?>
+<?= $k->absaetze($s['text'], feld: $k->feld($nr, "schritte.$i.text")) ?>
 
 </div>
 <?php endif ?>

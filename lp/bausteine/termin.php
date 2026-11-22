@@ -19,10 +19,10 @@ $preis = isset($b['preis']) ? (int) $b['preis'] : null; // null = keine Angabe, 
 <li class="lp-termin-eintrag" data-lp-ende="<?= $k->iso($t['beginn'], $dauer) ?>"><time class="lp-termin-zeit" datetime="<?= $k->iso($t['beginn']) ?>"><?= $k->e($k->datum($t['beginn'])) ?></time><?= $dauer > 0 ? ' · etwa ' . $dauer . ' Minuten' : '' ?></li>
 <?php endforeach ?>
 </ul>
-<p class="lp-termin-ort"><?= $k->e($b['ort']) ?></p>
+<p class="lp-termin-ort"<?= $k->feld($nr, 'ort') ?>><?= $k->e($b['ort']) ?></p>
 <?= $preis === null ? '' : '<p class="lp-termin-preis">' . ($preis === 0 ? 'Teilnahme kostenlos' : 'Teilnahme: ' . $preis . ' €') . "</p>\n" ?>
-<p class="lp-termin-leer" hidden><?= $k->e($b['wenn_leer']) ?></p>
-<?= isset($b['knopf']) ? $k->knopf($b['knopf']) . "\n" : '' ?>
+<p class="lp-termin-leer"<?= $k->feld($nr, 'wenn_leer') ?> hidden><?= $k->e($b['wenn_leer']) ?></p>
+<?= isset($b['knopf']) ? $k->knopf($b['knopf'], $k->feld($nr, 'knopf.text')) . "\n" : '' ?>
 </div>
 <?php foreach ($b['termine'] as $t): $dauer = (int) ($t['dauer_min'] ?? 0); ?>
 <?= $k->jsonLd(array_filter([

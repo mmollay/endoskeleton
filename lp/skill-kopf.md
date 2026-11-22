@@ -21,6 +21,8 @@ php lp/profil-uebernehmen.php <seite> <sammelordner>/_profil  # Profil in die Se
 # seite.json füllen: jede Lücke {{…}} ersetzen
 php lp/bauen.php <seite>                                   # Exit 0 gebaut, 1 Befunde, 2 technischer Fehler
 php lp/pruefen.php <seite>                                 # vor jeder Freigabe; --heute JJJJ-MM-TTTHH:MM für Tests
+# --felder (bauen.php und pruefen.php, ab 3.74.0): nur für die Vorschau „Direkt im Bild bearbeiten“ — jedes Textstück trägt
+# data-lp-feld="bausteine.<Stelle>.<pfad>"; die ausgelieferte Seite baut immer ohne --felder
 php lp/sammelordner.php <sammelordner>                     # .htaccess des Sammelordners (404-Sperren, kein Cache)
 ```
 
