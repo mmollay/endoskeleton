@@ -10,6 +10,10 @@ Meta-Pixel mit Einwilligung (Auftrag der Panel-Instanz, von Martin entschieden):
 erst, wenn der Besucher im Banner zustimmt.** Seiten ohne Pixel-ID bauen Byte für Byte wie bisher (bis auf `es/lp.css` und `es/lp.js`, die wachsen);
 ohne Zustimmung geht weiter keine Anfrage an einen fremden Server.
 
+### Changed — eigene Videodatei bis 200 MB (vorher 40 MB)
+- `Videodatei::MAX_BYTES` = 200 MiB. Das Panel rechnet eigene Videos bis 10 Minuten in 720p mit etwa 1,8 Mbit/s um (145–175 MB); auf 40 MB
+  gedrückt wären es rund 0,5 Mbit/s — für Vorträge zu unscharf. Den Start verzögert die Größe nicht (`preload="none"`, faststart).
+
 ### Added — Seitenfeld `meta.meta_pixel_id` (Kennung, nur Ziffern, 10–20 Stellen)
 - Setzt der Betreiber (das Panel), nie der Kunde. Eine andere Form (Buchstaben, zu kurz, zu lang, Zahl statt Text) ist ein sperrender Befund.
 - Mit ID steht auf jeder Seite (auch Impressum und Datenschutz) gleich nach dem Sprunglink ein Banner `lp-banner` („Cookies für Anzeigen“, Region mit
@@ -23,8 +27,8 @@ ohne Zustimmung geht weiter keine Anfrage an einen fremden Server.
   sie nur bis zum Verlassen der Seite. Die anonyme Statistik (3.56.0) bleibt unverändert ohne Web-Speicher.
 - Profil: optionaler Text `einwilligung_pixel` (20–600 Zeichen); ohne ihn ein fester Text in der Anrede des Profils, der Meta Platforms Ireland,
   Zweck, Cookies, Übermittlung (auch in die USA) und den Widerruf nennt (`Profil::PIXEL_STANDARD`, `Profil::pixelText()`).
-- Prüfung (`lp/pruefen.php`): Seite mit Pixel-ID, deren Datenschutzerklärung „Meta“ nicht als eigenes Wort nennt → sperrender Befund an
-  `profil.rechtliches.datenschutz`.
+- Prüfung (`lp/pruefen.php`): Seite mit Pixel-ID, deren Datenschutzerklärung weder „Meta-Pixel“ noch „Meta Platforms“ nennt → sperrender Befund an
+  `profil.rechtliches.datenschutz` („Meta“ allein, etwa „Folge uns auf Meta“, genügt nicht).
 - Neue Klassen: `lp-banner`, `lp-banner-innen`, `lp-banner-titel`, `lp-banner-text`, `lp-banner-knoepfe`, `lp-banner-knopf`, `lp-fuss-banner`.
   Im Druck entfallen Banner und Knopf.
 

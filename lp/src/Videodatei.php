@@ -2,7 +2,7 @@
 /**
  * Die eigene Videodatei einer Seite (3.62.0): im Bauplan nur ein Pfad (Kopfbereich: video_datei, Baustein „video“: datei), die Datei selbst liegt
  * im Seitenordner unter vid/. Es kommt nur ein MP4 mit festem Namen durch: Muster, gewöhnliche Datei (kein Link), „ftyp“ an Stelle 4–8, höchstens
- * 40 MB. Eine einzige Prüfung für Schema (Bauplan) und Kontext (beim Bauen noch einmal) — so läuft keine Datei am Prüfer vorbei.
+ * 200 MB (3.73.0, vorher 40 MB: zehn Minuten aus dem Panel, H.264 mit etwa 1,8 Mbit/s, sind 145–175 MB). Eine einzige Prüfung für Schema (Bauplan) und Kontext (beim Bauen noch einmal) — so läuft keine Datei am Prüfer vorbei.
  */
 
 declare(strict_types=1);
@@ -13,8 +13,11 @@ final class Videodatei
 {
     /** Einziger erlaubter Pfad: vid/eigen-<16 Hexzeichen>.mp4. \z statt $ — ein Zeilenumbruch am Ende fiele bei $ durch. */
     public const MUSTER = '#^vid/eigen-[0-9a-f]{16}\.mp4\z#';
-    /** Größte erlaubte Datei: 40 MiB = 41 943 040 Byte. */
-    public const MAX_BYTES = 40 * 1024 * 1024;
+    /**
+     * Größte erlaubte Datei: 200 MiB = 209 715 200 Byte (3.73.0). Das Panel liefert zehn Minuten in 720p mit etwa 1,8 Mbit/s (145–175 MB); auf 40 MB gedrückt
+     * wären es nur rund 0,5 Mbit/s — für Vorträge mit Gesicht und Folien zu unscharf. Die Größe verzögert den Start nicht: preload="none" und faststart.
+     */
+    public const MAX_BYTES = 200 * 1024 * 1024;
     /** Ein MP4 beginnt mit einem Kasten: 4 Byte Länge, „ftyp“, 4 Byte Hauptmarke. */
     private const KOPF_BYTES = 12;
 

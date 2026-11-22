@@ -50,7 +50,7 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   (dann `alt` Pflicht, leer nur mit `"dekorativ": true`). WebP, höchstens 400 KB. Bestandsbilder brauchen in
   `bilder.json` `"freigegeben": true`; im Seitenordner liegen nur Bilder, die der Bauplan verwendet.
 - Eigenes Video (seit 3.62.0): `video_datei` im Kopfbereich (`bild-rechts`) oder `anbieter` `datei` mit `datei` im Baustein `video`.
-  Der Pfad ist immer `vid/eigen-<16 Hexzeichen>.mp4` (nur MP4, höchstens 40 MB, die Datei liegt im Seitenordner und wird vom
+  Der Pfad ist immer `vid/eigen-<16 Hexzeichen>.mp4` (nur MP4, höchstens 200 MB, die Datei liegt im Seitenordner und wird vom
   Betreiber angelegt — nie einen Pfad erfinden). Das Bild des Abschnitts ist das Startbild; das Video lädt und startet nie von selbst,
   es gibt keinen Drittanbieter. `video_datei` und `video_kennung` (YouTube) schließen sich aus; im Seitenordner liegen nur Videos,
   auf die der Bauplan verweist.
@@ -135,7 +135,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
 | `video_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur bei bild-rechts; seit 3.61.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie) |
-| `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
+| `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 200 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json
@@ -221,7 +221,7 @@ Varianten: `breit`, `mit-text` · seit 3.51.0, geändert 3.62.0
 | `text` | absatz | bei mit-text | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
 | `anbieter` | auswahl | – | eines von `youtube`, `datei`; Standard `youtube`; fehlt: youtube; „datei“ (eigenes Video aus dem Seitenordner, kein Drittanbieter) gibt es seit 3.62.0 |
 | `kennung` | kennung | wenn `anbieter` = `youtube` | `^[A-Za-z0-9_-]{11}$`; nur wenn `anbieter` = `youtube` |
-| `datei` | videodatei | wenn `anbieter` = `datei` | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 40 MB; nur wenn `anbieter` = `datei`; seit 3.62.0 |
+| `datei` | videodatei | wenn `anbieter` = `datei` | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 200 MB; nur wenn `anbieter` = `datei`; seit 3.62.0 |
 | `vorschau` | bild | ja | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
 
 ```json

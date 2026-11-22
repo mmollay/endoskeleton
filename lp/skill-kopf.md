@@ -50,7 +50,7 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   (dann `alt` Pflicht, leer nur mit `"dekorativ": true`). WebP, höchstens 400 KB. Bestandsbilder brauchen in
   `bilder.json` `"freigegeben": true`; im Seitenordner liegen nur Bilder, die der Bauplan verwendet.
 - Eigenes Video (seit 3.62.0): `video_datei` im Kopfbereich (`bild-rechts`) oder `anbieter` `datei` mit `datei` im Baustein `video`.
-  Der Pfad ist immer `vid/eigen-<16 Hexzeichen>.mp4` (nur MP4, höchstens 40 MB, die Datei liegt im Seitenordner und wird vom
+  Der Pfad ist immer `vid/eigen-<16 Hexzeichen>.mp4` (nur MP4, höchstens 200 MB, die Datei liegt im Seitenordner und wird vom
   Betreiber angelegt — nie einen Pfad erfinden). Das Bild des Abschnitts ist das Startbild; das Video lädt und startet nie von selbst,
   es gibt keinen Drittanbieter. `video_datei` und `video_kennung` (YouTube) schließen sich aus; im Seitenordner liegen nur Videos,
   auf die der Bauplan verweist.

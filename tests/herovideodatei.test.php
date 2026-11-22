@@ -5,7 +5,7 @@
  *
  *   VD01 Katalog: Felder, Regeln (nur_wenn, pflicht_wenn, nicht_mit), Klasse lp-video-datei, Beispiele unverändert
  *   VD02 Pfadmuster: nur vid/eigen-<16 Hex>.mp4 (\z, nie $) — alles andere sperrend, auch wenn die Datei da ist
- *   VD03 Datei: muss da sein, gewöhnlich (kein Link), ftyp an Stelle 4–8, höchstens 40 MB
+ *   VD03 Datei: muss da sein, gewöhnlich (kein Link), ftyp an Stelle 4–8, höchstens 200 MB (10 Minuten aus dem Panel, 3.73.0)
  *   VD04 Kopfbereich: nur bild-rechts, nur mit Bild; nie zusammen mit video_kennung
  *   VD05 Bau Kopfbereich: <video controls preload="none" playsinline poster>, kein Autoplay, Ersatzlink, keine Fremdquelle
  *   VD06 Baustein video: anbieter datei und youtube (Standard), Regeln gegenseitig
@@ -127,8 +127,8 @@ return [
         }
         T::contains($schema($heroDatei('vid/eigen-0123456789ABCDEF.mp4'), $o), 'Videodatei', 'Kundentext nennt das Feld');
     },
-    'VD03 Datei: da, gewöhnlich, ftyp an Stelle 4–8, nicht über 40 MB' => static function () use ($schema, $heroDatei, $ordnerMit): void {
-        T::eq(Videodatei::MAX_BYTES, 40 * 1024 * 1024, 'Grenze 40 MB als Konstante');
+    'VD03 Datei: da, gewöhnlich, ftyp an Stelle 4–8, nicht über 200 MB' => static function () use ($schema, $heroDatei, $ordnerMit): void {
+        T::eq(Videodatei::MAX_BYTES, 200 * 1024 * 1024, 'Grenze 200 MB als Konstante (10 Minuten mit 1,8 Mbit/s aus dem Panel passen hinein)');
         $s = $heroDatei();
         T::contains($schema($s, $ordnerMit(['seite.json' => ''])), 'nicht gefunden', 'fehlt: nicht gefunden');
         $o = $ordnerMit([]);
@@ -143,7 +143,7 @@ return [
             T::contains($t, 'MP4', "$was: Kundentext sagt, dass es kein MP4-Video ist");
         }
         T::eq($schema($s, $ordnerMit([VD_DATEI => VD_KOPF])), '', 'ftyp an Stelle 4–8: gültig');
-        // Größe: genau 40 MB gültig, ein Byte mehr nicht (dünn besetzte Datei, kostet nichts)
+        // Größe: genau 200 MB gültig, ein Byte mehr nicht (dünn besetzte Datei, kostet nichts)
         foreach ([Videodatei::MAX_BYTES => '', Videodatei::MAX_BYTES + 1 => 'zu groß'] as $groesse => $erwartet) {
             $o = $ordnerMit([VD_DATEI => VD_KOPF]);
             $h = fopen("$o/" . VD_DATEI, 'r+b');
@@ -154,7 +154,7 @@ return [
                 T::eq($t, '', "genau $groesse Byte: gültig");
             } else {
                 T::contains($t, '[sperrend] bausteine.0.video_datei', "$groesse Byte: sperrend");
-                T::contains($t, '40 MB', 'Kundentext nennt die Grenze');
+                T::contains($t, '200 MB', 'Kundentext nennt die Grenze');
             }
         }
         // Verknüpfungen: weder die Datei noch der Ordner vid/ darf ein Link sein

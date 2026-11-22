@@ -9,7 +9,7 @@
  *         im HTML keine Adresse von Meta (geladen wird erst in lp.js nach der Zustimmung)
  *   PX04  Text aus dem Profil (einwilligung_pixel, maskiert); das Profil prüft 20–600 Zeichen
  *   PX05  Falsche Pixel-ID sperrt (9 und 21 Ziffern, Buchstaben, Zahl statt Text)
- *   PX06  Prüfer: Pixel ohne Satz zu Meta in der Datenschutzerklärung sperrt; mit Satz kein Befund; ohne Pixel kein Befund
+ *   PX06  Prüfer: Pixel ohne „Meta-Pixel“ oder „Meta Platforms“ in der Datenschutzerklärung sperrt („Meta“ allein nicht); mit Satz kein Befund; ohne Pixel kein Befund
  *   PX07  Checkliste: Seite mit Banner ohne Mangel; lp.js lädt connect.facebook.net nur aus der Zustimmung heraus
  */
 
@@ -132,6 +132,9 @@ return [
         T::ok(str_contains($ohne, 'profil.rechtliches.datenschutz') && str_contains($ohne, 'Meta'), "ohne Satz zu Meta sperrt ($ohne)");
         T::eq($pruefen(['meta_pixel_id' => PX_ID], $profil(null, $ds . "\n" . $mitMeta)), '', 'mit Satz zu Meta kein sperrender Befund');
         T::eq($pruefen(['meta_pixel_id' => PX_ID], $profil(null, $ds . "\nWir verwenden kein Metadatenformat.\n")), $ohne, '„Metadaten“ zählt nicht als Meta');
+        T::eq($pruefen(['meta_pixel_id' => PX_ID], $profil(null, $ds . "\nFolge uns auch auf Meta.\n")), $ohne, '„Meta“ allein (ohne Pixel oder Meta Platforms) reicht nicht');
+        T::eq($pruefen(['meta_pixel_id' => PX_ID], $profil(null, $ds . "\nWir nutzen das Meta-Pixel.\n")), '', '„Meta-Pixel“ genügt');
+        T::eq($pruefen(['meta_pixel_id' => PX_ID], $profil(null, $ds . "\nAnbieter ist die Meta Platforms Ireland Ltd.\n")), '', '„Meta Platforms“ genügt');
         T::eq($pruefen([], $profil(null, $ds)), '', 'ohne Pixel kein Befund');
     },
     'PX07 Checkliste ohne Mangel; lp.js lädt Meta nur nach der Zustimmung' => static function () use ($profil, $mitMeta): void {
