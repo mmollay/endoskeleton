@@ -129,6 +129,82 @@ section.lp-block {
   color: var(--primary);
 }
 
+/* Einwilligung für das Meta-Pixel (3.73.0): Banner unten über der Seite, solange keine Wahl getroffen ist. Solange es offen ist, hält
+   scroll-padding den Fokus über dem Banner (die Tastatur scrollt das fokussierte Element nicht darunter). Zustimmen und Ablehnen sehen gleich aus. */
+html[data-lp-banner="offen"] {
+  scroll-padding-bottom: 50vh;
+}
+
+html[data-lp-banner="offen"] .lp-seite {
+  padding-bottom: 50vh;
+}
+
+.lp-banner {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 20;
+  max-height: 50vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  color: var(--text);
+  border-top: 0.25rem solid var(--primary);
+  box-shadow: 0 -0.5rem 1.875rem var(--shadow);
+}
+
+.lp-banner[hidden] {
+  display: none;
+}
+
+.lp-banner-innen {
+  display: grid;
+  gap: var(--space-sm);
+  padding-block: var(--space-md);
+}
+
+.lp-banner-titel {
+  margin: 0;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.lp-banner-text {
+  margin: 0;
+  max-width: 60rem;
+  font-size: var(--fs-sm);
+}
+
+.lp-banner-text a {
+  display: inline-block;   /* bricht als Ganzes um: Fokusrahmen ein Rechteck, nie über zwei Zeilen zerrissen */
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.lp-banner-knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.lp-banner-knopf {
+  min-width: 9rem;
+}
+
+.lp-fuss-banner {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.lp-fuss-banner[hidden] {
+  display: none;
+}
+
 .lp-rechtsseite .lp-block-innen {
   display: block;
   max-width: 48rem;
@@ -1361,6 +1437,16 @@ section.lp-zahlen--band {
     --primary: currentColor;
     --primary-dark: currentColor;
     --error: currentColor;
+  }
+
+  /* Einwilligung (3.73.0): auf Papier gibt es nichts zu wählen */
+  .lp-banner,
+  .lp-fuss-banner {
+    display: none;
+  }
+
+  html[data-lp-banner="offen"] .lp-seite {
+    padding-bottom: 0;
   }
 
   .lp-seite .btn {

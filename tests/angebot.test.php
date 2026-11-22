@@ -213,8 +213,14 @@ return [
         T::contains($js, "replace(/anmelden$/, 'treffer')", 'Adresse leitet sich aus dem Formularziel ab');
         T::contains($js, '.hostname', 'vom Verweiser bleibt nur der Host');
         T::notContains($js, 'panel.ssi.at', 'keine feste Adresse im Skript');
+        // Einzige Ausnahme (3.73.0): der Block des Meta-Pixels — er läuft nur mit Banner (Pixel-ID) und schreibt erst nach einem Klick (tests/pixel.test.php).
+        $a = strpos($js, '// Meta-Pixel (3.73.0)');
+        $z = strpos($js, '// Formular: Pflichtfelder prüfen');
+        T::ok($a !== false && $z > $a, 'Block des Meta-Pixels abgegrenzt');
+        T::contains(substr($js, (int) $a, $z - $a), "if (einwilligung && /^[0-9]{10,20}$/.test(", 'Block des Meta-Pixels nur mit Banner');
+        $ohnePixel = substr($js, 0, (int) $a) . substr($js, (int) $z);
         foreach (['localStorage', 'sessionStorage', 'indexedDB', 'document.cookie'] as $speicher) {
-            T::notContains($js, $speicher, "kein Zugriff auf $speicher (auch das wäre ein Zugriff auf das Endgerät)");
+            T::notContains($ohnePixel, $speicher, "kein Zugriff auf $speicher (auch das wäre ein Zugriff auf das Endgerät)");
         }
     },
     'lp.js: Verlassen (3.57.0, mehrfach seit 3.65.0) — Meldungen mit sichtbarer Zeit seit dem letzten Senden und Scrolltiefe, „da“ nach 60 s, passiver Scroll-Hörer, keine Wanduhr' => static function (): void {

@@ -1,12 +1,13 @@
 {
-  "version": "3.72.0",
+  "version": "3.73.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
       "beschreibung": { "typ": "zeile", "label": "Beschreibung für Suchmaschinen", "max": 160, "pflicht": true },
       "vorschaubild": { "typ": "bilddatei", "label": "Vorschaubild", "fehlt": "beim Teilen des Links erscheint das Bild des Kopfbereichs (ohne Kopfbild: keine Bildkarte)" },
       "adresse":      { "typ": "kennung", "label": "Adresse der Seite im Netz", "muster": "^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\\z", "fehlt": "die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde" },
-      "indexieren":   { "typ": "janein", "label": "In Suchmaschinen zeigen" }
+      "indexieren":   { "typ": "janein", "label": "In Suchmaschinen zeigen" },
+      "meta_pixel_id": { "typ": "kennung", "label": "Meta-Pixel-ID", "muster": "^[0-9]{10,20}\\z", "seit": "3.73.0", "fehlt": "kein Meta-Pixel und kein Einwilligungsbanner; mit ID zeigt die Seite ein Banner (Zustimmen oder Ablehnen) und lädt das Meta-Pixel erst nach der Zustimmung; die Datenschutzerklärung im Profil muss Meta nennen; nur eintragen, wenn der Inhaber der Seite die ID nennt — nie erfinden" }
     }
   },
   "rahmen": {
@@ -15,7 +16,9 @@
       "lp-seite": "3.51.0", "lp-kopf": "3.51.0", "lp-kopf-innen": "3.51.0", "lp-logo": "3.51.0",
       "lp-inhalt": "3.51.0", "lp-block": "3.51.0", "lp-block-innen": "3.51.0", "lp-titel": "3.51.0",
       "lp-knopf": "3.51.0", "lp-fuss": "3.51.0", "lp-fuss-innen": "3.51.0", "lp-fuss-firma": "3.51.0",
-      "lp-fuss-links": "3.51.0", "lp-rechtsseite": "3.51.0"
+      "lp-fuss-links": "3.51.0", "lp-rechtsseite": "3.51.0",
+      "lp-banner": "3.73.0", "lp-banner-innen": "3.73.0", "lp-banner-titel": "3.73.0", "lp-banner-text": "3.73.0",
+      "lp-banner-knoepfe": "3.73.0", "lp-banner-knopf": "3.73.0", "lp-fuss-banner": "3.73.0"
     },
     "farbpaare": [
       ["--text", "--bg", false], ["--text", "--bg-alt", false], ["--text", "--card-bg", false], ["--text", "--lp-akzent", false],

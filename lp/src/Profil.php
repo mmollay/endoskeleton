@@ -16,13 +16,21 @@ final class Profil
     public const SCHRIFTEN = ['--font-body', '--font-heading'];
 
     private const SCHLUESSEL = ['format', 'name', 'version', 'sprache', 'anrede', 'vorschlag', 'firma', 'logo', 'einwilligung',
-        'einwilligung_newsletter', 'formularziel', 'link_hosts', 'sperrliste', 'grenzwoerter'];
+        'einwilligung_newsletter', 'einwilligung_pixel', 'formularziel', 'link_hosts', 'sperrliste', 'grenzwoerter'];
 
     /**
      * Der Wortlaut des freiwilligen Newsletter-Häkchens (3.55.0), wenn das Profil keinen eigenen (`einwilligung_newsletter`) hat; `%s` ist der Name der
      * Marke. Die Pflicht-Einwilligung (`einwilligung`) deckt seit 3.55.0 nur Zugangslink und Erinnerung — das Panel prüft beide Texte über ihre Kurzsumme.
      */
     public const NEWSLETTER_STANDARD = 'Ja, ich möchte zusätzlich Neuigkeiten von %s per E-Mail bekommen. Jederzeit abbestellbar.';
+    /**
+     * Der Text des Einwilligungsbanners für das Meta-Pixel (3.73.0), wenn das Profil keinen eigenen (`einwilligung_pixel`) hat — je Anrede.
+     * Er nennt Meta, den Zweck, die Übermittlung und den Weg zum Widerruf; der Link auf die Datenschutzerklärung steht im Banner dahinter.
+     */
+    public const PIXEL_STANDARD = [
+        'du' => 'Mit deiner Zustimmung setzen wir das Meta-Pixel von Meta Platforms Ireland Ltd. (Facebook, Instagram) ein: Es misst, ob du über eine Anzeige zu uns kommst und dich anmeldest. Dabei werden Cookies gespeichert und Daten wie deine IP-Adresse an Meta übermittelt, auch in die USA. Ohne Zustimmung lädt nichts davon. Deine Wahl kannst du jederzeit unten unter „Cookie-Einstellungen“ ändern.',
+        'Sie' => 'Mit Ihrer Zustimmung setzen wir das Meta-Pixel von Meta Platforms Ireland Ltd. (Facebook, Instagram) ein: Es misst, ob Sie über eine Anzeige zu uns kommen und sich anmelden. Dabei werden Cookies gespeichert und Daten wie Ihre IP-Adresse an Meta übermittelt, auch in die USA. Ohne Zustimmung lädt nichts davon. Ihre Wahl können Sie jederzeit unten unter „Cookie-Einstellungen“ ändern.',
+    ];
     private const FIRMA = ['name', 'strasse', 'plz_ort', 'land', 'email', 'telefon', 'uid', 'firmenbuch'];
     private const RECHTSTEXTE = ['impressum' => 'Das Impressum', 'datenschutz' => 'Die Datenschutzerklärung'];
     private const WO = 'Kundenprofil';
@@ -169,6 +177,10 @@ final class Profil
             && (!self::text($d['einwilligung_newsletter']) || mb_strlen($d['einwilligung_newsletter']) < 20 || mb_strlen($d['einwilligung_newsletter']) > 600)) {
             $fehler('einwilligung_newsletter', 'einwilligung_newsletter muss fehlen oder 20–600 Zeichen haben', 'Der Text des Newsletter-Häkchens ist leer oder zu lang.');
         }
+        if (array_key_exists('einwilligung_pixel', $d)
+            && (!self::text($d['einwilligung_pixel']) || mb_strlen(trim($d['einwilligung_pixel'])) < 20 || mb_strlen($d['einwilligung_pixel']) > 600)) {
+            $fehler('einwilligung_pixel', 'einwilligung_pixel muss fehlen oder 20–600 Zeichen haben', 'Der Text des Einwilligungsbanners (Meta-Pixel) ist leer oder zu lang.');
+        }
         $ziel = $d['formularziel'] ?? null;
         if (!is_string($ziel) || ($ziel !== '' && !Text::https($ziel, $this->hosts()))) {
             $fehler('formularziel', 'formularziel muss leer oder https auf einen Host aus link_hosts sein (ohne Benutzer, ohne Port)', 'Das Formularziel muss leer oder eine sichere Adresse (https) auf einer freigegebenen Website sein.');
@@ -284,6 +296,17 @@ final class Profil
         }
         $name = trim((string) ($daten['name'] ?? ''));
         return sprintf(self::NEWSLETTER_STANDARD, $name !== '' ? $name : 'uns');
+    }
+
+    /**
+     * Der Text des Einwilligungsbanners (3.73.0): `einwilligung_pixel` des Profils, sonst PIXEL_STANDARD in der Anrede des Profils.
+     *
+     * @param array<string, mixed> $daten profil.json
+     */
+    public static function pixelText(array $daten): string
+    {
+        $eigen = $daten['einwilligung_pixel'] ?? null;
+        return self::text($eigen) ? trim($eigen) : self::PIXEL_STANDARD[($daten['anrede'] ?? 'du') === 'Sie' ? 'Sie' : 'du'];
     }
 
     private static function ohneKommentare(string $css): string

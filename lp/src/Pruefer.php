@@ -52,6 +52,7 @@ final class Pruefer
         $p->bildrechte();
         $p->vorschau();
         $p->rechtstexte();
+        $p->pixel();
         foreach (self::SEITEN as $datei) {
             $p->html($datei);
         }
@@ -333,6 +334,18 @@ final class Pruefer
             if (Rechtstext::platzhalter($this->profil->rechtstext($name))) {
                 $this->sperrend("profil.rechtliches.$name", "rechtliches/$name.txt enthält Platzhalter", "$label ist noch ein Platzhalter — der endgültige Text fehlt noch.");
             }
+        }
+    }
+
+    /**
+     * Meta-Pixel (3.73.0): Wer es einsetzt, muss es in der Datenschutzerklärung nennen — sonst keine Freigabe. Geprüft wird nur, ob „Meta“ als
+     * eigenes Wort vorkommt (nicht „Metadaten“); ob der Absatz rechtlich trägt, entscheidet der Kunde.
+     */
+    private function pixel(): void
+    {
+        if (($this->plan['meta']['meta_pixel_id'] ?? '') !== '' && !preg_match('/(?<![\p{L}\p{N}])Meta(?![\p{L}\p{N}])/u', $this->profil->rechtstext('datenschutz'))) {
+            $this->sperrend('profil.rechtliches.datenschutz', 'meta_pixel_id gesetzt, aber rechtliches/datenschutz.txt nennt Meta nicht',
+                'Die Seite nutzt das Meta-Pixel, die Datenschutzerklärung erwähnt Meta aber noch nicht — bitte einen Absatz zum Meta-Pixel ergänzen.');
         }
     }
 

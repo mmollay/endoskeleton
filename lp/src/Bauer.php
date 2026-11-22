@@ -75,6 +75,7 @@ final class Bauer
             'k' => $k, 'version' => $version, 'logo' => "es/$logo",
             'css' => 'es/lp.css?v=' . substr(hash('sha256', $dateien['es/lp.css']), 0, 10),
             'js' => 'es/lp.js?v=' . substr(hash('sha256', $dateien['es/lp.js']), 0, 10),
+            'pixel' => isset($meta['meta_pixel_id']) ? (string) $meta['meta_pixel_id'] : null,   // Meta-Pixel (3.73.0): Banner auf jeder Seite, geladen erst nach Zustimmung (lp.js)
         ];
         $indexieren = ($meta['indexieren'] ?? false) === true;
         // Bewegung (3.64.0): der Player nur auf der Seite selbst; sein Stempel deckt das Live-Skript mit ab, das er nach dem Klick nachlädt

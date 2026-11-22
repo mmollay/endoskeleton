@@ -80,6 +80,12 @@ Bestehende Seiten baut immer der Stand ihrer Marke:
   vorangehakt, „(freiwillig)“ im Label) mit dem Text `einwilligung_newsletter` des Profils, sonst „Ja, ich möchte zusätzlich
   Neuigkeiten von <Name> per E-Mail bekommen. Jederzeit abbestellbar.“; seine Kurzsumme geht als `newsletter_kurz` mit.
   `newsletter` setzt der Betreiber (das Panel, wenn eine Newsletter-Gruppe gewählt ist) — nie selbst setzen oder entfernen.
+- Meta-Pixel (3.73.0): Mit `meta.meta_pixel_id` (nur Ziffern, 10–20 Stellen; setzt der Betreiber, nie der Kunde) zeigt jede Seite ein
+  Banner „Cookies für Anzeigen“ unten mit „Zustimmen“ und „Ablehnen“ (gleich gewichtet, nichts vorausgewählt) und in der Fußzeile den
+  Knopf „Cookie-Einstellungen“ (Widerruf). Erst nach „Zustimmen“ lädt `lp.js` `connect.facebook.net` (PageView, nach erfolgreicher Anmeldung
+  Lead); ohne Zustimmung oder ohne ID geht keine Anfrage an Meta. Die Wahl liegt nur nach einem Klick im Web-Speicher (je Pixel-ID). Text:
+  `einwilligung_pixel` des Profils (20–600 Zeichen), sonst ein fester Text, der Meta nennt. Die Datenschutzerklärung des Profils muss
+  „Meta“ nennen, sonst sperrt die Prüfung.
 - Statistik (3.56.0): `lp.js` zählt anonym Aufruf, Formularbeginn und Absenden beim Panel (Formularziel `…/lp/anmelden` →
   `…/lp/treffer`) — ohne Cookies, ohne Web-Speicher, ohne Kennung des Besuchers; gesendet werden nur Verweiser-Host, UTM
   und Fensterbreite; beim Verlassen der Seite (3.57.0) einmal auch die sichtbare Zeit (ganze Sekunden, höchstens 3600) und

@@ -63,6 +63,72 @@
   var rueckmeldung = Object.prototype.hasOwnProperty.call(meldungen, zustand);
   var geschlossen = zustand === 'fehler' && adresse.searchParams.get('grund') === 'geschlossen' && document.querySelector('.lp-anmeldung-geschlossen') !== null;
 
+  // Meta-Pixel (3.73.0): nur mit Einwilligung. Ohne Banner (Seite ohne Pixel-ID) passiert hier nichts. Bis zum Klick auf „Zustimmen“ geht keine
+  // Anfrage an Meta hinaus; gespeichert wird die Wahl erst nach einem Klick (Web-Speicher je Pixel-ID, jeder Zugriff in try — ohne Speicher gilt
+  // sie nur bis zum Verlassen der Seite). Ohne gespeicherte Wahl erscheint das Banner, ohne den Fokus an sich zu ziehen (es steht gleich nach dem
+  // Sprunglink). „Cookie-Einstellungen“ in der Fußzeile öffnet es wieder (Widerruf) und gibt den Fokus danach dorthin zurück. Nach der Zustimmung:
+  // PageView, auf der Rückkehrseite einer Anmeldung (?anmeldung=ok) zusätzlich Lead. Ablehnen nach einer Zustimmung entzieht sie (consent revoke)
+  // und löscht die Cookies des Pixels.
+  var einwilligung = document.getElementById('lp-banner');
+  if (einwilligung && /^[0-9]{10,20}$/.test(einwilligung.dataset.lpPixel || '')) {
+    var pixel = einwilligung.dataset.lpPixel, schluessel = 'lp-meta-pixel-' + pixel, geladen = false, zurueck = null;
+    var aendern = document.querySelector('.lp-fuss-banner');
+    var lead = zustand === 'ok' || zustand === 'bereits';
+    var lesen = function () { try { return localStorage.getItem(schluessel); } catch (e) { return null; } };
+    var merken = function (wahl) { try { localStorage.setItem(schluessel, wahl); } catch (e) { /* ohne Web-Speicher gilt die Wahl nur hier */ } };
+    var laden = function () {
+      if (geladen) { window.fbq('consent', 'grant'); return; }
+      geladen = true;
+      var fbq = window.fbq = function () { if (fbq.callMethod) { fbq.callMethod.apply(fbq, arguments); } else { fbq.queue.push(arguments); } };
+      if (!window._fbq) { window._fbq = fbq; }
+      fbq.push = fbq; fbq.loaded = true; fbq.version = '2.0'; fbq.queue = [];
+      var skript = document.createElement('script');
+      skript.async = true;
+      skript.src = 'https://connect.facebook.net/en_US/fbevents.js';
+      document.head.appendChild(skript);
+      fbq('init', pixel);
+      fbq('track', 'PageView');
+      if (lead) { fbq('track', 'Lead'); }
+    };
+    var entziehen = function () {
+      if (geladen) { window.fbq('consent', 'revoke'); }
+      var teile = location.hostname.split('.'), domains = [''];
+      for (var i = 0; i < teile.length - 1; i++) { domains.push('; domain=.' + teile.slice(i).join('.')); }
+      ['_fbp', '_fbc'].forEach(function (name) {
+        domains.forEach(function (d) { document.cookie = name + '=; Max-Age=0; path=/' + d; });
+      });
+    };
+    var zeigen = function (fokus) {
+      einwilligung.hidden = false;
+      document.documentElement.dataset.lpBanner = 'offen';
+      if (aendern) { aendern.setAttribute('aria-expanded', 'true'); }
+      if (fokus) { einwilligung.querySelector('[data-lp-wahl]').focus(); }
+    };
+    // Fokus nie unter dem offenen Banner (WCAG 2.4.11): scroll-padding beachtet nicht jeder Browser beim Tabben — dann rückt die Seite nach.
+    document.addEventListener('focusin', function (ereignis) {
+      if (einwilligung.hidden || einwilligung.contains(ereignis.target) || !ereignis.target.getBoundingClientRect) { return; }
+      var unten = ereignis.target.getBoundingClientRect().bottom, oben = einwilligung.getBoundingClientRect().top;
+      if (unten > oben) { window.scrollBy({ top: unten - oben + 16, behavior: 'instant' }); }
+    });
+    einwilligung.addEventListener('click', function (ereignis) {
+      var knopf = ereignis.target.closest && ereignis.target.closest('[data-lp-wahl]');
+      if (!knopf) { return; }
+      var ja = knopf.dataset.lpWahl === 'ja';
+      merken(ja ? 'ja' : 'nein');
+      if (ja) { laden(); } else { entziehen(); }
+      einwilligung.hidden = true;
+      delete document.documentElement.dataset.lpBanner;
+      if (aendern) { aendern.setAttribute('aria-expanded', 'false'); }
+      if (zurueck) { zurueck.focus(); zurueck = null; }
+    });
+    if (aendern) {
+      aendern.hidden = false;
+      aendern.addEventListener('click', function () { zurueck = aendern; zeigen(true); });
+    }
+    var gewaehlt = lesen();
+    if (gewaehlt === 'ja') { laden(); } else if (gewaehlt !== 'nein') { zeigen(false); }
+  }
+
   // Formular: Pflichtfelder prüfen, Fehler am Feld zeigen, das erste Fehlerfeld fokussieren.
   // Ohne JavaScript prüft der Browser selbst (required); mit JavaScript übernehmen die eigenen Meldungen.
   document.querySelectorAll('form.lp-formular').forEach(function (form) {

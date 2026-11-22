@@ -8,6 +8,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  * @var string $titel @var string $beschreibung @var bool $noindex @var string $inhalt
  * @var ?array{url: string, bild: ?string, breite: int, hoehe: int, alt: string} $og  Vorschaukarte beim Teilen (Endo\Lp\Vorschau), nur auf der Startseite
  * @var string $css @var string $js @var string $logo @var string $version
+ * @var ?string $pixel  Meta-Pixel-ID (3.73.0): Einwilligungsbanner und Widerruf-Knopf; ohne ID bleibt der Rahmen wie vorher
  */
 $p = $k->profil->daten;
 $f = $p['firma'];
@@ -47,6 +48,18 @@ $f = $p['firma'];
 </head>
 <body class="lp-seite">
 <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+<?php if (!empty($pixel)): ?>
+<div class="lp-banner" id="lp-banner" role="region" aria-labelledby="lp-banner-titel" data-lp-pixel="<?= $k->e($pixel) ?>" hidden>
+<div class="lp-banner-innen container">
+<p class="lp-banner-titel" id="lp-banner-titel">Cookies für Anzeigen</p>
+<p class="lp-banner-text"><?= $k->e(Endo\Lp\Profil::pixelText($p)) ?> <a href="datenschutz.html">Mehr dazu in der Datenschutzerklärung</a></p>
+<div class="lp-banner-knoepfe">
+<button type="button" class="btn btn-primary lp-banner-knopf" data-lp-wahl="ja">Zustimmen</button>
+<button type="button" class="btn btn-primary lp-banner-knopf" data-lp-wahl="nein">Ablehnen</button>
+</div>
+</div>
+</div>
+<?php endif ?>
 <header class="lp-kopf">
 <div class="lp-kopf-innen container">
 <a class="lp-logo" href="index.html"><img src="<?= $k->e($logo) ?>" alt="<?= $k->e($p['logo']['alt']) ?>" width="<?= (int) $p['logo']['breite'] ?>" height="<?= (int) $p['logo']['hoehe'] ?>"></a>
@@ -62,6 +75,9 @@ $f = $p['firma'];
 <nav class="lp-fuss-links" aria-label="Rechtliches">
 <a href="impressum.html">Impressum</a>
 <a href="datenschutz.html">Datenschutz</a>
+<?php if (!empty($pixel)): ?>
+<button type="button" class="lp-fuss-banner" aria-controls="lp-banner" aria-expanded="false" hidden>Cookie-Einstellungen</button>
+<?php endif ?>
 </nav>
 </div>
 </footer>

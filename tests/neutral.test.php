@@ -11,7 +11,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/hilfe.php';
 
 /* panel.ssi.at: die eigene Adresse von SSI — das Formularziel des Bausteins modules/newsletter.js (3.60.0) und dessen Tests. */
-const ERLAUBT = ['schema.org', 'www.youtube.com', 'www.youtube-nocookie.com', 'www.w3.org', 'panel.ssi.at'];
+const ERLAUBT = ['schema.org', 'www.youtube.com', 'www.youtube-nocookie.com', 'connect.facebook.net', 'www.w3.org', 'panel.ssi.at'];
 
 $w = H::wurzel();
 $dateien = [];

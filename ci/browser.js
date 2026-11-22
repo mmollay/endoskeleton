@@ -677,6 +677,86 @@ async function tastaturRundgang(page, hoechstens = 150) {
     await kontext.close();
   }
 
+  // Meta-Pixel (3.73.0): Banner unten, Zustimmen und Ablehnen gleich gewichtet; ohne Zustimmung, nach „Ablehnen“ (auch nach dem Neuladen) keine
+  // Anfrage an Meta; erst „Zustimmen“ lädt connect.facebook.net (PageView), auf der Rückkehrseite einer Anmeldung zusätzlich Lead. Widerruf über die Fußzeile.
+  const PIXEL = 'anmeldung--karte--pixel';
+  const pixelStand = (page) => page.evaluate(() => {
+    const b = document.getElementById('lp-banner'), r = b.getBoundingClientRect();
+    let speicher = null;
+    try { speicher = localStorage.getItem('lp-meta-pixel-1234567890123456'); } catch (e) { speicher = 'gesperrt'; }
+    return { offen: !b.hidden && r.height > 0, unten: Math.abs(r.bottom - innerHeight) < 1, speicher, fokus: document.activeElement.dataset.lpWahl || document.activeElement.className,
+      knoepfe: [...b.querySelectorAll('[data-lp-wahl]')].map((x) => { const s = getComputedStyle(x), q = x.getBoundingClientRect(); return [s.backgroundColor, s.color, s.fontSize, s.fontWeight, Math.round(q.height)].join('|'); }),
+      fuss: !document.querySelector('.lp-fuss-banner').hidden, offenAttr: document.querySelector('.lp-fuss-banner').getAttribute('aria-expanded'),
+      fbq: window.fbq ? window.fbq.queue.map((a) => Array.from(a).join(' ')) : null, breite: document.documentElement.scrollWidth };
+  });
+  for (const breite of [1440, 390]) {
+    const was = `Meta-Pixel (${breite})`;
+    const { page, fremd, kontext } = await oeffnen(browser, PIXEL, breite);
+    await page.waitForLoadState('networkidle');
+    let s = await pixelStand(page);
+    pruefe(s.offen && s.unten && s.fuss && s.speicher === null && s.fbq === null, `${was}: Banner unten offen, Fußzeilen-Knopf da, nichts gespeichert, kein fbq (${JSON.stringify(s)})`);
+    pruefe(s.knoepfe.length === 2 && s.knoepfe[0] === s.knoepfe[1], `${was}: Zustimmen und Ablehnen gleich gewichtet (${s.knoepfe.join(' / ')})`);
+    pruefe(s.fokus !== 'ja' && s.fokus !== 'nein' && s.breite <= breite, `${was}: Banner zieht den Fokus nicht an sich, kein Seitwärts-Scrollen (${s.fokus}, ${s.breite})`);
+    const halte = [];
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('Tab');
+      halte.push(await page.evaluate(() => document.activeElement.dataset.lpWahl || document.activeElement.getAttribute('href')));
+    }
+    pruefe(halte.join(' ') === '#inhalt datenschutz.html ja', `${was}: Tastatur nach dem Sprunglink zuerst ins Banner — Datenschutz, Zustimmen (${halte.join(' ')})`);
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(200);
+    s = await pixelStand(page);
+    pruefe(!s.offen && s.speicher === 'nein' && s.fbq === null && fremd.length === 0, `${was}: „Ablehnen“ per Tastatur — Banner zu, „nein“ gespeichert, keine Anfrage (${fremd.join(', ')})`);
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    s = await pixelStand(page);
+    pruefe(!s.offen && s.fbq === null && fremd.length === 0, `${was}: nach dem Neuladen bleibt es bei „nein“, keine Anfrage (${fremd.join(', ')})`);
+    await page.click('.lp-fuss-banner');
+    s = await pixelStand(page);
+    pruefe(s.offen && s.fokus === 'ja' && s.offenAttr === 'true', `${was}: „Cookie-Einstellungen“ öffnet das Banner wieder, Fokus auf „Zustimmen“`);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    s = await pixelStand(page);
+    pruefe(!s.offen && s.speicher === 'ja' && s.fokus === 'lp-fuss-banner' && s.offenAttr === 'false', `${was}: nach „Zustimmen“ Banner zu, „ja“ gespeichert, Fokus zurück in der Fußzeile (${JSON.stringify(s)})`);
+    pruefe(JSON.stringify(s.fbq) === JSON.stringify(['init 1234567890123456', 'track PageView']), `${was}: Pixel mit PageView, ohne Lead (${JSON.stringify(s.fbq)})`);
+    pruefe(fremd.length > 0 && fremd.every((u) => u.startsWith('https://connect.facebook.net/')), `${was}: erst jetzt eine Anfrage, nur an connect.facebook.net (${fremd.join(', ')})`);
+    await kontext.close();
+  }
+  {
+    const ja = `localStorage.setItem('lp-meta-pixel-1234567890123456', 'ja');`;
+    const { page, fremd, kontext } = await oeffnen(browser, PIXEL, 390, { suche: '?anmeldung=ok#anmeldung', init: [ja] });
+    await page.waitForLoadState('networkidle');
+    const s = await pixelStand(page);
+    pruefe(!s.offen && JSON.stringify(s.fbq) === JSON.stringify(['init 1234567890123456', 'track PageView', 'track Lead']), `Meta-Pixel: gespeicherte Zustimmung lädt ohne Banner, nach der Anmeldung mit Lead (${JSON.stringify(s.fbq)})`);
+    pruefe(fremd.length > 0 && fremd.every((u) => u.startsWith('https://connect.facebook.net/')), `Meta-Pixel: nach Zustimmung nur connect.facebook.net (${fremd.join(', ')})`);
+    await kontext.close();
+  }
+  {
+    const gesperrt = `Object.defineProperty(window, 'localStorage', { get() { throw new Error('gesperrt'); } });`;
+    const { page, fremd, kontext } = await oeffnen(browser, PIXEL, 390, { init: [gesperrt] });
+    const fehlerImSkript = [];
+    page.on('pageerror', (e) => fehlerImSkript.push(e.message));
+    await page.waitForLoadState('networkidle');
+    let s = await pixelStand(page);
+    pruefe(s.offen && fremd.length === 0, `Meta-Pixel ohne Web-Speicher: Banner offen, keine Anfrage (${fremd.join(', ')})`);
+    await page.click('[data-lp-wahl="nein"]');
+    s = await pixelStand(page);
+    pruefe(!s.offen && fremd.length === 0 && fehlerImSkript.length === 0, `Meta-Pixel ohne Web-Speicher: „Ablehnen“ wirkt ohne Fehler (${fehlerImSkript.join(', ')})`);
+    await kontext.close();
+  }
+  {
+    const { page, fremd, kontext } = await oeffnen(browser, PIXEL, 1280, { ohneJs: true });
+    pruefe(await page.$eval('#lp-banner', (b) => b.hidden) && fremd.length === 0, 'Meta-Pixel ohne JavaScript: kein Banner, keine Anfrage');
+    await kontext.close();
+  }
+  {
+    const { page, fremd, kontext } = await oeffnen(browser, 'anmeldung--karte', 1280);
+    await page.waitForLoadState('networkidle');
+    pruefe(await page.$('#lp-banner, .lp-fuss-banner') === null && fremd.length === 0, 'ohne Pixel-ID: kein Banner, keine Anfrage');
+    await kontext.close();
+  }
+
   // Kopfbereich mit Video (3.61.0): Startbild mit Play-Knopf, erst der Klick lädt youtube-nocookie, das Video sitzt 16:9 im Rahmen
   for (const breite of [1440, 390]) {
     const { page, fremd, kontext } = await oeffnen(browser, 'hero--bild-rechts', breite);

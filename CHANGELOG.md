@@ -4,6 +4,42 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.73.0] — 2026-11-22
+
+Meta-Pixel mit Einwilligung (Auftrag der Panel-Instanz, von Martin entschieden): **eine Landingpage kann das Meta-Pixel nutzen — geladen wird es
+erst, wenn der Besucher im Banner zustimmt.** Seiten ohne Pixel-ID bauen Byte für Byte wie bisher (bis auf `es/lp.css` und `es/lp.js`, die wachsen);
+ohne Zustimmung geht weiter keine Anfrage an einen fremden Server.
+
+### Added — Seitenfeld `meta.meta_pixel_id` (Kennung, nur Ziffern, 10–20 Stellen)
+- Setzt der Betreiber (das Panel), nie der Kunde. Eine andere Form (Buchstaben, zu kurz, zu lang, Zahl statt Text) ist ein sperrender Befund.
+- Mit ID steht auf jeder Seite (auch Impressum und Datenschutz) gleich nach dem Sprunglink ein Banner `lp-banner` („Cookies für Anzeigen“, Region mit
+  Namen), unten über der Seite: Text, Link auf die Datenschutzerklärung und die Knöpfe „Zustimmen“ und „Ablehnen“ — gleiche Klasse, gleiche Größe,
+  nichts vorausgewählt. In der Fußzeile steht der Knopf „Cookie-Einstellungen“ (`lp-fuss-banner`, `aria-controls`, `aria-expanded`), der das Banner
+  wieder öffnet (Widerruf). Beide sind ohne JavaScript versteckt — dann lädt ohnehin nichts.
+- `lp.js`: Ohne gespeicherte Wahl öffnet sich das Banner, ohne den Fokus an sich zu ziehen (Tastatur: zweiter Halt nach dem Sprunglink); solange es
+  offen ist, hält `scroll-padding` den Fokus darüber. Erst „Zustimmen“ lädt `https://connect.facebook.net/en_US/fbevents.js` (init, PageView;
+  auf der Rückkehrseite einer Anmeldung `?anmeldung=ok` zusätzlich Lead). „Ablehnen“ nach einer Zustimmung entzieht sie (`consent revoke`) und
+  löscht `_fbp`/`_fbc`. Die Wahl liegt erst nach einem Klick im Web-Speicher (`lp-meta-pixel-<ID>`), jeder Zugriff in try — ohne Speicher gilt
+  sie nur bis zum Verlassen der Seite. Die anonyme Statistik (3.56.0) bleibt unverändert ohne Web-Speicher.
+- Profil: optionaler Text `einwilligung_pixel` (20–600 Zeichen); ohne ihn ein fester Text in der Anrede des Profils, der Meta Platforms Ireland,
+  Zweck, Cookies, Übermittlung (auch in die USA) und den Widerruf nennt (`Profil::PIXEL_STANDARD`, `Profil::pixelText()`).
+- Prüfung (`lp/pruefen.php`): Seite mit Pixel-ID, deren Datenschutzerklärung „Meta“ nicht als eigenes Wort nennt → sperrender Befund an
+  `profil.rechtliches.datenschutz`.
+- Neue Klassen: `lp-banner`, `lp-banner-innen`, `lp-banner-titel`, `lp-banner-text`, `lp-banner-knoepfe`, `lp-banner-knopf`, `lp-fuss-banner`.
+  Im Druck entfallen Banner und Knopf.
+
+### Changed
+- Testprofile (hell und dunkel): die Datenschutzerklärung hat einen Absatz „Messung von Anzeigen“ (Meta-Pixel) — das ändert `datenschutz.html` jeder
+  Musterbuch-Seite. Musterbuch: `anmeldung--karte--pixel`. Prüfliste: Punkt Datenschutz nennt das Pixel.
+
+### Tests
+- `tests/pixel.test.php` (PX01–PX07): Katalog, ohne Pixel keine Spur, Banner und Widerruf auf allen drei Seiten (du/Sie), Text aus dem Profil
+  (maskiert, Länge), falsche IDs, Prüfer mit und ohne Satz zu Meta, Checkliste ohne Mangel. `ci/browser.js` Meta-Pixel: ohne Zustimmung, nach
+  „Ablehnen“ (auch nach dem Neuladen), ohne Web-Speicher, ohne JavaScript und ohne ID keine Anfrage; nach „Zustimmen“ nur `connect.facebook.net`
+  mit PageView, nach der Anmeldung mit Lead; Widerruf über die Fußzeile mit Fokus zurück; 1440 und 390 px.
+
+---
+
 ## [3.72.0] — 2026-11-22
 
 Erweiterung des Landingpage-Baukastens für Vortrags- und Beratungsseiten (Auftrag der Panel-Instanz, von Martin entschieden): **ein neuer Baustein
