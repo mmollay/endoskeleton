@@ -1,0 +1,24 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Hinweis-Kasten – standard",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Hinweis-Kasten“ in der Variante „standard“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Hinweis-Kasten – standard",
+            "text": "Baustein „hinweis“ in der Variante „standard“ (seit 3.72.0, geändert 3.72.0)."
+        },
+        {
+            "typ": "hinweis",
+            "variante": "standard",
+            "kennzeichnung": "Wichtiger Hinweis",
+            "titel": "Keine Heilversprechen",
+            "text": "Der Vortrag gibt allgemeine Informationen und ersetzt keine ärztliche Beratung, Diagnose oder Behandlung.\n\nBei Beschwerden wende dich bitte an deine Ärztin oder deinen Arzt."
+        }
+    ]
+}

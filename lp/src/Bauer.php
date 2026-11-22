@@ -46,7 +46,8 @@ final class Bauer
         $meta = $plan['meta'];
         $k = new Kontext($profil, $meta, $seite);
         $bloecke = [];
-        foreach ($plan['bausteine'] as $i => $b) {
+        foreach (self::folge($plan['bausteine']) as $i) {
+            $b = $plan['bausteine'][$i];
             $b['variante'] ??= $katalog->baustein($b['typ'])['varianten'][0];
             $bloecke[] = self::vorlage("$endo/lp/bausteine/{$b['typ']}.php", ['b' => $b, 'k' => $k, 'nr' => $i + 1]);
         }
@@ -124,6 +125,29 @@ final class Bauer
             . $profil->css . "\n"
             . ":root {\n  --primary-rgb: $rgb;\n}\n\n"
             . file_get_contents("$endo/lp/lp.css");
+    }
+
+    /**
+     * Reihenfolge der Abschnitte auf der Seite (3.72.0): Ein Hinweis-Kasten mit `vor_anmeldung` steht direkt vor dem Abschnitt Anmeldung, alles
+     * andere an seinem Platz im Bauplan. Ohne Anmeldung bleibt auch der Kasten an seinem Platz. Die Nummer jedes Abschnitts (Kennungen, Befunde)
+     * bleibt seine Stelle im Bauplan.
+     *
+     * @return list<int> Stellen im Bauplan in der Folge der Seite
+     */
+    private static function folge(array $bausteine): array
+    {
+        $anmeldung = array_search('anmeldung', array_column($bausteine, 'typ'), true);
+        $vor = static fn (array $b): bool => $anmeldung !== false && $b['typ'] === 'hinweis' && ($b['vor_anmeldung'] ?? false) === true;
+        $folge = [];
+        foreach ($bausteine as $i => $b) {
+            if ($i === $anmeldung) {
+                array_push($folge, ...array_keys(array_filter($bausteine, $vor)));
+            }
+            if (!$vor($b)) {
+                $folge[] = $i;
+            }
+        }
+        return $folge;
     }
 
     /** Führt eine Vorlage mit eigenen Variablen aus und gibt ihre Ausgabe zurück. */

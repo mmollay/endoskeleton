@@ -154,8 +154,8 @@ return [
         T::ok($p !== null && (new DOMXPath($p->ownerDocument))->query('following-sibling::form[contains(@class,"lp-formular")]', $p)->length === 1, 'vor dem Formular');
         [, $x] = $bau(H::seite());
         T::eq($x->query('//*[contains(@class,"lp-anmeldung-danach")]')->length, 0, 'ohne Angabe kein Element');
-        $s['bausteine'][1]['danach'] = str_repeat('x', 301);
-        T::ok(Schema::pruefen($s, Katalog::laden(), Profil::laden(H::testprofil()), T::tmp()) !== [], 'mehr als 300 Zeichen werden abgewiesen');
+        $s['bausteine'][1]['danach'] = str_repeat('x', 501);
+        T::ok(Schema::pruefen($s, Katalog::laden(), Profil::laden(H::testprofil()), T::tmp()) !== [], 'mehr als 500 Zeichen werden abgewiesen (bis 3.71.0: 300)');
     },
     'anmeldung: „Was danach passiert“ hält die Absatz-Regeln des Katalogs (**fett**, Leerzeile, nur Leerraum)' => static function () use ($bau): void {
         $s = H::seite();

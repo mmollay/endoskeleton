@@ -111,7 +111,7 @@ der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilde
 | `adresse` | kennung | – | `^https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+/\z`; fehlt: die Seite gibt beim Teilen keine Karte aus (og:url, og:image, twitter:card); setzt der Betreiber, nie der Kunde |
 | `indexieren` | janein | – | `true` / `false` |
 
-## Bausteine (Katalog 3.71.0)
+## Bausteine (Katalog 3.72.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -183,13 +183,13 @@ Varianten: `karte`, `band` · seit 3.51.0, geändert 3.52.0 · höchstens 2-mal
 
 ### `themen` — Themen
 
-Varianten: `haken`, `zwei-spalten` · seit 3.51.0, geändert 3.51.0
+Varianten: `haken`, `zwei-spalten` · seit 3.51.0, geändert 3.72.0
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
 | `text` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
-| `punkte` | liste | ja | 2–12 Einträge (eine Zeile, ≤ 120 Zeichen) |
+| `punkte` | liste | ja | 2–12 Einträge (eine Zeile, ≤ 200 Zeichen) |
 
 ```json
 {
@@ -285,19 +285,21 @@ Varianten: `standard` · seit 3.51.0, geändert 3.51.0 · höchstens 1-mal
 
 ### `anmeldung` — Anmeldung
 
-Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.55.0 · höchstens 1-mal
+Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.72.0 · höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
 | `titel` | zeile | ja | eine Zeile, ≤ 60 Zeichen |
 | `text` | absatz | – | ≤ 400 Zeichen, Leerzeile = Absatz, `**fett**` |
-| `danach` | absatz | – | ≤ 300 Zeichen, Leerzeile = Absatz, `**fett**` |
+| `danach` | absatz | – | ≤ 500 Zeichen, Leerzeile = Absatz, `**fett**`; fehlt: kein Absatz über dem Formular; jede E-Mail-Adresse darin wird ein mailto:-Link, auch auf fremde Domains (seit 3.72.0, vorher bis 300 Zeichen und nur Adressen auf link_hosts) |
 | `felder` | auswahl | ja | Liste aus `vorname`, `nachname`, `email`, `telefon`, muss `email` enthalten |
 | `knopf_text` | zeile | ja | eine Zeile, ≤ 40 Zeichen |
 | `liste` | kennung | ja | `^[a-z0-9][a-z0-9-]{1,59}$` |
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
 | `plaetze` | zahl | – | 1–10000; fehlt: unbegrenzt |
 | `newsletter` | janein | – | `true` / `false`; fehlt: kein Newsletter-Häkchen |
+| `freifeld` | janein | – | `true` / `false`; seit 3.72.0; fehlt: kein freies Feld; die Antwort steht nur in der Anmeldeliste des Betreibers, nie in Mails an andere |
+| `freifeld_frage` | zeile | – | eine Zeile, ≤ 100 Zeichen; seit 3.72.0; fehlt: „Worum geht es dir?“ (bei Anrede Sie: „Worum geht es Ihnen?“); gilt nur mit freifeld |
 
 ```json
 {
@@ -631,5 +633,26 @@ Varianten: `nebeneinander` · seit 3.71.0, geändert 3.71.0 · höchstens 2-mal
             "beschriftung": "Ein Beispiel"
         }
     ]
+}
+```
+
+### `hinweis` — Hinweis-Kasten
+
+Varianten: `standard` · seit 3.72.0, geändert 3.72.0 · höchstens 2-mal
+
+| Feld | Typ | Pflicht | Grenzen |
+|---|---|---|---|
+| `kennzeichnung` | zeile | – | eine Zeile, ≤ 40 Zeichen; fehlt: keine Kennzeichnung |
+| `titel` | zeile | ja | eine Zeile, ≤ 80 Zeichen |
+| `text` | absatz | – | ≤ 600 Zeichen, Leerzeile = Absatz, `**fett**`; fehlt: ohne Text wird der Kasten nicht gebaut — so kann er in einer Vorlage stehen, ohne dass eine Seite ohne Angaben ihn zeigt |
+| `vor_anmeldung` | janein | – | `true` / `false`; Standard ``; fehlt: der Kasten steht dort, wo er im Bauplan steht; mit true direkt vor dem Abschnitt Anmeldung (gibt es keinen, an seinem Platz) — die Nummer des Abschnitts bleibt seine Stelle im Bauplan |
+
+```json
+{
+    "typ": "hinweis",
+    "variante": "standard",
+    "kennzeichnung": "Wichtiger Hinweis",
+    "titel": "Keine Heilversprechen",
+    "text": "Der Vortrag gibt allgemeine Informationen und ersetzt keine ärztliche Beratung. Bei Beschwerden wende dich bitte an deine Ärztin oder deinen Arzt."
 }
 ```

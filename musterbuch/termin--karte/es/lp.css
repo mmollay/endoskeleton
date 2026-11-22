@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.71.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.72.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3639,6 +3639,26 @@ section.lp-anmeldung {
   color: var(--text);
 }
 
+/* Freies Feld (3.72.0): wie die Eingabefelder, mehrzeilig; die Höhe zieht man bei Bedarf selbst größer */
+.lp-feld textarea {
+  width: 100%;
+  min-height: 7rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.lp-freifeld-hinweis {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
 .lp-feld input[aria-invalid="true"] {
   border: 2px solid var(--error);
 }
@@ -4105,6 +4125,38 @@ section.lp-zahlen--band {
   color: var(--text-muted);
 }
 
+/* ─── HINWEIS-KASTEN (3.72.0) ───────────────────────────────────────────── */
+/* Ruhig abgesetzt, kein Alarmrot: Fläche der Karte mit feinem Rahmen und einer Kante in der Hauptfarbe. Die Kennzeichnung ist klein und fett
+   (--primary-dark und --text auf --card-bg prüft die Kontrast-Matrix); der Unterschied hängt nicht an der Farbe allein (Kante, Rahmen, Wortlaut). */
+.lp-hinweis-kasten {
+  max-width: 46rem;
+  padding: var(--space-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 0.3125rem solid var(--primary);
+  border-radius: var(--radius-md);
+}
+
+.lp-hinweis-kennzeichnung {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--primary-dark);
+}
+
+.lp-hinweis-kasten .lp-titel {
+  margin-top: 0;
+}
+
+.lp-hinweis-text {
+  color: var(--text);
+}
+
+.lp-hinweis-text p:last-child {
+  margin-bottom: 0;
+}
+
 /* ─── REFERENZEN ────────────────────────────────────────────────────────── */
 .lp-referenzen--raster .lp-referenzen-liste {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
@@ -4326,7 +4378,8 @@ section.lp-zahlen--band {
   .lp-mitglied,
   .lp-zeiten-liste,
   .lp-referenz,
-  .lp-paar {
+  .lp-paar,
+  .lp-hinweis-kasten {
     break-inside: avoid;
   }
 

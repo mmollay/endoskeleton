@@ -4,6 +4,32 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.72.0] — 2026-11-22
+
+Erweiterung des Landingpage-Baukastens für Vortrags- und Beratungsseiten (Auftrag der Panel-Instanz, von Martin entschieden): **ein neuer Baustein
+„Hinweis-Kasten“, ein freiwilliges freies Feld im Formular, Mail-Links in „Was danach passiert“ und längere Grenzen**. Bestehende Seiten bauen
+gleich (nur `es/lp.css` wächst); Double-Opt-In, Bestätigung und Einwilligung sind unverändert.
+
+### Added — Baustein `hinweis` „Hinweis-Kasten“ (Variante `standard`, höchstens 2 je Seite)
+- Felder: `kennzeichnung` (zeile, 40 — kleine Zeile über der Überschrift, z. B. „Wichtiger Hinweis“), `titel` (zeile, 80, Pflicht), `text` (absatz, 600 — ohne Text entsteht kein Abschnitt), `vor_anmeldung` (janein, Vorgabe nein).
+- **Stelle:** mit `vor_anmeldung` steht der Kasten auf der Seite direkt vor dem Abschnitt Anmeldung, sonst an seinem Platz im Bauplan (das Panel hängt ihn ans Ende). Ohne Anmeldung bleibt er an seinem Platz. Die Nummer des Abschnitts (Kennungen wie `lp-a4-titel`, Pfade in Befunden) bleibt seine Stelle im Bauplan (`Bauer::folge`).
+- Darstellung: ruhig abgesetzt, kein Alarmrot — Kartenfläche, feiner Rahmen, Kante in der Hauptfarbe; Überschrift H2 wie jeder Abschnitt, Kennzeichnung klein und fett in `--primary-dark`. Bricht im Druck nicht durch.
+- Neue Klassen: `lp-hinweis`, `lp-hinweis--standard`, `lp-hinweis-kasten`, `lp-hinweis-kennzeichnung`, `lp-hinweis-text`.
+
+### Added — freies Feld im Baustein `anmeldung`
+- `freifeld` (janein, Vorgabe nein) schaltet ein mehrzeiliges, freiwilliges Feld zu; `freifeld_frage` (zeile, 100) ist seine Beschriftung, leer = „Worum geht es dir?“ bzw. „Worum geht es Ihnen?“.
+- Das Feld heißt fest `name="anliegen"`, `id="lp-f-anliegen"`, `maxlength="1000"`, ohne `required`, Beschriftung mit „(freiwillig)“, `aria-describedby` auf den Hinweis „Höchstens 1000 Zeichen.“; es steht nach den übrigen Feldern und vor der Einwilligung. Ohne `freifeld` ist das Formular Byte für Byte wie bisher.
+- Neue Klassen: `lp-freifeld`, `lp-freifeld-hinweis`. Das Ziel des Formulars (Panel) muss `anliegen` kennen; ein Ziel, das es nicht kennt, übergeht es.
+
+### Changed
+- **`anmeldung.danach`: bis 500 Zeichen** (vorher 300). **Jede E-Mail-Adresse darin wird ein `mailto:`-Link**, unabhängig von `link_hosts` — aber nur nach strengem Muster (`Text::MAIL_STRENG`: Buchstaben, Ziffern, `._+-` vor dem @, Domain mit Endung aus Buchstaben; kein `%`, kein `?`, keine Anführungszeichen, kein `localhost`). Alles andere bleibt maskierter Text; freie Links und HTML gibt es weiter nicht. `Text::inline`/`absaetze` und `Kontext::absaetze` haben dafür einen neuen, optionalen letzten Parameter `$mails`.
+- **`themen.punkte`: Einträge bis 200 Zeichen** (vorher 120).
+
+### Tests
+- `tests/hinweis.test.php` (HW01–HW07): Katalog, Markup, Stelle und Reihenfolge, Mail-Links samt bösartiger Adressen, freies Feld (du/Sie, Barrierefreiheit, Byte-Gleichheit ohne Feld), Grenzen, Checkliste ohne Mangel. Musterbuch: `hinweis--standard`, `anmeldung--karte--freifeld`.
+
+---
+
 ## [3.71.0] — 2026-11-05
 
 Etappe 2 des Auftrags „mehr wiederverwendbare Bausteine“ (Auftrag der Panel-Instanz vom 05.11.2026, von Martin freigegeben): **sieben neue

@@ -1,0 +1,44 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Anmeldung – karte – freifeld",
+        "beschreibung": "Musterseite des Endoskeleton-Bausteins „Anmeldung“ in der Variante „karte“."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "anker": "start",
+            "dachzeile": "Musterbuch",
+            "titel": "Anmeldung – karte – freifeld",
+            "text": "Baustein „anmeldung“ in der Variante „karte“ mit freiem Feld und Mail-Link in „danach“ (seit 3.51.0, geändert 3.72.0)."
+        },
+        {
+            "typ": "hinweis",
+            "variante": "standard",
+            "kennzeichnung": "Wichtiger Hinweis",
+            "titel": "Keine Heilversprechen",
+            "text": "Der Vortrag ersetzt keine ärztliche Beratung.",
+            "vor_anmeldung": true
+        },
+        {
+            "typ": "anmeldung",
+            "variante": "karte",
+            "anker": "anmeldung",
+            "titel": "Jetzt kostenlos anmelden",
+            "felder": [
+                "vorname",
+                "email"
+            ],
+            "knopf_text": "Ich bin dabei",
+            "liste": "beispiel-abend",
+            "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail.",
+            "text": "Trag dich ein – den Zugangslink bekommst du per E-Mail.",
+            "danach": "Den Zoom-Link bekommst du am Tag vor dem Vortrag per E-Mail. Keine Zeit? Schreib an post@beispiel.invalid, dann schicken wir dir die Aufzeichnung.",
+            "plaetze": 30,
+            "newsletter": true,
+            "freifeld": true,
+            "freifeld_frage": "Worum geht es dir?"
+        }
+    ]
+}

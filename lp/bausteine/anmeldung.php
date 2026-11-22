@@ -16,10 +16,16 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  * ohne Ziel). Sein Text kommt aus `einwilligung_newsletter` des Profils, sonst aus Profil::NEWSLETTER_STANDARD mit dem Namen der Marke; die Kurzprüfsumme
  * dieses Wortlauts geht als verstecktes Feld `newsletter_kurz` mit (eigener Nachweis mit eigenem Wortlaut im Panel). Ohne `newsletter` ist das Formular
  * Byte für Byte wie bisher — ältere Weiterleitungsstellen verstehen es weiter.
+ *
+ * Freies Feld (3.72.0): Mit `"freifeld": true` steht vor der Einwilligung ein freiwilliges Textfeld `anliegen` (höchstens 1000 Zeichen) mit der Frage
+ * `freifeld_frage` (Vorgabe „Worum geht es dir?“), beschriftet als „(freiwillig)“, mit einem Hinweis auf die Grenze über aria-describedby. Ohne
+ * `freifeld` ist das Formular Byte für Byte wie bisher. Im Text `danach` wird jede Mailadresse ein mailto:-Link (Kontext::absaetze, $mails).
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
 $newsletterText = ($b['newsletter'] ?? false) === true ? Endo\Lp\Profil::newsletterText($p) : '';
+$freifeld = ($b['freifeld'] ?? false) === true;
+$frage = trim((string) ($b['freifeld_frage'] ?? '')) !== '' ? trim((string) $b['freifeld_frage']) : $k->du('Worum geht es dir?', 'Worum geht es Ihnen?');
 $felder = [
     'vorname'  => ['Vorname', 'text', 'given-name', true, $k->du('Bitte gib deinen Vornamen ein.', 'Bitte geben Sie Ihren Vornamen ein.')],
     'nachname' => ['Nachname', 'text', 'family-name', true, $k->du('Bitte gib deinen Nachnamen ein.', 'Bitte geben Sie Ihren Nachnamen ein.')],
@@ -38,7 +44,7 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 
 <?= $k->absaetze($b['text'] ?? '') ?>
 
-<?= $k->absaetze($b['danach'] ?? '', 'lp-anmeldung-danach') ?>
+<?= $k->absaetze($b['danach'] ?? '', 'lp-anmeldung-danach', true) ?>
 <form class="lp-formular" method="post"<?= $ziel !== '' ? ' action="' . $k->e($ziel) . '"' : '' ?>>
 <?php if ($ziel === ''): ?>
 <p class="lp-anmeldung-hinweis" role="note">Die Anmeldung wird gerade eingerichtet und ist in Kürze möglich.</p>
@@ -59,6 +65,13 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <?php endif ?>
 </div>
 <?php endforeach ?>
+<?php if ($freifeld): ?>
+<div class="lp-feld lp-freifeld">
+<label for="lp-f-anliegen"><?= $k->e($frage) ?> <span class="lp-freiwillig">(freiwillig)</span></label>
+<textarea id="lp-f-anliegen" name="anliegen" rows="4" maxlength="1000" aria-describedby="lp-f-anliegen-hinweis"></textarea>
+<p class="lp-freifeld-hinweis" id="lp-f-anliegen-hinweis">Höchstens 1000 Zeichen.</p>
+</div>
+<?php endif ?>
 <div class="lp-feld lp-einwilligung">
 <input id="lp-f-einwilligung" name="einwilligung" type="checkbox" value="ja" required>
 <label for="lp-f-einwilligung"><?= $k->e($p['einwilligung']) ?> Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</label>

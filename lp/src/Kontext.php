@@ -44,10 +44,13 @@ final class Kontext
         return Text::inline($s, $this->profil->hosts());
     }
 
-    /** Fließtext in Absätzen: wie inline(), dazu Leerzeile = neuer Absatz. Die einzige Stelle, an der die Hostliste in die Bausteine kommt. */
-    public function absaetze(?string $s, string $klasse = ''): string
+    /**
+     * Fließtext in Absätzen: wie inline(), dazu Leerzeile = neuer Absatz. Die einzige Stelle, an der die Hostliste in die Bausteine kommt.
+     * $mails (3.72.0): jede Mailadresse nach strengem Muster wird ein mailto:-Link, auch auf fremde Domains (Text::inline) — nur für „danach“.
+     */
+    public function absaetze(?string $s, string $klasse = '', bool $mails = false): string
     {
-        return Text::absaetze((string) $s, $klasse, $this->profil->hosts());
+        return Text::absaetze((string) $s, $klasse, $this->profil->hosts(), $mails);
     }
 
     /** Text je nach Anrede des Profils. */
