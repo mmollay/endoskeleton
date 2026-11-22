@@ -47,8 +47,8 @@ ohne Zustimmung geht weiter keine Anfrage an einen fremden Server.
   sie nur bis zum Verlassen der Seite. Die anonyme Statistik (3.56.0) bleibt unverändert ohne Web-Speicher.
 - Profil: optionaler Text `einwilligung_pixel` (20–600 Zeichen); ohne ihn ein fester Text in der Anrede des Profils, der Meta Platforms Ireland,
   Zweck, Cookies, Übermittlung (auch in die USA) und den Widerruf nennt (`Profil::PIXEL_STANDARD`, `Profil::pixelText()`).
-- Prüfung (`lp/pruefen.php`): Seite mit Pixel-ID, deren Datenschutzerklärung weder „Meta-Pixel“ noch „Meta Platforms“ nennt → sperrender Befund an
-  `profil.rechtliches.datenschutz` („Meta“ allein, etwa „Folge uns auf Meta“, genügt nicht).
+- Prüfung (`lp/pruefen.php`): Seite mit Pixel-ID, deren Datenschutzerklärung weder „Meta-Pixel“ / „Meta Pixel“ noch „Facebook-Pixel“ / „Facebook Pixel“ noch „Meta Platforms“
+  nennt → sperrender Befund an `profil.rechtliches.datenschutz` („Meta“ oder „Facebook“ allein, etwa „Folge uns auf Meta“, genügt nicht).
 - Neue Klassen: `lp-banner`, `lp-banner-innen`, `lp-banner-titel`, `lp-banner-text`, `lp-banner-knoepfe`, `lp-banner-knopf`, `lp-fuss-banner`.
   Im Druck entfallen Banner und Knopf.
 
