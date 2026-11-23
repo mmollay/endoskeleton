@@ -824,6 +824,70 @@ async function tastaturRundgang(page, hoechstens = 150) {
     await kontext.close();
   }
 
+  // Knopf nach dem Video (3.75.0): vorher verborgen; nach dem Ende das Video verschwommen und gesperrt, darüber der Knopf des Kopfbereichs und „Nochmal ansehen“
+  // (groß genug, im Rahmen, Fokus auf dem Knopf); der Klick springt ins erste Feld des Formulars; „Nochmal ansehen“ gibt das Video wieder frei. Playwrights
+  // Chromium spielt kein H.264 ab — das Ende wird deshalb als Ereignis ausgelöst. Mit ES_FOTOS=<Ordner> legt der Test dort Fotos des Endzustands ab.
+  const videoEndeMessen = (page) => page.evaluate(() => {
+    const v = document.querySelector('video.lp-video-datei'), e = document.querySelector('.lp-video-ende'), rahmen = v.parentElement.getBoundingClientRect();
+    const k = e.querySelector('.lp-video-ende-knopf'), n = e.querySelector('.lp-video-nochmal');
+    const innen = (b) => b.width > 0 && b.left >= rahmen.left - 0.5 && b.right <= rahmen.right + 0.5 && b.top >= rahmen.top - 0.5 && b.bottom <= rahmen.bottom + 0.5;
+    return { anzeige: getComputedStyle(e).display, inert: v.inert, filter: getComputedStyle(v).filter, uebergang: parseFloat(getComputedStyle(e).transitionDuration), aktiv: document.activeElement.className,
+      text: k.textContent.trim(), ziel: k.getAttribute('href'), kh: k.getBoundingClientRect().height, nh: n.getBoundingClientRect().height, kInnen: innen(k.getBoundingClientRect()), nInnen: innen(n.getBoundingClientRect()),
+      seite: document.documentElement.scrollWidth, zeit: v.currentTime };
+  });
+  const videoEnde = (page) => page.evaluate(() => document.querySelector('video.lp-video-datei').dispatchEvent(new Event('ended')));
+  for (const [ton, adresse] of TOENE) {
+    for (const breite of [1440, 390]) {
+      const { page, fremd, kontext } = await oeffnen(browser, adresse('hero--bild-rechts--video-ende'), breite);
+      const id = `Knopf nach dem Video ${ton} (${breite})`;
+      await page.waitForLoadState('load');
+      const vorher = await videoEndeMessen(page);
+      pruefe(vorher.anzeige === 'none' && !vorher.inert && vorher.filter === 'none', `${id}: vor dem Ende verborgen, Video frei und scharf (${JSON.stringify(vorher)})`);
+      await page.focus('video.lp-video-datei');
+      await videoEnde(page);
+      await page.waitForTimeout(600);
+      const m = await videoEndeMessen(page);
+      pruefe(m.anzeige === 'flex' && m.inert && /blur\(/.test(m.filter), `${id}: nach dem Ende Überlagerung da, Video gesperrt und verschwommen (${m.anzeige}, inert ${m.inert}, ${m.filter})`);
+      pruefe(m.text === 'Kostenlos anmelden' && m.ziel === '#anmeldung', `${id}: Knopf = Knopf des Kopfbereichs (${m.text}, ${m.ziel})`);
+      pruefe(m.kh >= 44 && m.nh >= 44 && m.kInnen && m.nInnen, `${id}: Knopf und „Nochmal ansehen“ mindestens 44 hoch und im Rahmen (${Math.round(m.kh)}, ${Math.round(m.nh)}, ${m.kInnen}, ${m.nInnen})`);
+      pruefe(m.aktiv.includes('lp-video-ende-knopf'), `${id}: der Fokus liegt auf dem Knopf (${m.aktiv})`);
+      pruefe(m.seite <= breite && fremd.length === 0, `${id}: kein Seitwärts-Scrollen, keine Fremdanfrage (${m.seite}, ${fremd})`);
+      if (process.env.ES_FOTOS) { await page.screenshot({ path: path.join(process.env.ES_FOTOS, `video-ende-${ton}-${breite}.png`) }); }
+      await page.keyboard.press('Tab');
+      pruefe(await page.evaluate(() => document.activeElement.classList.contains('lp-video-nochmal')), `${id}: Tab führt vom Knopf zu „Nochmal ansehen“`);
+      await page.click('.lp-video-ende-knopf');
+      // Der Fokus kommt erst, wenn der Sprung steht (sanftes Scrollen läuft noch): auf ihn warten, nicht sofort messen.
+      await page.waitForFunction(() => /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName), null, { timeout: 4000 }).catch(() => {});
+      const sprung = await page.evaluate(() => ({ hash: location.hash, feld: document.activeElement.tagName, im: document.activeElement.closest('.lp-anmeldung') !== null, erstes: document.activeElement === document.querySelector('.lp-anmeldung form.lp-formular input:not([type=hidden])') }));
+      pruefe(sprung.hash === '#anmeldung' && /^(INPUT|SELECT|TEXTAREA)$/.test(sprung.feld) && sprung.im && sprung.erstes, `${id}: Klick springt zum Formular, Fokus im ersten Feld (${JSON.stringify(sprung)})`);
+      await page.click('.lp-video-nochmal');
+      const nochmal = await videoEndeMessen(page);
+      pruefe(nochmal.anzeige === 'none' && !nochmal.inert && nochmal.filter === 'none' && nochmal.zeit === 0, `${id}: „Nochmal ansehen“ gibt das Video wieder frei, von vorn (${JSON.stringify([nochmal.anzeige, nochmal.inert, nochmal.filter, nochmal.zeit])})`);
+      await kontext.close();
+    }
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts--video-ende', 1440, { reducedMotion: 'reduce' });
+    await videoEnde(page);
+    const r = await videoEndeMessen(page);
+    pruefe(r.anzeige === 'flex' && r.uebergang === 0, `Knopf nach dem Video, weniger Bewegung: kein Übergang (${r.anzeige}, ${r.uebergang})`);
+    await kontext.close();
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts--video-ende', 1440, { ohneJs: true });
+    const o = await videoEndeMessen(page);
+    pruefe(o.anzeige === 'none' && !o.inert, `Knopf nach dem Video ohne JavaScript: Überlagerung bleibt verborgen, das Video bleibt wie es war (${o.anzeige})`);
+    await kontext.close();
+  }
+  {
+    const { page, kontext } = await oeffnen(browser, 'hero--bild-rechts--video-datei', 1440);
+    await page.waitForLoadState('load');
+    await videoEnde(page);
+    const a = await page.evaluate(() => { const v = document.querySelector('video.lp-video-datei'); return { teile: document.querySelectorAll('.lp-video-ende, .lp-video-nochmal, [data-lp-videoende]').length, inert: v.inert, filter: getComputedStyle(v).filter }; });
+    pruefe(a.teile === 0 && !a.inert && a.filter === 'none', `Vorgabe aus (Musterseite ohne das Feld): keine Überlagerung, das Video bleibt nach dem Ende wie es war (${JSON.stringify(a)})`);
+    await kontext.close();
+  }
+
   // Termine mit gestellter Uhr: vergangene ausgeblendet, ohne Termin der Ersatztext
   {
     let { page, kontext } = await oeffnen(browser, 'termin--karte', 1280, { uhr: '2099-11-01T12:00:00+01:00' });

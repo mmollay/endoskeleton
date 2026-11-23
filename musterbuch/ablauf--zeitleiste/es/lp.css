@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.74.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.75.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3439,6 +3439,61 @@ section.lp-termin--band {
   font-size: var(--fs-sm);
 }
 
+/* Knopf nach dem Video (3.75.0): Am Ende des eigenen Videos (lp.js nimmt hidden von der Überlagerung, :has() verwischt dann das Video — ohne
+   Klasse von JS) steht das letzte Bild verschwommen und abgedunkelt; scale schneidet den hellen Rand der Verwischung im Rahmen ab. Die Überlagerung dunkelt zusätzlich mit
+   der Überschriftenfarbe ab, ihre Schrift hat die Seitenfarbe — dieses Paar ist auf jeder Marke lesbar. Bei „weniger Bewegung“ blendet nichts ein. */
+.lp-video-rahmen:has(.lp-video-ende:not([hidden])) .lp-video-datei {
+  filter: blur(0.75rem) brightness(0.6);
+  transform: scale(1.1);
+}
+
+.lp-video-ende {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: color-mix(in srgb, var(--heading) 45%, transparent);
+  color: var(--bg);
+  text-align: center;
+  transition: opacity 0.4s ease;
+}
+
+@starting-style {
+  .lp-video-ende {
+    opacity: 0;
+  }
+}
+
+.lp-video-ende[hidden] {
+  display: none;
+}
+
+.lp-video-ende-knopf {
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--fs-lg);
+}
+
+.lp-video-nochmal {
+  min-height: 2.75rem;
+  padding: var(--space-xs) var(--space-sm);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lp-video-nochmal:focus-visible {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.125rem;
+}
+
 @media (min-width: 60rem) {
   .lp-video--mit-text .lp-block-innen {
     grid-template-columns: 1fr 1.3fr;
@@ -4416,6 +4471,7 @@ section.lp-zahlen--band {
   .lp-formular fieldset,
   .lp-video-start::before,
   .lp-video-start::after,
+  .lp-video-ende,
   .lp-bewegung-leiste,
   .lp-bewegung-kamera {
     display: none;
@@ -4429,6 +4485,11 @@ section.lp-zahlen--band {
 
   .lp-video-rahmen {
     background: transparent;
+  }
+
+  .lp-video-rahmen:has(.lp-video-ende:not([hidden])) .lp-video-datei {
+    filter: none;
+    transform: none;
   }
 
   .lp-bewegung-figur canvas {

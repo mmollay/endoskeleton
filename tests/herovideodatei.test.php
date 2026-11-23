@@ -84,7 +84,7 @@ return [
         T::eq($f['seit'] ?? null, '3.62.0', 'seit 3.62.0');
         T::ok(!($f['pflicht'] ?? false) && !isset($f['pflicht_bei']), 'freiwillig');
         T::ok(!isset($hero['beispiel']['video_datei']), 'das Katalog-Beispiel bleibt ohne Video');
-        T::eq($hero['geaendert'], '3.62.0', 'Kopfbereich geändert 3.62.0');
+        T::eq($hero['geaendert'], '3.75.0', 'Kopfbereich geändert 3.75.0 (Knopf nach dem Video)');
         $video = $k->baustein('video');
         T::eq($video['geaendert'], '3.62.0', 'Baustein video geändert 3.62.0');
         T::eq($video['felder']['anbieter']['werte'] ?? null, ['youtube', 'datei'], 'Anbieter youtube und datei');
@@ -415,7 +415,8 @@ return [
         T::contains($skill, 'seit 3.62.0', 'Skill nennt die Version');
         T::contains($skill, 'nur wenn', 'Skill nennt die Bedingung am Anbieter');
         $js = (string) file_get_contents("$w/lp/lp.js");
-        T::notContains($js, '.play(', 'lp.js spielt nichts selbst ab');
+        T::eq(substr_count($js, '.play('), 1, 'lp.js spielt nur an einer Stelle etwas ab (3.75.0), nie von selbst');
+        T::ok(preg_match("~lp-video-nochmal'\)\.addEventListener\('click', function \(\) \{[^}]*\.play\(~", $js) === 1, '… und zwar im Klick auf „Nochmal ansehen“');
         T::notContains($js, 'lp-video-datei', 'lp.js fasst das eigene Video nicht an');
         T::eq(substr_count($js, "'.lp-video-start'"), 1, 'lp.js: weiter genau ein Handler für den YouTube-Start');
         T::notContains($js, '<video', 'lp.js baut kein <video>');

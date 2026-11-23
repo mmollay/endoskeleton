@@ -184,17 +184,22 @@ final class Kontext
      * Eigenes Video (3.62.0): <video> mit Bedienleiste im 16:9-Rahmen, das Bild ist das Startbild (poster). preload="none": nichts lädt, bis der
      * Besucher startet; nichts startet von selbst (kein autoplay, kein muted, kein loop). Kein Drittanbieter — die Datei liegt im Seitenordner.
      * Die Datei wird hier noch einmal geprüft (Videodatei): ein Bauplan am Prüfer vorbei bekommt nie ein Video, das es nicht geben darf.
+     * $endeKnopf (3.75.0, der Knopf des Kopfbereichs): Mit ihm liegt nach dem Ende des Videos eine Überlagerung über dem Rahmen (bis dahin hidden,
+     * lp.js zeigt sie bei „ended“): das letzte Bild verschwommen, darüber derselbe Knopf und „Nochmal ansehen“. Ohne ihn bleibt der Rahmen wie bisher.
      */
-    public function videoDatei(string $datei, string $titel, array $poster): string
+    public function videoDatei(string $datei, string $titel, array $poster, ?array $endeKnopf = null): string
     {
         if (($f = Videodatei::fehler($this->seite, $datei)) !== null) {
             throw new BauFehler("Videodatei $datei: $f[0]");
         }
         [$start] = $this->bildDaten($poster);
-        return '<div class="lp-video-rahmen">' . "\n"
+        $ende = $endeKnopf === null ? '' : "\n" . '<div class="lp-video-ende" hidden>' . "\n"
+            . '<a class="btn btn-primary lp-knopf lp-video-ende-knopf" href="' . $this->e((string) $endeKnopf['ziel']) . '">' . $this->e((string) $endeKnopf['text']) . "</a>\n"
+            . '<button type="button" class="lp-video-nochmal">Nochmal ansehen</button>' . "\n</div>";
+        return '<div class="lp-video-rahmen"' . ($endeKnopf === null ? '' : ' data-lp-videoende') . '>' . "\n"
             . sprintf('<video class="lp-video-datei" controls preload="none" playsinline poster="%s" aria-label="%s">', $this->e($start), $this->e('Video: ' . $titel)) . "\n"
             . sprintf('<source src="%s" type="video/mp4">', $this->e($datei)) . "\n"
-            . "</video>\n</div>\n"
+            . "</video>$ende\n</div>\n"
             . '<p class="lp-video-link">' . $this->du('Lässt sich das Video nicht abspielen? Du kannst es auch', 'Lässt sich das Video nicht abspielen? Sie können es auch')
             . ' <a href="' . $this->e($datei) . '">als Datei öffnen</a>.</p>';
     }

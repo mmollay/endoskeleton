@@ -15,6 +15,33 @@
     });
   });
 
+  // Knopf nach dem Video (3.75.0): nur Rahmen mit data-lp-videoende (Kopfbereich mit video_ende_knopf). Am Ende des eigenen Videos steht das letzte Bild
+  // verschwommen, darüber der Anmelde-Knopf (ein Link zu #anmeldung — den Sprung ins erste Feld macht der Handler „Sprung zum Formular“ weiter unten)
+  // und „Nochmal ansehen“. Solange die Überlagerung steht, ist das Video gesperrt (inert): Tab und Zeiger erreichen die Bedienleiste dahinter nicht.
+  // Nichts startet von selbst: Das Video läuft nur nach dem Klick auf „Nochmal ansehen“ oder auf seine eigene Bedienleiste.
+  document.querySelectorAll('.lp-video-rahmen[data-lp-videoende]').forEach(function (rahmen) {
+    var video = rahmen.querySelector('video'), ende = rahmen.querySelector('.lp-video-ende');
+    if (!video || !ende) { return; }
+    function schalten(sichtbar) {
+      ende.hidden = !sichtbar;
+      video.inert = sichtbar;
+    }
+    video.addEventListener('ended', function () {
+      var hatteFokus = rahmen.contains(document.activeElement);
+      // Im Vollbild liegt nur das Video obenauf, die Überlagerung wäre unsichtbar: zuerst zurück ins Fenster.
+      if (document.fullscreenElement) { document.exitFullscreen().catch(function () {}); } else if (video.webkitDisplayingFullscreen) { video.webkitExitFullscreen(); }
+      schalten(true);
+      if (hatteFokus) { ende.querySelector('.lp-video-ende-knopf').focus({ preventScroll: true }); }
+    });
+    video.addEventListener('play', function () { schalten(false); });
+    ende.querySelector('.lp-video-nochmal').addEventListener('click', function () {
+      schalten(false);
+      video.currentTime = 0;
+      video.play().catch(function () {});
+      video.focus({ preventScroll: true });
+    });
+  });
+
   // Druck (3.70.0): Auf Papier lässt sich nichts aufklappen — für den Druck sind alle Fragen offen, danach wieder wie vorher.
   var zugeklappt = [];
   window.addEventListener('beforeprint', function () {

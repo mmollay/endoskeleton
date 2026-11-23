@@ -69,6 +69,7 @@ final class Skill
         $pflicht = ($f['pflicht'] ?? false) ? 'ja' : (isset($f['pflicht_bei']) ? 'bei ' . implode(', ', $f['pflicht_bei']) : (isset($f['pflicht_wenn']) ? 'wenn ' . self::bedingung($f['pflicht_wenn']) : '–'));
         return "| $name | {$f['typ']} | $pflicht | " . self::grenzen($f) . (isset($f['nur_bei']) ? '; nur bei ' . implode(', ', $f['nur_bei']) : '')
             . (isset($f['nur_wenn']) ? '; nur wenn ' . self::bedingung($f['nur_wenn']) : '')
+            . (isset($f['an_braucht']) ? '; true braucht ' . implode(', ', array_map(static fn ($n) => "`$n`", $f['an_braucht'])) : '')
             . (isset($f['nicht_mit']) ? '; nicht zusammen mit ' . implode(', ', array_map(static fn ($n) => "`$n`", $f['nicht_mit'])) : '')
             . (isset($f['standard']) ? "; Standard `{$f['standard']}`" : '') . (isset($f['seit']) ? "; seit {$f['seit']}" : '')
             . (isset($f['fehlt']) ? "; fehlt: {$f['fehlt']}" : '') . " |\n";

@@ -2,13 +2,14 @@
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
  * Kopfbereich: einzige H1 der Seite, optional Bild (rechts oder dahinter) und Knopf. Bei bild-rechts wird das Bild zum Startbild eines Videos:
- * mit video_kennung (3.61.0) ein YouTube-Video mit zwei Klicks (Kontext::videoStart), mit video_datei (3.62.0) ein eigenes Video (Kontext::videoDatei).
+ * mit video_kennung (3.61.0) ein YouTube-Video mit zwei Klicks (Kontext::videoStart), mit video_datei (3.62.0) ein eigenes Video (Kontext::videoDatei);
+ * mit video_ende_knopf (3.75.0) liegt nach dem Ende des eigenen Videos der Knopf des Kopfbereichs über dem verschwommenen letzten Bild.
  * @var array $b @var Endo\Lp\Kontext $k @var int $nr */
 $titelId = $k->id($nr, 'titel');
 $video = null;
 if ($b['variante'] === 'bild-rechts' && isset($b['bild'])) {
     $video = isset($b['video_kennung']) ? $k->videoStart($b['video_kennung'], $b['titel'], $b['bild'], true, 'halb')
-        : (isset($b['video_datei']) ? $k->videoDatei($b['video_datei'], $b['titel'], $b['bild']) : null);
+        : (isset($b['video_datei']) ? $k->videoDatei($b['video_datei'], $b['titel'], $b['bild'], ($b['video_ende_knopf'] ?? false) === true ? $b['knopf'] : null) : null);
 }
 ?>
 <?= $k->oeffnen($b, $nr) ?>

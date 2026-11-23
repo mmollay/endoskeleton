@@ -120,7 +120,7 @@ der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilde
 | `indexieren` | janein | – | `true` / `false` |
 | `meta_pixel_id` | kennung | – | `^[0-9]{10,20}\z`; seit 3.73.0; fehlt: kein Meta-Pixel und kein Einwilligungsbanner; mit ID zeigt die Seite ein Banner (Zustimmen oder Ablehnen) und lädt das Meta-Pixel erst nach der Zustimmung; die Datenschutzerklärung im Profil muss Meta nennen; nur eintragen, wenn der Inhaber der Seite die ID nennt — nie erfinden |
 
-## Bausteine (Katalog 3.74.0)
+## Bausteine (Katalog 3.75.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -128,7 +128,7 @@ Jeder Baustein kennt zusätzlich `typ` (Pflicht), `variante` (ohne Angabe die er
 
 ### `hero` — Kopfbereich
 
-Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.62.0 · genau einmal, als erster Abschnitt
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.75.0 · genau einmal, als erster Abschnitt
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -138,6 +138,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 | `bild` | bild | bei bild-rechts, bild-hinten | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}` |
 | `video_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur bei bild-rechts; seit 3.61.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Kennung wird es zum Startbild mit Play-Knopf, erst der Klick lädt das Video von YouTube (youtube-nocookie) |
 | `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 200 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
+| `video_ende_knopf` | janein | – | `true` / `false`; true braucht `video_datei`, `knopf`; seit 3.75.0; fehlt: das eigene Video bleibt nach dem Ende stehen wie bisher; mit true zeigt es nach dem Ende das letzte Bild verschwommen und darüber den Knopf des Kopfbereichs (derselbe Text, dasselbe Ziel) mit „Nochmal ansehen“ |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
 
 ```json

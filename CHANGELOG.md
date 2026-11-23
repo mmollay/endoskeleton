@@ -4,6 +4,35 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.75.0] — 2026-11-23
+
+Knopf nach dem Video (Martin, 23.11.2026: „Bitte optional einstellbar machen, dass nach dem Video der Button erscheint, also das Bild verschwommen ist und
+ein Button kommt: ‚Jetzt anmelden‘, damit der User eine Art Call-to-Action-Effekt hat, auf den er direkt draufklicken kann, nachdem er das Video gesehen
+hat.“). **Vorgabe AUS:** Ohne das neue Feld baut jede Seite Byte für Byte wie bisher (Musterbuch unverändert, Test `bestand`); nur das neue Musterbuch-Beispiel
+`hero--bild-rechts--video-ende` kommt dazu. Nur das **eigene** Video meldet sein Ende sauber (`ended`); beim YouTube-Video (zwei Klicks, iframe von
+youtube-nocookie) gäbe es das nur über die IFrame-API des Anbieters — die lädt Skripte von Google und bleibt deshalb draußen.
+
+### Added — Feld `video_ende_knopf` im Kopfbereich (bild-rechts mit `video_datei`)
+- `video_ende_knopf: true` (ja/nein, Standard aus): Nach dem Ende des Videos steht das letzte Bild verschwommen und abgedunkelt, darüber der **Knopf des
+  Kopfbereichs** (derselbe Text, dasselbe Ziel — der Kunde ändert ihn an einer Stelle) und klein „Nochmal ansehen“.
+- Der Klick auf den Knopf springt zum Anmeldeformular und setzt den Cursor ins erste Feld (der vorhandene Handler „Sprung zum Formular“ erledigt das).
+- Barrierefrei: Knopf und „Nochmal ansehen“ sind echte, fokussierbare Bedienelemente mit sichtbarem Fokus. Hatte die Tastatur den Fokus im Video, geht er auf den
+  Knopf. Solange die Überlagerung steht, ist das Video gesperrt (`inert`). Im Vollbild geht es zuerst zurück ins Fenster. Bei „weniger Bewegung“ gibt es keinen Übergang.
+- Ohne JavaScript bleibt die Überlagerung verborgen (`hidden`): Das Video bleibt, wie es war. Nichts startet von selbst; „Nochmal ansehen“ spielt nur auf Klick.
+- Neue Klassen: `lp-video-ende` (Überlagerung; steht sie nicht mehr auf `hidden`, verwischt `:has()` das Video — JS setzt keine Klasse), `lp-video-ende-knopf` (der
+  große Knopf), `lp-video-nochmal` („Nochmal ansehen“). Das Datenattribut `data-lp-videoende` am Rahmen schaltet das Verhalten in `lp.js` ein.
+
+### Changed — Schema-Regel `an_braucht`
+- Neue Feldregel `an_braucht: [feld, …]` im Katalog: Ein Schalter mit `true` braucht die genannten Felder (hier `video_datei` und `knopf`), sonst sperrend mit
+  Kundentext; `false` ist immer gültig (das Panel darf es nach einem Wechsel der Darstellung schreiben). Die Feldtabelle in `lp/SKILL.md` nennt die Regel.
+- `Kontext::videoDatei` bekommt als vierten Parameter den Knopf (`null` = wie bisher). Katalog: Kopfbereich geändert 3.75.0.
+
+### Tests
+- `tests/videoende.test.php` (VE01–VE08), Browsertest „Knopf nach dem Video“ in `ci/browser.js`; `herovideodatei.test.php` VD01 erwartet `geaendert` 3.75.0, VD10 erlaubt
+  in `lp.js` genau ein `.play(` — im Klick auf „Nochmal ansehen“ (vorher keines).
+
+---
+
 ## [3.74.0] — 2026-11-22
 
 Feld-Markierung für „Direkt im Bild bearbeiten“ (Auftrag der Panel-Instanz, Martin: „Ja, sauber umbauen“): Das Panel fand Texte im Bild bisher
