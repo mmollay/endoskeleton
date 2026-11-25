@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.75.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.76.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3221,6 +3221,56 @@ html[data-lp-banner="offen"] .lp-seite {
 
 .lp-hero-text .lp-knopf {
   margin-top: var(--space-sm);
+}
+
+/* Drei Knöpfe oben (3.76.0, schnellwahl): direkt unter der Überschrift untereinander, am Handy über die volle Breite, ab 40 rem so breit wie der
+   längste Text (fit-content: nie breiter als der Platz in der Spalte). Jeder Knopf ist mindestens 2,75 rem (44 px) hoch und bricht lange Texte um, statt die Seite zu verbreitern. Der Wartetext von B
+   steht im gleichen Maß in einem gestrichelten Kästchen — kein Knopf, nur der Hinweis, wann der Link erscheint. */
+.lp-schnellwahl {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.lp-hero-text .lp-schnellwahl-knopf,
+.lp-schnellwahl-wartet {
+  margin: 0;
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+.lp-schnellwahl-knopf {
+  white-space: normal;
+  text-align: center;
+}
+
+.lp-schnellwahl-zoom {
+  display: grid;
+}
+
+.lp-schnellwahl-zoom[hidden],
+.lp-schnellwahl-wartet[hidden] {
+  display: none;
+}
+
+.lp-schnellwahl-wartet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-md);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .lp-schnellwahl {
+    width: fit-content;
+    max-width: 100%;
+  }
 }
 
 .lp-hero-bild {

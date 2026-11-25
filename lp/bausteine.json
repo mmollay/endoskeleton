@@ -1,5 +1,5 @@
 {
-  "version": "3.75.0",
+  "version": "3.76.0",
   "seite": {
     "felder": {
       "titel":        { "typ": "zeile", "label": "Seitentitel", "max": 60, "pflicht": true },
@@ -34,11 +34,12 @@
   },
   "bausteine": {
     "hero": {
-      "name": "Kopfbereich", "seit": "3.51.0", "geaendert": "3.75.0",
+      "name": "Kopfbereich", "seit": "3.51.0", "geaendert": "3.76.0",
       "klassen": {
         "lp-hero": "3.51.0", "lp-hero--bild-rechts": "3.51.0", "lp-hero--bild-hinten": "3.51.0", "lp-hero--schlicht": "3.51.0",
         "lp-hero-text": "3.51.0", "lp-hero-dachzeile": "3.51.0", "lp-hero-titel": "3.51.0", "lp-hero-bild": "3.51.0", "lp-hero-medien": "3.61.0",
-        "lp-video-ende": "3.75.0", "lp-video-ende-knopf": "3.75.0", "lp-video-nochmal": "3.75.0"
+        "lp-video-ende": "3.75.0", "lp-video-ende-knopf": "3.75.0", "lp-video-nochmal": "3.75.0",
+        "lp-schnellwahl": "3.76.0", "lp-schnellwahl-knopf": "3.76.0", "lp-schnellwahl-zoom": "3.76.0", "lp-schnellwahl-wartet": "3.76.0"
       },
       "varianten": ["bild-rechts", "bild-hinten", "schlicht"],
       "felder": {
@@ -52,7 +53,9 @@
                        "fehlt": "das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst)" },
         "video_ende_knopf": { "typ": "janein", "label": "Knopf nach dem Video", "an_braucht": ["video_datei", "knopf"], "seit": "3.75.0",
                        "fehlt": "das eigene Video bleibt nach dem Ende stehen wie bisher; mit true zeigt es nach dem Ende das letzte Bild verschwommen und darüber den Knopf des Kopfbereichs (derselbe Text, dasselbe Ziel) mit „Nochmal ansehen“" },
-        "knopf":     { "typ": "knopf", "label": "Knopf" }
+        "knopf":     { "typ": "knopf", "label": "Knopf" },
+        "schnellwahl": { "typ": "janein", "label": "Drei Knöpfe oben", "seit": "3.76.0",
+                       "fehlt": "der Kopfbereich zeigt nur seinen Knopf; mit true stehen unter der Überschrift untereinander „Für den nächsten Zoom-Vortrag anmelden“ (zur Anmeldung, ersetzt den Knopf), „Jetzt ohne E-Mail beim Zoom-Vortrag dabei sein“ (nur mit Online-Termin; den Zoom-Link liefert das Panel erst 15 Minuten vor Beginn) und „Echten Erfolgsbericht ansehen (ohne E-Mail)“ (nur mit Erfahrungen oder Video) — jeder nur, wenn die Seite sein Ziel hat" }
       },
       "regeln": { "zuerst": true, "genau_einmal": true },
       "beispiel": {

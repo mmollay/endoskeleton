@@ -1,0 +1,61 @@
+{
+    "format": 1,
+    "meta": {
+        "titel": "Musterbuch: Kopfbereich – drei Knöpfe oben",
+        "beschreibung": "Kopfbereich „schlicht“ mit drei Knöpfen unter der Überschrift: zur Anmeldung, Zoom ohne E-Mail (Link erst 15 Minuten vorher) und zum Erfolgsbericht."
+    },
+    "bausteine": [
+        {
+            "typ": "hero",
+            "variante": "schlicht",
+            "dachzeile": "Kostenloser Online-Abend",
+            "titel": "Gesund durch den Winter",
+            "text": "Was du selbst für dein Immunsystem tun kannst – verständlich erklärt.",
+            "knopf": {
+                "text": "Kostenlos anmelden",
+                "ziel": "#anmeldung"
+            },
+            "schnellwahl": true
+        },
+        {
+            "typ": "termin",
+            "variante": "karte",
+            "titel": "Nächster Termin",
+            "art": "online",
+            "termine": [
+                {
+                    "beginn": "2099-10-06T19:00",
+                    "dauer_min": 60
+                }
+            ],
+            "ort": "Online über Zoom – den Link bekommst du per E-Mail",
+            "wenn_leer": "Der nächste Termin steht bald fest."
+        },
+        {
+            "typ": "erfahrungen",
+            "variante": "karten",
+            "titel": "Das sagen Teilnehmer",
+            "eintraege": [
+                {
+                    "text": "Sehr verständlich erklärt, ich habe viel mitgenommen.",
+                    "name": "Anna B.",
+                    "ort": "Graz",
+                    "quelle": "https://www.example.com/erfahrungen/1"
+                }
+            ]
+        },
+        {
+            "typ": "anmeldung",
+            "variante": "karte",
+            "anker": "anmeldung",
+            "titel": "Jetzt kostenlos anmelden",
+            "felder": [
+                "vorname",
+                "email"
+            ],
+            "knopf_text": "Ich bin dabei",
+            "liste": "beispiel-abend",
+            "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail."
+        }
+    ]
+}

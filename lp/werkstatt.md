@@ -1,4 +1,4 @@
-# Landingpage bearbeiten (Endoskeleton 3.75.0)
+# Landingpage bearbeiten (Endoskeleton 3.76.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -30,6 +30,7 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · genau einmal, als erster 
 | `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 200 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
 | `video_ende_knopf` | janein | – | `true` / `false`; true braucht `video_datei`, `knopf`; seit 3.75.0; fehlt: das eigene Video bleibt nach dem Ende stehen wie bisher; mit true zeigt es nach dem Ende das letzte Bild verschwommen und darüber den Knopf des Kopfbereichs (derselbe Text, dasselbe Ziel) mit „Nochmal ansehen“ |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
+| `schnellwahl` | janein | – | `true` / `false`; seit 3.76.0; fehlt: der Kopfbereich zeigt nur seinen Knopf; mit true stehen unter der Überschrift untereinander „Für den nächsten Zoom-Vortrag anmelden“ (zur Anmeldung, ersetzt den Knopf), „Jetzt ohne E-Mail beim Zoom-Vortrag dabei sein“ (nur mit Online-Termin; den Zoom-Link liefert das Panel erst 15 Minuten vor Beginn) und „Echten Erfolgsbericht ansehen (ohne E-Mail)“ (nur mit Erfahrungen oder Video) — jeder nur, wenn die Seite sein Ziel hat |
 
 ```json
 {

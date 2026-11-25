@@ -29,9 +29,33 @@ final class Kontext
     /** @var array<string, string> Zielpfad im Seitenordner (es/groessen/…) => erzeugte Bytes (kleinere Fassungen der Bilder, 3.70.0) */
     public array $erzeugt = [];
 
-    /** $felder (3.74.0): Bau für „Direkt im Bild bearbeiten“ — feld() markiert dann jedes Textstück mit seinem Pfad im Bauplan. */
-    public function __construct(public readonly Profil $profil, public readonly array $meta, private readonly string $seite, public readonly bool $felder = false)
+    /**
+     * $felder (3.74.0): Bau für „Direkt im Bild bearbeiten“ — feld() markiert dann jedes Textstück mit seinem Pfad im Bauplan.
+     * $bausteine (3.76.0): alle Bausteine des Bauplans, damit ein Baustein auf andere zeigen kann (sprungziel(), hat()).
+     */
+    public function __construct(public readonly Profil $profil, public readonly array $meta, private readonly string $seite, public readonly bool $felder = false,
+        private readonly array $bausteine = [])
     {
+    }
+
+    /** Der erste Baustein eines dieser Typen (Reihenfolge der Typen zählt, nicht die der Seite), der $bedingung erfüllt, mit seiner Nummer — sonst null. */
+    public function hat(array $typen, ?callable $bedingung = null): ?array
+    {
+        foreach ($typen as $typ) {
+            foreach ($this->bausteine as $i => $b) {
+                if (($b['typ'] ?? '') === $typ && ($bedingung === null || $bedingung($b))) {
+                    return ['nr' => $i + 1, 'b' => $b];
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Sprungziel zu einem Baustein (3.76.0): sein Anker, sonst seine Überschrift (jedes h2 trägt id() „titel“) — null, wenn die Seite keinen hat. */
+    public function sprungziel(array $typen, ?callable $bedingung = null): ?string
+    {
+        $t = $this->hat($typen, $bedingung);
+        return $t === null ? null : '#' . (isset($t['b']['anker']) ? (string) $t['b']['anker'] : $this->id($t['nr'], 'titel'));
     }
 
     /**

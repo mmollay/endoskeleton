@@ -66,6 +66,50 @@
     }
   });
 
+  // Schnellwahl B (3.76.0): Der Zoom-Link steht nie im HTML. Vor dem Fenster (15 Minuten vor Beginn bis Ende des nächsten Termins) zeigt der Platz,
+  // wann der Vortrag ist; im Fenster fragt die Seite das Panel (Formularziel …/lp/anmelden → …/lp/zoom, ohne Cookies). Ob der Link kommt, entscheidet
+  // das Panel nach seiner Uhr; dieses Skript zeigt nur einen https-Link als Knopf und fragt sonst nach einer Minute wieder. Ohne Termin bleibt B verborgen.
+  document.querySelectorAll('[data-lp-zoom]').forEach(function (platz) {
+    try {
+      var form = document.querySelector('form.lp-formular'), liste = form && form.querySelector('input[name="liste"]');
+      var aktion = form && form.getAttribute('action'), quelle = aktion && new URL(aktion, location.href);
+      if (!liste || !quelle || !/\/anmelden$/.test(quelle.pathname) || !window.fetch) { return; }
+      quelle.pathname = quelle.pathname.replace(/anmelden$/, 'zoom'); quelle.search = '?liste=' + encodeURIComponent(liste.value); quelle.hash = '';
+      var wartet = platz.querySelector('.lp-schnellwahl-wartet'), uhr = null, VORLAUF = 15 * 60000;
+      var termine = Array.prototype.map.call(document.querySelectorAll('.lp-termin-eintrag[data-lp-ende]'), function (t) {
+        var zeit = t.querySelector('time[datetime]'), beginn = zeit ? Date.parse(zeit.getAttribute('datetime')) : NaN, ende = Date.parse(t.dataset.lpEnde);
+        return { beginn: beginn, ende: ende > beginn ? ende : beginn + 120 * 60000, text: zeit ? zeit.textContent.trim() : '' };
+      }).filter(function (t) { return !isNaN(t.beginn); }).sort(function (a, b) { return a.beginn - b.beginn; });
+      var knopfWeg = function () { var a = platz.querySelector('a'); if (a) { a.remove(); } };
+      var warten = function (text, ms) { knopfWeg(); wartet.textContent = text; wartet.hidden = false; uhr = setTimeout(zeigen, Math.min(ms, 2147483647)); };
+      var zeigen = function () {
+        clearTimeout(uhr);
+        var jetzt = Date.now(), t = termine.filter(function (x) { return x.ende > jetzt; })[0];
+        if (!t) { knopfWeg(); platz.hidden = true; return; }
+        platz.hidden = false;
+        if (jetzt < t.beginn - VORLAUF) {
+          warten('Nächster Vortrag: ' + t.text + ' — der Link erscheint hier 15 Minuten vorher.', t.beginn - VORLAUF - jetzt);
+          return;
+        }
+        fetch(quelle.href, { credentials: 'omit', cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) {
+            if (!d || d.offen !== true || typeof d.link !== 'string' || !/^https:\/\//.test(d.link)) {
+              warten('Der Vortrag beginnt gleich — der Link erscheint hier in Kürze.', 60000);
+              return;
+            }
+            var a = platz.querySelector('a') || document.createElement('a');
+            a.className = 'btn btn-primary lp-knopf lp-schnellwahl-knopf'; a.href = d.link; a.rel = 'noopener noreferrer';
+            a.dataset.lpKnopf = 'zoom'; a.textContent = platz.dataset.lpZoomText;
+            wartet.hidden = true; wartet.textContent = ''; platz.insertBefore(a, wartet);
+            uhr = setTimeout(zeigen, Math.max(1000, t.ende - Date.now()));
+          })
+          .catch(function () { warten('Der Vortrag beginnt gleich — der Link erscheint hier in Kürze.', 60000); });
+      };
+      zeigen();
+    } catch (e) { /* B bleibt verborgen */ }
+  });
+
   // Titel: Schriftstufe nach Textmenge (3.59.0). Die Schwellen setzt der Bau in data-lp-stufen (Kontext::TITEL_STUFEN, die einzige Liste), die Stufe
   // von Anfang an data-lp-groesse; hier läuft dieselbe Regel nur nach, wenn sich der Text ändert (Tippen im Bild, Escape). Gezählt wird in Zeichen
   // (Array.from, wie mb_strlen), Leerraum am Rand zählt nicht.
@@ -265,8 +309,8 @@
       ziel.pathname = ziel.pathname.replace(/anmelden$/, 'treffer'); ziel.search = ''; ziel.hash = '';
       var suche = new URLSearchParams(location.search), gesendet = {}, aufgerufen = false, seit = null, weg = 0, summe = 0, unten = 0;
       var utm = function (name) { return (suche.get('utm_' + name) || '').replace(/[^A-Za-z0-9 _.-]/g, '').slice(0, 60); };
-      var melden = function (art, dauer, tiefe) {
-        if (art !== 'verlassen' && art !== 'da') {
+      var melden = function (art, dauer, tiefe, knopf) {
+        if (art !== 'verlassen' && art !== 'da' && art !== 'klick') {
           if (gesendet[art]) { return; }
           gesendet[art] = true;
         }
@@ -276,7 +320,7 @@
             v: 2, liste: liste.value.slice(0, 60), art: art, pfad: location.pathname.slice(0, 120),
             ref: verweiser === location.hostname ? '' : verweiser.slice(0, 100),
             utm: { quelle: utm('source'), medium: utm('medium'), kampagne: utm('campaign') }, breite: window.innerWidth,
-            dauer: dauer, tiefe: tiefe
+            dauer: dauer, tiefe: tiefe, knopf: knopf
           })], { type: 'text/plain;charset=UTF-8' }));
         } catch (e) { /* die Statistik darf die Anmeldung nie stören */ }
       };
@@ -292,6 +336,12 @@
         form.addEventListener(name, function (ereignis) { if (!selbstFokus && ereignis.target.closest && !ereignis.target.closest('.form-hp')) { melden('formular'); } });
       });
       form.addEventListener('submit', function (ereignis) { if (!ereignis.defaultPrevented) { melden('absenden'); } });
+      // Schnellwahl (3.76.0): Klick auf einen der drei Knöpfe oben — einmal je Knopf und Seitenaufruf, nur sein Name (anmelden|zoom|bericht).
+      var geklickt = {};
+      document.addEventListener('click', function (ereignis) {
+        var knopf = ereignis.target.closest && ereignis.target.closest('[data-lp-knopf]'), name = knopf && knopf.dataset.lpKnopf;
+        if (name && !geklickt[name]) { geklickt[name] = true; melden('klick', undefined, undefined, name); }
+      });
       // Scroll-Ereignisse kommen höchstens einmal je Bildwechsel; gelesen wird nur die Position, die Seitenhöhe erst beim Verlassen.
       var tiefer = function () { unten = Math.max(unten, window.scrollY + window.innerHeight); };
       // Danach steht die Uhr bis zur Rückkehr: Verstecken und pagehide hintereinander senden einmal.

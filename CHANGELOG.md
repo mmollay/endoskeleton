@@ -4,6 +4,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.76.0] — 2026-11-25
+
+Drei Knöpfe oben im Kopfbereich (Wunsch für eine Kunden-Landingpage, Martin, 25.11.2026: „ohne Tracking“). Am Handy sofort beim Öffnen sichtbar, untereinander,
+gut antippbar. **Vorgabe AUS:** Ohne das neue Feld baut jede Seite Byte für Byte wie bisher (Musterbuch unverändert, Test `bestand`); nur das neue
+Musterbuch-Beispiel `hero--schlicht--schnellwahl` kommt dazu. Gezählt wird nur mit der vorhandenen cookiefreien Statistik — kein Tag Manager, kein Pixel.
+
+### Added — Feld `schnellwahl` im Kopfbereich
+- `schnellwahl: true` (ja/nein, Standard aus) stellt unter die Überschrift ein `nav.lp-schnellwahl` mit bis zu drei Knöpfen; jeder erscheint nur, wenn sein
+  Ziel auf der Seite ist, ohne Ziel gibt es keinen leeren Stapel:
+  - **A** „Für den nächsten Zoom-Vortrag anmelden“ → Anker der Anmeldung (ersetzt den Knopf des Kopfbereichs; der Sprung setzt wie bisher den Cursor ins erste Feld).
+  - **B** „Jetzt ohne E-Mail beim Zoom-Vortrag dabei sein“ (nur mit Online-Termin und Anmeldung): ein verborgener Platz ohne Link. `lp.js` zeigt bis 15 Minuten vor
+    Beginn des nächsten Termins „Nächster Vortrag: … — der Link erscheint hier 15 Minuten vorher.“ und fragt im Fenster das Panel
+    (Formularziel …/lp/anmelden → …/lp/zoom?liste=…, ohne Cookies). Nur eine https-Antwort `{offen: true, link}` wird zum Knopf; sonst neuer Versuch nach
+    einer Minute. Nach dem Ende kommt der nächste Termin an die Reihe; ohne Termin oder ohne JavaScript bleibt B verborgen. Der Link steht nie im HTML.
+  - **C** „Echten Erfolgsbericht ansehen (ohne E-Mail)“ → Baustein Erfahrungen, sonst Video (dessen Anker, sonst seine Überschrift).
+- Statistik: Jeder Knopf trägt `data-lp-knopf` (anmelden|zoom|bericht); ein Klick sendet einmal je Knopf und Seitenaufruf die Art `klick` mit `knopf`
+  (Vertrag v2, Feld `knopf` nur bei dieser Art). Das Panel braucht dafür die Art `klick` und den Endpunkt `/lp/zoom`.
+- Barrierefrei: echte Links, Mindesthöhe 2,75 rem (44 px), lange Texte brechen um, der Wartetext von B ist `aria-live`.
+- Neue Klassen: `lp-schnellwahl` (der Stapel), `lp-schnellwahl-knopf` (jeder Knopf), `lp-schnellwahl-zoom` (Platz von B), `lp-schnellwahl-wartet` (Wartetext von B).
+- `Kontext` kennt alle Bausteine des Bauplans (`hat()`, `sprungziel()`); `Bauer` reicht sie durch. Katalog: Kopfbereich geändert 3.76.0.
+
+### Tests
+- `tests/schnellwahl.test.php` (SW01–SW08), Browsertest „Drei Knöpfe oben“ in `ci/browser.js` (Uhr vor, im und nach dem Fenster, Zoom-Attrappe, Klick-Meldung).
+
 ## [3.75.0] — 2026-11-23
 
 Knopf nach dem Video (Martin, 23.11.2026: „Bitte optional einstellbar machen, dass nach dem Video der Button erscheint, also das Bild verschwommen ist und

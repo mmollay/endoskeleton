@@ -45,7 +45,7 @@ final class Bauer
         }
 
         $meta = $plan['meta'];
-        $k = new Kontext($profil, $meta, $seite, $felder);
+        $k = new Kontext($profil, $meta, $seite, $felder, $plan['bausteine']);
         $bloecke = [];
         foreach (self::folge($plan['bausteine']) as $i) {
             $b = $plan['bausteine'][$i];
