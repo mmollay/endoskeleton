@@ -71,7 +71,7 @@ return [
         T::ok(!($f['pflicht'] ?? false) && !isset($f['pflicht_bei']) && !isset($f['pflicht_wenn']), 'freiwillig');
         T::ok(!isset($f['nur_bei']), 'ohne nur_bei: false bleibt in jeder Darstellung gültig (das Panel schreibt es nach einem Wechsel der Darstellung)');
         T::ok(!isset($hero['beispiel']['video_ende_knopf']), 'das Katalog-Beispiel bleibt ohne den Knopf');
-        T::eq($hero['geaendert'], '3.76.0', 'Kopfbereich geändert 3.76.0 (drei Knöpfe oben, nach 3.75.0)');
+        T::eq($hero['geaendert'], '3.77.0', 'Kopfbereich geändert 3.77.0 (drei Knöpfe, zweite Fassung)');
         foreach (['lp-video-ende', 'lp-video-ende-knopf', 'lp-video-nochmal'] as $klasse) {
             T::eq($hero['klassen'][$klasse] ?? null, '3.75.0', "Klasse $klasse seit 3.75.0");
         }

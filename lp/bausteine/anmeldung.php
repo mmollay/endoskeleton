@@ -17,12 +17,18 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
  * dieses Wortlauts geht als verstecktes Feld `newsletter_kurz` mit (eigener Nachweis mit eigenem Wortlaut im Panel). Ohne `newsletter` ist das Formular
  * Byte für Byte wie bisher — ältere Weiterleitungsstellen verstehen es weiter.
  *
+ * Hinweis statt Pflicht-Häkchen (3.77.0, Martin 25.11.2026): Mit `"einwilligung_hinweis": true` (nur für Single-Opt-In-Listen, deren Angaben nur dem Vortrag
+ * dienen) steht statt des Pflicht-Häkchens ein Satz mit Link zur Datenschutzerklärung (Profil::hinweisText); das Formular schickt `einwilligung=hinweis`
+ * und als einwilligung_kurz die Kurzsumme dieses Satzes. Das Newsletter-Häkchen bleibt unverändert freiwillig. Seit 3.77.0 trägt jedes Formular ein leeres
+ * verstecktes Feld `fbclid` (lp.js füllt es aus der Adresse; das Panel meldet damit eine Anmeldung an Meta, ohne Adresse und Namen).
+ *
  * Freies Feld (3.72.0): Mit `"freifeld": true` steht vor der Einwilligung ein freiwilliges Textfeld `anliegen` (höchstens 1000 Zeichen) mit der Frage
  * `freifeld_frage` (Vorgabe „Worum geht es dir?“), beschriftet als „(freiwillig)“, mit einem Hinweis auf die Grenze über aria-describedby. Ohne
  * `freifeld` ist das Formular Byte für Byte wie bisher. Im Text `danach` wird jede Mailadresse ein mailto:-Link (Kontext::absaetze, $mails).
  */
 $p = $k->profil->daten;
 $ziel = (string) $p['formularziel'];
+$hinweis = ($b['einwilligung_hinweis'] ?? false) === true ? Endo\Lp\Profil::hinweisText($p) : '';
 $newsletterText = ($b['newsletter'] ?? false) === true ? Endo\Lp\Profil::newsletterText($p) : '';
 $freifeld = ($b['freifeld'] ?? false) === true;
 $frage = trim((string) ($b['freifeld_frage'] ?? '')) !== '' ? trim((string) $b['freifeld_frage']) : $k->du('Worum geht es dir?', 'Worum geht es Ihnen?');
@@ -72,11 +78,16 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <p class="lp-freifeld-hinweis" id="lp-f-anliegen-hinweis">Höchstens 1000 Zeichen.</p>
 </div>
 <?php endif ?>
+<?php if ($hinweis !== ''): ?>
+<p class="lp-einwilligung-hinweis"><?= $k->e($hinweis) ?> Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+<input type="hidden" name="einwilligung" value="hinweis">
+<?php else: ?>
 <div class="lp-feld lp-einwilligung">
 <input id="lp-f-einwilligung" name="einwilligung" type="checkbox" value="ja" required>
 <label for="lp-f-einwilligung"><?= $k->e($p['einwilligung']) ?> Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</label>
 <p class="lp-feld-fehler" id="lp-f-einwilligung-fehler" hidden><?= $k->e($k->du('Bitte bestätige die Einwilligung.', 'Bitte bestätigen Sie die Einwilligung.')) ?></p>
 </div>
+<?php endif ?>
 <?php if ($newsletterText !== ''): ?>
 <div class="lp-feld lp-einwilligung lp-einwilligung--freiwillig">
 <input id="lp-f-newsletter" name="newsletter" type="checkbox" value="ja">
@@ -88,7 +99,8 @@ $mail = static fn (string $t): string => str_replace('E-Mail', '<span class="lp-
 <input id="lp-f-website" name="website" type="text" tabindex="-1" autocomplete="off">
 </div>
 <input type="hidden" name="liste" value="<?= $k->e($b['liste']) ?>">
-<input type="hidden" name="einwilligung_kurz" value="<?= substr(hash('sha256', (string) $p['einwilligung']), 0, 12) ?>">
+<input type="hidden" name="einwilligung_kurz" value="<?= substr(hash('sha256', $hinweis !== '' ? $hinweis : (string) $p['einwilligung']), 0, 12) ?>">
+<input type="hidden" name="fbclid" value="">
 <?php if ($newsletterText !== ''): ?>
 <input type="hidden" name="newsletter_kurz" value="<?= substr(hash('sha256', $newsletterText), 0, 12) ?>">
 <?php endif ?>

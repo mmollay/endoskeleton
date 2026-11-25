@@ -94,7 +94,6 @@ async function oeffnen(browser, name, breite, optionen = {}) {
   const beacons = [];
   const anmeldungen = [];
   const angefragt = [];
-  const zooms = [];
   for (const skript of optionen.init || []) { await kontext.addInitScript(skript); }
   await page.route('**/*', (r) => {
     const u = new URL(r.request().url());
@@ -112,10 +111,6 @@ async function oeffnen(browser, name, breite, optionen = {}) {
       if (p.abbruch) { return r.abort(); }
       return r.fulfill({ status: p.status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': 'http://lp.test' }, body: JSON.stringify(p.daten) });
     }
-    if (u.host === 'beispiel.invalid' && /^\/(lp\/)?zoom$/.test(u.pathname)) {
-      zooms.push(u.href);
-      return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': 'http://lp.test' }, body: JSON.stringify(optionen.zoom || { offen: false }) });
-    }
     if (u.host !== 'lp.test') { fremd.push(u.href); return r.abort(); }
     angefragt.push(decodeURIComponent(u.pathname));
     const dunkel = /^\/dunkel(\/|$)/.test(u.pathname);
@@ -128,7 +123,7 @@ async function oeffnen(browser, name, breite, optionen = {}) {
   });
   if (optionen.uhr) { await page.clock.install({ time: new Date(optionen.uhr) }); }
   await page.goto(`http://lp.test/${name}${name && !name.endsWith('.html') ? '/' : ''}${optionen.suche || ''}`);   // pruefliste.html (3.70.0) ohne Schrägstrich
-  return { page, fremd, kontext, abfragen, beacons, anmeldungen, angefragt, zooms };
+  return { page, fremd, kontext, abfragen, beacons, anmeldungen, angefragt };
 }
 
 /**
@@ -893,62 +888,64 @@ async function tastaturRundgang(page, hoechstens = 150) {
     await kontext.close();
   }
 
-  // Drei Knöpfe oben (3.76.0): untereinander unter der Überschrift, je mindestens 44 hoch; B vor dem Fenster nur der Wartetext (keine Abfrage), im Fenster
-  // der Link vom Panel (Attrappe …/zoom), nach dem Ende verborgen; ein Klick meldet „klick“ mit dem Namen des Knopfs. Termin des Beispiels: 2099-10-06 19:00, 60 Minuten.
-  const LINK = 'https://zoom.beispiel.invalid/j/123';
+  // Drei Knöpfe oben (3.77.0): untereinander unter der Überschrift, je mindestens 44 hoch, am Handy auch bei 390×600 (Facebook-Browser mit seinen Leisten)
+  // alle drei ohne Scrollen im Bild. B führt im selben Fenster zur Adresse der Kampagne (utm_campaign, sonst die Vorgabe), C springt zur Aufzeichnung,
+  // die erst nach dem Tipp youtube-nocookie lädt; fbclid der Einstiegsadresse landet im Formular. Ein Klick meldet „klick“ mit dem Namen des Knopfs.
   const schnellwahlMessen = (page) => page.evaluate(() => {
-    const nav = document.querySelector('.lp-schnellwahl'), platz = nav.querySelector('[data-lp-zoom]'), w = platz.querySelector('.lp-schnellwahl-wartet');
-    const sichtbar = [...nav.querySelectorAll('a, .lp-schnellwahl-wartet')].filter((e) => e.getClientRects().length > 0).map((e) => {
-      const b = e.getBoundingClientRect(); return { name: e.dataset.lpKnopf || 'wartet', oben: b.top, unten: b.bottom, h: b.height, breite: b.width, text: e.textContent.trim(), href: e.getAttribute('href') };
+    const nav = document.querySelector('.lp-schnellwahl');
+    const sichtbar = [...nav.querySelectorAll('a')].filter((e) => e.getClientRects().length > 0).map((e) => {
+      const b = e.getBoundingClientRect(); return { name: e.dataset.lpKnopf, oben: b.top, unten: b.bottom, h: b.height, breite: b.width, text: e.textContent.trim(), href: e.getAttribute('href'), ziel: e.getAttribute('target') };
     });
-    return { sichtbar, platz: !platz.hidden, wartet: w.hidden ? '' : w.textContent, live: w.getAttribute('aria-live'), seite: document.documentElement.scrollWidth,
-      nachTitel: nav.previousElementSibling.tagName, hero: document.querySelectorAll('.lp-hero a.lp-knopf:not([data-lp-knopf])').length };
+    return { sichtbar, seite: document.documentElement.scrollWidth, hoehe: innerHeight, nachTitel: nav.previousElementSibling.tagName,
+      fbclid: document.querySelector('form.lp-formular input[name="fbclid"]').value, iframes: document.querySelectorAll('iframe').length };
   });
   for (const [ton, adresse] of TOENE) {
-    for (const breite of [1440, 390]) {
-      const id = `Drei Knöpfe ${ton} (${breite})`;
-      let { page, kontext, zooms, fremd } = await oeffnen(browser, adresse('hero--schlicht--schnellwahl'), breite, { uhr: '2099-10-01T12:00:00+02:00' });
-      let m = await schnellwahlMessen(page);
-      pruefe(m.nachTitel === 'H1' && m.hero === 0, `${id}: Stapel direkt unter der Überschrift, der Knopf des Kopfbereichs entfällt (${m.nachTitel}, ${m.hero})`);
-      pruefe(m.sichtbar.map((k) => k.name).join() === 'anmelden,wartet,bericht', `${id} vorher: A, Wartetext, C (${m.sichtbar.map((k) => k.name)})`);
+    for (const [breite, hoehe] of [[1440, 900], [390, 844], [390, 600]]) {
+      const id = `Drei Knöpfe ${ton} (${breite}×${hoehe})`;
+      const { page, kontext, fremd } = await oeffnen(browser, adresse('hero--schlicht--schnellwahl'), breite, { hoehe });
+      const m = await schnellwahlMessen(page);
+      pruefe(m.nachTitel === 'H1' && m.sichtbar.map((k) => k.name).join() === 'anmelden,bericht,aufzeichnung', `${id}: A, B, C direkt unter der Überschrift (${m.nachTitel}, ${m.sichtbar.map((k) => k.name)})`);
       pruefe(m.sichtbar.every((k, i) => k.h >= 44 && (i === 0 || k.oben >= m.sichtbar[i - 1].unten)), `${id}: untereinander, je mindestens 44 hoch (${m.sichtbar.map((k) => Math.round(k.h))})`);
+      pruefe(m.sichtbar.every((k) => k.unten <= m.hoehe), `${id}: alle drei ohne Scrollen im Bild (${m.sichtbar.map((k) => Math.round(k.unten))} ≤ ${m.hoehe})`);
       pruefe(breite > 400 || m.sichtbar.every((k) => k.breite >= breite - 2 * 16 - 40), `${id}: am Handy fast volle Breite (${m.sichtbar.map((k) => Math.round(k.breite))})`);
-      pruefe(/^Nächster Vortrag: Dienstag, 6\. Oktober 2099, 19:00 Uhr — der Link erscheint hier 15 Minuten vorher\.$/.test(m.wartet) && m.live === 'polite', `${id} vorher: Wartetext mit Termin (${m.wartet})`);
-      pruefe(zooms.length === 0 && m.seite <= breite && fremd.length === 0, `${id} vorher: keine Abfrage, kein Seitwärts-Scrollen, keine Fremdanfrage (${zooms}, ${m.seite}, ${fremd})`);
-      if (process.env.ES_FOTOS) { await page.screenshot({ path: path.join(process.env.ES_FOTOS, `schnellwahl-vorher-${ton}-${breite}.png`) }); }
-      await kontext.close();
-      ({ page, kontext, zooms, fremd } = await oeffnen(browser, adresse('hero--schlicht--schnellwahl'), breite, { uhr: '2099-10-06T18:50:00+02:00', zoom: { offen: true, link: LINK } }));
-      await page.waitForSelector('[data-lp-zoom] a', { timeout: 4000 }).catch(() => {});
-      m = await schnellwahlMessen(page);
-      const b = m.sichtbar.find((k) => k.name === 'zoom');
-      pruefe(m.sichtbar.map((k) => k.name).join() === 'anmelden,zoom,bericht' && b && b.href === LINK && b.text === 'Jetzt ohne E-Mail beim Zoom-Vortrag dabei sein' && b.h >= 44, `${id} im Fenster: B ist der Link vom Panel (${JSON.stringify(b)})`);
-      pruefe(zooms.length === 1 && zooms[0] === 'https://beispiel.invalid/zoom?liste=beispiel-abend', `${id} im Fenster: eine Abfrage beim Formularziel (${zooms})`);
-      if (process.env.ES_FOTOS) { await page.screenshot({ path: path.join(process.env.ES_FOTOS, `schnellwahl-offen-${ton}-${breite}.png`) }); }
+      pruefe(m.sichtbar.every((k) => k.ziel === null) && m.sichtbar[1].href === 'https://www.example.com/erfolge', `${id}: B ohne Kampagne zur Vorgabe, im selben Fenster (${m.sichtbar[1].href})`);
+      pruefe(m.iframes === 0 && m.seite <= breite && fremd.length === 0, `${id}: kein Video geladen, kein Seitwärts-Scrollen, keine Fremdanfrage (${m.iframes}, ${m.seite}, ${fremd})`);
+      if (process.env.ES_FOTOS) { await page.screenshot({ path: path.join(process.env.ES_FOTOS, `schnellwahl-${ton}-${breite}x${hoehe}.png`) }); }
       await kontext.close();
     }
   }
-  {
-    const { page, kontext, beacons } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { uhr: '2099-10-06T18:50:00+02:00', zoom: { offen: false } });
-    await page.waitForFunction(() => /beginnt gleich/.test(document.querySelector('.lp-schnellwahl-wartet').textContent), null, { timeout: 4000 }).catch(() => {});
+  for (const [suche, ziel, fb] of [['?utm_campaign=Herbst&fbclid=IwAR0_ab-C', 'https://www.example.com/erfolge-herbst', 'IwAR0_ab-C'], ['?utm_campaign=fremd&fbclid=<x>', 'https://www.example.com/erfolge', '']]) {
+    const { page, kontext } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { suche });
     const m = await schnellwahlMessen(page);
-    pruefe(!m.sichtbar.some((k) => k.name === 'zoom') && /beginnt gleich/.test(m.wartet), `Drei Knöpfe: sagt das Panel „noch nicht“, bleibt der Wartetext (${m.wartet})`);
-    for (const sel of ['[data-lp-knopf="bericht"]', '[data-lp-knopf="anmelden"]', '[data-lp-knopf="anmelden"]']) { await page.click(sel); await page.waitForTimeout(300); }
-    const klicks = beacons.map((x) => { try { return JSON.parse(x.text); } catch (e) { return {}; } }).filter((d) => d.art === 'klick').map((d) => d.knopf);
-    pruefe(klicks.join() === 'bericht,anmelden', `Drei Knöpfe: Klick meldet „klick“ mit dem Knopf, einmal je Knopf (${klicks})`);
-    const sprung = await page.evaluate(() => { const r = document.getElementById('anmeldung').getBoundingClientRect(); return { hash: location.hash, oben: Math.round(r.top), hoehe: innerHeight }; });
-    pruefe(sprung.hash === '#anmeldung' && sprung.oben < sprung.hoehe, `Drei Knöpfe: A springt zur Anmeldung, das Formular steht im Bild (${JSON.stringify(sprung)})`);
+    pruefe(m.sichtbar[1].href === ziel && m.fbclid === fb, `Drei Knöpfe ${suche}: B → ${m.sichtbar[1].href}, fbclid „${m.fbclid}“ (erwartet ${ziel}, „${fb}“)`);
     await kontext.close();
   }
   {
-    const { page, kontext, zooms } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { uhr: '2099-10-06T20:30:00+02:00', zoom: { offen: true, link: LINK } });
-    const m = await schnellwahlMessen(page);
-    pruefe(!m.platz && zooms.length === 0 && m.sichtbar.map((k) => k.name).join() === 'anmelden,bericht', `Drei Knöpfe nach dem Termin: B verborgen, keine Abfrage (${m.platz}, ${zooms})`);
+    const { page, kontext, beacons, fremd } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { hoehe: 600 });
+    for (const sel of ['[data-lp-knopf="aufzeichnung"]', '[data-lp-knopf="anmelden"]', '[data-lp-knopf="anmelden"]']) { await page.click(sel); await page.waitForTimeout(1500); }   // erst nach dem weichen Scrollen weiter: page.click holt den Knopf sonst mitten im Lauf zurück ins Bild
+    await page.waitForFunction(() => Math.abs(document.getElementById('anmeldung').getBoundingClientRect().top) < innerHeight, null, { timeout: 4000 }).catch(() => {});   // weiches Scrollen über die lange Strecke
+    const sprung = await page.evaluate(() => { const r = document.getElementById('anmeldung').getBoundingClientRect(); return { hash: location.hash, oben: Math.round(r.top), hoehe: innerHeight }; });
+    pruefe(sprung.hash === '#anmeldung' && sprung.oben < sprung.hoehe, `Drei Knöpfe: A springt zur Anmeldung, das Formular steht im Bild (${JSON.stringify(sprung)})`);
+    pruefe(fremd.length === 0 && await page.locator('iframe').count() === 0, `Drei Knöpfe: der Sprung zur Aufzeichnung lädt noch nichts von YouTube (${fremd})`);
+    await page.click('[data-lp-knopf="bericht"]', { noWaitAfter: true }).catch(() => {}); await page.waitForTimeout(300);
+    const klicks = beacons.map((x) => { try { return JSON.parse(x.text); } catch (e) { return {}; } }).filter((d) => d.art === 'klick').map((d) => d.knopf);
+    pruefe(klicks.join() === 'aufzeichnung,anmelden,bericht', `Drei Knöpfe: Klick meldet „klick“ mit dem Knopf, einmal je Knopf (${klicks})`);
+    await kontext.close();
+  }
+  {
+    const { page, kontext, fremd } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { hoehe: 600, suche: '#lp-a1-aufzeichnung' });
+    const vorher = { fremd: fremd.length, iframes: await page.locator('iframe').count(), hinweis: await page.locator('.lp-aufzeichnung .lp-video-link').count(), knopf: await page.locator('.lp-aufzeichnung a.lp-knopf[href="#anmeldung"]').count() };
+    pruefe(vorher.fremd === 0 && vorher.iframes === 0 && vorher.hinweis === 1 && vorher.knopf === 1, `Aufzeichnung vor dem Tipp: nur Bild und Hinweis, zweiter Anmeldeknopf darunter, keine Anfrage an Google (${JSON.stringify(vorher)})`);
+    await page.click('.lp-aufzeichnung .lp-video-start');
+    await page.waitForSelector('.lp-aufzeichnung iframe', { timeout: 4000 }).catch(() => {});
+    const src = await page.locator('.lp-aufzeichnung iframe').getAttribute('src').catch(() => '');
+    pruefe(String(src).startsWith('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ') && fremd.every((u) => u.startsWith('https://www.youtube-nocookie.com/')), `Aufzeichnung nach dem Tipp: nur youtube-nocookie (${src})`);
     await kontext.close();
   }
   {
     const { page, kontext } = await oeffnen(browser, 'hero--schlicht--schnellwahl', 390, { ohneJs: true });
-    const o = await page.evaluate(() => ({ b: getComputedStyle(document.querySelector('[data-lp-zoom]')).display, a: document.querySelectorAll('.lp-schnellwahl a').length }));
-    pruefe(o.b === 'none' && o.a === 2, `Drei Knöpfe ohne JavaScript: A und C da, B verborgen (${JSON.stringify(o)})`);
+    const o = await page.evaluate(() => [...document.querySelectorAll('.lp-schnellwahl a')].map((a) => a.getAttribute('href')));
+    pruefe(o.join() === '#anmeldung,https://www.example.com/erfolge,#lp-a1-aufzeichnung', `Drei Knöpfe ohne JavaScript: alle drei da, B zur Vorgabe (${o})`);
     await kontext.close();
   }
 

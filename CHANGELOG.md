@@ -4,6 +4,35 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.77.0] — 2026-11-25
+
+Drei Knöpfe oben, zweite Fassung nach Alberts Zahlen (95 % Handy, 89 % unter 30 s, 83 % scrollen höchstens ein Viertel) und Martins Entscheidungen vom
+25.11.2026 (kein Meta-Pixel, kein Cookie-Banner; Hinweis statt Pflicht-Häkchen bei Single-Opt-In). **Vorgabe AUS:** Ohne die neuen Felder baut jede Seite
+wie 3.76.0 — bis auf das leere versteckte Feld `fbclid` in jedem Formular.
+
+### Changed — Kopfbereich (`hero`, Feld `schnellwahl`)
+- Knopf 1 „Jetzt zum nächsten Live-Zoom anmelden“ → Anker der Anmeldung (ersetzt den Knopf des Kopfbereichs).
+- Knopf 2 „Echte Erfolgsberichte ansehen“: neues Feld `bericht_ziel` (url: https auf `link_hosts`, im selben Fenster, kein `target`), dazu
+  `bericht_kampagnen` (Liste {kampagne, ziel}, höchstens 20, nur mit `bericht_ziel`). Die Zuordnung steht als `data-lp-ziele` am Knopf; `lp.js` nimmt bei
+  passender `utm_campaign` (klein geschrieben) deren Adresse, nur https. Ohne `bericht_ziel` wie 3.76.0: Sprung zu Erfahrungen, sonst Video.
+- Knopf 3 „Zoom-Aufzeichnung sofort ansehen“: neue Felder `aufzeichnung_kennung` (YouTube, 11 Zeichen) und `aufzeichnung_bild` (nur zusammen). Unter dem
+  Text steht `div.lp-aufzeichnung` mit dem Zwei-Klick-Video (`Kontext::videoStart`: lokales Startbild, Hinweis, youtube-nocookie erst nach dem Tipp) und
+  einem zweiten Anmeldeknopf (ohne `data-lp-knopf`).
+- **Removed:** Knopf B „Zoom ohne E-Mail“ samt Abruf von `/lp/zoom` und den Klassen `lp-schnellwahl-zoom`, `lp-schnellwahl-wartet`.
+- Statistik: `data-lp-knopf` ist jetzt anmelden|bericht|aufzeichnung (Art `klick`, einmal je Knopf und Seitenaufruf).
+- Neue Klassen: `lp-aufzeichnung`, `lp-aufzeichnung-titel`. Ab 40 rem bleibt der Stapel so breit wie der längste Knopf; am Handy volle Breite.
+- `Schema`: `an_braucht` gilt jetzt auch für Felder, die kein ja/nein sind (steht das Feld, müssen die genannten auch stehen).
+
+### Added — Anmeldung (`anmeldung`)
+- `einwilligung_hinweis: true` (seit 3.77.0): statt des Pflicht-Häkchens `p.lp-einwilligung-hinweis` mit `Profil::hinweisText()` (je Anrede) und Link zur
+  Datenschutzerklärung; das Formular schickt `einwilligung=hinweis` und als `einwilligung_kurz` die Kurzsumme dieses Satzes. Das Newsletter-Häkchen bleibt
+  freiwillig; Honigtopf und alle Felder bleiben. Das Panel nimmt `hinweis` nur bei Listen mit Single-Opt-In an.
+- Verstecktes Feld `fbclid` (leer im HTML); `lp.js` trägt die Klick-Kennung einer Meta-Anzeige aus der Adresse ein (nur `[A-Za-z0-9_-]`, höchstens 500).
+  Neue Klasse `lp-einwilligung-hinweis`.
+
+### Tests
+- `tests/schnellwahl.test.php` neu (SW01–SW10); Browsertest „Drei Knöpfe oben“ in `ci/browser.js` (auch 390×600 ohne Scrollen, Kampagne, Zwei-Klick).
+
 ## [3.76.0] — 2026-11-25
 
 Drei Knöpfe oben im Kopfbereich (Wunsch für eine Kunden-Landingpage, Martin, 25.11.2026: „ohne Tracking“). Am Handy sofort beim Öffnen sichtbar, untereinander,

@@ -31,6 +31,15 @@ final class Profil
         'du' => 'Mit deiner Zustimmung setzen wir das Meta-Pixel von Meta Platforms Ireland Ltd. (Facebook, Instagram) ein: Es misst, ob du über eine Anzeige zu uns kommst und dich anmeldest. Dabei werden Cookies gespeichert und Daten wie deine IP-Adresse an Meta übermittelt, auch in die USA. Ohne Zustimmung lädt nichts davon. Deine Wahl kannst du jederzeit unten unter „Cookie-Einstellungen“ ändern.',
         'Sie' => 'Mit Ihrer Zustimmung setzen wir das Meta-Pixel von Meta Platforms Ireland Ltd. (Facebook, Instagram) ein: Es misst, ob Sie über eine Anzeige zu uns kommen und sich anmelden. Dabei werden Cookies gespeichert und Daten wie Ihre IP-Adresse an Meta übermittelt, auch in die USA. Ohne Zustimmung lädt nichts davon. Ihre Wahl können Sie jederzeit unten unter „Cookie-Einstellungen“ ändern.',
     ];
+    /**
+     * Der Hinweis statt des Pflicht-Häkchens (3.77.0, Martin 25.11.2026): Bei Single-Opt-In, wenn die Angaben nur für den Vortrag dienen (Zugangslink,
+     * Erinnerungen, Dank), steht im Formular dieser Satz mit dem Link zur Datenschutzerklärung. Seine Kurzsumme geht als einwilligung_kurz mit — so hält
+     * das Panel fest, welcher Wortlaut galt. Je Anrede; kein eigener Text im Profil (der Zweck ist fest).
+     */
+    public const HINWEIS_STANDARD = [
+        'du' => 'Wir nutzen deine Angaben nur für diesen Vortrag: für den Zugangslink, die Erinnerungen und ein Dankeschön danach.',
+        'Sie' => 'Wir nutzen Ihre Angaben nur für diesen Vortrag: für den Zugangslink, die Erinnerungen und ein Dankeschön danach.',
+    ];
     private const FIRMA = ['name', 'strasse', 'plz_ort', 'land', 'email', 'telefon', 'uid', 'firmenbuch'];
     private const RECHTSTEXTE = ['impressum' => 'Das Impressum', 'datenschutz' => 'Die Datenschutzerklärung'];
     private const WO = 'Kundenprofil';
@@ -307,6 +316,16 @@ final class Profil
     {
         $eigen = $daten['einwilligung_pixel'] ?? null;
         return self::text($eigen) ? trim($eigen) : self::PIXEL_STANDARD[($daten['anrede'] ?? 'du') === 'Sie' ? 'Sie' : 'du'];
+    }
+
+    /**
+     * Der Hinweis statt des Pflicht-Häkchens (3.77.0): HINWEIS_STANDARD in der Anrede des Profils.
+     *
+     * @param array<string, mixed> $daten profil.json
+     */
+    public static function hinweisText(array $daten): string
+    {
+        return self::HINWEIS_STANDARD[($daten['anrede'] ?? 'du') === 'Sie' ? 'Sie' : 'du'];
     }
 
     private static function ohneKommentare(string $css): string

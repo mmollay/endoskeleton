@@ -2,7 +2,7 @@
     "format": 1,
     "meta": {
         "titel": "Musterbuch: Kopfbereich – drei Knöpfe oben",
-        "beschreibung": "Kopfbereich „schlicht“ mit drei Knöpfen unter der Überschrift: zur Anmeldung, Zoom ohne E-Mail (Link erst 15 Minuten vorher) und zum Erfolgsbericht."
+        "beschreibung": "Drei Knöpfe unter der Überschrift: Anmeldung, Erfolgsberichte (je Kampagne) und Zoom-Aufzeichnung (erst nach dem Tipp); Hinweis statt Pflicht-Häkchen."
     },
     "bausteine": [
         {
@@ -15,7 +15,19 @@
                 "text": "Kostenlos anmelden",
                 "ziel": "#anmeldung"
             },
-            "schnellwahl": true
+            "schnellwahl": true,
+            "bericht_ziel": "https://www.example.com/erfolge",
+            "bericht_kampagnen": [
+                {
+                    "kampagne": "herbst",
+                    "ziel": "https://www.example.com/erfolge-herbst"
+                }
+            ],
+            "aufzeichnung_kennung": "dQw4w9WgXcQ",
+            "aufzeichnung_bild": {
+                "datei": "bestand/beispiel-vortrag.webp",
+                "alt": "Ausschnitt aus der Aufzeichnung des letzten Vortrags"
+            }
         },
         {
             "typ": "termin",
@@ -55,7 +67,8 @@
             ],
             "knopf_text": "Ich bin dabei",
             "liste": "beispiel-abend",
-            "danke": "Danke! Bitte bestätige deine Anmeldung in der E-Mail."
+            "danke": "Danke! Den Zoom-Link bekommst du gleich per E-Mail.",
+            "einwilligung_hinweis": true
         }
     ]
 }

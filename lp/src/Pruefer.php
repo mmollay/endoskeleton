@@ -573,7 +573,12 @@ final class Pruefer
             }
         }
         $html = (string) @file_get_contents("$this->seite/index.html");
-        if (!preg_match('/<input[^>]*name="einwilligung"[^>]*>/', $html, $m) || !str_contains($m[0], ' required')) {
+        // Hinweis statt Pflicht-Häkchen (3.77.0, einwilligung_hinweis): genau das versteckte Feld einwilligung=hinweis UND der Hinweis mit Link zur Datenschutzerklärung.
+        $hinweis = preg_match('/<input type="hidden" name="einwilligung" value="hinweis">/', $html) === 1
+            && preg_match('~<p class="lp-einwilligung-hinweis">[^<]+ Mehr dazu in der <a href="datenschutz\.html">~', $html) === 1;
+        if ($hinweis) {
+            // nichts weiter: kein Häkchen, das vorangehakt sein könnte
+        } elseif (!preg_match('/<input[^>]*name="einwilligung"[^>]*>/', $html, $m) || !str_contains($m[0], ' required')) {
             $this->sperrend('index.html', 'Einwilligung fehlt im Formular', 'Im Anmeldeformular fehlt die Einwilligung.');
         } elseif (preg_match('/\schecked\b/', $m[0])) {
             $this->sperrend('index.html', 'Einwilligung vorangehakt', 'Die Einwilligung im Formular ist schon angehakt — das ist nicht erlaubt.');

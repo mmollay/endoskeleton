@@ -120,7 +120,7 @@ der Breite ihrer Verwendung (`Kontext::GROESSEN`) — dann bekommen breite Bilde
 | `indexieren` | janein | – | `true` / `false` |
 | `meta_pixel_id` | kennung | – | `^[0-9]{10,20}\z`; seit 3.73.0; fehlt: kein Meta-Pixel und kein Einwilligungsbanner; mit ID zeigt die Seite ein Banner (Zustimmen oder Ablehnen) und lädt das Meta-Pixel erst nach der Zustimmung; die Datenschutzerklärung im Profil muss Meta nennen; nur eintragen, wenn der Inhaber der Seite die ID nennt — nie erfinden |
 
-## Bausteine (Katalog 3.76.0)
+## Bausteine (Katalog 3.77.0)
 
 _Erzeugt aus `lp/bausteine.json` mit `php ci/skill-bauen.php` — nicht von Hand ändern._
 
@@ -128,7 +128,7 @@ Jeder Baustein kennt zusätzlich `typ` (Pflicht), `variante` (ohne Angabe die er
 
 ### `hero` — Kopfbereich
 
-Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.76.0 · genau einmal, als erster Abschnitt
+Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.77.0 · genau einmal, als erster Abschnitt
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -140,7 +140,13 @@ Varianten: `bild-rechts`, `bild-hinten`, `schlicht` · seit 3.51.0, geändert 3.
 | `video_datei` | videodatei | – | `vid/eigen-<16 Hexzeichen>.mp4`: ein MP4 im Seitenordner, ≤ 200 MB; nur bei bild-rechts; nicht zusammen mit `video_kennung`; seit 3.62.0; fehlt: das Bild bleibt ein gewöhnliches Bild; mit Datei wird es zum Startbild eines eigenen Videos mit Bedienleiste (kein Drittanbieter, nichts lädt oder startet von selbst) |
 | `video_ende_knopf` | janein | – | `true` / `false`; true braucht `video_datei`, `knopf`; seit 3.75.0; fehlt: das eigene Video bleibt nach dem Ende stehen wie bisher; mit true zeigt es nach dem Ende das letzte Bild verschwommen und darüber den Knopf des Kopfbereichs (derselbe Text, dasselbe Ziel) mit „Nochmal ansehen“ |
 | `knopf` | knopf | – | `{"text": ≤ 40 Zeichen, "ziel": "#anker" | "https://…"}` |
-| `schnellwahl` | janein | – | `true` / `false`; seit 3.76.0; fehlt: der Kopfbereich zeigt nur seinen Knopf; mit true stehen unter der Überschrift untereinander „Für den nächsten Zoom-Vortrag anmelden“ (zur Anmeldung, ersetzt den Knopf), „Jetzt ohne E-Mail beim Zoom-Vortrag dabei sein“ (nur mit Online-Termin; den Zoom-Link liefert das Panel erst 15 Minuten vor Beginn) und „Echten Erfolgsbericht ansehen (ohne E-Mail)“ (nur mit Erfahrungen oder Video) — jeder nur, wenn die Seite sein Ziel hat |
+| `schnellwahl` | janein | – | `true` / `false`; seit 3.76.0; fehlt: der Kopfbereich zeigt nur seinen Knopf; mit true stehen direkt unter der Überschrift untereinander in voller Breite „Jetzt zum nächsten Live-Zoom anmelden“ (zur Anmeldung, ersetzt den Knopf), „Echte Erfolgsberichte ansehen“ (bericht_ziel im selben Fenster, sonst zu Erfahrungen oder Video) und „Zoom-Aufzeichnung sofort ansehen“ (nur mit aufzeichnung_kennung und aufzeichnung_bild) — jeder nur, wenn sein Ziel da ist (seit 3.77.0; der Zoom-Knopf ohne E-Mail aus 3.76.0 ist entfallen) |
+| `bericht_ziel` | url | – | `https://` auf erlaubte Hosts des Profils; nur wenn `schnellwahl` = `1`; seit 3.77.0; fehlt: Knopf 2 springt zu den Erfahrungen, sonst zum Video der Seite, sonst gibt es ihn nicht; mit Adresse (https auf link_hosts) öffnet er sie im selben Fenster |
+| `bericht_kampagnen` | liste | – | 1–20 Einträge; nur wenn `schnellwahl` = `1`; true braucht `bericht_ziel`; seit 3.77.0; fehlt: Knopf 2 öffnet immer bericht_ziel; mit Einträgen öffnet er bei passender utm_campaign der Einstiegsadresse (klein geschrieben) die Adresse des Eintrags |
+| `bericht_kampagnen[].kampagne` | kennung | ja | `^[a-z0-9][a-z0-9_-]{0,39}\z` |
+| `bericht_kampagnen[].ziel` | url | ja | `https://` auf erlaubte Hosts des Profils |
+| `aufzeichnung_kennung` | kennung | – | `^[A-Za-z0-9_-]{11}\z`; nur wenn `schnellwahl` = `1`; true braucht `aufzeichnung_bild`; seit 3.77.0; fehlt: kein Knopf 3; mit Kennung und Startbild steht unter dem Text die Aufzeichnung (erst der Tipp lädt sie von youtube-nocookie, vorher keine Verbindung zu Google) mit einem zweiten Anmeldeknopf darunter |
+| `aufzeichnung_bild` | bild | – | `{"datei": "bestand/…" | "img/…", "alt": …, "dekorativ": true}`; nur wenn `schnellwahl` = `1`; true braucht `aufzeichnung_kennung`; seit 3.77.0; fehlt: gehört zu aufzeichnung_kennung — liegt im Seitenordner, nie ein Vorschaubild von YouTube |
 
 ```json
 {
@@ -296,7 +302,7 @@ Varianten: `standard` · seit 3.51.0, geändert 3.51.0 · höchstens 1-mal
 
 ### `anmeldung` — Anmeldung
 
-Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.72.0 · höchstens 1-mal
+Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.77.0 · höchstens 1-mal
 
 | Feld | Typ | Pflicht | Grenzen |
 |---|---|---|---|
@@ -309,6 +315,7 @@ Varianten: `karte`, `breit` · seit 3.51.0, geändert 3.72.0 · höchstens 1-mal
 | `danke` | zeile | ja | eine Zeile, ≤ 200 Zeichen |
 | `plaetze` | zahl | – | 1–10000; fehlt: unbegrenzt |
 | `newsletter` | janein | – | `true` / `false`; fehlt: kein Newsletter-Häkchen |
+| `einwilligung_hinweis` | janein | – | `true` / `false`; seit 3.77.0; fehlt: das Pflicht-Häkchen der Einwilligung wie bisher; mit true steht stattdessen ein Satz mit Link zur Datenschutzerklärung und das Formular schickt einwilligung=hinweis — das Panel nimmt das nur bei Listen mit Single-Opt-In an |
 | `freifeld` | janein | – | `true` / `false`; seit 3.72.0; fehlt: kein freies Feld; die Antwort steht nur in der Anmeldeliste des Betreibers, nie in Mails an andere |
 | `freifeld_frage` | zeile | – | eine Zeile, ≤ 100 Zeichen; seit 3.72.0; fehlt: „Worum geht es dir?“ (bei Anrede Sie: „Worum geht es Ihnen?“); gilt nur mit freifeld |
 

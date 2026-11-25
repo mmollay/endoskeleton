@@ -152,8 +152,9 @@ final class Schema
                     $this->fehler("$pfad.$name", "$pfad.$name: nicht zusammen mit $anderes", "$wo: „{$def['label']}“ und „{$felder[$anderes]['label']}“ gibt es nur entweder-oder — bitte eines davon entfernen.");
                 }
             }
-            // an_braucht (3.75.0): Ein Schalter, der nur mit anderen Feldern etwas tut — „true“ ohne sie ist sperrend, „false“ gilt immer.
-            if (($werte[$name] ?? null) === true && ($fehlt = array_filter($def['an_braucht'] ?? [], static fn ($n) => !array_key_exists($n, $werte))) !== []) {
+            // an_braucht (3.75.0): Ein Schalter, der nur mit anderen Feldern etwas tut — „true“ ohne sie ist sperrend, „false“ gilt immer. Seit 3.77.0 auch für
+            // Felder anderer Art: Steht das Feld, müssen die genannten auch stehen (Aufzeichnung nur mit Startbild, Kampagnen nur mit Vorgabe-Adresse).
+            if ((($werte[$name] ?? null) === true || $def['typ'] !== 'janein') && ($fehlt = array_filter($def['an_braucht'] ?? [], static fn ($n) => !array_key_exists($n, $werte))) !== []) {
                 $fehlt = array_values($fehlt);
                 $this->fehler("$pfad.$name", "$pfad.$name: an nur mit " . implode(', ', $fehlt),
                     "$wo: „{$def['label']}“ geht nur mit " . implode(' und ', array_map(static fn ($n) => "„{$felder[$n]['label']}“", $fehlt)) . ' — bitte zuerst ergänzen.');

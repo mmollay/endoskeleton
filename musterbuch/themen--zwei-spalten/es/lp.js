@@ -66,49 +66,22 @@
     }
   });
 
-  // Schnellwahl B (3.76.0): Der Zoom-Link steht nie im HTML. Vor dem Fenster (15 Minuten vor Beginn bis Ende des nächsten Termins) zeigt der Platz,
-  // wann der Vortrag ist; im Fenster fragt die Seite das Panel (Formularziel …/lp/anmelden → …/lp/zoom, ohne Cookies). Ob der Link kommt, entscheidet
-  // das Panel nach seiner Uhr; dieses Skript zeigt nur einen https-Link als Knopf und fragt sonst nach einer Minute wieder. Ohne Termin bleibt B verborgen.
-  document.querySelectorAll('[data-lp-zoom]').forEach(function (platz) {
-    try {
-      var form = document.querySelector('form.lp-formular'), liste = form && form.querySelector('input[name="liste"]');
-      var aktion = form && form.getAttribute('action'), quelle = aktion && new URL(aktion, location.href);
-      if (!liste || !quelle || !/\/anmelden$/.test(quelle.pathname) || !window.fetch) { return; }
-      quelle.pathname = quelle.pathname.replace(/anmelden$/, 'zoom'); quelle.search = '?liste=' + encodeURIComponent(liste.value); quelle.hash = '';
-      var wartet = platz.querySelector('.lp-schnellwahl-wartet'), uhr = null, VORLAUF = 15 * 60000;
-      var termine = Array.prototype.map.call(document.querySelectorAll('.lp-termin-eintrag[data-lp-ende]'), function (t) {
-        var zeit = t.querySelector('time[datetime]'), beginn = zeit ? Date.parse(zeit.getAttribute('datetime')) : NaN, ende = Date.parse(t.dataset.lpEnde);
-        return { beginn: beginn, ende: ende > beginn ? ende : beginn + 120 * 60000, text: zeit ? zeit.textContent.trim() : '' };
-      }).filter(function (t) { return !isNaN(t.beginn); }).sort(function (a, b) { return a.beginn - b.beginn; });
-      var knopfWeg = function () { var a = platz.querySelector('a'); if (a) { a.remove(); } };
-      var warten = function (text, ms) { knopfWeg(); wartet.textContent = text; wartet.hidden = false; uhr = setTimeout(zeigen, Math.min(ms, 2147483647)); };
-      var zeigen = function () {
-        clearTimeout(uhr);
-        var jetzt = Date.now(), t = termine.filter(function (x) { return x.ende > jetzt; })[0];
-        if (!t) { knopfWeg(); platz.hidden = true; return; }
-        platz.hidden = false;
-        if (jetzt < t.beginn - VORLAUF) {
-          warten('Nächster Vortrag: ' + t.text + ' — der Link erscheint hier 15 Minuten vorher.', t.beginn - VORLAUF - jetzt);
-          return;
-        }
-        fetch(quelle.href, { credentials: 'omit', cache: 'no-store' })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) {
-            if (!d || d.offen !== true || typeof d.link !== 'string' || !/^https:\/\//.test(d.link)) {
-              warten('Der Vortrag beginnt gleich — der Link erscheint hier in Kürze.', 60000);
-              return;
-            }
-            var a = platz.querySelector('a') || document.createElement('a');
-            a.className = 'btn btn-primary lp-knopf lp-schnellwahl-knopf'; a.href = d.link; a.rel = 'noopener noreferrer';
-            a.dataset.lpKnopf = 'zoom'; a.textContent = platz.dataset.lpZoomText;
-            wartet.hidden = true; wartet.textContent = ''; platz.insertBefore(a, wartet);
-            uhr = setTimeout(zeigen, Math.max(1000, t.ende - Date.now()));
-          })
-          .catch(function () { warten('Der Vortrag beginnt gleich — der Link erscheint hier in Kürze.', 60000); });
-      };
-      zeigen();
-    } catch (e) { /* B bleibt verborgen */ }
-  });
+  // Knopf 2 der Schnellwahl (3.77.0): Die Adresse der Erfolgsberichte je Kampagne — passt utm_campaign der Einstiegsadresse (klein geschrieben) zu einem
+  // Eintrag aus data-lp-ziele, nimmt der Knopf dessen Adresse, aber nur eine https-Adresse. Sonst bleibt die Vorgabe aus dem HTML. Gleiches Fenster.
+  // fbclid (3.77.0): Kommt der Besucher über eine Meta-Anzeige, trägt das versteckte Formularfeld die Klick-Kennung aus der Adresse (nur erlaubte Zeichen,
+  // höchstens 500) — das Panel meldet damit nach der Anmeldung ein Lead-Ereignis an Meta, ohne Adresse und Namen. Kein Cookie, kein Speicher.
+  try {
+    var einstieg = new URLSearchParams(location.search);
+    var kampagne = (einstieg.get('utm_campaign') || '').trim().toLowerCase();
+    document.querySelectorAll('a[data-lp-ziele]').forEach(function (a) {
+      var ziele = JSON.parse(a.dataset.lpZiele), ziel = kampagne && Object.prototype.hasOwnProperty.call(ziele, kampagne) ? ziele[kampagne] : '';
+      if (typeof ziel === 'string' && /^https:\/\//.test(ziel)) { a.href = ziel; }
+    });
+    var fbclid = einstieg.get('fbclid') || '';
+    if (/^[A-Za-z0-9_-]{1,500}$/.test(fbclid)) {
+      document.querySelectorAll('form.lp-formular input[name="fbclid"]').forEach(function (feld) { feld.value = fbclid; });
+    }
+  } catch (e) { /* Vorgabe bleibt */ }
 
   // Titel: Schriftstufe nach Textmenge (3.59.0). Die Schwellen setzt der Bau in data-lp-stufen (Kontext::TITEL_STUFEN, die einzige Liste), die Stufe
   // von Anfang an data-lp-groesse; hier läuft dieselbe Regel nur nach, wenn sich der Text ändert (Tippen im Bild, Escape). Gezählt wird in Zeichen
@@ -336,7 +309,7 @@
         form.addEventListener(name, function (ereignis) { if (!selbstFokus && ereignis.target.closest && !ereignis.target.closest('.form-hp')) { melden('formular'); } });
       });
       form.addEventListener('submit', function (ereignis) { if (!ereignis.defaultPrevented) { melden('absenden'); } });
-      // Schnellwahl (3.76.0): Klick auf einen der drei Knöpfe oben — einmal je Knopf und Seitenaufruf, nur sein Name (anmelden|zoom|bericht).
+      // Schnellwahl (3.76.0): Klick auf einen der drei Knöpfe oben — einmal je Knopf und Seitenaufruf, nur sein Name (seit 3.77.0 anmelden|bericht|aufzeichnung).
       var geklickt = {};
       document.addEventListener('click', function (ereignis) {
         var knopf = ereignis.target.closest && ereignis.target.closest('[data-lp-knopf]'), name = knopf && knopf.dataset.lpKnopf;

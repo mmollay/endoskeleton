@@ -1,4 +1,4 @@
-/* SSI Endoskeleton 3.76.0 — Landingpage: base.css + Profil + lp.css */
+/* SSI Endoskeleton 3.77.0 — Landingpage: base.css + Profil + lp.css */
 /* ═══════════════════════════════════════════════════════════════════════════
    SSI WebGenerator Endoskeleton — base.css v3.12.0
    Core layout, grid, typography, responsive foundation.
@@ -3223,17 +3223,16 @@ html[data-lp-banner="offen"] .lp-seite {
   margin-top: var(--space-sm);
 }
 
-/* Drei Knöpfe oben (3.76.0, schnellwahl): direkt unter der Überschrift untereinander, am Handy über die volle Breite, ab 40 rem so breit wie der
-   längste Text (fit-content: nie breiter als der Platz in der Spalte). Jeder Knopf ist mindestens 2,75 rem (44 px) hoch und bricht lange Texte um, statt die Seite zu verbreitern. Der Wartetext von B
-   steht im gleichen Maß in einem gestrichelten Kästchen — kein Knopf, nur der Hinweis, wann der Link erscheint. */
+/* Drei Knöpfe oben (3.76.0, schnellwahl; 3.77.0 ohne Zoom-Platz, mit Aufzeichnung): direkt unter der Überschrift untereinander, am Handy über die volle
+   Breite, ab 40 rem gleich breit wie der längste Text (fit-content: nie breiter als der Platz in der Spalte). Jeder Knopf ist mindestens 2,75 rem (44 px)
+   hoch und bricht lange Texte um, statt die Seite zu verbreitern. Die Aufzeichnung steht unter dem Text des Kopfbereichs, ihr Anmeldeknopf darunter. */
 .lp-schnellwahl {
   display: grid;
   gap: var(--space-sm);
   margin-top: var(--space-md);
 }
 
-.lp-hero-text .lp-schnellwahl-knopf,
-.lp-schnellwahl-wartet {
+.lp-hero-text .lp-schnellwahl-knopf {
   margin: 0;
   width: 100%;
   min-height: 2.75rem;
@@ -3244,33 +3243,44 @@ html[data-lp-banner="offen"] .lp-seite {
   text-align: center;
 }
 
-.lp-schnellwahl-zoom {
-  display: grid;
-}
-
-.lp-schnellwahl-zoom[hidden],
-.lp-schnellwahl-wartet[hidden] {
-  display: none;
-}
-
-.lp-schnellwahl-wartet {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xs) var(--space-md);
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card-bg);
-  color: var(--text);
-  font-size: var(--fs-sm);
-  text-align: center;
-}
-
 @media (min-width: 40rem) {
   .lp-schnellwahl {
     width: fit-content;
     max-width: 100%;
   }
+}
+
+.lp-aufzeichnung {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  min-width: 0;
+  scroll-margin-top: var(--space-md);
+}
+
+.lp-aufzeichnung-titel {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Der Link „auf YouTube ansehen“ bricht nicht um: ein umbrochener Link hätte keinen Mittelpunkt auf sich selbst (Fokus „verdeckt“ im Tastatur-Rundgang). */
+.lp-aufzeichnung .lp-video-link a {
+  white-space: nowrap;
+}
+
+.lp-hero-text .lp-aufzeichnung .lp-knopf {
+  margin: 0;
+  min-height: 2.75rem;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Hinweis statt Pflicht-Häkchen (3.77.0, einwilligung_hinweis): ein ruhiger Satz an der Stelle des Häkchens, gleiche Schrift wie dessen Beschriftung. */
+.lp-einwilligung-hinweis {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--fs-sm);
+  color: var(--text);
 }
 
 .lp-hero-bild {

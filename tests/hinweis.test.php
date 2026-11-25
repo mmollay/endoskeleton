@@ -63,7 +63,7 @@ return [
         T::eq([$a['felder']['freifeld']['typ'] ?? null, $a['felder']['freifeld']['seit'] ?? null], ['janein', '3.72.0'], 'freifeld: ja/nein seit 3.72.0');
         T::eq([$a['felder']['freifeld_frage']['typ'] ?? null, $a['felder']['freifeld_frage']['max'] ?? null, $a['felder']['freifeld_frage']['seit'] ?? null],
             ['zeile', 100, '3.72.0'], 'freifeld_frage: Zeile bis 100 seit 3.72.0');
-        T::eq([$a['seit'], $a['geaendert'], $k->baustein('themen')['geaendert']], ['3.51.0', '3.72.0', '3.72.0'], 'anmeldung und themen geändert 3.72.0');
+        T::eq([$a['seit'], $a['geaendert'], $k->baustein('themen')['geaendert']], ['3.51.0', '3.77.0', '3.72.0'], 'anmeldung geändert 3.77.0 (Hinweis statt Häkchen), themen 3.72.0');
         foreach (['lp-hinweis', 'lp-hinweis--standard', 'lp-hinweis-kasten', 'lp-hinweis-kennzeichnung', 'lp-hinweis-text'] as $klasse) {
             T::eq($h['klassen'][$klasse] ?? null, '3.72.0', "Klasse $klasse seit 3.72.0");
         }

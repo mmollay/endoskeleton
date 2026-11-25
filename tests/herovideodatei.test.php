@@ -84,7 +84,7 @@ return [
         T::eq($f['seit'] ?? null, '3.62.0', 'seit 3.62.0');
         T::ok(!($f['pflicht'] ?? false) && !isset($f['pflicht_bei']), 'freiwillig');
         T::ok(!isset($hero['beispiel']['video_datei']), 'das Katalog-Beispiel bleibt ohne Video');
-        T::eq($hero['geaendert'], '3.76.0', 'Kopfbereich geändert 3.76.0 (drei Knöpfe oben)');
+        T::eq($hero['geaendert'], '3.77.0', 'Kopfbereich geändert 3.77.0 (drei Knöpfe, zweite Fassung)');
         $video = $k->baustein('video');
         T::eq($video['geaendert'], '3.62.0', 'Baustein video geändert 3.62.0');
         T::eq($video['felder']['anbieter']['werte'] ?? null, ['youtube', 'datei'], 'Anbieter youtube und datei');

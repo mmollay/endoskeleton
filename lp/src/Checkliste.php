@@ -218,7 +218,10 @@ final class Checkliste
             $einwilligung = $x->query('.//input[@name="einwilligung"]', $form)->item(0);
             if (!$einwilligung instanceof \DOMElement) {
                 $this->mangel('formular', $pfad, "$datei: Pflicht-Einwilligung (name=\"einwilligung\") fehlt", "$wo: Im Formular fehlt das Häkchen für die Einwilligung.");
-            } elseif (strtolower($einwilligung->getAttribute('type')) !== 'checkbox') {
+            } elseif (strtolower($einwilligung->getAttribute('type')) !== 'checkbox'
+                && !($einwilligung->getAttribute('type') === 'hidden' && $einwilligung->getAttribute('value') === 'hinweis'
+                    && $x->query('.//p[' . sprintf(self::KLASSE, 'lp-einwilligung-hinweis') . ']/a[@href="datenschutz.html"]', $form)->length === 1)) {
+                // Ausnahme (3.77.0): der Hinweis statt des Pflicht-Häkchens (einwilligung=hinweis mit Hinweis und Link im Formular)
                 $this->mangel('formular', $pfad, "$datei: Einwilligung ist kein Häkchen (type=\"" . $einwilligung->getAttribute('type') . '")',
                     "$wo: Die Einwilligung muss ein Häkchen sein, das man selbst setzt.");
             }
