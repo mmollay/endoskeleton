@@ -4,6 +4,110 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.0.0/)
 
 ---
 
+## [3.19.7] — 2026-04-04
+
+### Fixed
+- **demo.html** — FOUC (Flash of Unstyled Content) behoben: Blocking-Script im `<head>` parsed Hash und setzt CSS-URLs per `document.write` VOR dem ersten Render. Kein weißer Flash mehr bei URL mit Hash-Parametern.
+
+---
+
+## [3.19.6] — 2026-04-04
+
+### Added
+- **after-fix-v2.png** — Screenshot-Dokumentation nach Logo-Fix
+
+---
+
+## [3.19.5] — 2026-04-04
+
+### Fixed
+- **base.css** — Logo-Overlay in Navigation behoben: `flex-shrink: 0`, `white-space: nowrap` und `gap` auf `.nav-inner` verhindern, dass Logo und Menü-Items sich überlagern
+
+---
+
+## [3.19.4] — 2026-04-04
+
+### Fixed
+- **demo.html / shared.js** — Release-Bump v3.19.4
+
+---
+
+## [3.19.3] — 2026-04-04
+
+### Fixed
+- **demo.html** — Release-Bump nach IIFE-Scope-Fix und Tab/Quick-Preset-Korrekturen
+
+---
+
+## [3.19.2] — 2026-04-04
+
+### Fixed
+- **demo.html** — `switchSidebarTab`, `applyPreset`, `exportConfig` als `window.*` exponiert, da sie innerhalb einer IIFE definiert waren und durch `onclick`-Attribute im HTML nicht erreichbar waren (ReferenceError)
+
+---
+
+## [3.19.1] — 2026-04-04
+
+### Changed
+- **VERSION** — Patch-Release nach v3.19.0 (Config-Export, 4-Tab-Sidebar)
+
+---
+
+## [3.19.0] — 2026-04-04
+
+### Changed
+- **demo.html** — Sidebar in 4 Tabs gegliedert: Presets / Struktur / Stil / Details
+- Struktur-Tab: Layout, Hero, Max-Breite, Menü-Layout
+- Stil-Tab: Farbe, Charakter, Schrift, Buttons, Dichte, Animation
+- Details-Tab: Nav-Verhalten, Nav-Stil, Footer, Theme, Sprache, Config-Export
+- **Config Export** — Auto-Copy in Zwischenablage mit Toast-Feedback „✓ Kopiert"
+
+---
+
+## [3.18.0] — 2026-04-04
+
+### Added
+- **demo.html** — 6 Quick-Presets in der Sidebar: Corporate, Kreativ, Minimal, Tech, Natur, Neon
+- Jeder Preset setzt alle Parameter gleichzeitig (Layout, Hero, Farbe, Charakter, Font, Buttons,
+  Nav-Stil/Verhalten/Layout, Footer, Spacing, Animation, Breite, Theme)
+- UI-Controls (Selects + Buttons) werden bei Preset-Wahl synchron aktualisiert
+- Aktiver Preset wird visuell hervorgehoben (goldener Rahmen)
+
+---
+
+## [3.17.1] — 2026-04-04
+
+### Fixed
+- **VERSION** — Datei zeigte noch 3.16.0 statt 3.17.0 (nicht beim letzten Release mitgekommen)
+
+---
+
+## [3.17.0] — 2026-04-04
+
+### Changed
+- **demo.html** — Sidebar wechselt von Overlay auf Push-Modus: Content und fixe Nav werden
+  seitlich verschoben statt überlagert (`margin-right` auf `body`, `right` auf `.site-nav`)
+- **demo.html** — Tab-Button zeigt jetzt Pfeil-Symbol `›` mit Rotation-Animation statt statischem "Demo"-Text
+
+---
+
+## [3.16.0] — 2026-04-04
+
+### Fixed
+- **demo.html** — alle internen IDs und Funktionen von `softness-*` auf `charakter-*` umbenannt
+  (Link-ID, Select-ID, JS-Funktion, Event-Listener, URL-State-Key, Kombinations-Counter)
+- **Config-Export** — Schlüssel war `softness`, jetzt korrekt `charakter` (konsistent mit config.json)
+- **URL-State** — Fallback-Wert war `'balanced'` (legacy, existiert nicht mehr), jetzt `'neutral'`
+- **Versionsangaben** — demo.html Title, Sidebar-Label, alle CSS-Cache-Buster auf v3.16.0
+- **shared.js** — Version-Kommentar auf v3.16.0
+
+### Removed
+- **softness/balanced.css** — Legacy-Datei, ersetzt durch `neutral.css`
+- **softness/raw.css** — Legacy-Datei, ersetzt durch `kantig.css`
+- **softness/soft.css** — Legacy-Datei, ersetzt durch `sanft.css`
+
+---
+
 ## [3.15.0] — 2026-04-04
 
 ### Changed
